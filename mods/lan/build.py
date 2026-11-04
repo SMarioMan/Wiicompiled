@@ -118,7 +118,8 @@ def build(args):
     imports = output / 'imports.json'
     imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0',
                                    'MKWHasLicense': '0x8053F7D4', 'MKWSaveManager': '0x809B8F88',
-                                   'MKWDebugReport': '0x801A2530'}, indent=2) + '\n')
+                                   'MKWDebugReport': '0x801A2530',
+                                   'MKWRaceInfo': '0x809B8F70', 'MKWRaceData': '0x809B8F68'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
                     str(ROOT / 'projects/mkwii-ntsc-u/recomp.yml'), '--module', str(elf),

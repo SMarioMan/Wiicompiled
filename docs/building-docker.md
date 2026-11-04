@@ -5,8 +5,9 @@ workflows were tested using the USA RMCE01 RVZ. The Linux release reached
 CPU-driven VS initialization after being moved, using the null graphics backend.
 The Windows x64 target cross-compiles successfully inside Linux Docker.
 Rendering and Windows gameplay remain untested. The experimental
-[LAN port](../mods/lan/README.md) has joined two local instances in one room;
-LAN races, original guest-layout relocation and 24-player support remain unfinished.
+[LAN port](../mods/lan/README.md) has joined two local instances and verified
+advancing online VS race simulations. LAN race completion, original guest-layout
+relocation and 24-player support remain unfinished.
 
 ## Linux x64
 

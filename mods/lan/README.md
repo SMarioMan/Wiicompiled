@@ -3,8 +3,8 @@
 This directory contains the LAN v0.9 module adapted for native translation,
 including the supplied `build_lan.py` script's per-instance loopback networking,
 boot/menu hooks, fake PIDs and client joining. It is under development;
-**two-instance room joining is verified; races remain unverified and 24-player
-support is not implemented**.
+**two-instance room joining and online VS race progression are verified on
+Linux; 24-player support is not implemented**.
 
 The original archive is `https://www.chadsoft.co.uk/downloads/LAN_MKW_v0.9.zip`,
 SHA-256 `2a8d76844e79b23b147ea97f134386d313401e0535c2f52da9ab41822369095e`.
@@ -92,12 +92,15 @@ to `"../DATA"`. Never share a writable NAND between instances.
 
 Launch `WiiCompiledLAN` normally, or use `WiiCompiledLAN --headless` to hide the
 window and silence audio during automated testing. A working graphics/display
-backend is still needed. Linux host and client native builds have succeeded;
+backend is still needed. Linux host/client native builds and a Windows x64
+client cross-build inside Linux Docker have succeeded;
 startup reads the supplied boot arguments. Testing has reached
 two instances joining one room on one Linux machine with separate portable
 NANDs. Host state 3 and client state 4 each reported two players. This was
-observed using Xvfb and the null renderer; rendered races, race completion and
-Windows LAN gameplay have not been verified.
+observed using Xvfb and the null renderer. The automated race test also completed
+character/kart/drift selection and voting, reached the friend VS race on Luigi
+Circuit (course 8, mode 7), and observed stage 2 with advancing frames on both
+peers. Rendered races, race completion and Windows LAN gameplay remain unverified.
 
 
 ## Profiles and local integration test
@@ -119,7 +122,20 @@ Run both processes in the same network namespace. The test checks unique source
 addresses, host/client states, two players on both peers and five seconds in the
 active room. It exits nonzero on process exit, timeout or address mismatch,
 writes `lan-test-game.log` in each product, and terminates both processes on exit.
-This verifies room joining, not a completed race.
+This default check verifies room joining. Add `--race` to drive the host's Start
+button, character/kart/drift selection and course voting through controller input:
+
+```sh
+python3 mods/lan/tests/local_pair.py --race \
+  --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
+```
+
+The race check additionally requires both games' in-race scenarios to contain
+two players on the same course, reach racing stage 2, and advance at least 120
+simulation frames each over five seconds. It uses separate `MKWR` telemetry
+packets; the original `MKWL` room-status packet stays compatible. This test passed
+with both cleaned native Linux builds. It does not verify finishing a race,
+rendering, item synchronization or battle modes.
 
 For controller-driven integration tests, `WIICOMPILED_TEST_PAD_FILE` opts into a
 regular input file, replaced atomically by the test driver. Bytes 0–1 hold a

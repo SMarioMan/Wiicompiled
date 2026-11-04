@@ -171,6 +171,11 @@ static void update_game_state(struct dwc_gamedata *gamedata) {
 	}
 }
 
+/* USA globals verified against the pinned game's CreateInstance routines.
+ * Separate telemetry keeps the original room-status packet compatible. */
+extern const uint8_t *MKWRaceInfo;
+extern const uint8_t *MKWRaceData;
+
 static bool compute_and_broadcast_status(so_fd_t fd) {
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
 	if (gamedata == NULL)
@@ -223,6 +228,17 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
     so_addr_t monitor = baddr;
     monitor.sa_addr = 0x7f0000fe;
     SOSendTo(fd, status, sizeof(status), 0, &monitor);
+    if (status[4] >= 0x70 && status[4] <= 0x77 && MKWRaceInfo && MKWRaceData) {
+        const uint32_t race_status[7] = {
+            0x4d4b5752, MKW_INSTANCE_ID,
+            *(const uint32_t *)(MKWRaceInfo + 0x28), /* RaceStage */
+            *(const uint32_t *)(MKWRaceInfo + 0x20), /* simulation frame */
+            *(const uint32_t *)(MKWRaceData + 0xB68), /* race course */
+            MKWRaceData[0x24], /* in-race scenario player count */
+            *(const uint32_t *)(MKWRaceData + 0xB70) /* game mode */
+        };
+        SOSendTo(fd, race_status, sizeof(race_status), 0, &monitor);
+    }
 	return true;
 }
 

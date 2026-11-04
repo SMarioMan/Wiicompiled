@@ -14,7 +14,7 @@ enum class Kind {
 struct Descriptor {
     Kind kind;
     std::string_view displayName;
-    uint32_t lanInstance = 0;
+    uint32_t lanConfigAddress = 0;
 };
 
 // Each public executable links exactly one small provider definition. Keeping

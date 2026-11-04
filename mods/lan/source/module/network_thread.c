@@ -206,11 +206,20 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 		.sa_addr = 0xffffffff
 	};
 	/* One unicast per local instance; no wildcard port or broadcast sharing. */
-    for (unsigned i = 1; i <= MKW_INSTANCE_COUNT; i++) {
-        if (i == MKW_INSTANCE_ID) continue;
-        so_addr_t destination = baddr;
-        destination.sa_addr = 0x7f000000 | i;
-        SOSendTo(fd, &packet, sizeof(packet), 0, &destination);
+    if (mkw_lan_config.peer_count) {
+        for (unsigned i = 0; i < mkw_lan_config.peer_count; i++) {
+            so_addr_t destination = baddr;
+            destination.sa_addr = mkw_lan_config.peers[i];
+            if (destination.sa_addr != local_ip)
+                SOSendTo(fd, &packet, sizeof(packet), 0, &destination);
+        }
+    } else {
+        for (unsigned i = 1; i <= MKW_INSTANCE_COUNT; i++) {
+            if ((0x7f000000 | i) == local_ip) continue;
+            so_addr_t destination = baddr;
+            destination.sa_addr = 0x7f000000 | i;
+            SOSendTo(fd, &packet, sizeof(packet), 0, &destination);
+        }
     }
     /* Optional launcher status channel; gameplay does not depend on a listener. */
     uint32_t status[7] = { 0x4d4b574c, MKW_INSTANCE_ID, (uint32_t)game_state,
@@ -371,12 +380,26 @@ void* network_thread_main(void *arg) {
 		return NULL;
 	}
 	LOG_INFO("network_thread initialised");
-    /* Auto-join must not start until the host occupies friend slot zero. */
-    if (MKW_INSTANCE_ID != 1) {
-        for (unsigned i = 0; i < 600 && tracked_peers[0].info.status == 0; i++) {
+    /* Automation joins the first advertising host, independent of instance ID.
+       Manual login does not wait for a host; users can create their own room. */
+    if (MKW_AUTOMATION == 2) {
+        for (unsigned frame = 0; frame < 600; frame++) {
+            bool found = false;
             timestamp++;
-            if (i % 60 == 0) compute_and_broadcast_status(broadcast_socket);
+            if (frame % 60 == 0) compute_and_broadcast_status(broadcast_socket);
             check_for_status_or_broadcast();
+            for (unsigned peer = 0; peer < BROADCAST_TRACK_MAX; peer++) {
+                if (tracked_peers[peer].info.status == 4) {
+                    if (peer) {
+                        struct tracked_peer temporary = tracked_peers[0];
+                        tracked_peers[0] = tracked_peers[peer];
+                        tracked_peers[peer] = temporary;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if (found) break;
             VIWaitForRetrace();
         }
     }

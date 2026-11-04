@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:8.0.408-noble AS builder
+ARG PRODUCT=base
+ENV WIICOMPILED_PRODUCT=$PRODUCT
 ENV DEBIAN_FRONTEND=noninteractive DOTNET_CLI_TELEMETRY_OPTOUT=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git g++ binutils unzip xz-utils python3 \

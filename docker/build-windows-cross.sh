@@ -9,6 +9,11 @@ output=$(realpath "$2")
 jobs=${3:-4}
 [[ "$jobs" =~ ^[1-9][0-9]*$ ]] || { echo 'JOBS must be a positive integer.' >&2; exit 2; }
 [[ -z $(ls -A "$output") ]] || { echo 'Output directory must be empty.' >&2; exit 2; }
+case "${WIICOMPILED_PRODUCT:-base}" in
+    base) ;;
+    lan) exec bash /opt/wiicompiled/docker/build-lan-release.sh "$1" "$2" windows "$jobs" ;;
+    *) echo 'WIICOMPILED_PRODUCT must be base or lan.' >&2; exit 2 ;;
+esac
 source /opt/wiicompiled/docker/build-workspace.sh
 prepare_build_workspace
 ensure_nodtool

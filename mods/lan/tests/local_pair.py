@@ -5,6 +5,7 @@ Run inside one host/network namespace with a working SDL display backend.
 A license in slot zero must already exist in each product's private NAND.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -22,6 +23,19 @@ def write_pad(path, buttons=0, x=0, y=0):
 
 def run(args):
     directories = [args.host.resolve(), args.client.resolve()]
+    ids = [args.host_id, args.client_id]
+    if ids[0] == ids[1]:
+        raise ValueError('Local instances require different runtime IDs')
+    binary = 'WiiCompiledLAN.exe' if os.name == 'nt' else 'WiiCompiledLAN'
+    hashes = []
+    for directory in directories:
+        digest = hashlib.sha256()
+        with (directory / binary).open('rb') as executable:
+            for chunk in iter(lambda: executable.read(256*1024), b''):
+                digest.update(chunk)
+        hashes.append(digest.digest())
+    if hashes[0] != hashes[1]:
+        raise ValueError('Use the same unified LAN executable in both portable directories')
     if directories[0] == directories[1]:
         raise ValueError('Host and client require different portable directories')
     processes, logs, pads = [], [], []
@@ -35,7 +49,7 @@ def run(args):
         monitor.bind(('127.0.0.254', 27900))
         monitor.settimeout(0.2)
         try:
-            for directory in directories:
+            for directory, instance, role in zip(directories, ids, ("--lan-host", "--lan-join")):
                 executable = directory / ('WiiCompiledLAN.exe' if os.name == 'nt' else 'WiiCompiledLAN')
                 if not executable.is_file() or not (directory / 'portable.txt').is_file():
                     raise ValueError(f'Expected a portable LAN product in {directory}')
@@ -45,24 +59,24 @@ def run(args):
                 log = (directory / 'lan-test-game.log').open('w')
                 logs.append(log)
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
-                processes.append(subprocess.Popen([str(executable), '--headless'], cwd=directory,
+                processes.append(subprocess.Popen([str(executable), '--headless', f'--lan-id={instance}', '--lan-peers=12', role], cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
             while time.monotonic() - started < args.timeout:
-                for instance, process in enumerate(processes, 1):
+                for instance, process in zip(ids, processes):
                     if process.poll() is not None:
                         raise RuntimeError(f'Instance {instance} exited with {process.returncode}')
                 now = time.monotonic()
                 if args.race and room_confirmed is not None:
                     elapsed = now - room_confirmed
-                    for instance, pad in enumerate(pads, 1):
+                    for instance, pad in zip(ids, pads):
                         page = status.get(instance, ({}, 0))[0].get('page')
                         buttons, x = 0, 0
                         if elapsed < 3:
                             # Start is left of the initially selected Message button.
-                            x = -80 if instance == 1 and elapsed < 1.2 else 0
+                            x = -80 if instance == args.host_id and elapsed < 1.2 else 0
                         elif page == 0x42:
                             buttons = 0x100  # accelerate after countdown
-                        elif not (instance == 2 and page == 0x9d):
+                        elif not (instance == args.client_id and page == 0x9d):
                             buttons = 0x100 if elapsed % 3 < 0.35 else 0
                         controls = buttons, x
                         if last_input.get(instance) != controls:
@@ -75,7 +89,7 @@ def run(args):
                 if len(packet) != 28:
                     continue
                 magic, instance, state, players, section, page, transition = struct.unpack('>7I', packet)
-                if magic not in (0x4d4b574c, 0x4d4b5752) or instance not in (1, 2):
+                if magic not in (0x4d4b574c, 0x4d4b5752) or instance not in ids:
                     continue
                 if peer[0] != f'127.0.0.{instance}':
                     raise RuntimeError(f'Instance {instance} used unexpected source address {peer}')
@@ -86,13 +100,13 @@ def run(args):
                     race[instance] = record, now
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, race=record)), flush=True)
                     running = all(i in race and now-race[i][1] < 3 and
-                        race[i][0]['stage'] == 2 and race[i][0]['players'] == 2 for i in (1, 2))
-                    if running and race[1][0]['course'] == race[2][0]['course']:
+                        race[i][0]['stage'] == 2 and race[i][0]['players'] == 2 for i in ids)
+                    if running and race[ids[0]][0]['course'] == race[ids[1]][0]['course']:
                         if race_since is None:
                             race_since = now
-                            race_start_frames = {i: race[i][0]['frames'] for i in (1, 2)}
+                            race_start_frames = {i: race[i][0]['frames'] for i in ids}
                         if room_confirmed is not None and now-race_since >= 5 and all(
-                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in (1, 2)):
+                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids):
                             print(json.dumps(dict(result='passed', check='both peers advancing in the same two-player race')), flush=True)
                             return 0
                     else:
@@ -104,9 +118,9 @@ def run(args):
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, **record)), flush=True)
                 status[instance] = record, now
                 joined = all(i in status and now-status[i][1] < 3 and
-                    status[i][0]['state'] == (3 if i == 1 else 4) and
+                    status[i][0]['state'] == (3 if i == args.host_id else 4) and
                     status[i][0]['players'] == 2 and status[i][0]['page'] == 0x9d and
-                    status[i][0]['transition'] == 4 for i in (1, 2))
+                    status[i][0]['transition'] == 4 for i in ids)
                 ready_since = (ready_since or now) if joined else None
                 if ready_since and now-ready_since >= 5:
                     if room_confirmed is None:
@@ -137,6 +151,8 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=Path, required=True)
     parser.add_argument('--client', type=Path, required=True)
     parser.add_argument('--timeout', type=float, default=180)
+    parser.add_argument('--host-id', type=int, choices=range(1, 13), default=1)
+    parser.add_argument('--client-id', type=int, choices=range(1, 13), default=2)
     parser.add_argument('--race', action='store_true', help='Also navigate menus and require both race simulations to advance')
     options = parser.parse_args()
     try:

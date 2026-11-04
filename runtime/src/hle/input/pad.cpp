@@ -1,3 +1,4 @@
+#include "lan_runtime.h"
 #include "hle_stubs.h"
 #include "memory.h"
 #include "hle/controller_status_contract.h"
@@ -82,6 +83,7 @@ void ApplyLanMenuInput(PADStatus& pad, uint32_t& rumbleMask) {
     static unsigned pulse = 0;
     static bool startupDone = false;
     static uint32_t lastPage = UINT32_MAX;
+    const auto& options = LanRuntime::Settings();
     if (startupDone) return;
     try {
         const auto manager = Memory::Read32(0x809BD508u); // USA boot/menu layout
@@ -90,19 +92,24 @@ void ApplyLanMenuInput(PADStatus& pad, uint32_t& rumbleMask) {
         const auto page = count > 0 && count <= 11 ? Memory::Read32(section + 0x354u + (count - 1) * 4) : 0;
         const auto id = page ? Memory::Read32(page + 4) : 0;
         if (id != lastPage) {
-            RT_LOG(RT_TAG_MOD) << "LAN instance " << product.lanInstance << " menu page 0x"
+            RT_LOG(RT_TAG_MOD) << "LAN instance " << options.instance << " menu page 0x"
                 << std::hex << id << " in section 0x" << (section ? Memory::Read32(section) : 0)
                 << std::dec << std::endl;
             lastPage = id;
         }
-        if (id == 0x9D) startupDone = true;
+        if (options.automation == LanRuntime::Automation::Manual) return;
+        if (id == 0x9D) {
+            // Host/join is a startup convenience, not a permanent lobby role.
+            LanRuntime::FinishAutomation();
+            startupDone = true;
+        }
         const bool select = page && Memory::Read32(page + 8) == 4 &&
             (id == 0x85 || id == 0x86 ||
              (id == 0x4E && (Memory::Read32(section) == 0x55 || Memory::Read32(section) == 0x84)) ||
              (id == 0x51 && Memory::Read32(manager + 0x38) == 0x124 &&
                 Memory::Read32(manager + 0x3C) == 0x124) ||
-             (product.lanInstance == 1 && id == 0x8D) ||
-             (product.lanInstance != 1 && (id == 0x96 || id == 0x97)));
+             (options.automation == LanRuntime::Automation::Host && id == 0x8D) ||
+             (options.automation == LanRuntime::Automation::Join && (id == 0x96 || id == 0x97)));
         if (select) {
             const unsigned phase = pulse++ % 120;
             if (id == 0x86) {

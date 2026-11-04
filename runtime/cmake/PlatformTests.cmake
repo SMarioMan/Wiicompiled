@@ -218,3 +218,8 @@ add_executable(mkw_test_pad_input_tests "${MKW_TEST_RUNTIME_DIR}/tests/test_pad_
 target_include_directories(mkw_test_pad_input_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
 target_compile_features(mkw_test_pad_input_tests PRIVATE cxx_std_17)
 add_test(NAME mkw_test_pad_input_tests COMMAND mkw_test_pad_input_tests)
+
+add_executable(mkw_lan_options_tests "${MKW_TEST_RUNTIME_DIR}/tests/lan_options_tests.cpp")
+target_include_directories(mkw_lan_options_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
+target_compile_features(mkw_lan_options_tests PRIVATE cxx_std_20)
+add_test(NAME mkw_lan_options_tests COMMAND mkw_lan_options_tests)

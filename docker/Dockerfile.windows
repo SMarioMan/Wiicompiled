@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 ARG LINUX_BUILDER=wiicompiled-linux-toolchain
 FROM ${LINUX_BUILDER} AS builder
+ARG PRODUCT=base
+ENV WIICOMPILED_PRODUCT=$PRODUCT
 COPY . .
 RUN --mount=type=tmpfs,target=/tmp \
     --mount=type=cache,target=/opt/cross-downloads \

@@ -12,25 +12,28 @@ Original module/SDK notices are retained; see [COPYING](source/COPYING).
 The attachment SHA-256 is recorded in `PROVENANCE.json`. Game files are not
 included. The current boot/menu patch addresses require the verified USA game.
 
-Build the translator and use the repository's pinned portable LLVM toolchain:
+Build the translator and one unified module with the pinned portable toolchain:
 
 ```sh
 dotnet build translator/Translator.sln -c Release
 python3 mods/lan/build.py \
-  --toolchain Launcher/artifacts/portable-tools/toolchain-x86_64 \
-  --instance 1 --instances 2 --out build/lan-host
-python3 mods/lan/build.py \
-  --toolchain Launcher/artifacts/portable-tools/toolchain-x86_64 \
-  --instance 2 --instances 2 --out build/lan-client
+  --toolchain Launcher/artifacts/portable-tools/toolchain-x86_64 --out build/lan
 ```
 
-The compiler runs on Linux and emits freestanding PowerPC ELF; a guest compiler
-is needed only at build time. These commands produce `Code.pul`, ELF, static
-patch JSON and source/compiler/link provenance, not standalone executables.
-Use different IDs for every process: ID 1 hosts, other IDs join. Each instance
-binds `127.0.0.ID:27900` for discovery and `127.0.0.ID:27901` for game traffic.
-The optional status monitor receives packets at `127.0.0.254:27900`.
-Current IDs/counts are limited to the original game's twelve-player layout.
+The freestanding PowerPC module is linked once. It contains a versioned runtime
+configuration record; its ELF symbol generates `lan_runtime_config.h`. Native
+startup fills that data record after copying the module image, before guest
+hooks run. Runtime configuration changes data, never PowerPC instructions.
+There are no compiled host/client roles or instance IDs. Current capacity is
+twelve players; 24-player layouts remain unfinished.
+
+Default startup preserves the normal menus. Any instance can create a room or
+choose a room from the friend roster. Optional `--lan-host` and `--lan-join`
+automate the initial connection; they stop imposing a role after the first room.
+`--lan-id=N` selects a distinct local socket identity. On separate machines,
+`--lan-bind=IP` and repeatable `--lan-peer=IP` select real LAN endpoints. PIDs derive
+from the bound address, independently of lobby role. See the
+[Docker build/run examples](../../docs/building-docker.md#optional-lan-product).
 
 Unlike the original BrainSlug loader, WiiCompiled cannot execute a new native
 instruction merely because guest code writes PowerPC bytes. The module's startup
@@ -44,16 +47,18 @@ PADRead is owned by WiiCompiled's native input implementation. The port must
 supply menu automation there rather than replace it with the original hardware
 routine. The experimental native LAN product provides that integration.
 
+For complete disc-to-release container builds, use the
+[Docker LAN recipes](../../docs/building-docker.md#optional-lan-product).
+The steps below describe the underlying development workflow.
+
 ## Experimental native product
 
-After producing both profiles' `Code.pul` files, translate the base with the USA
-project so it records both patch sets. Then emit the selected mod and shard graph:
+After producing `build/lan/Code.pul`, translate the base with the USA
+project so it records the patch set. Then emit the selected mod and shard graph:
 
 ```sh
 cli=translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll
 project=projects/mkwii-ntsc-u/recomp.yml
-role=host                         # client for the second executable
-instance=1                        # 2 for the second executable
 dotnet "$cli" translate-recursive 0x800060A4 --project "$project" \
   --outdir generated/functions --output-metadata generated/base_translation_output.json \
   --production-source-bundle generated/base_translation_sources.bin \
@@ -61,7 +66,7 @@ dotnet "$cli" translate-recursive 0x800060A4 --project "$project" \
 dotnet "$cli" emit-base-manifest --project "$project" --out build/base \
   --functions-dir generated/functions \
   --translation-output-metadata generated/base_translation_output.json --region E
-dotnet "$cli" translate-mod --project "$project" --profile "lan-$role" \
+dotnet "$cli" translate-mod --project "$project" --profile lan \
   --base-manifest build/base/mkwii_base_manifest.json \
   --base-translation-output-metadata generated/base_translation_output.json \
   --mod-name 'WiiCompiled LAN' --emit-cpp --threads 4
@@ -69,12 +74,12 @@ dotnet "$cli" generate-data-init --project "$project"
 dotnet "$cli" emit-build-shards --project "$project" \
   --base-metadata generated/base_translation_output.json \
   --base-functions-dir generated/functions --native-source-dir runtime/src \
-  --resolved-profile "build/mods/lan-$role/resolved_dispatch_profile.json" \
-  --retro-cpp-dir "build/mods/lan-$role/cpp" --out generated/build_shards
+  --resolved-profile "build/mods/lan/resolved_dispatch_profile.json" \
+  --retro-cpp-dir "build/mods/lan/cpp" --out generated/build_shards
 cmake -S runtime -B native-build -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER="$TOOLCHAIN/bin/clang" \
   -DCMAKE_CXX_COMPILER="$TOOLCHAIN/bin/clang++" \
-  -DMKW_MOD_PRODUCT=lan -DMKW_LAN_INSTANCE="$instance"
+  -DMKW_MOD_PRODUCT=lan -DMKW_LAN_CONFIG_HEADER="$PWD/build/lan/lan_runtime_config.h"
 cmake --build native-build --target WiiCompiledLAN --parallel 4
 ```
 
@@ -84,23 +89,26 @@ shard emitter retains some historical `retro` option names for the common mod
 pipeline. The resulting product identifies itself as WiiCompiled LAN and does
 not enable Retro Rewind's network or filesystem behavior.
 
-The module's `--instance` and CMake's `MKW_LAN_INSTANCE` must match. Copy each
-executable into its own release directory with `DATA`, `wii_bootstrap`,
+Copy the same executable into separate portable directories with `DATA`, `wii_bootstrap`,
 `dsp_coef.bin` and the other bootstrap files exported by the base Docker build.
 Use `portable.txt` and separate `UserData` directories; set `[paths] dvd_root`
 to `"../DATA"`. Never share a writable NAND between instances.
 
 Launch `WiiCompiledLAN` normally, or use `WiiCompiledLAN --headless` to hide the
 window and silence audio during automated testing. A working graphics/display
-backend is still needed. Linux host/client native builds and a Windows x64
-client cross-build inside Linux Docker have succeeded;
+backend is still needed. The unified Linux executable and its Windows x64
+cross-build inside Linux Docker have succeeded;
 startup reads the supplied boot arguments. Testing has reached
 two instances joining one room on one Linux machine with separate portable
 NANDs. Host state 3 and client state 4 each reported two players. This was
 observed using Xvfb and the null renderer. The automated race test also completed
 character/kart/drift selection and voting, reached the friend VS race on Luigi
 Circuit (course 8, mode 7), and observed stage 2 with advancing frames on both
-peers. Rendered races, race completion and Windows LAN gameplay remain unverified.
+peers. Identical executables also passed with runtime IDs 1 and 2 exchanging
+host/join roles. Manual menu hosting and joining passed with automation disabled.
+Two isolated network namespaces at `172.30.241.10` and `172.30.241.20` also reached
+and advanced the same race using explicit runtime LAN peer addresses. Rendered
+races, race completion and Windows LAN gameplay remain unverified.
 
 
 ## Profiles and local integration test
@@ -129,7 +137,9 @@ python3 mods/lan/tests/local_pair.py \
   --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
 ```
 
-Run both processes in the same network namespace. The test checks unique source
+The test requires identical executable hashes in both directories. It passes
+runtime IDs and automation flags; use `--host-id=2 --client-id=1` to reverse the
+roles with the same executable. Run local processes in the same network namespace. The test checks unique source
 addresses, host/client states, two players on both peers and five seconds in the
 active room. It exits nonzero on process exit, timeout or address mismatch,
 writes `lan-test-game.log` in each product, and terminates both processes on exit.

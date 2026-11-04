@@ -1,3 +1,4 @@
+#include "lan_runtime.h"
 #include <algorithm>
 #include <atomic>
 #include <cctype>
@@ -1363,11 +1364,12 @@ int RuntimeMain(int argc, char** argv) {
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && !BootRace::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu and --headless, use Config.toml through the installed host.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu and --headless, LAN products also accept --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
             }
         }
+        LanRuntime::Validate();
         if (g_headless && !BootRace::Requested() && RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
             throw std::invalid_argument("--headless needs a boot race or the LAN product");
         }

@@ -67,10 +67,19 @@ extern void MKWSetBootArgs(void);
 __asm__(".section .text.MKWSetBootArgs,\"ax\"\n"
         ".global MKWSetBootArgs\n"
         "MKWSetBootArgs:\n"
+        "lis 4,mkw_lan_config@ha\n"
+        "addi 4,4,mkw_lan_config@l\n"
+        "lwz 4,16(4)\n"
+        "cmpwi 4,0\n"
+        "beq 1f\n"
         "lis 4,mkw_argv@ha\n"
         "addi 4,4,mkw_argv@l\n"
         "stw 4,-27668(13)\n"
         "li 4,2\n"
+        "stw 4,-27672(13)\n"
+        "blr\n"
+        "1: li 4,0\n"
+        "stw 4,-27668(13)\n"
         "stw 4,-27672(13)\n"
         "blr\n"
         ".previous\n");
@@ -104,11 +113,12 @@ int (*MKWOriginalExtract)(void *self);
 extern void *MKWSaveManager;
 extern bool MKWHasLicense(void *manager, unsigned index);
 int MKWBootSection(void *self) {
+    if (!MKW_AUTOMATION) return MKWOriginalExtract(self);
     /* The debug boot path assumes an existing license. Let first-time users
        create a license in the normal menu before selecting online play. */
     if (!MKWSaveManager || !MKWHasLicense(MKWSaveManager, 0)) return 0x3f;
     MKWOriginalExtract(self);
-    return MKW_INSTANCE_ID == 1 ? 0x55 : 0x84;
+    return MKW_AUTOMATION == 1 ? 0x55 : 0x84;
 }
 
 
@@ -128,7 +138,7 @@ void sleep_a_frame(void) {
 }
 
 static void setup_pid(struct dwc_gamedata *gamedata) {
-	my_fake_pid = 0x4d4b5700 | MKW_INSTANCE_ID;
+	my_fake_pid = 0x40000000 | (MKW_LOCAL_IP & 0x3fffffff);
 	gamedata->my_pid = my_fake_pid;
 	gamedata->gamedata2->my_pid = my_fake_pid;
 	pid_struct.pid = my_fake_pid;
@@ -238,3 +248,13 @@ static so_ret_t MKWBind(so_fd_t fd, const so_addr_t *address) {
 static uint32_t MKWHostID(void) { return MKW_LOCAL_IP; }
 BSLUG_MUST_REPLACE(SOBind, MKWBind);
 BSLUG_MUST_REPLACE(SOGetHostID, MKWHostID);
+
+/* Only opt-in host automation redirects the initially selected roster button.
+ * Manual users retain both the original roster and Create Room controls. */
+extern void MKWOriginalRoster(void *page, void *button, uint32_t hud);
+extern void MKWCreateRoom(void *page, void *button, uint32_t hud);
+static void MKWRosterClick(void *page, void *button, uint32_t hud) {
+    if (MKW_AUTOMATION == 1) MKWCreateRoom(page, button, hud);
+    else MKWOriginalRoster(page, button, hud);
+}
+BSLUG_MUST_REPLACE(MKWOriginalRoster, MKWRosterClick);

@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = pathlib.Path(__file__).resolve().parent / 'source'
 
 
-def static_patches(instance):
+def static_patches():
     patches = []
 
     def add(operation, address, value):
@@ -48,8 +48,6 @@ def static_patches(instance):
         write(f'game:dwc_think+0x{0x118 + index * 4:X}', word)
     add('CaptureBranchTarget', 'module:MKWOriginalExtract', 0x8060406C)
     add('BranchLink', 0x8060406C, 'module:MKWBootSection')
-    if instance == 1:
-        add('Branch', 0x80619D8C, 0x8061A01C)
     add('BranchLink', 0x8051FF80, 'module:MKWSetController')
     write(0x8066B8D4, 0x48000060)
     pointer_pair(0x8065ACC0 + 8 * 4, 0x3C600000, 0x38630000, 'module:pid_struct')
@@ -74,8 +72,6 @@ def static_patches(instance):
 
 
 def build(args):
-    if not 1 <= args.instance <= args.instances <= 12:
-        raise ValueError('The current game layouts support 1 <= instance <= instances <= 12.')
     output = args.out.resolve()
     output.mkdir(parents=True, exist_ok=True)
     intermediate = output / 'objects'
@@ -94,8 +90,7 @@ def build(args):
     objects = [intermediate / 'lan.bmg.o']
     subprocess.run(common + ['-c', str(blob), '-o', str(objects[0])], cwd=module, check=True)
     flags = ['-O2', '-Wall', '-std=gnu99', '-ffreestanding', '-fno-builtin', '-fno-common',
-             '-DGEKKO', '-DHW_RVL', '-D__wii__', '-DNDEBUG', '-fshort-wchar',
-             f'-DMKW_BUILD_INSTANCE_ID={args.instance}', f'-DMKW_BUILD_INSTANCE_COUNT={args.instances}']
+             '-DGEKKO', '-DHW_RVL', '-D__wii__', '-DNDEBUG', '-fshort-wchar']
     if args.diagnostics:
         flags += ['-DMKW_LAN_DIAGNOSTICS']
     flags += ['-I' + str(i) for i in [SOURCE / 'bslug_include', intermediate]]
@@ -114,11 +109,12 @@ def build(args):
     subprocess.run([str(linker), '-m', 'elf32ppc', '-r', *map(str, objects),
                     '-T', str(script), '-o', str(elf)], check=True)
     patches = output / 'static-patches.json'
-    patches.write_text(json.dumps(static_patches(args.instance), indent=2) + '\n')
+    patches.write_text(json.dumps(static_patches(), indent=2) + '\n')
     imports = output / 'imports.json'
     imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0',
                                    'MKWHasLicense': '0x8053F7D4', 'MKWSaveManager': '0x809B8F88',
                                    'MKWDebugReport': '0x801A2530',
+                                   'MKWOriginalRoster': '0x80619D8C', 'MKWCreateRoom': '0x8061A01C',
                                    'MKWRaceInfo': '0x809B8F70', 'MKWRaceData': '0x809B8F68'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
@@ -126,7 +122,12 @@ def build(args):
                     '--symbols-dir', str(SOURCE / 'symbols'), '--imports', str(imports), '--patches', str(patches),
                     '--module-guest-base', args.module_guest_base, '--out', str(output / 'Code.pul')],
                    cwd=ROOT, check=True)
-    provenance = dict(instance=args.instance, instances=args.instances, diagnostics=args.diagnostics,
+    linked = json.loads((output / 'Code.pul.json').read_text())
+    config_address = linked['ModuleGuestBase'] + linked['SymbolOffsets']['mkw_lan_config']
+    (output / 'lan_runtime_config.h').write_text(
+        '#pragma once\n#include <cstdint>\n'
+        f'inline constexpr uint32_t kLanConfigGuestAddress = 0x{config_address:08X}u;\n')
+    provenance = dict(runtime_configuration_version=1, diagnostics=args.diagnostics,
         compiler_sha256=hashlib.sha256(compiler.read_bytes()).hexdigest(),
         source_sha256={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in sorted(SOURCE.rglob('*')) if p.is_file()})
@@ -137,8 +138,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--toolchain', type=pathlib.Path, required=True)
     parser.add_argument('--dotnet', default='dotnet')
-    parser.add_argument('--instance', type=int, required=True)
-    parser.add_argument('--instances', type=int, required=True)
     parser.add_argument('--diagnostics', action='store_true', help='Log unique game message IDs for port debugging')
     parser.add_argument('--module-guest-base', default='0x81800000')
     parser.add_argument('--out', type=pathlib.Path, required=True)

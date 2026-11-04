@@ -9,6 +9,11 @@ if [[ -n $(ls -A "$output") ]]; then
     echo 'Output directory must be empty; refusing to overwrite existing files.' >&2
     exit 2
 fi
+case "${WIICOMPILED_PRODUCT:-base}" in
+    base) ;;
+    lan) exec bash /opt/wiicompiled/docker/build-lan-release.sh "$1" "$2" linux "${WIICOMPILED_BUILD_JOBS:-4}" ;;
+    *) echo 'WIICOMPILED_PRODUCT must be base or lan.' >&2; exit 2 ;;
+esac
 source /opt/wiicompiled/docker/build-workspace.sh
 prepare_build_workspace
 [[ -f aurora-main/CMakeLists.txt ]] || {

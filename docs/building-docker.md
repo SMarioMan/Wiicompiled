@@ -107,3 +107,68 @@ and `UserData` together. Game data is resolved relative to `UserData/Config.toml
 and saves/settings remain in that writable directory after moving the release.
 The Windows build targets x86-64-v3 CPUs. Windows gameplay validation is still pending; successful cross-compilation
 does not establish native Windows runtime behavior.
+
+## Optional LAN product
+
+Build a single LAN variant with `--build-arg PRODUCT=lan` when building either
+Dockerfile, or select it when running a builder with `WIICOMPILED_PRODUCT=lan`.
+It currently requires the clean USA game and retains twelve-player capacity.
+Every copy of the resulting executable can create or join a room through the
+normal LAN/Nintendo WFC menus. Instance identities and startup automation are
+runtime options; no host/client builds are needed.
+
+```sh
+mkdir -p release-lan
+docker run --rm --user "$(id -u):$(id -g)" \
+  --env WIICOMPILED_PRODUCT=lan \
+  --mount 'type=bind,src=/absolute/path/game.rvz,dst=/input/game.rvz,readonly' \
+  --mount "type=bind,src=$(pwd)/release-lan,dst=/output" \
+  wiicompiled-linux-toolchain /input/game.rvz /output
+```
+
+For Windows, use the same environment option with the Windows cross-builder:
+
+```sh
+mkdir -p release-lan-windows
+docker run --rm --user "$(id -u):$(id -g)" \
+  --env WIICOMPILED_PRODUCT=lan \
+  --mount 'type=bind,src=/absolute/path/game.rvz,dst=/input/game.rvz,readonly' \
+  --mount "type=bind,src=$(pwd)/release-lan-windows,dst=/output" \
+  wiicompiled-windows-cross /input/game.rvz /output 4
+```
+
+Each output contains `WiiCompiledLAN` (Linux) or `WiiCompiledLAN.exe` (Windows),
+`DATA`, bootstrap files, portable settings, LAN notices and module provenance in
+`lan-build`. Windows also includes runtime DLLs and the Visual C++ redistributable.
+Linux accepts `WIICOMPILED_BUILD_JOBS`; Windows uses its positional jobs argument.
+The Linux BuildKit `release` target also accepts `--build-arg PRODUCT=lan`.
+
+Run the executable without automation flags to use the normal menus. Create a
+license in slot zero on first launch. For multiple instances on one machine,
+copy the entire release to separate directories and assign unique runtime IDs:
+
+```sh
+# From the first portable directory; optionally automate creating a room:
+./WiiCompiledLAN --lan-id=1 --lan-host
+# From a separate copy of the SAME release; optionally join the first host:
+./WiiCompiledLAN --lan-id=2 --lan-join
+# Manual menus can host or join, regardless of ID:
+./WiiCompiledLAN --lan-id=3
+```
+
+Automation ends on reaching the first room. Each process uses its own writable
+`UserData`; local discovery uses `127.0.0.ID:27900` and game traffic uses port
+27901. Default discovery covers IDs 1–12; `--lan-peers=N` can reduce that range.
+For separate machines, bind the actual LAN address and list peers at runtime:
+
+```sh
+./WiiCompiledLAN --lan-bind=192.168.1.10 --lan-peer=192.168.1.20
+# On the other machine:
+./WiiCompiledLAN --lan-bind=192.168.1.20 --lan-peer=192.168.1.10
+```
+
+Repeat `--lan-peer=IP` for additional peers. UDP ports 27900 and 27901 must be
+reachable between them. These network settings do not restrict who can create a
+room. See the [LAN tests](../mods/lan/README.md) for first-run, room and race checks.
+Rendering, completed races and Windows LAN gameplay remain unverified;
+24-player support is not implemented.

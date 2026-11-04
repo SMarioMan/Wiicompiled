@@ -366,10 +366,8 @@ set_property(CACHE MKW_MOD_PRODUCT PROPERTY STRINGS retro-rewind lan)
 if(NOT MKW_MOD_PRODUCT MATCHES "^(retro-rewind|lan)$")
     message(FATAL_ERROR "MKW_MOD_PRODUCT must be retro-rewind or lan")
 endif()
-set(MKW_LAN_INSTANCE "1" CACHE STRING "LAN instance ID matching the compiled LAN module")
-if(MKW_MOD_PRODUCT STREQUAL "lan" AND NOT MKW_LAN_INSTANCE MATCHES "^([1-9]|1[0-2])$")
-    message(FATAL_ERROR "MKW_LAN_INSTANCE must be between 1 and 12")
-endif()
+set(MKW_LAN_CONFIG_HEADER "${CMAKE_CURRENT_LIST_DIR}/../build/lan/lan_runtime_config.h"
+    CACHE FILEPATH "ELF-linked LAN runtime configuration binding")
 # The host ISA guard is the one translation unit that must not receive the
 # x86-64-v3 flags, so it gets its own object library instead of riding along in
 # the runtime library. See cmake/PublicProducts.cmake and the file's own header.

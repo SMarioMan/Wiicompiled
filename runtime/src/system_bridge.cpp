@@ -1,3 +1,4 @@
+#include "lan_runtime.h"
 #include "system_bridge.h"
 
 #include <cctype>
@@ -320,6 +321,7 @@ void SystemBridge::Initialize() {
     RT_LOG(RT_TAG_RUNTIME) << "Initializing data sections from embedded DOL/REL data" << std::endl;
     InitializeDataSections();
     RecompMod::RunImageInitializers();
+    LanRuntime::InitializeGuest();
 
     // Constructors run before the main entry point, but they still require the
     // PowerPC ABI environment. Keep using the persistent context here: the old

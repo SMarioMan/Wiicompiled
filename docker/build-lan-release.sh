@@ -17,7 +17,9 @@ ensure_nodtool
 source Launcher/build-cache.sh
 mkdir -p Assets
 [[ ! -d Assets/DATA ]] || { echo 'Unexpected existing disc extraction.' >&2; exit 1; }
-Launcher/artifacts/nodtool extract "$game" Assets/DATA -q
+# Keep one extracted copy even when /output is a separate bind mount.
+Launcher/artifacts/nodtool extract "$game" "$output/DATA" -q
+ln -s "$output/DATA" Assets/DATA
 cp Assets/DATA/sys/main.dol Assets/main.dol
 cp Assets/DATA/files/rel/StaticR.rel Assets/StaticR.rel
 project=$(mkw_resolve_project "$PWD" "$PWD/Assets")
@@ -64,7 +66,6 @@ for name in dsp_coef.bin initial_pipeline_cache.db noshaders.zip cacert.pem; do
     [[ ! -f "$build/$name" ]] || cp "$build/$name" "$output/"
 done
 cp -a "$build/wii_bootstrap" "$output/"
-mv Assets/DATA "$output/DATA"
 cp LICENSE THIRD-PARTY-NOTICES.md "$output/"
 cp mods/lan/source/COPYING "$output/LAN-COPYING"
 mkdir "$output/lan-build"

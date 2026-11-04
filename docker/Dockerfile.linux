@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+FROM ubuntu:24.04 AS builder
+ENV DEBIAN_FRONTEND=noninteractive DOTNET_CLI_TELEMETRY_OPTOUT=1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl git dotnet-sdk-8.0 g++ binutils unzip xz-utils python3 \
+    pkg-config libvulkan-dev libx11-dev libxrandr-dev libxi-dev libxcursor-dev \
+    libxinerama-dev libwayland-dev libxkbcommon-dev libasound2-dev libudev-dev \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/wiicompiled
+COPY Launcher/prepare-portable-tools.sh Launcher/prepare-portable-tools.sh
+RUN --mount=type=cache,target=/opt/wiicompiled/Launcher/artifacts/downloads \
+    --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export CURL_CA_BUNDLE=/run/secrets/proxy_ca; fi; \
+    bash Launcher/prepare-portable-tools.sh --arch x86_64
+COPY . .
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi; \
+    dotnet build Launcher/WiiCompiled.Setup.Linux -c Release
+ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-linux.sh"]
+
+# A separate named context keeps disc contents out of the builder image.
+FROM builder AS compile
+ARG GAME_SHA256
+ARG GAME_FILE=game.rvz
+RUN --mount=type=bind,from=game,target=/input,readonly \
+    --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then \
+      export SSL_CERT_FILE=/run/secrets/proxy_ca CMAKE_TLS_CAINFO=/run/secrets/proxy_ca; \
+    fi; \
+    test -n "$GAME_SHA256" && \
+    printf '%s  %s\n' "$GAME_SHA256" "/input/$GAME_FILE" | sha256sum -c - && \
+    mkdir /release && bash docker/build-linux.sh "/input/$GAME_FILE" /release
+
+FROM scratch AS release
+COPY --from=compile /release/ /

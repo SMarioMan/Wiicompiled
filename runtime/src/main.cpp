@@ -1357,7 +1357,7 @@ int RuntimeMain(int argc, char** argv) {
     
     std::string currentEntryLabel;
 
-    // `--headless`: with a boot race, run without a window, sound or dialogs.
+    // `--headless`: boot races and automated LAN instances run without sound or dialogs.
     g_headless = std::any_of(argv + 1, argv + argc,
                              [](const char* arg) { return std::string_view(arg) == "--headless"; });
 
@@ -1368,8 +1368,8 @@ int RuntimeMain(int argc, char** argv) {
                                             "'; the game runtime only accepts --race[=<course id>], --race-cpu and --headless, use Config.toml through the installed host.");
             }
         }
-        if (g_headless && !BootRace::Requested()) {
-            throw std::invalid_argument("--headless needs --race[=<course id>] or --race-cpu");
+        if (g_headless && !BootRace::Requested() && RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
+            throw std::invalid_argument("--headless needs a boot race or the LAN product");
         }
         if (g_headless) {
             AudioBackend::Instance().SetSilenced(true);

@@ -360,11 +360,21 @@ endif()
 set(MKW_PLATFORM_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/platform/host_platform.cpp")
 set(MKW_BASE_PRODUCT_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/product/base_product.cpp")
 set(MKW_RETRO_REWIND_PRODUCT_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/product/retro_rewind_product.cpp")
+set(MKW_LAN_PRODUCT_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/product/lan_product.cpp")
+set(MKW_MOD_PRODUCT "retro-rewind" CACHE STRING "Mod product: retro-rewind or lan")
+set_property(CACHE MKW_MOD_PRODUCT PROPERTY STRINGS retro-rewind lan)
+if(NOT MKW_MOD_PRODUCT MATCHES "^(retro-rewind|lan)$")
+    message(FATAL_ERROR "MKW_MOD_PRODUCT must be retro-rewind or lan")
+endif()
+set(MKW_LAN_INSTANCE "1" CACHE STRING "LAN instance ID matching the compiled LAN module")
+if(MKW_MOD_PRODUCT STREQUAL "lan" AND NOT MKW_LAN_INSTANCE MATCHES "^([1-9]|1[0-2])$")
+    message(FATAL_ERROR "MKW_LAN_INSTANCE must be between 1 and 12")
+endif()
 # The host ISA guard is the one translation unit that must not receive the
 # x86-64-v3 flags, so it gets its own object library instead of riding along in
 # the runtime library. See cmake/PublicProducts.cmake and the file's own header.
 set(MKW_CPU_BASELINE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/host_cpu_baseline.cpp")
-list(REMOVE_ITEM SOURCES ${MKW_BASE_PRODUCT_SOURCE} ${MKW_RETRO_REWIND_PRODUCT_SOURCE}
+list(REMOVE_ITEM SOURCES ${MKW_BASE_PRODUCT_SOURCE} ${MKW_RETRO_REWIND_PRODUCT_SOURCE} ${MKW_LAN_PRODUCT_SOURCE}
      ${MKW_CPU_BASELINE_SOURCE} ${MKW_PLATFORM_SOURCE})
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/PlatformTests.cmake")

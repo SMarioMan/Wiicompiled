@@ -3,6 +3,7 @@
 #include "hle/controller_status_contract.h"
 #include "input_bindings.h"
 #include "motion_trick.h"
+#include "runtime_product.h"
 
 #include <algorithm>
 #include <atomic>
@@ -70,6 +71,42 @@ void FillTriggersHeldByButtons(PADStatus* statuses) {
     }
 }
 
+// The LAN boot/menu path uses a virtual port, including unattended local instances.
+// Keep this in the native PAD path: jumping into the original PADRead would bypass HLE.
+void ApplyLanMenuInput(PADStatus& pad, uint32_t& rumbleMask) {
+    const auto& product = RuntimeProduct::Active();
+    if (product.kind != RuntimeProduct::Kind::Lan) return;
+    pad.err = PAD_ERR_NONE;
+    rumbleMask |= 0x80000000u;
+    static unsigned pulse = 0;
+    static bool startupDone = false;
+    static uint32_t lastPage = UINT32_MAX;
+    if (startupDone) return;
+    try {
+        const auto manager = Memory::Read32(0x809BD508u); // USA boot/menu layout
+        const auto section = manager ? Memory::Read32(manager) : 0;
+        const auto count = section ? Memory::Read32(section + 0x37Cu) : 0;
+        const auto page = count > 0 && count <= 11 ? Memory::Read32(section + 0x354u + (count - 1) * 4) : 0;
+        const auto id = page ? Memory::Read32(page + 4) : 0;
+        if (id != lastPage) {
+            RT_LOG(RT_TAG_MOD) << "LAN instance " << product.lanInstance << " menu page 0x"
+                << std::hex << id << std::dec << std::endl;
+            lastPage = id;
+        }
+        if (id == 0x9D) startupDone = true;
+        const bool select = page && Memory::Read32(page + 8) == 4 &&
+            (id == 0x85 || (id == 0x51 && Memory::Read32(manager + 0x38) == 0x124 &&
+                Memory::Read32(manager + 0x3C) == 0x124) ||
+             (product.lanInstance == 1 && id == 0x8D) ||
+             (product.lanInstance != 1 && (id == 0x96 || id == 0x97)));
+        if (select) {
+            if ((pulse++ % 120) < 4) pad.button |= PAD_BUTTON_A;
+        } else pulse = 0;
+    } catch (const Memory::AccessViolation&) {
+        pulse = 0;
+    }
+}
+
 void WritePadStatus(uint32_t base, const PADStatus& status) {
     const auto guestStatus = PadStatusContract::Encode({
         status.button,
@@ -118,6 +155,7 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     FillTriggersHeldByButtons(statuses);
     InputBindings::Apply(statuses);
     MotionTrick::Apply(statuses);
+    ApplyLanMenuInput(statuses[0], rumbleMask);
 
     try {
         for (uint32_t i = 0; i < PAD_CHANMAX; ++i) {

@@ -1,17 +1,20 @@
 #pragma once
 
 #include <string_view>
+#include <cstdint>
 
 namespace RuntimeProduct {
 
 enum class Kind {
     BaseGame,
     RetroRewind,
+    Lan,
 };
 
 struct Descriptor {
     Kind kind;
     std::string_view displayName;
+    uint32_t lanInstance = 0;
 };
 
 // Each public executable links exactly one small provider definition. Keeping

@@ -32,24 +32,19 @@ public static class ContinuationPlanner
         var functionIndex = new BaseFunctionIndex(baseManifest.Functions);
         var entries = new Dictionary<uint, ContinuationEntry>();
 
-        foreach (var command in chunk.Commands)
+        void AddTarget(KamekCommand command, string reason)
         {
-            if (!IsBranchLikeTarget(command.Id) || command.Arguments.Count == 0)
-            {
-                continue;
-            }
-
             var target = KamekAddress.Resolve(command.Arguments[0], moduleGuestBase);
             var section = FindSection(baseManifest, target);
             if (section is null || !section.Executable)
             {
-                continue;
+                return;
             }
 
             var function = functionIndex.FindContaining(target);
             if (function is null || function.Start == target)
             {
-                continue;
+                return;
             }
 
             entries.TryAdd(target, new ContinuationEntry(
@@ -59,13 +54,43 @@ public static class ContinuationPlanner
                 section.Name,
                 command.AddressIsRelative ? checked(moduleGuestBase + command.Address) : command.Address,
                 command.Id,
-                "branch-like Code.pul target lands inside a base function"));
+                reason));
         }
+
+        foreach (var command in chunk.Commands.Where(c => IsBranchLikeTarget(c.Id) && c.Arguments.Count > 0))
+            AddTarget(command, "branch-like Code.pul target lands inside a base function");
+        foreach (var command in StaticLinkRegisterTargets(chunk))
+            AddTarget(command, "relocated LR return PC lands inside a base function");
 
         return new ContinuationPlan
         {
             Entries = entries.Values.OrderBy(e => e.Address).ToList()
         };
+    }
+
+    private static IEnumerable<KamekCommand> StaticLinkRegisterTargets(KamekChunk chunk)
+    {
+        // A relocatable trampoline may materialize an original return PC in LR rather than
+        // branch to it directly. Treat that return PC as a continuation too.
+        var lows = chunk.Commands.Where(c => c.AddressIsRelative && c.Id == KamekCommandId.Addr16Lo)
+            .GroupBy(c => c.Address).ToDictionary(g => g.Key, g => g.ToArray());
+        foreach (var high in chunk.Commands.Where(c => c.AddressIsRelative && c.Id is KamekCommandId.Addr16Hi or KamekCommandId.Addr16Ha))
+        {
+            if (high.Arguments.Count != 1 || high.Address % 4 != 2 || high.Address > chunk.CodeBlob.Length - 10 ||
+                !lows.TryGetValue(high.Address + 4, out var candidates)) continue;
+            var start = (int)high.Address - 2;
+            var lis = BinaryPrimitives.ReadUInt32BigEndian(chunk.CodeBlob.AsSpan(start, 4));
+            var lower = BinaryPrimitives.ReadUInt32BigEndian(chunk.CodeBlob.AsSpan(start + 4, 4));
+            var mtlr = BinaryPrimitives.ReadUInt32BigEndian(chunk.CodeBlob.AsSpan(start + 8, 4));
+            var reg = (lis >> 21) & 31;
+            if ((lis & 0xFC1F0000) != 0x3C000000 || mtlr != (0x7C0803A6 | (reg << 21))) continue;
+            var validLow = high.Id == KamekCommandId.Addr16Hi
+                ? lower >> 26 == 24 && ((lower >> 21) & 31) == reg && ((lower >> 16) & 31) == reg
+                : lower >> 26 == 14 && reg != 0 && ((lower >> 21) & 31) == reg && ((lower >> 16) & 31) == reg;
+            if (!validLow) continue;
+            foreach (var low in candidates.Where(c => c.Arguments.Count == 1 && c.Arguments[0] == high.Arguments[0]))
+                yield return high;
+        }
     }
 
     public static ContinuationPlan AddModuleTailJumpContinuations(

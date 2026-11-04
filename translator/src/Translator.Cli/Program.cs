@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Translator.Cli.Configuration;
 using Translator.Core;
 using Translator.Core.CodeGen;
@@ -28,6 +29,7 @@ using Translator.Core.IO;
 using Translator.Core.Parsing.Kamek;
 using Translator.Core.Parsing.Dol;
 using Translator.Core.Parsing.Rel;
+using Translator.Core.Parsing.BrainSlug;
 using Translator.Core.Translation;
 
 // All formats here (YAML, JSON, hex, hashes) are culture-invariant. Under Turkish locale, YamlDotNet's
@@ -172,6 +174,7 @@ return command switch
     "generate-data-init" => RunGenerateDataInit(),
     "translate-recursive" => RunTranslateRecursive(tail),
     "translate-mod" => RunTranslateMod(tail),
+    "link-brainslug" => RunLinkBrainSlug(tail),
     "emit-build-shards" => RunEmitBuildShards(tail),
     "emit-native-index" => RunEmitNativeIndex(tail),
     "emit-base-manifest" => RunEmitBaseManifest(tail),
@@ -179,6 +182,73 @@ return command switch
     "validate-retro-wfc-payload" => RunValidateRetroWfcPayload(tail),
     _ => ShowHelp(command)
 };
+
+int RunLinkBrainSlug(string[] argsTail)
+{
+    if (project is null)
+    {
+        Console.Error.WriteLine("link-brainslug requires --project so game hashes and addresses are verified.");
+        return 1;
+    }
+    try
+    {
+        var modulePath = OptionValue(argsTail, "--module")!;
+        var output = Path.GetFullPath(OptionValue(argsTail, "--out")!);
+        if (string.Equals(output, Path.GetFullPath(modulePath), OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            throw new ArgumentException("Output must not overwrite the input module.");
+        var importsPath = OptionValue(argsTail, "--imports");
+        var overrides = importsPath is null ? new Dictionary<string, string>() :
+            JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(importsPath))
+                ?? throw new InvalidDataException("Invalid import-address JSON.");
+        var patterns = OptionValue(argsTail, "--symbols-dir") is { } symbolDirectory ? BrainSlugSymbolPatterns.Load(symbolDirectory) : null;
+        var resolved = new Dictionary<string, uint?>(StringComparer.Ordinal);
+        uint? Resolve(string name)
+        {
+            if (resolved.TryGetValue(name, out var cached)) return cached;
+            uint? address = overrides.TryGetValue(name, out var literal) ? ParseAddress(literal) :
+                name == "_start" ? dolFile.Value.EntryPoint :
+                functionMap is not null && functionMap.TryGetAddress(name, out var mapped) ? mapped :
+                patterns?.Resolve(name, dolFile.Value.ExecutableSections);
+            resolved.Add(name, address);
+            return address;
+        }
+        var ranges = BuildExecutableRanges();
+        var baseImage = image.Value; // Forces the project's DOL/REL checksum checks before publishing.
+        uint ReadInstruction(uint address)
+        {
+            if (!ranges.Any(r => r.Contains(address) && (ulong)address + 4 <= r.End))
+                throw new InvalidDataException($"Hook 0x{address:X8} is outside executable game sections.");
+            return BinaryPrimitives.ReadUInt32BigEndian(baseImage.Memory.AsSpan(baseImage.GetOffset(address, 4), 4));
+        }
+        var moduleBytes = File.ReadAllBytes(modulePath);
+        var module = BrainSlugElfFile.Parse(moduleBytes);
+        var linked = module.Link(Resolve, ReadInstruction);
+        var moduleBase = OptionValue(argsTail, "--module-guest-base") is { } baseText ? ParseAddress(baseText) : 0x81800000u;
+        linked.ValidatePlacement(moduleBase);
+        var region = project.Identity.Region ?? throw new InvalidDataException("BrainSlug linking requires a region in the project manifest.");
+        if (region.Length != 1) throw new InvalidDataException("Expected one region letter in the project manifest.");
+        var pul = linked.ToCodePul(region[0]);
+        var metadata = JsonSerializer.Serialize(new
+        {
+            Format = "brainslug-kamek-link-v1", project.Identity.GameId, Region = region,
+            ElfSha256 = ChecksumUtilities.Sha256Hex(moduleBytes),
+            CodePulSha256 = ChecksumUtilities.Sha256Hex(pul), ModuleGuestBase = moduleBase,
+            linked.RequiredAlignment, linked.Hooks, linked.SymbolOffsets,
+            ResolvedImports = resolved,
+            Note = "Declared hooks and ELF relocations only. Runtime instruction writes still require static lowering."
+        }, new JsonSerializerOptions { WriteIndented = true });
+        FileOutput.WriteBytesIfChanged(output, pul);
+        FileOutput.WriteTextIfChanged(output + ".json", metadata);
+        Console.WriteLine($"[translator] linked {linked.Hooks.Count} BrainSlug hook(s), {module.Imports.Count} import(s), {linked.Chunk.Commands.Count} relocation/patch command(s): {output}");
+        Console.WriteLine("[translator] This does not lower a module's runtime instruction writes; they must be incorporated before static translation.");
+        return 0;
+    }
+    catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or InvalidOperationException or JsonException or OverflowException or XmlException)
+    {
+        Console.Error.WriteLine($"[translator] BrainSlug link failed: {error.Message}");
+        return 2;
+    }
+}
 
 /// <summary>
 /// May the workspace's completed base translation be reused for the Code.pul about to build?
@@ -3673,6 +3743,7 @@ static string[] KnownCommands() => new[]
     "generate-data-init",
     "translate-recursive",
     "translate-mod",
+    "link-brainslug",
     "emit-base-manifest",
     "emit-build-shards",
     "emit-native-index",
@@ -3714,6 +3785,14 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
         new("--retro-wfc-payload", "path-or-url"),
         new("--skip-retro-wfc"),
         new("--emit-cpp")
+    }),
+    "link-brainslug" => (null, new CommandOption[]
+    {
+        new("--module", "path/to/module.mod", Required: true),
+        new("--out", "path/to/Code.pul", Required: true),
+        new("--imports", "verified-import-addresses.json"),
+        new("--symbols-dir", "brainslug-symbols-directory"),
+        new("--module-guest-base", "0x81800000")
     }),
     "check-base-mod-awareness" => (null, new CommandOption[]
     {

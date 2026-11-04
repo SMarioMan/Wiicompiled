@@ -11,6 +11,7 @@ jobs=${3:-4}
 [[ -z $(ls -A "$output") ]] || { echo 'Output directory must be empty.' >&2; exit 2; }
 source /opt/wiicompiled/docker/build-workspace.sh
 prepare_build_workspace
+ensure_nodtool
 source Launcher/build-cache.sh
 mkdir -p Assets
 [[ ! -d Assets/DATA ]] || { echo 'Unexpected existing disc extraction.' >&2; exit 1; }

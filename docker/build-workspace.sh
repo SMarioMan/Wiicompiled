@@ -10,3 +10,13 @@ prepare_build_workspace() {
     mkdir -p "$XDG_DATA_HOME"
     cd "$workspace"
 }
+
+# Clean images exclude Launcher/artifacts. Resolve the pinned disc tool before
+# extraction instead of relying on a previous installer run's download cache.
+ensure_nodtool() {
+    if [[ ! -x Launcher/artifacts/nodtool ]]; then
+        dotnet build Launcher/WiiCompiled.Setup.Common.Cli -c Release
+        dotnet Launcher/WiiCompiled.Setup.Common.Cli/bin/Release/net8.0/WiiCompiled.Setup.Common.Cli.dll \
+            --workspace "$PWD"
+    fi
+}

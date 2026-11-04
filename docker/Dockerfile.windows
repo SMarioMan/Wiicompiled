@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG LINUX_BUILDER=wiicompiled-linux-toolchain
 FROM ${LINUX_BUILDER} AS builder
-ARG PRODUCT=base
-ENV WIICOMPILED_PRODUCT=$PRODUCT
 COPY . .
 RUN --mount=type=tmpfs,target=/tmp \
     --mount=type=cache,target=/opt/cross-downloads \
@@ -13,4 +11,7 @@ RUN --mount=type=tmpfs,target=/tmp \
     fi; \
     bash docker/prepare-windows-cross.sh && \
     chmod -R a+rX /opt/wiicompiled /opt/windows-cross
+# Product selection does not change the compiler/toolchain image layers.
+ARG PRODUCT=base
+ENV WIICOMPILED_PRODUCT=$PRODUCT
 ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-windows-cross.sh"]

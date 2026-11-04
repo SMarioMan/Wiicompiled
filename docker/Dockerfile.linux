@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:8.0.408-noble AS builder
-ARG PRODUCT=base
-ENV WIICOMPILED_PRODUCT=$PRODUCT
 ENV DEBIAN_FRONTEND=noninteractive DOTNET_CLI_TELEMETRY_OPTOUT=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git g++ binutils unzip xz-utils python3 \
@@ -22,6 +20,9 @@ RUN --mount=type=tmpfs,target=/tmp \
     if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi; \
     dotnet build Launcher/WiiCompiled.Setup.Linux -c Release && \
     chmod -R a+rX /opt/wiicompiled
+# Product selection does not change the compiler/toolchain image layers.
+ARG PRODUCT=base
+ENV WIICOMPILED_PRODUCT=$PRODUCT
 ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-linux.sh"]
 
 # A separate named context keeps disc contents out of the builder image.

@@ -45,7 +45,9 @@ builder at two guest bases, original-function branches and LR continuations,
 BSS, pointer/scalar relocations, malformed input, and signature ambiguity checks.
 The original LAN v0.9 module and the attached script's modified module have also
 been linked against the verified USA game (ten and twelve hooks respectively).
-Multi-instance LAN gameplay and 24-player gameplay remain unverified.
+The native LAN port has joined two instances in one room. LAN races remain
+unverified and 24-player support is not implemented. See
+[LAN build and test instructions](../mods/lan/README.md).
 
 `--patches static-patches.json` additionally lowers explicit build-time writes.
 Each record has `Operation`, `Address` and `Value` strings. References are hex

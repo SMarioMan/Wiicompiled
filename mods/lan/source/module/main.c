@@ -101,7 +101,12 @@ __asm__(".section .text.MKWSetController,\"ax\"\n"
         "bctr\n"
         ".previous\n");
 int (*MKWOriginalExtract)(void *self);
+extern void *MKWSaveManager;
+extern bool MKWHasLicense(void *manager, unsigned index);
 int MKWBootSection(void *self) {
+    /* The debug boot path assumes an existing license. Let first-time users
+       create a license in the normal menu before selecting online play. */
+    if (!MKWSaveManager || !MKWHasLicense(MKWSaveManager, 0)) return 0x3f;
     MKWOriginalExtract(self);
     return MKW_INSTANCE_ID == 1 ? 0x55 : 0x84;
 }

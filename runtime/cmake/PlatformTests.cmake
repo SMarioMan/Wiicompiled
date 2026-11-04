@@ -213,3 +213,8 @@ target_include_directories(mkw_mod_initializers_tests PRIVATE "${MKW_TEST_RUNTIM
 target_compile_features(mkw_mod_initializers_tests PRIVATE cxx_std_17)
 add_test(NAME mkw_mod_initializers_early_tests COMMAND mkw_mod_initializers_tests)
 add_test(NAME mkw_mod_initializers_late_tests COMMAND mkw_mod_initializers_tests late)
+
+add_executable(mkw_test_pad_input_tests "${MKW_TEST_RUNTIME_DIR}/tests/test_pad_input_tests.cpp")
+target_include_directories(mkw_test_pad_input_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
+target_compile_features(mkw_test_pad_input_tests PRIVATE cxx_std_17)
+add_test(NAME mkw_test_pad_input_tests COMMAND mkw_test_pad_input_tests)

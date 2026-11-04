@@ -1,11 +1,12 @@
 # Container builds
 
-Validation status: all 732 translator tests pass. A Linux release built and
-booted into CPU-driven VS initialization after being moved, using the null
-graphics backend. The Windows x64 target cross-compiles successfully on Linux.
-Both complete container workflows were tested using the USA RMCE01 RVZ.
-The Linux output also reached CPU-driven VS initialization after being moved. Rendering and Windows gameplay remain untested. LAN, guest-layout
-relocation, and 24-player support remain unimplemented.
+Validation status: all 764 translator tests pass. Both complete container
+workflows were tested using the USA RMCE01 RVZ. The Linux release reached
+CPU-driven VS initialization after being moved, using the null graphics backend.
+The Windows x64 target cross-compiles successfully inside Linux Docker.
+Rendering and Windows gameplay remain untested. The experimental
+[LAN port](../mods/lan/README.md) has joined two local instances in one room;
+LAN races, original guest-layout relocation and 24-player support remain unfinished.
 
 ## Linux x64
 

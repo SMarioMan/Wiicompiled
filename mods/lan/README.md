@@ -3,7 +3,8 @@
 This directory contains the LAN v0.9 module adapted for native translation,
 including the supplied `build_lan.py` script's per-instance loopback networking,
 boot/menu hooks, fake PIDs and client joining. It is under development;
-**multi-instance gameplay and 24-player support are not yet verified**.
+**two-instance room joining is verified; races remain unverified and 24-player
+support is not implemented**.
 
 The original archive is `https://www.chadsoft.co.uk/downloads/LAN_MKW_v0.9.zip`,
 SHA-256 `2a8d76844e79b23b147ea97f134386d313401e0535c2f52da9ab41822369095e`.
@@ -92,6 +93,40 @@ to `"../DATA"`. Never share a writable NAND between instances.
 Launch `WiiCompiledLAN` normally, or use `WiiCompiledLAN --headless` to hide the
 window and silence audio during automated testing. A working graphics/display
 backend is still needed. Linux host and client native builds have succeeded;
-startup now reads the supplied boot arguments. Testing currently exposes a
-video-retrace scheduler stall before room discovery, so these builds are not
-yet a working LAN release.
+startup reads the supplied boot arguments. Testing has reached
+two instances joining one room on one Linux machine with separate portable
+NANDs. Host state 3 and client state 4 each reported two players. This was
+observed using Xvfb and the null renderer; rendered races, race completion and
+Windows LAN gameplay have not been verified.
+
+
+## Profiles and local integration test
+
+Each instance needs a valid license in slot zero. If no license exists, the
+module returns to the normal first-run menu instead of using the debug online
+boot path. Create the license through the game, then restart the instance.
+The native menu driver accepts the LAN data prompt and stops providing automatic
+input after reaching the friend room.
+
+With a working display (or Xvfb) and two prepared portable products, run:
+
+```sh
+python3 mods/lan/tests/local_pair.py \
+  --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
+```
+
+Run both processes in the same network namespace. The test checks unique source
+addresses, host/client states, two players on both peers and five seconds in the
+active room. It exits nonzero on process exit, timeout or address mismatch,
+writes `lan-test-game.log` in each product, and terminates both processes on exit.
+This verifies room joining, not a completed race.
+
+For controller-driven integration tests, `WIICOMPILED_TEST_PAD_FILE` opts into a
+regular input file, replaced atomically by the test driver. Bytes 0–1 hold a
+big-endian GameCube button mask; optional bytes 2–3 hold signed stick X/Y values.
+A two-byte record centers the stick. Four zero bytes release every injected
+control. A missing or truncated record supplies no input. This hook is disabled
+unless the environment variable is set. For example, `01 00 00 00` presses A,
+`00 00 50 00` moves the stick right, and `00 00 00 00` releases it.
+`--diagnostics` on the module builder additionally logs unique original BMG
+message IDs to help identify menu prompts.

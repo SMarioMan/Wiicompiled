@@ -96,6 +96,8 @@ def build(args):
     flags = ['-O2', '-Wall', '-std=gnu99', '-ffreestanding', '-fno-builtin', '-fno-common',
              '-DGEKKO', '-DHW_RVL', '-D__wii__', '-DNDEBUG', '-fshort-wchar',
              f'-DMKW_BUILD_INSTANCE_ID={args.instance}', f'-DMKW_BUILD_INSTANCE_COUNT={args.instances}']
+    if args.diagnostics:
+        flags += ['-DMKW_LAN_DIAGNOSTICS']
     flags += ['-I' + str(i) for i in [SOURCE / 'bslug_include', intermediate]]
     for source in sorted(module.glob('*.c')):
         obj = intermediate / (source.name + '.o')
@@ -114,14 +116,16 @@ def build(args):
     patches = output / 'static-patches.json'
     patches.write_text(json.dumps(static_patches(args.instance), indent=2) + '\n')
     imports = output / 'imports.json'
-    imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0'}, indent=2) + '\n')
+    imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0',
+                                   'MKWHasLicense': '0x8053F7D4', 'MKWSaveManager': '0x809B8F88',
+                                   'MKWDebugReport': '0x801A2530'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
                     str(ROOT / 'projects/mkwii-ntsc-u/recomp.yml'), '--module', str(elf),
                     '--symbols-dir', str(SOURCE / 'symbols'), '--imports', str(imports), '--patches', str(patches),
                     '--module-guest-base', args.module_guest_base, '--out', str(output / 'Code.pul')],
                    cwd=ROOT, check=True)
-    provenance = dict(instance=args.instance, instances=args.instances,
+    provenance = dict(instance=args.instance, instances=args.instances, diagnostics=args.diagnostics,
         compiler_sha256=hashlib.sha256(compiler.read_bytes()).hexdigest(),
         source_sha256={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in sorted(SOURCE.rglob('*')) if p.is_file()})
@@ -134,6 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--dotnet', default='dotnet')
     parser.add_argument('--instance', type=int, required=True)
     parser.add_argument('--instances', type=int, required=True)
+    parser.add_argument('--diagnostics', action='store_true', help='Log unique game message IDs for port debugging')
     parser.add_argument('--module-guest-base', default='0x81800000')
     parser.add_argument('--out', type=pathlib.Path, required=True)
     build(parser.parse_args())

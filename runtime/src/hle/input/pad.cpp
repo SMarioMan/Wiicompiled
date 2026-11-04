@@ -4,6 +4,7 @@
 #include "input_bindings.h"
 #include "motion_trick.h"
 #include "runtime_product.h"
+#include "test_pad_input.h"
 
 #include <algorithm>
 #include <atomic>
@@ -90,17 +91,24 @@ void ApplyLanMenuInput(PADStatus& pad, uint32_t& rumbleMask) {
         const auto id = page ? Memory::Read32(page + 4) : 0;
         if (id != lastPage) {
             RT_LOG(RT_TAG_MOD) << "LAN instance " << product.lanInstance << " menu page 0x"
-                << std::hex << id << std::dec << std::endl;
+                << std::hex << id << " in section 0x" << (section ? Memory::Read32(section) : 0)
+                << std::dec << std::endl;
             lastPage = id;
         }
         if (id == 0x9D) startupDone = true;
         const bool select = page && Memory::Read32(page + 8) == 4 &&
-            (id == 0x85 || (id == 0x51 && Memory::Read32(manager + 0x38) == 0x124 &&
+            (id == 0x85 || id == 0x86 ||
+             (id == 0x4E && (Memory::Read32(section) == 0x55 || Memory::Read32(section) == 0x84)) ||
+             (id == 0x51 && Memory::Read32(manager + 0x38) == 0x124 &&
                 Memory::Read32(manager + 0x3C) == 0x124) ||
              (product.lanInstance == 1 && id == 0x8D) ||
              (product.lanInstance != 1 && (id == 0x96 || id == 0x97)));
         if (select) {
-            if ((pulse++ % 120) < 4) pad.button |= PAD_BUTTON_A;
+            const unsigned phase = pulse++ % 120;
+            if (id == 0x86) {
+                if (phase < 4) pad.button |= PAD_BUTTON_LEFT | PAD_BUTTON_UP;
+                else if (phase >= 12 && phase < 16) pad.button |= PAD_BUTTON_A;
+            } else if (phase < 4) pad.button |= PAD_BUTTON_A;
         } else pulse = 0;
     } catch (const Memory::AccessViolation&) {
         pulse = 0;
@@ -156,6 +164,11 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     InputBindings::Apply(statuses);
     MotionTrick::Apply(statuses);
     ApplyLanMenuInput(statuses[0], rumbleMask);
+    if (const auto input = TestPadInput::ReadConfigured()) {
+        statuses[0].button |= input->buttons;
+        statuses[0].stickX = input->stickX;
+        statuses[0].stickY = input->stickY;
+    }
 
     try {
         for (uint32_t i = 0; i < PAD_CHANMAX; ++i) {

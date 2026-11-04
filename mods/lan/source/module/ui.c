@@ -29,9 +29,24 @@ static struct bmg_struct *get_lan_bmg()
 	return &lan_bmg_struct;
 }
 
+#ifdef MKW_LAN_DIAGNOSTICS
+extern void MKWDebugReport(const char *format, ...);
+static uint32_t seen_messages[128];
+static unsigned seen_message_count;
+#endif
+
 void MyBMG_Print(void *r3, struct bmg_struct *bmg1, struct bmg_struct *bmg2, int messageId, void *parameters)
 {
 	int ipParams[4];
+#ifdef MKW_LAN_DIAGNOSTICS
+    unsigned i;
+    for (i = 0; i < seen_message_count; ++i) if (seen_messages[i] == (uint32_t)messageId) break;
+    if (i == seen_message_count && i < 128) {
+        seen_messages[seen_message_count++] = messageId;
+        MKWDebugReport("LAN BMG message 0x%04x\n", messageId);
+    }
+#endif
+
 	switch (messageId)
 	{
 		case 0x07dd: messageId = 11000; break;

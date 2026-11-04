@@ -14,8 +14,14 @@ local-products
 out
 dist
 PulsarPacks
+Dependencies
 *.iso
 *.rvz
 *.wbfs
 *.gcm
 *.ciso
+*.dol
+*.rel
+*.gcz
+*.wia
+*.nkit

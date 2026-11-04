@@ -1,0 +1,16 @@
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
+# Windows SDK consumers may use Windows.h while MinGW installs windows.h.
+# Match the Windows host's header lookup semantics on a Linux filesystem.
+set(CMAKE_C_FLAGS_INIT "-ivfsoverlay /opt/windows-cross/headers.json")
+set(CMAKE_CXX_FLAGS_INIT "-ivfsoverlay /opt/windows-cross/headers.json")
+set(_mingw /opt/windows-cross/mingw)
+set(CMAKE_C_COMPILER "${_mingw}/bin/x86_64-w64-mingw32-clang")
+set(CMAKE_CXX_COMPILER "${_mingw}/bin/x86_64-w64-mingw32-clang++")
+set(CMAKE_ASM_COMPILER "${_mingw}/bin/x86_64-w64-mingw32-clang")
+set(CMAKE_RC_COMPILER "${_mingw}/bin/x86_64-w64-mingw32-windres")
+set(CMAKE_FIND_ROOT_PATH "${_mingw}/x86_64-w64-mingw32")
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)

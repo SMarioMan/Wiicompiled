@@ -58,6 +58,7 @@ retro_wfc_offline_dir=""
 skip_retro_wfc_payload=0
 force_clean_build=0
 parallel_override=0
+translate_only=0
 cc_override=""
 cxx_override=""
 cmake_override=""
@@ -84,6 +85,7 @@ Usage: local-build.sh --output-dir DIR [options]
   --skip-retro-wfc-payload        Build Retro Rewind without a Retro-WFC payload
   --force-clean-build             Discard every translation/build cache first
   --parallel N                    Pin translator threads, translated-shard job pool, and Ninja parallelism to N
+  --translate-only                Generate verified translation and build shards without compiling
   --cc PATH / --cxx PATH          C/C++ compiler (default: cc/c++ on PATH)
   --fuse-ld NAME_OR_PATH          Linker passed to clang as -fuse-ld=NAME_OR_PATH (default: clang's own default linker)
   --cmake PATH / --ninja PATH     Build tools (default: on PATH)
@@ -112,6 +114,7 @@ while [[ $# -gt 0 ]]; do
         --skip-retro-wfc-payload) skip_retro_wfc_payload=1; shift ;;
         --force-clean-build) force_clean_build=1; shift ;;
         --parallel) parallel_override=$2; shift 2 ;;
+        --translate-only) translate_only=1; shift ;;
         --cc) cc_override=$2; shift 2 ;;
         --cxx) cxx_override=$2; shift 2 ;;
         --fuse-ld) fuse_ld_override=$2; shift 2 ;;
@@ -402,6 +405,10 @@ if (( builds_retro )); then
 fi
 log_step emit-build-shards "Preparing local native build shards"
 translator "${shard_args[@]}"
+
+if (( translate_only )); then
+    exit 0
+fi
 
 # ---------------------------------------------------------------------------
 # Native configure + build. Deliberately not passing -DAURORA_DAWN_PROVIDER=package or

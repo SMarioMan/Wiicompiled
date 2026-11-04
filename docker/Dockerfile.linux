@@ -14,16 +14,20 @@ RUN --mount=type=cache,target=/opt/wiicompiled/Launcher/artifacts/downloads \
     if [ -f /run/secrets/proxy_ca ]; then export CURL_CA_BUNDLE=/run/secrets/proxy_ca; fi; \
     bash Launcher/prepare-portable-tools.sh --arch x86_64
 COPY . .
-RUN --mount=type=secret,id=proxy_ca \
+# MSBuild leaves Unix sockets under /tmp; keep them out of rootless Docker layers.
+RUN --mount=type=tmpfs,target=/tmp \
+    --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi; \
-    dotnet build Launcher/WiiCompiled.Setup.Linux -c Release
+    dotnet build Launcher/WiiCompiled.Setup.Linux -c Release && \
+    chmod -R a+rX /opt/wiicompiled
 ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-linux.sh"]
 
 # A separate named context keeps disc contents out of the builder image.
 FROM builder AS compile
 ARG GAME_SHA256
 ARG GAME_FILE=game.rvz
-RUN --mount=type=bind,from=game,target=/input,readonly \
+RUN --mount=type=tmpfs,target=/tmp \
+    --mount=type=bind,from=game,target=/input,readonly \
     --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then \
       export SSL_CERT_FILE=/run/secrets/proxy_ca CMAKE_TLS_CAINFO=/run/secrets/proxy_ca; \

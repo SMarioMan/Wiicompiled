@@ -9,7 +9,8 @@ if [[ -n $(ls -A "$output") ]]; then
     echo 'Output directory must be empty; refusing to overwrite existing files.' >&2
     exit 2
 fi
-cd /opt/wiicompiled
+source /opt/wiicompiled/docker/build-workspace.sh
+prepare_build_workspace
 [[ -f aurora-main/CMakeLists.txt ]] || {
     echo 'Initialize submodules before building the image.' >&2
     exit 1
@@ -21,6 +22,7 @@ dotnet Launcher/WiiCompiled.Setup.Linux/bin/Release/net8.0/WiiCompiled.Setup.Lin
     --cmake "$PWD/Launcher/artifacts/portable-tools/toolchain-x86_64/bin/cmake" \
     --ninja "$PWD/Launcher/artifacts/portable-tools/toolchain-x86_64/bin/ninja" --fuse-ld lld
 cp -a Assets/DATA "$output/DATA"
+cp LICENSE THIRD-PARTY-NOTICES.md "$output/"
 touch "$output/portable.txt"
 mkdir -p "$output/UserData"
 printf '[paths]\ndvd_root = "../DATA"\n' > "$output/UserData/Config.toml"

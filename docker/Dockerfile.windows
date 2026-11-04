@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1
+ARG LINUX_BUILDER=wiicompiled-linux-toolchain
+FROM ${LINUX_BUILDER} AS builder
+COPY . .
+RUN --mount=type=tmpfs,target=/tmp \
+    --mount=type=cache,target=/opt/cross-downloads \
+    --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then \
+      export CURL_CA_BUNDLE=/run/secrets/proxy_ca SSL_CERT_FILE=/run/secrets/proxy_ca \
+        CMAKE_TLS_CAINFO=/run/secrets/proxy_ca GIT_SSL_CAINFO=/run/secrets/proxy_ca; \
+    fi; \
+    bash docker/prepare-windows-cross.sh && \
+    chmod -R a+rX /opt/wiicompiled /opt/windows-cross
+ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-windows-cross.sh"]

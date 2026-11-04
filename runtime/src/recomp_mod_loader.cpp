@@ -24,16 +24,6 @@ struct ExecutableRange {
     std::string name;
 };
 
-std::vector<RecompMod::InitializerFn>& MemoryInitializers() {
-    static std::vector<RecompMod::InitializerFn> initializers;
-    return initializers;
-}
-
-std::vector<RecompMod::InitializerFn>& PostRelInitializers() {
-    static std::vector<RecompMod::InitializerFn> initializers;
-    return initializers;
-}
-
 std::vector<std::filesystem::path>& OverlayRoots() {
     static std::vector<std::filesystem::path> roots;
     return roots;
@@ -57,16 +47,6 @@ std::vector<RecompMod::MemoryReservation>& Reservations() {
 std::mutex& ModMutex() {
     static std::mutex mutex;
     return mutex;
-}
-
-bool& MemoryInitializersRan() {
-    static bool ran = false;
-    return ran;
-}
-
-bool& PostRelInitializersRan() {
-    static bool ran = false;
-    return ran;
 }
 
 std::vector<ExecutableRange>& ExecutableRanges() {
@@ -211,64 +191,6 @@ std::atomic<bool> g_executableWriteGuardEnabled{false};
 std::atomic<uint8_t> g_executableWriteGuardPages[kExecutableWriteGuardPageCount]{};
 std::atomic<uint8_t> g_executableWriteGuardCoarsePages[kExecutableWriteGuardCoarsePageCount]{};
 std::atomic<uint8_t> g_executableWriteGuardMidPages[kExecutableWriteGuardMidPageCount]{};
-
-void RegisterMemoryInitializer(InitializerFn fn) {
-    if (!fn) {
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(ModMutex());
-    MemoryInitializers().push_back(fn);
-}
-
-void RunMemoryInitializers() {
-    std::vector<InitializerFn> pending;
-    {
-        std::lock_guard<std::mutex> lock(ModMutex());
-        if (MemoryInitializersRan()) {
-            return;
-        }
-        MemoryInitializersRan() = true;
-        pending = MemoryInitializers();
-    }
-
-    for (auto* fn : pending) {
-        fn();
-    }
-
-    if (!pending.empty()) {
-        RT_LOG(RT_TAG_MOD) << "Ran " << pending.size() << " recomp mod memory initializer(s)" << std::endl;
-    }
-}
-
-void RegisterPostRelInitializer(InitializerFn fn) {
-    if (!fn) {
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(ModMutex());
-    PostRelInitializers().push_back(fn);
-}
-
-void RunPostRelInitializers() {
-    std::vector<InitializerFn> pending;
-    {
-        std::lock_guard<std::mutex> lock(ModMutex());
-        if (PostRelInitializersRan()) {
-            return;
-        }
-        PostRelInitializersRan() = true;
-        pending = PostRelInitializers();
-    }
-
-    for (auto* fn : pending) {
-        fn();
-    }
-
-    if (!pending.empty()) {
-        RT_LOG(RT_TAG_MOD) << "Ran " << pending.size() << " recomp mod post-REL initializer(s)" << std::endl;
-    }
-}
 
 void RegisterDvdOverlayRoot(std::string root) {
     if (root.empty()) {

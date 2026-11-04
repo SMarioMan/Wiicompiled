@@ -56,3 +56,9 @@ an original relative branch-and-link. Captures happen before any writes, so
 module trampolines and original-call pointers cannot accidentally capture their
 own replacements. The JSON hash is recorded in link provenance. The LAN builder
 uses this interface for its startup and OSLink patches.
+
+Module images now load after the embedded game data and before DOL constructors
+or the guest entry point. The later REL initializer applies base patches without
+recopying the module image, preserving any state changed by early hooks. Mod
+constructors still run after the REL prolog. This ordering is necessary for the
+LAN boot-argument hook, which runs before StaticR links.

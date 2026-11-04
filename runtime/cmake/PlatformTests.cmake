@@ -205,3 +205,11 @@ if(MKW_PLATFORM_MACOS)
     target_compile_features(mkw_macos_external_audio_tests PRIVATE cxx_std_17)
     add_test(NAME mkw_macos_external_audio_tests COMMAND mkw_macos_external_audio_tests)
 endif()
+
+add_executable(mkw_mod_initializers_tests
+    "${MKW_TEST_RUNTIME_DIR}/tests/mod_initializers_tests.cpp"
+    "${MKW_TEST_RUNTIME_DIR}/src/recomp_mod_initializers.cpp")
+target_include_directories(mkw_mod_initializers_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
+target_compile_features(mkw_mod_initializers_tests PRIVATE cxx_std_17)
+add_test(NAME mkw_mod_initializers_early_tests COMMAND mkw_mod_initializers_tests)
+add_test(NAME mkw_mod_initializers_late_tests COMMAND mkw_mod_initializers_tests late)

@@ -22,9 +22,10 @@ struct MemoryReservation {
     std::string name;
 };
 
-// Two initializer phases, both emitted by the translator's mod data-patch
-// writer. (A third, plain RegisterInitializer/RunInitializers pair existed with
-// no registrant on either side and was removed.)
+// Image bytes are available before any guest entry/constructor can call a mod.
+// Base/REL patches are applied at REL prolog; guest mod constructors run afterward.
+void RegisterImageInitializer(InitializerFn fn);
+void RunImageInitializers();
 void RegisterMemoryInitializer(InitializerFn fn);
 void RunMemoryInitializers();
 void RegisterPostRelInitializer(InitializerFn fn);

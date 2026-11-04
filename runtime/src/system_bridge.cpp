@@ -319,6 +319,7 @@ void SystemBridge::Initialize() {
     // initial memory state for .data, .rodata, .sdata, etc.
     RT_LOG(RT_TAG_RUNTIME) << "Initializing data sections from embedded DOL/REL data" << std::endl;
     InitializeDataSections();
+    RecompMod::RunImageInitializers();
 
     // Constructors run before the main entry point, but they still require the
     // PowerPC ABI environment. Keep using the persistent context here: the old

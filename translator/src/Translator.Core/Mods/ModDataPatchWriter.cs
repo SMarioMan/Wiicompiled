@@ -92,10 +92,6 @@ public static class ModDataPatchWriter
         sb.AppendLine("    if (kModuleBssSize != 0) {");
         sb.AppendLine("        std::memset(Memory::GetPointer(kModuleGuestBase + kModuleBssOffset, kModuleBssSize), 0, kModuleBssSize);");
         sb.AppendLine("    }");
-        if (sourceKamekCodeSha1Digest is { Length: 20 })
-        {
-            sb.AppendLine("    std::memcpy(Memory::GetPointer(0x800017B0u, 20u), kKamekCodeSha1Digest, 20u);");
-        }
         sb.AppendLine("}");
         sb.AppendLine();
         EmitStaticPatchHelpers(sb);
@@ -160,7 +156,10 @@ public static class ModDataPatchWriter
             sb.AppendLine();
         }
         sb.AppendLine("void ApplyDataPatches() {");
-        sb.AppendLine("    InitializeModuleImage();");
+        if (sourceKamekCodeSha1Digest is { Length: 20 })
+        {
+            sb.AppendLine("    std::memcpy(Memory::GetPointer(0x800017B0u, 20u), kKamekCodeSha1Digest, 20u);");
+        }
         sb.AppendLine("    ApplyExecutableBasePatches();");
         foreach (var patch in patchPlan.DataPatches.OrderBy(p => p.CommandAddress))
         {
@@ -179,6 +178,7 @@ public static class ModDataPatchWriter
         sb.AppendLine("struct RegisterModDataPatches {");
         sb.AppendLine("    RegisterModDataPatches() {");
         sb.AppendLine("        RecompMod::RegisterMemoryReservation(kModuleGuestBase, kModuleReservedEnd, \"Kamek module\");");
+        sb.AppendLine("        RecompMod::RegisterImageInitializer(&InitializeModuleImage);");
         sb.AppendLine("        RecompMod::RegisterMemoryInitializer(&ApplyDataPatches);");
         if (emitCtorRunner)
         {

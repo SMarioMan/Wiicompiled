@@ -109,7 +109,18 @@ Each instance needs a valid license in slot zero. If no license exists, the
 module returns to the normal first-run menu instead of using the debug online
 boot path. Create the license through the game, then restart the instance.
 The native menu driver accepts the LAN data prompt and stops providing automatic
-input after reaching the friend room.
+input after reaching the friend room. Normal first-run license creation has also
+been exercised through controller input with an initially empty license slot.
+For a fresh private portable product, this automated check presses the normal
+menu controls, then requires an on-disk license with a valid save CRC:
+
+```sh
+python3 mods/lan/tests/create_profile.py --product '/absolute/path/LAN Host'
+```
+
+It refuses an existing license in slot zero. It uses the default Mii selected by
+the game and writes its game log to `lan-profile-game.log`. Restart the product
+after creation to enter the LAN boot path.
 
 With a working display (or Xvfb) and two prepared portable products, run:
 

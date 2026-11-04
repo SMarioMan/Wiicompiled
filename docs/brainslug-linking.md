@@ -46,3 +46,13 @@ BSS, pointer/scalar relocations, malformed input, and signature ambiguity checks
 The original LAN v0.9 module and the attached script's modified module have also
 been linked against the verified USA game (ten and twelve hooks respectively).
 Multi-instance LAN gameplay and 24-player gameplay remain unverified.
+
+`--patches static-patches.json` additionally lowers explicit build-time writes.
+Each record has `Operation`, `Address` and `Value` strings. References are hex
+literals, `game:importName` or `module:symbolName`, with optional `+0xOFFSET`
+terms. Supported operations are scalar writes, pointer/halfword relocations,
+branches, `Copy32`/`Copy16` from clean game code and `CaptureBranchTarget` from
+an original relative branch-and-link. Captures happen before any writes, so
+module trampolines and original-call pointers cannot accidentally capture their
+own replacements. The JSON hash is recorded in link provenance. The LAN builder
+uses this interface for its startup and OSLink patches.

@@ -1,0 +1,12 @@
+{
+  "upstream_archive": "https://www.chadsoft.co.uk/downloads/LAN_MKW_v0.9.zip",
+  "upstream_sha256": "2a8d76844e79b23b147ea97f134386d313401e0535c2f52da9ab41822369095e",
+  "attachment_name": "build_lan.py",
+  "attachment_sha256": "7938b060e0457c6827d660b1bed8ea5e62baffc0865040b16b81ae72895bda9f",
+  "changes": [
+    "Loopback networking and boot/menu hooks from the user-supplied script.",
+    "Lower startup and OSLink code writes into static Kamek patches.",
+    "Move PADRead automation into the native runtime.",
+    "Use freestanding Clang and LLVM lld instead of devkitPPC."
+  ]
+}

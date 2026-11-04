@@ -223,6 +223,15 @@ int RunLinkBrainSlug(string[] argsTail)
         var moduleBytes = File.ReadAllBytes(modulePath);
         var module = BrainSlugElfFile.Parse(moduleBytes);
         var linked = module.Link(Resolve, ReadInstruction);
+        var patchesPath = OptionValue(argsTail, "--patches");
+        var patchesBytes = patchesPath is null ? null : File.ReadAllBytes(patchesPath);
+        if (patchesBytes is not null)
+        {
+            var patches = JsonSerializer.Deserialize<List<BrainSlugStaticPatch>>(patchesBytes,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                ?? throw new InvalidDataException("Invalid static patch JSON.");
+            linked = BrainSlugStaticPatches.Apply(linked, patches, Resolve, ReadInstruction);
+        }
         var moduleBase = OptionValue(argsTail, "--module-guest-base") is { } baseText ? ParseAddress(baseText) : 0x81800000u;
         linked.ValidatePlacement(moduleBase);
         var region = project.Identity.Region ?? throw new InvalidDataException("BrainSlug linking requires a region in the project manifest.");
@@ -232,6 +241,7 @@ int RunLinkBrainSlug(string[] argsTail)
         {
             Format = "brainslug-kamek-link-v1", project.Identity.GameId, Region = region,
             ElfSha256 = ChecksumUtilities.Sha256Hex(moduleBytes),
+            StaticPatchesSha256 = patchesBytes is null ? null : ChecksumUtilities.Sha256Hex(patchesBytes),
             CodePulSha256 = ChecksumUtilities.Sha256Hex(pul), ModuleGuestBase = moduleBase,
             linked.RequiredAlignment, linked.Hooks, linked.SymbolOffsets,
             ResolvedImports = resolved,
@@ -240,7 +250,7 @@ int RunLinkBrainSlug(string[] argsTail)
         FileOutput.WriteBytesIfChanged(output, pul);
         FileOutput.WriteTextIfChanged(output + ".json", metadata);
         Console.WriteLine($"[translator] linked {linked.Hooks.Count} BrainSlug hook(s), {module.Imports.Count} import(s), {linked.Chunk.Commands.Count} relocation/patch command(s): {output}");
-        Console.WriteLine("[translator] This does not lower a module's runtime instruction writes; they must be incorporated before static translation.");
+        Console.WriteLine("[translator] Runtime instruction writes are not inferred; all such writes must be supplied as static patches before translation.");
         return 0;
     }
     catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or InvalidOperationException or JsonException or OverflowException or XmlException)
@@ -3792,6 +3802,7 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
         new("--out", "path/to/Code.pul", Required: true),
         new("--imports", "verified-import-addresses.json"),
         new("--symbols-dir", "brainslug-symbols-directory"),
+        new("--patches", "static-patches.json"),
         new("--module-guest-base", "0x81800000")
     }),
     "check-base-mod-awareness" => (null, new CommandOption[]

@@ -70,3 +70,27 @@ profiles:
         - section: Retro Rewind
           option: Pack
           choice: 1
+
+  lan-host:
+    enabled: true
+    requires_game_id: RMCE01
+    requires_dol_sha256: d2beec1b1645fcd134efe9e7e63774b546667764ed8d431029daccd725995694
+    code_pul: build/lan-host/Code.pul
+    mod_root: build/lan-host
+    region: E
+    module_guest_base: 0x81800000
+    module_link_base: 0x81800000
+    output: build/mods/lan-host
+    enable_retro_wfc: false
+
+  lan-client:
+    enabled: true
+    requires_game_id: RMCE01
+    requires_dol_sha256: d2beec1b1645fcd134efe9e7e63774b546667764ed8d431029daccd725995694
+    code_pul: build/lan-client/Code.pul
+    mod_root: build/lan-client
+    region: E
+    module_guest_base: 0x81800000
+    module_link_base: 0x81800000
+    output: build/mods/lan-client
+    enable_retro_wfc: false

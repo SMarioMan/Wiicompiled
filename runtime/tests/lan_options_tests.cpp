@@ -25,12 +25,17 @@ int main() {
     Invalid([&] { join.Parse("--lan-id=-1"); });
     Options remote;
     Check(remote.Parse("--lan-bind=192.168.1.10"));
-    Invalid([&] { remote.Validate(); });
+    remote.Validate(); // multicast discovery does not require a peer list
     Check(remote.Parse("--lan-peer=192.168.1.20"));
     remote.Validate();
     Check(remote.bindAddress == 0xc0a8010a && remote.peers[0] == 0xc0a80114);
     for (const auto ip : {"1.2.3", "1.2.3.4.5", "256.2.3.4", "1..3.4", "0.0.0.0", "255.255.255.255", "224.0.0.1"})
         Invalid([&] { Options::Address(ip); });
+    Options local;
+    Check(local.Parse("--lan-local"));
+    Check(local.localOnly);
+    local.Parse("--lan-bind=127.0.0.1");
+    Invalid([&] { local.Validate(); });
     Options mismatch;
     mismatch.Parse("--lan-id=12"); mismatch.Parse("--lan-peers=2");
     Invalid([&] { mismatch.Validate(); });

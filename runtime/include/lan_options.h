@@ -12,6 +12,7 @@ struct Options {
     uint32_t instances = 12;
     Automation automation = Automation::Manual;
     uint32_t bindAddress = 0;
+    bool localOnly = false;
     std::vector<uint32_t> peers;
 
     static uint32_t Number(std::string_view value, uint32_t maximum) {
@@ -44,7 +45,8 @@ struct Options {
             if (automation != Automation::Manual && automation != selected)
                 throw std::invalid_argument("Choose only one LAN automation role");
             automation = selected;
-        } else if (argument.starts_with("--lan-id=")) instance = Number(argument.substr(9), 12);
+        } else if (argument == "--lan-local") localOnly = true;
+        else if (argument.starts_with("--lan-id=")) instance = Number(argument.substr(9), 12);
         else if (argument.starts_with("--lan-peers=")) instances = Number(argument.substr(12), 12);
         else if (argument.starts_with("--lan-bind=")) bindAddress = Address(argument.substr(11));
         else if (argument.starts_with("--lan-peer=")) {
@@ -55,8 +57,8 @@ struct Options {
     }
     void Validate() const {
         if (instance > instances) throw std::invalid_argument("--lan-id must not exceed --lan-peers");
-        if (bindAddress && (bindAddress >> 24) != 127 && peers.empty())
-            throw std::invalid_argument("A physical --lan-bind address requires at least one --lan-peer address");
+        if (bindAddress && localOnly)
+            throw std::invalid_argument("Choose --lan-local or --lan-bind, not both");
     }
 };
 } // namespace LanRuntime

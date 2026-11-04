@@ -244,6 +244,7 @@ void WritePollResults(uint32_t outAddress,
 // network_socket.cpp
 void CleanupAllWiiSockets();
 sockaddr_in ReadWiiSockAddr(uint32_t addr);
+in_addr ResolveDefaultInterfaceIp(in_addr fallback);
 int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t outBuf,
                          uint32_t outLen);
 int32_t HandleIpTopIoctlv(uint32_t cmd, const std::vector<IoVector>& in,

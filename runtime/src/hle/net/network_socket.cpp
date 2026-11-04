@@ -1,4 +1,5 @@
 #include "network_internal.h"
+#include "hle/socket_option_contract.h"
 
 namespace NetworkHle {
 
@@ -75,34 +76,7 @@ static void WriteWiiSockAddr(uint32_t addr, const sockaddr_in& native, uint32_t 
     Memory::Write32(addr + 4, ntohl(native.sin_addr.s_addr));
 }
 
-static int MapSockOptLevel(uint32_t level) {
-    return level == 0xFFFF ? SOL_SOCKET : static_cast<int>(level);
-}
-
-static int MapSockOptName(uint32_t optname) {
-    switch (optname) {
-    case 0x4:
-        return SO_REUSEADDR;
-    case 0x80:
-        return SO_LINGER;
-    case 0x100:
-        return SO_OOBINLINE;
-    case 0x1001:
-        return SO_SNDBUF;
-    case 0x1002:
-        return SO_RCVBUF;
-    case 0x1008:
-        return SO_TYPE;
-    case 0x1009:
-        return SO_ERROR;
-    default:
-        return static_cast<int>(optname);
-    }
-}
-
-static in_addr ResolveDefaultInterfaceIp() {
-    in_addr fallback{};
-    fallback.s_addr = inet_addr("10.0.1.30");
+in_addr ResolveDefaultInterfaceIp(in_addr fallback) {
     if (!EnsureSocketRuntime()) {
         return fallback;
     }
@@ -116,7 +90,10 @@ static in_addr ResolveDefaultInterfaceIp() {
     remote.sin_family = AF_INET;
     remote.sin_addr.s_addr = inet_addr("8.8.8.8");
     remote.sin_port = htons(53);
-    connect(s, reinterpret_cast<const sockaddr*>(&remote), sizeof(remote));
+    if (connect(s, reinterpret_cast<const sockaddr*>(&remote), sizeof(remote)) != 0) {
+        CloseNativeSocket(s);
+        return fallback;
+    }
 
     sockaddr_in local{};
     socklen_t len = sizeof(local);
@@ -126,6 +103,12 @@ static in_addr ResolveDefaultInterfaceIp() {
     }
     CloseNativeSocket(s);
     return local.sin_addr;
+}
+
+static in_addr ResolveDefaultInterfaceIp() {
+    in_addr fallback{};
+    fallback.s_addr = inet_addr("10.0.1.30");
+    return ResolveDefaultInterfaceIp(fallback);
 }
 
 static int32_t HandleInetAton(uint32_t inBuf, uint32_t inLen, uint32_t outBuf, uint32_t outLen) {
@@ -230,8 +213,9 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
         if (!outBuf || outLen < 0x14) return -SO_EINVAL;
         WiiSocket* s = GetWiiSocket(Memory::Read32(outBuf));
         if (!s) return -SO_EBADF;
-        const int level = MapSockOptLevel(Memory::Read32(outBuf + 4));
-        const int optname = MapSockOptName(Memory::Read32(outBuf + 8));
+        const auto guestLevel = Memory::Read32(outBuf + 4);
+        const int level = SocketOptionContract::Level(guestLevel);
+        const int optname = SocketOptionContract::Name(guestLevel, Memory::Read32(outBuf + 8));
         int value = 0;
         socklen_t valueLen = sizeof(value);
         const int ret = getsockopt(s->native, level, optname, reinterpret_cast<char*>(&value), &valueLen);
@@ -243,10 +227,19 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
         if (!inBuf || inLen < 0x10) return -SO_EINVAL;
         WiiSocket* s = GetWiiSocket(Memory::Read32(inBuf));
         if (!s) return -SO_EBADF;
-        const int level = MapSockOptLevel(Memory::Read32(inBuf + 4));
-        const int optname = MapSockOptName(Memory::Read32(inBuf + 8));
+        const auto guestLevel = Memory::Read32(inBuf + 4);
+        const auto guestName = Memory::Read32(inBuf + 8);
+        const int level = SocketOptionContract::Level(guestLevel);
+        const int optname = SocketOptionContract::Name(guestLevel, guestName);
         const uint32_t optLen = std::min<uint32_t>(Memory::Read32(inBuf + 0x0C), inLen - 0x10);
         const char* optVal = reinterpret_cast<const char*>(Memory::GetPointer(inBuf + 0x10, optLen));
+        if (SocketOptionContract::IsInteger(guestLevel, guestName)) {
+            int value = 0;
+            if (!SocketOptionContract::Integer({reinterpret_cast<const uint8_t*>(optVal), optLen}, value))
+                return -SO_EINVAL;
+            return SocketResult(setsockopt(s->native, level, optname,
+                reinterpret_cast<const char*>(&value), sizeof(value)), false);
+        }
         return SocketResult(setsockopt(s->native, level, optname, optVal, static_cast<int>(optLen)), false);
     }
     case IOCTL_SO_LISTEN: {

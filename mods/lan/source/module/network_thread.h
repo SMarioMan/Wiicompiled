@@ -7,9 +7,12 @@
 #include <stdint.h>
 
 #include "mkw.h"
+#include "local_config.h"
 
 #define NETWORK_THREAD_SIZE 0x4000
-#define FAKE_PUBLIC_IP 0x08080808
+/* Preserve the SDK's same-NAT shortcut; real peer IPs come from LAN discovery.
+ * Host-assigned game ports distinguish peers without invoking GameSpy NAT. */
+#define MKW_ADVERTISED_IP 0x08080808
 
 struct peer_info {
 	uint32_t ip;

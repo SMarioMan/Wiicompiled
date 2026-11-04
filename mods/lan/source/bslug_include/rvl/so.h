@@ -203,11 +203,17 @@ struct so_ainfo_t {
 };
 
 enum so_lvl_t {
+    SOL_IP = 0,
     SOL_INTERFACE = 0xfffe,
     SOL_SOCKET = 0xffff,
 };
 
 enum so_opt_t {
+    IP_MULTICAST_IF = 9,
+    IP_MULTICAST_TTL = 10,
+    IP_MULTICAST_LOOP = 11,
+    IP_ADD_MEMBERSHIP = 12,
+    IP_DROP_MEMBERSHIP = 13,
     SO_REUSEADDR = 0x0004,
     SO_SNDBUF = 0x1001,
     SO_RCVBUF = 0x1002,

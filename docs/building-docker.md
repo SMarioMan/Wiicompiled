@@ -149,26 +149,32 @@ copy the entire release to separate directories and assign unique runtime IDs:
 
 ```sh
 # From the first portable directory; optionally automate creating a room:
-./WiiCompiledLAN --lan-id=1 --lan-host
+./WiiCompiledLAN --lan-local --lan-id=1 --lan-host
 # From a separate copy of the SAME release; optionally join the first host:
-./WiiCompiledLAN --lan-id=2 --lan-join
+./WiiCompiledLAN --lan-local --lan-id=2 --lan-join
 # Manual menus can host or join, regardless of ID:
-./WiiCompiledLAN --lan-id=3
+./WiiCompiledLAN --lan-local --lan-id=3
 ```
 
 Automation ends on reaching the first room. Each process uses its own writable
-`UserData`; local discovery uses `127.0.0.ID:27900` and game traffic uses port
-27901. Default discovery covers IDs 1–12; `--lan-peers=N` can reduce that range.
-For separate machines, bind the actual LAN address and list peers at runtime:
+`UserData`. `--lan-local` binds `127.0.0.ID` for multiple instances on one machine;
+use a distinct ID for each copy (currently 1–12).
+
+Without `--lan-local`, the executable selects the default LAN interface and
+finds nearby lobbies through IPv4 multicast at `239.255.77.75:27909`, with a
+one-hop TTL. No peer list is required. Select an interface explicitly when needed:
 
 ```sh
-./WiiCompiledLAN --lan-bind=192.168.1.10 --lan-peer=192.168.1.20
+./WiiCompiledLAN --lan-bind=192.168.1.10
 # On the other machine:
-./WiiCompiledLAN --lan-bind=192.168.1.20 --lan-peer=192.168.1.10
+./WiiCompiledLAN --lan-bind=192.168.1.20
 ```
 
-Repeat `--lan-peer=IP` for additional peers. UDP ports 27900 and 27901 must be
-reachable between them. These network settings do not restrict who can create a
+Multicast handles discovery; lobby negotiation uses unicast UDP port 27900 and
+race packets go directly to the advertised peer endpoints. Permit incoming UDP
+traffic for the executable in the host firewall. If the network filters multicast,
+add repeatable `--lan-peer=IP` options to both sides for unicast discovery.
+These network settings do not restrict who can create a
 room. See the [LAN tests](../mods/lan/README.md) for first-run, room and race checks.
 Rendering, completed races and Windows LAN gameplay remain unverified;
 24-player support is not implemented.

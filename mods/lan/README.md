@@ -27,11 +27,21 @@ hooks run. Runtime configuration changes data, never PowerPC instructions.
 There are no compiled host/client roles or instance IDs. Current capacity is
 twelve players; 24-player layouts remain unfinished.
 
+Validated on Linux with the Null renderer: two local instances and two separate
+network namespaces discover and race without explicit peers; four simultaneous
+local instances join one room and advance together in online VS. Concurrent
+server reservations are queued while the SDK finishes its active handshake.
+Completed races, rendering and Windows LAN gameplay remain unverified.
+
 Default startup preserves the normal menus. Any instance can create a room or
 choose a room from the friend roster. Optional `--lan-host` and `--lan-join`
 automate the initial connection; they stop imposing a role after the first room.
-`--lan-id=N` selects a distinct local socket identity. On separate machines,
-`--lan-bind=IP` and repeatable `--lan-peer=IP` select real LAN endpoints. PIDs derive
+The default interface is selected automatically. Discovery uses multicast group
+`239.255.77.75:27909` with TTL 1; game traffic remains unicast. `--lan-bind=IP`
+selects a particular LAN interface, and repeatable `--lan-peer=IP` options add
+unicast discovery destinations if multicast is filtered. For multiple processes
+on one machine, use `--lan-local --lan-id=N` with distinct IDs and separate
+portable directories. PIDs derive
 from the bound address, independently of lobby role. See the
 [Docker build/run examples](../../docs/building-docker.md#optional-lan-product).
 
@@ -137,22 +147,29 @@ python3 mods/lan/tests/local_pair.py \
   --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
 ```
 
-The test requires identical executable hashes in both directories. It passes
-runtime IDs and automation flags; use `--host-id=2 --client-id=1` to reverse the
-roles with the same executable. Run local processes in the same network namespace. The test checks unique source
-addresses, host/client states, two players on both peers and five seconds in the
-active room. It exits nonzero on process exit, timeout or address mismatch,
-writes `lan-test-game.log` in each product, and terminates both processes on exit.
-This default check verifies room joining. Add `--race` to drive the host's Start
-button, character/kart/drift selection and course voting through controller input:
+The test requires identical executable hashes in all directories. It passes
+`--lan-local`, runtime IDs and automation flags; use `--host-id=2 --client-id=1`
+to reverse the roles with the same executable. Repeat `--client` for additional
+independent portable directories (currently up to twelve total instances).
+Optional repeated `--client-id` values follow the client directory order;
+otherwise the test assigns distinct IDs automatically. Run local processes in
+the same network namespace. Discovery uses multicast, with no peer list supplied.
+
+The test checks unique source addresses, host/client states, the expected player
+count on every peer and five seconds in the active room. It exits nonzero on
+process exit, timeout or address mismatch, writes `lan-test-game.log` in each
+product, and terminates its processes on exit. Add `--race` to drive the host's
+Start button, character/kart/drift selection and course voting through controller
+input:
 
 ```sh
 python3 mods/lan/tests/local_pair.py --race \
-  --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
+  --host '/absolute/path/LAN Host' \
+  --client '/absolute/path/LAN Client 1' --client '/absolute/path/LAN Client 2'
 ```
 
-The race check additionally requires both games' in-race scenarios to contain
-two players on the same course, reach racing stage 2, and advance at least 120
+The race check requires every game's in-race scenario to contain the expected
+player count on the same course, reach racing stage 2, and advance at least 120
 simulation frames each over five seconds. It uses separate `MKWR` telemetry
 packets; the original `MKWL` room-status packet stays compatible. This test passed
 with both cleaned native Linux builds. It does not verify finishing a race,

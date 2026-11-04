@@ -1,4 +1,5 @@
 #include "local_config.h"
+#include "log.h"
 #include <rvl/so.h>
 /* main.c
  *   by Alex Chadwick
@@ -192,6 +193,9 @@ static uint8_t Mydwc_get_friend_status(const struct dwc_buddy *buddy, uint8_t *l
 static bool MyDWC_SetupGameServer(int player_count, void (*r4)(void *), void *r5, int r6, int r7, void (*r8)(void *), uint8_t *r9, void *r10) {
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
 	setup_pid(gamedata);
+#ifdef MKW_LAN_DIAGNOSTICS
+    MKWDebugReport("LAN server setup count=%d flags=%d,%d\n", player_count, r6, r7);
+#endif
 	bool result = DWC_SetupGameServer(player_count, r4, r5, r6, r7, r8, r9, r10);
 	network_thread_after_server_setup(gamedata);
 	return result;
@@ -221,7 +225,7 @@ static int Mydwc_send_status_record(int type, uint32_t pid, uint32_t ip, uint16_
 }
 
 static uint32_t MyServerBrowserGetMyPublicIPAddr(void *sb) {
-	return FAKE_PUBLIC_IP;
+	return MKW_ADVERTISED_IP;
 }
 
 
@@ -240,10 +244,20 @@ static so_ret_t MKWBind(so_fd_t fd, const so_addr_t *address) {
     so_addr_t local = *address;
     if (local.sa_family == AF_INET) {
         local.sa_addr = MKW_LOCAL_IP;
-        /* DWC's random ephemeral port can fall in Windows/Hyper-V exclusions. */
-        if (local.sa_port != 27900) local.sa_port = 27901;
+        /* Let the host choose an available port, including on Windows with
+           excluded port ranges. The SDK advertises the assigned endpoint. */
+        if (local.sa_port != 27900) local.sa_port = 0;
     }
-    return SOBind(fd, &local);
+    const so_ret_t result = SOBind(fd, &local);
+#ifdef MKW_LAN_DIAGNOSTICS
+    if (result == SO_OK) {
+        so_addr_t actual = { .sa_len = sizeof(actual) };
+        if (SOGetSockName(fd, &actual) == SO_OK)
+            MKWDebugReport("LAN bound socket %d requested=%u actual=%u ip=%x\n", fd,
+                (unsigned)address->sa_port, (unsigned)actual.sa_port, (unsigned)actual.sa_addr);
+    }
+#endif
+    return result;
 }
 static uint32_t MKWHostID(void) { return MKW_LOCAL_IP; }
 BSLUG_MUST_REPLACE(SOBind, MKWBind);

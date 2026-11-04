@@ -1,4 +1,5 @@
 #include "lan_runtime.h"
+#include "hle/net/network_internal.h"
 #include "memory.h"
 #include "runtime_log.h"
 #include "runtime_product.h"
@@ -26,7 +27,15 @@ void InitializeGuest() {
     Memory::Write32(address+8, options.instance);
     Memory::Write32(address+12, options.instances);
     Memory::Write32(address+16, static_cast<uint32_t>(options.automation));
-    Memory::Write32(address+20, options.bindAddress);
+    uint32_t bindAddress = options.bindAddress;
+    if (!bindAddress) {
+        if (options.localOnly) bindAddress = 0x7f000000 | options.instance;
+        else {
+            in_addr fallback{}; fallback.s_addr = htonl(0x7f000001);
+            bindAddress = ntohl(NetworkHle::ResolveDefaultInterfaceIp(fallback).s_addr);
+        }
+    }
+    Memory::Write32(address+20, bindAddress);
     Memory::Write32(address+24, static_cast<uint32_t>(options.peers.size()));
     for (size_t i = 0; i < options.peers.size(); i++) Memory::Write32(address+28+uint32_t(i)*4, options.peers[i]);
     RT_LOG(RT_TAG_MOD) << "LAN runtime instance " << options.instance << ", automation "

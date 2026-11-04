@@ -16,6 +16,8 @@
 
 // port to do udp advertisement on
 #define BROADCAST_PORT 27900
+#define DISCOVERY_PORT 27909
+#define DISCOVERY_GROUP 0xefff4d4b /* 239.255.77.75 */
 #define BROADCAST_INTERVAL 60
 #define BROADCAST_TIMEOUT (BROADCAST_INTERVAL * 5)
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
@@ -31,7 +33,8 @@ uint32_t local_ip;
 bool network_thread_running;
 
 static uint64_t timestamp;
-static so_fd_t broadcast_socket;
+static so_fd_t broadcast_socket = -1;
+static so_fd_t multicast_socket = -1;
 static int broadcast_timer;
 static int8_t game_state; // 1 is idling
 static uint16_t communication_port;
@@ -59,11 +62,43 @@ static struct tracked_peer {
 	uint8_t mii[MII_SIZE];
 } tracked_peers[BROADCAST_TRACK_MAX];
 
+static void close_discovery(void) {
+    if (multicast_socket >= 0) SOClose(multicast_socket);
+    if (broadcast_socket >= 0) SOClose(broadcast_socket);
+    multicast_socket = broadcast_socket = -1;
+}
+
+static bool initialise_multicast(void) {
+    /* A separate shared multicast receiver keeps unicast SDK replies routed
+       to their own per-instance socket, rather than a wildcard reuse socket. */
+    multicast_socket = SOSocket(PF_INET, SOCK_DGRAM, PROTO_UDP);
+    if (multicast_socket < 0) return false;
+    const uint32_t enabled = 1;
+    const uint32_t interface = (local_ip >> 24) == 127 ? 0x7f000001 : local_ip;
+    const uint32_t membership[2] = { DISCOVERY_GROUP, interface };
+    const so_addr_t address = {
+        .sa_len = sizeof(so_addr_t), .sa_family = AF_INET,
+        .sa_port = DISCOVERY_PORT, .sa_addr = 0
+    };
+    /* Module imports use SOBind's original-function trampoline. */
+    if (SOSetSockOpt(multicast_socket, SOL_SOCKET, SO_REUSEADDR, &enabled, sizeof(enabled)) < 0 ||
+        SOBind(multicast_socket, &address) < 0 ||
+        SOSetSockOpt(multicast_socket, SOL_IP, IP_ADD_MEMBERSHIP, membership, sizeof(membership)) < 0 ||
+        set_nonblock(multicast_socket) < 0 ||
+        SOSetSockOpt(broadcast_socket, SOL_IP, IP_MULTICAST_IF, &interface, sizeof(interface)) < 0 ||
+        SOSetSockOpt(broadcast_socket, SOL_IP, IP_MULTICAST_TTL, &enabled, sizeof(enabled)) < 0 ||
+        SOSetSockOpt(broadcast_socket, SOL_IP, IP_MULTICAST_LOOP, &enabled, sizeof(enabled)) < 0) {
+        LOG_ERROR("could not initialise multicast discovery");
+        return false;
+    }
+    return true;
+}
+
 static bool initialise(void) {
 	if (game_state != 0)
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
-	local_ip = SOGetHostID();
+	local_ip = MKW_LOCAL_IP;
 	if (local_ip == 0) {
 		LOG_ERROR("SOGetHostID returned 0");
 		return false;
@@ -94,6 +129,8 @@ static bool initialise(void) {
 		return false;
 	}
 
+    if (!initialise_multicast()) return false;
+
 	r = dwc_init_gt2_socket();
 	if (r != 0) {
 		LOG_ERROR("dwc_init_gt2_socket returned %d", r);
@@ -102,6 +139,7 @@ static bool initialise(void) {
 
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
 	communication_port = gamedata->gamedata2->socket->local_port;
+    LOG_INFO("advertised game port %u", (unsigned)communication_port);
 	gamedata->gamedata2->online_status = 3;
 
 	return true;
@@ -205,21 +243,16 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 		.sa_port = BROADCAST_PORT,
 		.sa_addr = 0xffffffff
 	};
-	/* One unicast per local instance; no wildcard port or broadcast sharing. */
-    if (mkw_lan_config.peer_count) {
-        for (unsigned i = 0; i < mkw_lan_config.peer_count; i++) {
-            so_addr_t destination = baddr;
-            destination.sa_addr = mkw_lan_config.peers[i];
-            if (destination.sa_addr != local_ip)
-                SOSendTo(fd, &packet, sizeof(packet), 0, &destination);
-        }
-    } else {
-        for (unsigned i = 1; i <= MKW_INSTANCE_COUNT; i++) {
-            if ((0x7f000000 | i) == local_ip) continue;
-            so_addr_t destination = baddr;
-            destination.sa_addr = 0x7f000000 | i;
+	so_addr_t discovery = baddr;
+    discovery.sa_addr = DISCOVERY_GROUP;
+    discovery.sa_port = DISCOVERY_PORT;
+    SOSendTo(fd, &packet, sizeof(packet), 0, &discovery);
+    /* Explicit peers remain a fallback across multicast-filtering links. */
+    for (unsigned i = 0; i < mkw_lan_config.peer_count; i++) {
+        so_addr_t destination = baddr;
+        destination.sa_addr = mkw_lan_config.peers[i];
+        if (destination.sa_addr != local_ip)
             SOSendTo(fd, &packet, sizeof(packet), 0, &destination);
-        }
     }
     /* Optional launcher status channel; gameplay does not depend on a listener. */
     uint32_t status[7] = { 0x4d4b574c, MKW_INSTANCE_ID, (uint32_t)game_state,
@@ -313,6 +346,15 @@ static void process_broadcast(const struct broadcast_packet buffer, const so_add
 	_CPU_ISR_Restore(isr);
 }
 
+/* The SDK handles one server reservation at a time. Defer concurrent
+ * requests until the active handshake finishes; keep other commands flowing. */
+static struct pending_reservation {
+    uint64_t received_at;
+    uint32_t length;
+    so_addr_t address;
+    uint32_t packet[STATUS_SIZE_MAX / 4];
+} pending_reservations[BROADCAST_TRACK_MAX];
+
 static void process_status(uint32_t *buffer, int32_t length, const so_addr_t raddr) {
 	LOG_INFO("receive size %u from %x:%u", (unsigned)length, (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
 	if (length < 0x14) return;
@@ -320,7 +362,21 @@ static void process_status(uint32_t *buffer, int32_t length, const so_addr_t rad
 	if (buffer[0] != STATUS_MAGIC) return;
 	LOG_INFO("receive status message %u from %x:%u", (unsigned)(buffer[2] >> 24), (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
-	gamedata->public_ip = FAKE_PUBLIC_IP;
+    if ((buffer[2] >> 24) == 1 &&
+        gamedata->dwc_match_state >= DWC_MATCH_STATE_SV_OWN_NN &&
+        gamedata->dwc_match_state <= DWC_MATCH_STATE_SV_SYN_WAIT) {
+        const int peer = find_peer_by_pid(__builtin_bswap32(buffer[4]));
+        if (peer >= 0) {
+            struct pending_reservation *pending = &pending_reservations[peer];
+            pending->received_at = timestamp;
+            pending->address = raddr;
+            pending->length = length;
+            for (unsigned i = 0; i < (unsigned)length / 4; i++) pending->packet[i] = buffer[i];
+            LOG_INFO("queued concurrent reservation from %x", (unsigned)raddr.sa_addr);
+            return;
+        }
+    }
+	gamedata->public_ip = MKW_ADVERTISED_IP;
 	dwc_process_status_record(buffer[2] >> 24, __builtin_bswap32(buffer[4]), raddr.sa_addr, raddr.sa_port, buffer + 5, (buffer[2] >> 18) & 0x3f);
 }
 
@@ -345,18 +401,18 @@ bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status) {
 	return true;
 }
 
-static void check_for_status_or_broadcast() {
+static void receive_packets(so_fd_t socket, bool allow_status) {
 	so_ret_t r;
 	do {
 		uint32_t buffer[STATUS_SIZE_MAX / 4];
 		so_addr_t raddr = { .sa_len = sizeof(so_addr_t) };
-		r = SORecvFrom(broadcast_socket, &buffer, sizeof(buffer), 0, &raddr);
+		r = SORecvFrom(socket, &buffer, sizeof(buffer), 0, &raddr);
 		if (r <= 0) break;
 		if (r < 0x4) {
 			LOG_ERROR("received overly short message. %u length", (unsigned)r);
 			continue;
 		}
-		if (buffer[0] == STATUS_MAGIC) {
+		if (allow_status && buffer[0] == STATUS_MAGIC) {
 			process_status(buffer, r, raddr);
 		} else if (buffer[0] == BROADCAST_MAGIC) {
 			if (r != sizeof(struct broadcast_packet)) continue;
@@ -365,6 +421,24 @@ static void check_for_status_or_broadcast() {
 			LOG_ERROR("received unknown message. %u length %x header", (unsigned)r, (unsigned)buffer[0]);
 		}
 	} while (r > 0);
+ }
+
+static void check_for_status_or_broadcast(void) {
+    receive_packets(broadcast_socket, true);
+    receive_packets(multicast_socket, false);
+    struct dwc_gamedata *gamedata = get_dwc_gamedata();
+    if (gamedata && gamedata->dwc_match_state == DWC_MATCH_STATE_SV_WAITING) {
+        for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++) {
+            struct pending_reservation *pending = &pending_reservations[i];
+            if (!pending->length) continue;
+            const uint32_t length = pending->length;
+            pending->length = 0;
+            if (timestamp - pending->received_at > BROADCAST_TIMEOUT) continue;
+            LOG_INFO("resuming queued reservation from %x", (unsigned)pending->address.sa_addr);
+            process_status(pending->packet, length, pending->address);
+            break;
+        }
+    }
 	for (int i = 0; i < BROADCAST_TRACK_MAX; i++) {
 		if (tracked_peers[i].last_update + BROADCAST_TIMEOUT < timestamp) {
 			tracked_peers[i].info.status = 0;
@@ -376,6 +450,8 @@ void* network_thread_main(void *arg) {
 	network_thread_running = true;
 	LOG_INFO("network_thread startup");
 	if (!initialise()) {
+        close_discovery();
+        network_thread_running = false;
 		mkw_net_state->connection_state = 5; // idk lol
 		return NULL;
 	}
@@ -416,18 +492,22 @@ void* network_thread_main(void *arg) {
 		VIWaitForRetrace();
 	}
 	LOG_INFO("network_thread exit");
+    close_discovery();
 	my_mii = 0;
 	for (int i = 0; i < BROADCAST_TRACK_MAX; i++)
-		tracked_peers[i] = (struct tracked_peer){ };
+		{
+            tracked_peers[i] = (struct tracked_peer){ };
+            pending_reservations[i].length = 0;
+        }
 	network_thread_running = false;
 	return NULL;
 }
 
 static void fill_in_peer_0(struct dwc_gamedata *gamedata) {
 	gamedata->public_port = communication_port;
-	gamedata->public_ip = FAKE_PUBLIC_IP;
+	gamedata->public_ip = MKW_ADVERTISED_IP;
 	gamedata->peers[0].player_id = gamedata->my_pid;
-	gamedata->peers[0].public_ip = FAKE_PUBLIC_IP;
+	gamedata->peers[0].public_ip = MKW_ADVERTISED_IP;
 	gamedata->peers[0].local_ip = local_ip;
 	gamedata->peers[0].public_port = communication_port;
 	gamedata->peers[0].private_port = communication_port;
@@ -497,7 +577,7 @@ bool network_thread_send_status_record(int type, uint32_t pid, uint32_t ip, uint
 	full_packet[0] = STATUS_MAGIC;
 	full_packet[1] = __builtin_bswap32(90);
 	full_packet[2] = (type << 24) | ((packet_len_in_words * 4) << 16) | communication_port;
-	full_packet[3] = FAKE_PUBLIC_IP;
+	full_packet[3] = MKW_ADVERTISED_IP;
 	full_packet[4] = __builtin_bswap32(my_fake_pid);
 
 	const so_addr_t daddr = {

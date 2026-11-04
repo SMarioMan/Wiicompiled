@@ -223,3 +223,11 @@ add_executable(mkw_lan_options_tests "${MKW_TEST_RUNTIME_DIR}/tests/lan_options_
 target_include_directories(mkw_lan_options_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
 target_compile_features(mkw_lan_options_tests PRIVATE cxx_std_20)
 add_test(NAME mkw_lan_options_tests COMMAND mkw_lan_options_tests)
+
+add_executable(mkw_multicast_socket_tests "${MKW_TEST_RUNTIME_DIR}/tests/multicast_socket_tests.cpp")
+target_include_directories(mkw_multicast_socket_tests PRIVATE "${MKW_TEST_RUNTIME_DIR}/include")
+target_compile_features(mkw_multicast_socket_tests PRIVATE cxx_std_20)
+if(WIN32)
+    target_link_libraries(mkw_multicast_socket_tests PRIVATE ws2_32)
+endif()
+add_test(NAME mkw_multicast_socket_tests COMMAND mkw_multicast_socket_tests)

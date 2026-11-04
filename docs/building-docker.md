@@ -1,13 +1,16 @@
 # Container builds
 
-Validation status: all 764 translator tests pass. Both complete container
-workflows were tested using the USA RMCE01 RVZ. The Linux release reached
-CPU-driven VS initialization after being moved, using the null graphics backend.
-The Windows x64 target cross-compiles successfully inside Linux Docker.
-Rendering and Windows gameplay remain untested. The experimental
-[LAN port](../mods/lan/README.md) has joined two local instances and verified
-advancing online VS race simulations. LAN race completion, original guest-layout
-relocation and 24-player support remain unfinished.
+Validation status: all 764 translator tests pass. Complete base and optional LAN
+container workflows were tested with the USA RMCE01 RVZ, including Windows x64
+cross-compilation inside Linux Docker. Both LAN exports contain the required
+release artifacts and matching module source provenance; the Windows import audit
+found its application DLL dependencies present, with the VC++ redistributable
+included. The moved Linux LAN export passed first-run license creation and
+two-instance online VS race progression using the null graphics backend.
+Multicast discovery and race progression also passed across two network namespaces
+and with four simultaneous local instances. Rendering, Windows gameplay and
+completed LAN races remain unverified. Original guest-layout relocation and
+24-player support remain unfinished.
 
 ## Linux x64
 

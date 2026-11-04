@@ -31,7 +31,11 @@ Validated on Linux with the Null renderer: two local instances and two separate
 network namespaces discover and race without explicit peers; four simultaneous
 local instances join one room and advance together in online VS. Concurrent
 server reservations are queued while the SDK finishes its active handshake.
-Completed races, rendering and Windows LAN gameplay remain unverified.
+Clean Linux and Windows Docker LAN workflows also exported complete releases
+from the USA RVZ. The moved Linux export passed first-run license creation and
+two-instance racing; Windows PE imports resolve to shipped DLLs, Windows system
+DLLs or the included VC++ redistributable. Completed races, rendering and Windows
+LAN gameplay remain unverified.
 
 Default startup preserves the normal menus. Any instance can create a room or
 choose a room from the friend roster. Optional `--lan-host` and `--lan-join`
@@ -41,8 +45,8 @@ The default interface is selected automatically. Discovery uses multicast group
 selects a particular LAN interface, and repeatable `--lan-peer=IP` options add
 unicast discovery destinations if multicast is filtered. For multiple processes
 on one machine, use `--lan-local --lan-id=N` with distinct IDs and separate
-portable directories. PIDs derive
-from the bound address, independently of lobby role. See the
+portable directories. PIDs derive from the bound address, independently of lobby
+role. See the
 [Docker build/run examples](../../docs/building-docker.md#optional-lan-product).
 
 Unlike the original BrainSlug loader, WiiCompiled cannot execute a new native

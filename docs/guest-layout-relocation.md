@@ -110,8 +110,7 @@ bound uses the configured capacity. The subordinate GP/VS AI object's CPU record
 four local-screen records and following state move together. The constructor's
 full-chunk bounds use array ends rather than fixed original element offsets.
 Its private and virtual consumers and three cursor-based local-array accesses
-are included. Other AI data, including rank sorting
-scratch arrays and battle-specific structures, still require migration.
+are included. Other AI data and battle-specific structures still require migration.
 
 Format version 5 adds `ArrayFills` for constructors that initialize every slot
 with unrolled scalar stores. Each span declares exact instruction words, base
@@ -164,8 +163,7 @@ routine and all three difficulty loaders at 12, 13, 24, 48 and 100 slots. The
 fixtures replace allocation and file I/O only. Every loaded byte is compared
 with independently normalized authored profiles, including fractional input
 conversion, and source data, stack, saved registers and allocation guards are
-checked. This verifies parameter storage/loading; AI sorting scratch arrays and
-complete racing still require migration.
+checked. This verifies parameter storage/loading; complete racing still requires migration.
 
 ## Virtual controller storage
 
@@ -362,3 +360,18 @@ assignment; destinations may not alias the fill base or value registers.
 Expanded emission writes the full arrays, then computes the declared addresses
 using their expanded offsets. No other effects are allowed in the span, and
 original-capacity emission remains unchanged.
+
+## AI rank sorting
+
+Both CPU and local-participant AI sorters use a uniform capacity-sized pointer
+array in an aligned symbolic stack frame. Their checked initialization spans
+include the scratch-address setup, and both stack allocation and restoration
+move together. Six-way unrolled reads use `ceil(players/6)` iterations and
+bounded loads for a partial final group. The local sorter still emits at most
+four physical participants, but can accept any global race rank up to the
+configured capacity; its output fields move with the owner layout.
+
+Native tests execute both original routines at 12, 13, 24, 48 and 100 slots,
+checking reverse and sparse CPU ranks, local participants at high global ranks,
+rank compaction, preserved local ranks, stack restoration and neighboring memory.
+These tests verify sorting storage and behavior, not complete gameplay.

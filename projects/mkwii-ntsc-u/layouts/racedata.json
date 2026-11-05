@@ -1,5 +1,5 @@
 {
-  "Version": 6,
+  "Version": 7,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data and selected AI storage/loading, checked field consumers, initialization, bookkeeping and scoring. Input/controller storage, AI rank sorting, items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -478,6 +478,25 @@
           "Name": "objects",
           "Type": "Pointer",
           "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "AIOrderFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "StackHeader"
+        },
+        {
+          "Name": "slots",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "footer",
+          "Type": "StackHeader"
         }
       ]
     }
@@ -23328,6 +23347,128 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "AIRacerObjects.objects.count"
+    },
+    {
+      "Instruction": "0x807326B8",
+      "ExpectedWord": "0x9421FFC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIOrderFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x807326B8",
+      "ExpectedWord": "0x9421FFC0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80732810",
+      "ExpectedWord": "0x38210040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.size"
+    },
+    {
+      "Instruction": "0x80732734",
+      "ExpectedWord": "0x38810008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.slots.offset"
+    },
+    {
+      "Instruction": "0x80732730",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x80732818",
+      "ExpectedWord": "0x9421FFC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIOrderFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80732818",
+      "ExpectedWord": "0x9421FFC0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80732924",
+      "ExpectedWord": "0x38210040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.size"
+    },
+    {
+      "Instruction": "0x80732894",
+      "ExpectedWord": "0x38810008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIOrderFrame.slots.offset"
+    },
+    {
+      "Instruction": "0x80732890",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x807328AC",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807328C0",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807328D4",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807328E8",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807328FC",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80732910",
+      "ExpectedWord": "0x9003014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
     }
   ],
   "GlobalPointers": {
@@ -28035,6 +28176,138 @@
       "IndexBias": 0,
       "GroupWidth": 4,
       "Fallback": 5
+    },
+    {
+      "Instruction": "0x80732744",
+      "ExpectedWord": "0x80A40000",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": -2,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80732764",
+      "ExpectedWord": "0x80A40004",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": -1,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80732784",
+      "ExpectedWord": "0x80A40008",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807327A4",
+      "ExpectedWord": "0x80A4000C",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 1,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807327C4",
+      "ExpectedWord": "0x80A40010",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 2,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807327E4",
+      "ExpectedWord": "0x80A40014",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 3,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807328A0",
+      "ExpectedWord": "0x80040000",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": -2,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807328B4",
+      "ExpectedWord": "0x80040004",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": -1,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807328C8",
+      "ExpectedWord": "0x80040008",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807328DC",
+      "ExpectedWord": "0x8004000C",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 1,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x807328F0",
+      "ExpectedWord": "0x80040010",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 2,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80732904",
+      "ExpectedWord": "0x80040014",
+      "Node": 0,
+      "Index": "r4",
+      "IndexBase": "r1",
+      "IndexStride": "Pointer.size",
+      "IndexBias": 3,
+      "GroupWidth": 6,
+      "Fallback": 0
     }
   ],
   "ArrayFills": [
@@ -28134,6 +28407,74 @@
           "Stride": "AIRacerObjects.objects.stride",
           "Count": "AIRacerObjects.objects.count",
           "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x807326C8",
+      "ExpectedWords": [
+        "0x90010008",
+        "0x38A10008",
+        "0x9001000C",
+        "0x90010010",
+        "0x90010014",
+        "0x90010018",
+        "0x9001001C",
+        "0x90010020",
+        "0x90010024",
+        "0x90010028",
+        "0x9001002C",
+        "0x90010030",
+        "0x90010034"
+      ],
+      "BaseRegister": "r1",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIOrderFrame.slots.offset",
+          "Stride": "AIOrderFrame.slots.stride",
+          "Count": "AIOrderFrame.slots.count",
+          "Width": 4
+        }
+      ],
+      "Addresses": [
+        {
+          "Register": "r5",
+          "Array": "AIOrderFrame.slots.offset"
+        }
+      ]
+    },
+    {
+      "Begin": "0x80732828",
+      "ExpectedWords": [
+        "0x90010008",
+        "0x38A10008",
+        "0x9001000C",
+        "0x90010010",
+        "0x90010014",
+        "0x90010018",
+        "0x9001001C",
+        "0x90010020",
+        "0x90010024",
+        "0x90010028",
+        "0x9001002C",
+        "0x90010030",
+        "0x90010034"
+      ],
+      "BaseRegister": "r1",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIOrderFrame.slots.offset",
+          "Stride": "AIOrderFrame.slots.stride",
+          "Count": "AIOrderFrame.slots.count",
+          "Width": 4
+        }
+      ],
+      "Addresses": [
+        {
+          "Register": "r5",
+          "Array": "AIOrderFrame.slots.offset"
         }
       ]
     }

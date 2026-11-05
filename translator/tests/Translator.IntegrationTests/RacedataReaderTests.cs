@@ -10,8 +10,10 @@ public class RacedataReaderTests
 {
     [Theory]
     [InlineData(12)]
+    [InlineData(13)]
     [InlineData(24)]
     [InlineData(48)]
+    [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RelocatedModeReadersAndOriginalTeamAggregationUseTheExpandedScenario(int players)
     {

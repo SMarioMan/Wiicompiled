@@ -28,7 +28,8 @@ public sealed partial class GuestLayoutRelocations
     public GuestLayoutRelocations(IEnumerable<GuestLayoutType> types, int originalPlayers, int players,
         IEnumerable<GuestLayoutReference> references, bool complete = false,
         IEnumerable<GuestArrayCopies>? arrayCopies = null,
-        IEnumerable<GuestRankTable>? rankTables = null)
+        IEnumerable<GuestRankTable>? rankTables = null,
+        IEnumerable<GuestBoundedAccess>? boundedAccesses = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -49,12 +50,15 @@ public sealed partial class GuestLayoutRelocations
         ValidateCopyDefinitions(sites);
         _rankTables = (rankTables ?? Array.Empty<GuestRankTable>()).ToArray();
         ValidateRankDefinitions(sites);
+        _boundedAccesses = (boundedAccesses ?? Array.Empty<GuestBoundedAccess>()).ToArray();
+        ValidateBoundDefinitions();
     }
 
     public void ValidateImage(ProgramImage image)
     {
         ValidateCopies(image);
         ValidateRankTables(image);
+        ValidateBoundedAccesses(image);
         foreach (var (address, sites) in _references)
         {
             var word = BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(address, 4), 4));
@@ -68,8 +72,13 @@ public sealed partial class GuestLayoutRelocations
 
     public object Describe() => new
     {
-        Format = "guest-layout-plan-v3", OriginalPlayers, Players, Complete,
+        Format = "guest-layout-plan-v4", OriginalPlayers, Players, Complete,
         Types = _expanded.Types,
+        BoundedAccesses = _boundedAccesses.Select(site => new {
+            Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
+            site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride,
+            Enabled = Players % site.GroupWidth != 0
+        }),
         RankTables = _rankTables.Select(table => new {
             Address = $"0x{table.Address:X8}", OriginalCapacity = OriginalPlayers, Capacity = Players,
             Extension = "scaled-linear-rank-curve-with-strict-rank-envelope",
@@ -102,7 +111,7 @@ public sealed partial class GuestLayoutRelocations
                     throw new InvalidDataException($"Guest array-copy instruction mismatch at 0x{origin.Address:X8}.");
                 return origin.Address == copy.Begin ? ExpandCopies(copy) : Array.Empty<IrInstruction>();
             }
-        if (!_references.TryGetValue(origin.Address, out var sites)) return instructions;
+        if (!_references.TryGetValue(origin.Address, out var sites)) return ApplyBoundedAccess(origin, instructions);
         var result = instructions.ToArray();
         foreach (var site in sites)
         {
@@ -141,18 +150,20 @@ public sealed partial class GuestLayoutRelocations
                 _ => throw Mismatch()
             };
         }
-        return result;
+        return ApplyBoundedAccess(origin, result);
     }
 
     public static GuestLayoutRelocations Read(string path, int players)
     {
         var file = JsonSerializer.Deserialize<LayoutFile>(File.ReadAllText(path))
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
             throw new InvalidDataException("Expandable rank tables require layout format version 3.");
+        if (file.Version < 4 && file.BoundedAccesses is { Length: > 0 })
+            throw new InvalidDataException("Bounded unrolled accesses require layout format version 4.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
@@ -162,13 +173,18 @@ public sealed partial class GuestLayoutRelocations
             file.RankTables?.Select(table => new GuestRankTable(Hex(table.Address),
                 Convert.FromHexString(table.ExpectedHex), table.Curve,
                 table.Lookups.Select(site => new GuestRankLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
-                    site.Node, site.AddressBase, site.AddressOffset, site.Destination, site.Players, site.Position)).ToArray())));
+                    site.Node, site.AddressBase, site.AddressOffset, site.Destination, site.Players, site.Position)).ToArray())),
+            file.BoundedAccesses?.Select(site => new GuestBoundedAccess(Hex(site.Instruction), Hex(site.ExpectedWord),
+                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)));
     }
 
     private static uint Hex(string value) => uint.Parse(value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
         ? value.AsSpan(2) : value.AsSpan(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
-        ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null);
+        ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null,
+        BoundAccessFile[]? BoundedAccesses = null);
+    private sealed record BoundAccessFile(string Instruction, string ExpectedWord, int Node, string Index,
+        int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null);
     private sealed record RankTableFile(string Address, string ExpectedHex, int[] Curve, RankLookupFile[] Lookups);
     private sealed record RankLookupFile(string Instruction, string ExpectedWord, int Node, string AddressBase,
         int AddressOffset, string Destination, string Players, string Position);

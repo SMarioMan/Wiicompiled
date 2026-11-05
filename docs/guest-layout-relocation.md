@@ -33,7 +33,7 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 1,863 references across creation, construction,
+menu and awards scenarios and audits 1,982 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates.
 The manifest records 568 further consumer entry points in `AuditedConsumers`.
@@ -82,12 +82,20 @@ The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.
 
-Exact division by a positive integer expresses unrolled loop counts, such as
-`players/4` for the original four-player unrolled capacity scan. A capacity that
-does not divide exactly is rejected rather than silently skipping or overrunning
-slots. The current development manifest therefore requires multiples of four.
-This scan counts the expanded array while preserving the separate physical
-four-screen limit and the original competition-mode participant limits.
+Exact division by a positive integer, such as `players/4`, rejects nonintegral
+results. `ceil(players/4)` and `ceil(players/6)` cover a final partial group in
+the original unrolled scans and initializers. Format version 4 adds 116 audited
+`BoundedAccesses`: loads outside capacity return a declared inactive value and
+stores outside capacity do nothing. Bounds use a declared logical index, or an
+element-pointer difference and symbolic stride. Field relocation happens before
+the bound is applied. Generated checks are omitted when capacity is an exact
+multiple of the group width, including the 24-player target.
+
+This grows default player initialization, menu/award resets and parameter
+registration with capacity. The capacity scan preserves the separate physical
+four-screen limit and original competition-mode participant limits. Race-info's
+rotation setup also receives the configured capacity; its separate mask/table
+representation still needs migration for capacities beyond 32.
 
 ## Rank scoring
 
@@ -163,8 +171,8 @@ MKW_TEST_CXX=/absolute/path/to/clang++ \
   dotnet test translator/tests/Translator.IntegrationTests -c Release
 ```
 
-The game-backed checks verify that twelve twelve-player lifecycle/copy/reader/point routines emit
-exactly the same C++ as the originals, and syntax-check their relocated 24-player
+The game-backed checks verify that thirteen lifecycle/copy/reader/point routines
+emit exactly the original C++ at twelve players, and syntax-check their relocated 24-player
 versions. A native execution test runs the original scenario assignment at 12,
 24 and 48 players against the runtime's actual guest-memory implementation. It
 checks every player's selected fields, the settings/mission/ghost tail, preserved
@@ -185,6 +193,11 @@ race/battle or its network synchronization.
 Capacity-count checks vary the number of occupied slots from zero to capacity,
 mix local and CPU players, isolate the final slot, and exercise mode-specific
 participant and split-screen rules against the expanded settings offsets.
+These scans also run at 13 and 100 slots. The original scenario reset and the
+real initialization prefix before external parameter-file registration run at
+12, 13, 24, 48 and 100 slots, checking every touched player field, neighboring
+fields, race/ghost regions and stack guards. This prefix check does not execute
+external registration or establish complete game initialization.
 Race-to-race bookkeeping checks every player's previous score and finish
 position, race-number rollover and neighboring-field guards at all three
 capacities. At twelve players, it also compares the complete race-data object,

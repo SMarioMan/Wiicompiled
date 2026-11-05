@@ -106,7 +106,7 @@ public class GuestLayoutRelocationTests
         var path = Path.GetTempFileName();
         try
         {
-            foreach (var version in new[] { 1, 2, 3, 4 })
+            foreach (var version in new[] { 1, 2, 3, 4, 5 })
             {
                 File.WriteAllText(path, JsonSerializer.Serialize(new {
                     Version = version, OriginalPlayers = 2,
@@ -118,7 +118,7 @@ public class GuestLayoutRelocationTests
                         Fields = new[] { new GuestArrayFieldCopy(0, 1, 1) }
                     } }
                 }));
-                if (version is 2 or 3) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
+                if (version is 2 or 3 or 4) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
                 else Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 4));
             }
         }
@@ -151,6 +151,17 @@ public class GuestLayoutRelocationTests
         var changed = TranslatorCppTestHarness.CreateImage((pc, words[0]), (pc+4, words[1]+1),
             (pc+8, words[2]), (pc+12, words[3]), (pc+16, 0x4e800020));
         Assert.Throws<InvalidDataException>(() => new FunctionTranslator(changed, layoutRelocations: relocations));
+    }
+
+    [Fact]
+    public void CeilingCountsCoverPartialUnrolledGroupsWithoutRoundingDown()
+    {
+        var layout = new GuestLayouts(RaceTypes(), 100);
+        Assert.Equal(25, layout.Symbol("ceil(players/4)"));
+        Assert.Equal(17, layout.Symbol("ceil(players/6)"));
+        Assert.Equal(4, new GuestLayouts(RaceTypes(), 13).Symbol("ceil(players/4)"));
+        foreach (var expression in new[] { "ceil(players)", "ceil(players/0)", "ceil(players/6" })
+            Assert.Throws<InvalidDataException>(() => layout.Symbol(expression));
     }
 
     [Fact]

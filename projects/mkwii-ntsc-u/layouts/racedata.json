@@ -1,5 +1,5 @@
 {
-  "Version": 3,
+  "Version": 4,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: race-data lifecycle, selected readers, point updates, capacity scans, verified unrolled bookkeeping and expandable rank scoring. Other consumers and subsystems still need migration; this is not a playable 24-player profile.",
@@ -1615,7 +1615,7 @@
       "ExpectedWord": "0x38000003",
       "Node": 0,
       "Operand": "value",
-      "Symbol": "players/4"
+      "Symbol": "ceil(players/4)"
     },
     {
       "Instruction": "0x8052AD64",
@@ -16604,6 +16604,951 @@
       "Symbol": "Racedata.race.offset+Scenario.settings.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x80529960",
+      "ExpectedWord": "0xB1690CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529970",
+      "ExpectedWord": "0xB1690CF6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529980",
+      "ExpectedWord": "0x99490CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529990",
+      "ExpectedWord": "0x99490CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805299A0",
+      "ExpectedWord": "0xB1690DE0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805299A4",
+      "ExpectedWord": "0xB1690DE6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805299A8",
+      "ExpectedWord": "0x98090DE9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805299AC",
+      "ExpectedWord": "0x98090DE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805299B0",
+      "ExpectedWord": "0xB1690ED0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805299B4",
+      "ExpectedWord": "0xB1690ED6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805299B8",
+      "ExpectedWord": "0x98E90ED9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805299BC",
+      "ExpectedWord": "0x98E90ED8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805299C0",
+      "ExpectedWord": "0xB1690FC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805299C4",
+      "ExpectedWord": "0xB1690FC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805299C8",
+      "ExpectedWord": "0x98C90FC9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805299CC",
+      "ExpectedWord": "0x98C90FC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805299D0",
+      "ExpectedWord": "0xB16910B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805299D4",
+      "ExpectedWord": "0xB16910B6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805299D8",
+      "ExpectedWord": "0x98A910B9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805299DC",
+      "ExpectedWord": "0x98A910B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805299E0",
+      "ExpectedWord": "0xB16911A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805299E4",
+      "ExpectedWord": "0xB16911A6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805299E8",
+      "ExpectedWord": "0x988911A9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805299EC",
+      "ExpectedWord": "0x988911A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529A50",
+      "ExpectedWord": "0xB16918E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529A60",
+      "ExpectedWord": "0xB16918E6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529A70",
+      "ExpectedWord": "0x994918E9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529A80",
+      "ExpectedWord": "0x994918E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529A90",
+      "ExpectedWord": "0xB16919D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529A94",
+      "ExpectedWord": "0xB16919D6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529A98",
+      "ExpectedWord": "0x980919D9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529A9C",
+      "ExpectedWord": "0x980919D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529AA0",
+      "ExpectedWord": "0xB1691AC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529AA4",
+      "ExpectedWord": "0xB1691AC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529AA8",
+      "ExpectedWord": "0x98E91AC9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529AAC",
+      "ExpectedWord": "0x98E91AC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529AB0",
+      "ExpectedWord": "0xB1691BB0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529AB4",
+      "ExpectedWord": "0xB1691BB6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529AB8",
+      "ExpectedWord": "0x98C91BB9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529ABC",
+      "ExpectedWord": "0x98C91BB8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529AC0",
+      "ExpectedWord": "0xB1691CA0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529AC4",
+      "ExpectedWord": "0xB1691CA6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529AC8",
+      "ExpectedWord": "0x98A91CA9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529ACC",
+      "ExpectedWord": "0x98A91CA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529AD0",
+      "ExpectedWord": "0xB1691D90",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529AD4",
+      "ExpectedWord": "0xB1691D96",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529AD8",
+      "ExpectedWord": "0x98891D99",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529ADC",
+      "ExpectedWord": "0x98891D98",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529354",
+      "ExpectedWord": "0xB1690CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529364",
+      "ExpectedWord": "0xB1690CF6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529374",
+      "ExpectedWord": "0x99490CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529384",
+      "ExpectedWord": "0x99490CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529394",
+      "ExpectedWord": "0xB1690DE0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529398",
+      "ExpectedWord": "0xB1690DE6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x8052939C",
+      "ExpectedWord": "0x98090DE9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805293A0",
+      "ExpectedWord": "0x98090DE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805293A4",
+      "ExpectedWord": "0xB1690ED0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805293A8",
+      "ExpectedWord": "0xB1690ED6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805293AC",
+      "ExpectedWord": "0x98E90ED9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805293B0",
+      "ExpectedWord": "0x98E90ED8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805293B4",
+      "ExpectedWord": "0xB1690FC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805293B8",
+      "ExpectedWord": "0xB1690FC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805293BC",
+      "ExpectedWord": "0x98C90FC9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805293C0",
+      "ExpectedWord": "0x98C90FC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805293C4",
+      "ExpectedWord": "0xB16910B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805293C8",
+      "ExpectedWord": "0xB16910B6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805293CC",
+      "ExpectedWord": "0x98A910B9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805293D0",
+      "ExpectedWord": "0x98A910B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805293D4",
+      "ExpectedWord": "0xB16911A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805293D8",
+      "ExpectedWord": "0xB16911A6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805293DC",
+      "ExpectedWord": "0x988911A9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805293E0",
+      "ExpectedWord": "0x988911A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529444",
+      "ExpectedWord": "0xB16918E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529454",
+      "ExpectedWord": "0xB16918E6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x80529464",
+      "ExpectedWord": "0x994918E9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529474",
+      "ExpectedWord": "0x994918E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529484",
+      "ExpectedWord": "0xB16919D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529488",
+      "ExpectedWord": "0xB16919D6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x8052948C",
+      "ExpectedWord": "0x980919D9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80529490",
+      "ExpectedWord": "0x980919D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529494",
+      "ExpectedWord": "0xB1691AC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80529498",
+      "ExpectedWord": "0xB1691AC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x8052949C",
+      "ExpectedWord": "0x98E91AC9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805294A0",
+      "ExpectedWord": "0x98E91AC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805294A4",
+      "ExpectedWord": "0xB1691BB0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805294A8",
+      "ExpectedWord": "0xB1691BB6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805294AC",
+      "ExpectedWord": "0x98C91BB9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805294B0",
+      "ExpectedWord": "0x98C91BB8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805294B4",
+      "ExpectedWord": "0xB1691CA0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805294B8",
+      "ExpectedWord": "0xB1691CA6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805294BC",
+      "ExpectedWord": "0x98A91CA9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805294C0",
+      "ExpectedWord": "0x98A91CA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x805294C4",
+      "ExpectedWord": "0xB1691D90",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805294C8",
+      "ExpectedWord": "0xB1691D96",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805294CC",
+      "ExpectedWord": "0x98891D99",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805294D0",
+      "ExpectedWord": "0x98891D98",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80529268",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80529278",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80529284",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80529294",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x805292A0",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805292AC",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805292B8",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805292C4",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x805292D4",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805292D8",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805292DC",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805292E4",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x805292EC",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805292F0",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805292F4",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805292F8",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8052920C",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)"
+    },
+    {
+      "Instruction": "0x80529308",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x805293F0",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x80529914",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x805299FC",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x805295D4",
+      "ExpectedWord": "0x2C17000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8052DC84",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {
@@ -19558,6 +20503,972 @@
       "Entry": "0x80887A84",
       "Name": "",
       "Receiver": null
+    }
+  ],
+  "BoundedAccesses": [
+    {
+      "Instruction": "0x80529960",
+      "ExpectedWord": "0xB1690CF0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529970",
+      "ExpectedWord": "0xB1690CF6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529980",
+      "ExpectedWord": "0x99490CF9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529990",
+      "ExpectedWord": "0x99490CF8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299A0",
+      "ExpectedWord": "0xB1690DE0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299A4",
+      "ExpectedWord": "0xB1690DE6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299A8",
+      "ExpectedWord": "0x98090DE9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299AC",
+      "ExpectedWord": "0x98090DE8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299B0",
+      "ExpectedWord": "0xB1690ED0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299B4",
+      "ExpectedWord": "0xB1690ED6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299B8",
+      "ExpectedWord": "0x98E90ED9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299BC",
+      "ExpectedWord": "0x98E90ED8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299C0",
+      "ExpectedWord": "0xB1690FC0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299C4",
+      "ExpectedWord": "0xB1690FC6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299C8",
+      "ExpectedWord": "0x98C90FC9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299CC",
+      "ExpectedWord": "0x98C90FC8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299D0",
+      "ExpectedWord": "0xB16910B0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299D4",
+      "ExpectedWord": "0xB16910B6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299D8",
+      "ExpectedWord": "0x98A910B9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299DC",
+      "ExpectedWord": "0x98A910B8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299E0",
+      "ExpectedWord": "0xB16911A0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299E4",
+      "ExpectedWord": "0xB16911A6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299E8",
+      "ExpectedWord": "0x988911A9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805299EC",
+      "ExpectedWord": "0x988911A8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A50",
+      "ExpectedWord": "0xB16918E0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A60",
+      "ExpectedWord": "0xB16918E6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A70",
+      "ExpectedWord": "0x994918E9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A80",
+      "ExpectedWord": "0x994918E8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A90",
+      "ExpectedWord": "0xB16919D0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A94",
+      "ExpectedWord": "0xB16919D6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A98",
+      "ExpectedWord": "0x980919D9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529A9C",
+      "ExpectedWord": "0x980919D8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AA0",
+      "ExpectedWord": "0xB1691AC0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AA4",
+      "ExpectedWord": "0xB1691AC6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AA8",
+      "ExpectedWord": "0x98E91AC9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AAC",
+      "ExpectedWord": "0x98E91AC8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AB0",
+      "ExpectedWord": "0xB1691BB0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AB4",
+      "ExpectedWord": "0xB1691BB6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AB8",
+      "ExpectedWord": "0x98C91BB9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529ABC",
+      "ExpectedWord": "0x98C91BB8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AC0",
+      "ExpectedWord": "0xB1691CA0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AC4",
+      "ExpectedWord": "0xB1691CA6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AC8",
+      "ExpectedWord": "0x98A91CA9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529ACC",
+      "ExpectedWord": "0x98A91CA8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AD0",
+      "ExpectedWord": "0xB1691D90",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AD4",
+      "ExpectedWord": "0xB1691D96",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529AD8",
+      "ExpectedWord": "0x98891D99",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529ADC",
+      "ExpectedWord": "0x98891D98",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529354",
+      "ExpectedWord": "0xB1690CF0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529364",
+      "ExpectedWord": "0xB1690CF6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529374",
+      "ExpectedWord": "0x99490CF9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529384",
+      "ExpectedWord": "0x99490CF8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529394",
+      "ExpectedWord": "0xB1690DE0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529398",
+      "ExpectedWord": "0xB1690DE6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x8052939C",
+      "ExpectedWord": "0x98090DE9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293A0",
+      "ExpectedWord": "0x98090DE8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293A4",
+      "ExpectedWord": "0xB1690ED0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293A8",
+      "ExpectedWord": "0xB1690ED6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293AC",
+      "ExpectedWord": "0x98E90ED9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293B0",
+      "ExpectedWord": "0x98E90ED8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293B4",
+      "ExpectedWord": "0xB1690FC0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293B8",
+      "ExpectedWord": "0xB1690FC6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293BC",
+      "ExpectedWord": "0x98C90FC9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293C0",
+      "ExpectedWord": "0x98C90FC8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293C4",
+      "ExpectedWord": "0xB16910B0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293C8",
+      "ExpectedWord": "0xB16910B6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293CC",
+      "ExpectedWord": "0x98A910B9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293D0",
+      "ExpectedWord": "0x98A910B8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293D4",
+      "ExpectedWord": "0xB16911A0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293D8",
+      "ExpectedWord": "0xB16911A6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293DC",
+      "ExpectedWord": "0x988911A9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805293E0",
+      "ExpectedWord": "0x988911A8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529444",
+      "ExpectedWord": "0xB16918E0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529454",
+      "ExpectedWord": "0xB16918E6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529464",
+      "ExpectedWord": "0x994918E9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529474",
+      "ExpectedWord": "0x994918E8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529484",
+      "ExpectedWord": "0xB16919D0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529488",
+      "ExpectedWord": "0xB16919D6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x8052948C",
+      "ExpectedWord": "0x980919D9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529490",
+      "ExpectedWord": "0x980919D8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529494",
+      "ExpectedWord": "0xB1691AC0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529498",
+      "ExpectedWord": "0xB1691AC6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x8052949C",
+      "ExpectedWord": "0x98E91AC9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294A0",
+      "ExpectedWord": "0x98E91AC8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294A4",
+      "ExpectedWord": "0xB1691BB0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294A8",
+      "ExpectedWord": "0xB1691BB6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294AC",
+      "ExpectedWord": "0x98C91BB9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294B0",
+      "ExpectedWord": "0x98C91BB8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 2,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294B4",
+      "ExpectedWord": "0xB1691CA0",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294B8",
+      "ExpectedWord": "0xB1691CA6",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294BC",
+      "ExpectedWord": "0x98A91CA9",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294C0",
+      "ExpectedWord": "0x98A91CA8",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 3,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294C4",
+      "ExpectedWord": "0xB1691D90",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294C8",
+      "ExpectedWord": "0xB1691D96",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294CC",
+      "ExpectedWord": "0x98891D99",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x805294D0",
+      "ExpectedWord": "0x98891D98",
+      "Node": 0,
+      "Index": "r10",
+      "IndexBias": 4,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80529268",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x80529278",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x80529284",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x80529294",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292A0",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292AC",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292B8",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292C4",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292D4",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292D8",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292DC",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292E4",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292EC",
+      "ExpectedWord": "0x91460C24",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292F0",
+      "ExpectedWord": "0x91060C20",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292F4",
+      "ExpectedWord": "0x90860C28",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x805292F8",
+      "ExpectedWord": "0x91260CE4",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "IndexBase": "r3",
+      "IndexStride": "Player.size"
+    },
+    {
+      "Instruction": "0x8052AC64",
+      "ExpectedWord": "0x80070018",
+      "Node": 0,
+      "Index": "r11",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "Fallback": 5
+    },
+    {
+      "Instruction": "0x8052ACA0",
+      "ExpectedWord": "0x80070018",
+      "Node": 0,
+      "Index": "r11",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "Fallback": 5
+    },
+    {
+      "Instruction": "0x8052ACDC",
+      "ExpectedWord": "0x80070018",
+      "Node": 0,
+      "Index": "r11",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "Fallback": 5
+    },
+    {
+      "Instruction": "0x8052AD18",
+      "ExpectedWord": "0x80070018",
+      "Node": 0,
+      "Index": "r11",
+      "IndexBias": 0,
+      "GroupWidth": 4,
+      "Fallback": 5
     }
   ]
 }

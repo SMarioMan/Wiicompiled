@@ -56,6 +56,34 @@ with `Addend`. The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.
 
+## Finding additional consumers
+
+The audit command follows declared object pointers within basic blocks and emits
+review candidates, without applying patches:
+
+```sh
+dotnet run --project translator/src/Translator.Cli -c Release -- \
+  audit-guest-layouts 0x8052A1D0 --project projects/mkwii-ntsc-u/recomp.yml \
+  --guest-layouts projects/mkwii-ntsc-u/layouts/racedata.json \
+  --layout-players 24 --receiver Scenario --out build/layouts/game-type-audit.json
+```
+
+`--receiver` declares that the function receives that object type in `r3`;
+use it only after verifying the function's contract. The manifest's optional
+`GlobalPointers` maps addresses of pointer-valued globals to their object types.
+The USA manifest declares the race-data singleton, so functions that load it can
+be audited without a receiver declaration. The report includes input hashes,
+original instruction words, lifted operands and before/after values. Proposed
+references are checked against the original instruction and operand before the
+report is written.
+
+The analysis discards volatile pointer facts across guest calls and does not
+guess dynamic indices, interior array cursors, alignment padding or inter-block
+merges. A receiver unchanged throughout a call-free function can be carried into
+each block. Unrelated constants such as controller counts and mode identifiers
+are left alone. The report is an aid to manual review, not a completeness proof;
+loop bounds, allocation sizes and unproven aliases still need separate auditing.
+
 ## Validation
 
 The default translator suite remains independent of game binaries and a host C++

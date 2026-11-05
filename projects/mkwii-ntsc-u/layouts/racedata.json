@@ -1282,5 +1282,8 @@
       "Operand": "offset",
       "Symbol": "Scenario.ghost.offset"
     }
-  ]
+  ],
+  "GlobalPointers": {
+    "0x809B8F68": "Racedata"
+  }
 }

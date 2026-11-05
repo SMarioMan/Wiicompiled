@@ -47,11 +47,11 @@ if ((layoutOption is null) != (layoutPlayersOption is null))
     throw new ArgumentException("--guest-layouts and --layout-players must be supplied together.");
 var layoutRelocations = layoutOption is null ? null : GuestLayoutRelocations.Read(layoutOption,
     int.Parse(layoutPlayersOption!, CultureInfo.InvariantCulture));
-if (layoutRelocations is not null && command != "plan-guest-layouts" &&
+if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "audit-guest-layouts") &&
     (!layoutRelocations.Complete && layoutRelocations.Players != layoutRelocations.OriginalPlayers))
     throw new InvalidOperationException("This guest layout manifest is incomplete. Use plan-guest-layouts to inspect it; it cannot produce an expanded game build.");
-if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "translate-recursive" or "translate-mod"))
-    throw new ArgumentException("Guest layout options apply to translation or plan-guest-layouts only.");
+if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "audit-guest-layouts" or "translate-recursive" or "translate-mod"))
+    throw new ArgumentException("Guest layout options apply to translation, plan-guest-layouts or audit-guest-layouts only.");
 var project = !string.IsNullOrWhiteSpace(projectOption)
     ? TranslationProjectConfig.Load(projectOption)
     : null;
@@ -187,6 +187,7 @@ return command switch
     "translate-mod" => RunTranslateMod(tail),
     "link-brainslug" => RunLinkBrainSlug(tail),
     "plan-guest-layouts" => RunPlanGuestLayouts(tail),
+    "audit-guest-layouts" => RunAuditGuestLayouts(tail),
     "emit-build-shards" => RunEmitBuildShards(tail),
     "emit-native-index" => RunEmitNativeIndex(tail),
     "emit-base-manifest" => RunEmitBaseManifest(tail),
@@ -204,6 +205,37 @@ int RunPlanGuestLayouts(string[] argsTail)
     FileOutput.WriteTextIfChanged(output, JsonSerializer.Serialize(layoutRelocations.Describe(),
         new JsonSerializerOptions { WriteIndented = true }));
     Console.WriteLine($"[translator] validated guest layout plan for {layoutRelocations.Players} players: {output}");
+    return 0;
+}
+
+int RunAuditGuestLayouts(string[] argsTail)
+{
+    if (layoutRelocations is null || layoutOption is null)
+        throw new ArgumentException("audit-guest-layouts requires --guest-layouts and --layout-players.");
+    layoutRelocations.ValidateImage(image.Value);
+    using var document = JsonDocument.Parse(File.ReadAllText(layoutOption));
+    var types = document.RootElement.GetProperty("Types").Deserialize<GuestLayoutType[]>()!;
+    var globals = new Dictionary<uint, string>();
+    if (document.RootElement.TryGetProperty("GlobalPointers", out var pointers))
+        foreach (var pointer in pointers.EnumerateObject()) globals.Add(ParseAddress(pointer.Name), pointer.Value.GetString()!);
+    var address = ParseAddress(argsTail[0]);
+    var receiver = OptionValue(argsTail, "--receiver");
+    // Audit the original IR. Applying the proposed layout first would hide
+    // original operands and make the proof circular.
+    var discovery = new FunctionTranslator(image.Value).Discover(address, new TranslationOptions(
+        EnableLeafInlining: false, KnownFunctionEntryPoints: functionMap?.Addresses.ToHashSet()));
+    var audit = new GuestLayoutAudit(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
+        globals, project?.Memory.SdaBase, project?.Memory.Sda2Base).Analyze(discovery, receiver);
+    new GuestLayoutRelocations(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
+        audit.Candidates.Select(candidate => candidate.Reference)).ValidateImage(image.Value);
+    var output = OptionValue(argsTail, "--out")!;
+    FileOutput.WriteTextIfChanged(output, JsonSerializer.Serialize(new
+    {
+        Format = "guest-layout-audit-v1", Function = $"0x{address:X8}", Receiver = receiver,
+        image.Value.Sha256, ManifestSha256 = ChecksumUtilities.Sha256Hex(File.ReadAllBytes(layoutOption)),
+        audit.Candidates, audit.UnresolvedPointerOperations, audit.Note
+    }, new JsonSerializerOptions { WriteIndented = true }));
+    Console.WriteLine($"[translator] {audit.Candidates.Count} layout review candidate(s); {audit.UnresolvedPointerOperations} unresolved pointer operation(s): {output}");
     return 0;
 }
 
@@ -3769,7 +3801,7 @@ static void WriteUsage(TextWriter writer, IReadOnlyList<string> commands)
         writer.WriteLine(CommandUsage(name));
     }
     writer.WriteLine("Every command also accepts [--project path] [--profile name] [--prefer-cached-inputs] [--help].");
-    writer.WriteLine("Translation and plan-guest-layouts also accept [--guest-layouts path --layout-players N].");
+    writer.WriteLine("Translation, plan-guest-layouts and audit-guest-layouts also accept [--guest-layouts path --layout-players N].");
 }
 
 static string[] KnownCommands() => new[]
@@ -3780,6 +3812,7 @@ static string[] KnownCommands() => new[]
     "translate-mod",
     "link-brainslug",
     "plan-guest-layouts",
+    "audit-guest-layouts",
     "emit-base-manifest",
     "emit-build-shards",
     "emit-native-index",
@@ -3798,6 +3831,10 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
         (null, Array.Empty<CommandOption>()),
     "generate-data-init" => (null, Array.Empty<CommandOption>()),
     "plan-guest-layouts" => (null, new CommandOption[] { new("--out", "path", Required: true) }),
+    "audit-guest-layouts" => ("<start_addr>", new CommandOption[]
+    {
+        new("--receiver", "type"), new("--out", "path", Required: true)
+    }),
     "translate-recursive" => ("<start_addr>", new CommandOption[]
     {
         new("--outdir", "path"),

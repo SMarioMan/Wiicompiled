@@ -33,9 +33,16 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 203 references across creation, construction,
+menu and awards scenarios and audits 1,157 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates.
+The manifest records 521 further consumer entry points in `AuditedConsumers`.
+Their declared receiver or singleton-pointer provenance is reproduced by the
+integration suite. Every discovered field move must match its declared original
+and expanded values. Their twelve-player C++ remains identical to the original,
+and all expanded consumer bodies compile in native aggregate translation units.
+This covers field references in menus, race logic, items and other systems;
+it does not imply those systems' separate player arrays or limits are migrated.
 It also binds the 54 original instruction words of the race-to-race bookkeeping
 copy to a capacity-dependent array operation. Every original load and store must
 prove the declared ordered field copies; branches, calls, extra memory accesses,

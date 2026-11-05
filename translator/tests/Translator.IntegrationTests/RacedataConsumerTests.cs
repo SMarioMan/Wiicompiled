@@ -41,7 +41,7 @@ public class RacedataConsumerTests
         var audit = new GuestLayoutAudit(types, 12, 24, globals, 0x80388880, 0x8038ac20);
         var originalLayout = new GuestLayouts(types, 12); var expandedLayout = new GuestLayouts(types, 24);
         var consumers = definition.GetProperty("AuditedConsumers").EnumerateArray().ToArray();
-        Assert.True(consumers.Length >= 500, "Consumer verification list unexpectedly lost coverage");
+        Assert.True(consumers.Length >= 600, "Consumer verification list unexpectedly lost coverage");
         var covered = new HashSet<uint>();
         var temporary = Path.Combine(Path.GetTempPath(), "mkw-racedata-consumers-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temporary);
@@ -72,7 +72,15 @@ public class RacedataConsumerTests
                         covered.Add(reference.Instruction);
                     }
                     var baseline = original.Translate(entry, options).CxxCode;
-                    Assert.True(baseline == twelve.Translate(entry, options).CxxCode,
+                    var hasVerifiedCopy = discovery.LinearIr.Blocks.SelectMany(block => block.Instructions)
+                        .OfType<Translator.Core.Ir.IrTracePpc>().Any(trace => copies.Any(copy => trace.Address == copy.Begin));
+                    if (hasVerifiedCopy)
+                    {
+                        // This routine has full original-capacity memory/register equivalence
+                        // coverage in RacedataReaderTests; its verified copy emits new C++.
+                        Assert.Equal(0x8052d19cu, entry);
+                    }
+                    else Assert.True(baseline == twelve.Translate(entry, options).CxxCode,
                         $"Original-capacity emission changed in {entry:X8} {name}");
                     source.AppendLine(expanded.Translate(entry, options).CxxCode);
                 }

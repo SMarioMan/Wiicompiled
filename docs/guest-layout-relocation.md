@@ -33,13 +33,14 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 1,982 references across creation, construction,
+menu and awards scenarios and audits 2,304 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates.
-The manifest records 568 further consumer entry points in `AuditedConsumers`.
+The manifest records 605 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
-and expanded values. Their twelve-player C++ remains identical to the original,
+and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
+routine instead has full memory/register equivalence coverage),
 and all expanded consumer bodies compile in native aggregate translation units.
 This covers field references in menus, race logic, items and other systems;
 it does not imply those systems' separate player arrays or limits are migrated.
@@ -183,7 +184,12 @@ facts. Saved object pointers cross branches and loops only when all reachable
 incoming paths agree. Suggestions are collected after fixed-point convergence,
 so loop back edges can invalidate an initially plausible pointer. Unresolved
 indirect control flow and unsupported instructions prevent inter-block inference.
-Dynamic indices, interior array cursors and alignment padding remain unresolved.
+A variable index multiplied by a declared player-array stride can carry a typed
+base through addition. A proposed field must lie inside that declared array,
+including through nested scenario fields, and its element stride must be
+unchanged. The report records `IndexStride` for review. Bounds remain a separate
+audit; settings outside the indexed array, differing scales, interior cursors and
+alignment padding remain unresolved.
 Unrelated constants such as controller counts and mode identifiers
 are left alone. The report is an aid to manual review, not a completeness proof;
 loop bounds, allocation sizes and unproven aliases still need separate auditing.

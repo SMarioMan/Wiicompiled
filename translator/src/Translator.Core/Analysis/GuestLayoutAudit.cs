@@ -7,18 +7,18 @@ using System.Globalization;
 
 namespace Translator.Core.Analysis;
 
-public sealed record GuestLayoutCandidate(GuestLayoutReference Reference, int Before, int After, string ReceiverType);
+public sealed record GuestLayoutCandidate(GuestLayoutReference Reference, int Before, int After, string ReceiverType, int IndexStride = 0);
 public sealed record GuestLayoutAuditResult(IReadOnlyList<GuestLayoutCandidate> Candidates,
     int UnresolvedPointerOperations, string Note);
 
 /// <summary>
 /// Finds review candidates from declared receiver/global pointer types. It never applies patches.
 /// Facts cross control-flow edges only when every reachable predecessor agrees.
-/// Unknown operations discard affected facts; dynamic indices and array cursors are not guessed.
+/// Unknown operations discard affected facts; scaled indices require a declared, unchanged array stride.
 /// </summary>
 public sealed class GuestLayoutAudit
 {
-    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0);
+    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0);
     private readonly Dictionary<string, GuestLayoutType> _definitions;
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -87,7 +87,7 @@ public sealed class GuestLayoutAudit
             RunBlock(block, inputs.GetValueOrDefault(block.Label) ?? Seeds(
                 block.Label.Equals(function.LinearIr.EntryLabel, StringComparison.OrdinalIgnoreCase), invariant: true), collect: true);
         return new GuestLayoutAuditResult(candidates, unresolved,
-            "Review candidates only. No patches were applied; dynamic indices, bounds, interior pointers and unknown control flow need separate audit.");
+            "Review candidates only. No patches were applied; bounds, interior pointers and unknown control flow need separate audit.");
 
         Dictionary<string, Fact> Seeds(bool entry, bool invariant)
         {
@@ -141,14 +141,15 @@ public sealed class GuestLayoutAudit
                 // An interior pointer can also be an array cursor. Rebasing a
                 // cursor's final stride would skip the new elements; require review.
                 if (basis.Offset != 0) { unresolved++; return; }
-                var path = Locate(type, offset);
+                var path = basis.IndexStride == 0 || IsIndexedArrayField(type, offset, basis.IndexStride)
+                    ? Locate(type, offset) : null;
                 if (path is null) { unresolved++; return; }
                 if (checked(_original.Symbol(path.Value.Symbol) + path.Value.Addend) != offset)
                     throw new InvalidDataException("Layout audit produced an inconsistent original field path.");
                 var after = checked(_expanded.Symbol(path.Value.Symbol) + path.Value.Addend);
                 if (after == offset) return;
                 var site = new GuestLayoutReference(pc, words[pc], index, operand, path.Value.Symbol, path.Value.Addend);
-                candidates.Add(new GuestLayoutCandidate(site, offset, after, type));
+                candidates.Add(new GuestLayoutCandidate(site, offset, after, type, basis.IndexStride));
             }
             void Process(IrInstruction node, uint pc, int index)
             {
@@ -165,7 +166,7 @@ public sealed class GuestLayoutAudit
                             immediate is >= int.MinValue and <= int.MaxValue)
                         {
                             Propose(pc, index, "right", left, (int)immediate);
-                            result = Narrow(type, checked(left.Offset + (int)immediate));
+                            result = left.IndexStride == 0 ? Narrow(type, checked(left.Offset + (int)immediate)) : null;
                         }
                         else if (left?.Constant is { } a && right?.Constant is { } b)
                         {
@@ -175,6 +176,20 @@ public sealed class GuestLayoutAudit
                                 "and" => a&b, "mul" => unchecked(a*b), _ => null
                             };
                             if (constant is { } value) result = new Fact(Constant: value);
+                        }
+                        else if (binary.Op == "mul" &&
+                            (left?.Constant is { } scaleLeft && right is null && binary.Right.RegisterName is not null && IsArrayStride(scaleLeft) ||
+                             right?.Constant is { } scaleRight && left is null && binary.Left.RegisterName is not null && IsArrayStride(scaleRight)))
+                        {
+                            result = new Fact(IndexStride: checked((int)(left?.Constant ?? right!.Constant!.Value)));
+                        }
+                        else if (binary.Op == "add")
+                        {
+                            var pointer = left?.Type is not null ? left : right?.Type is not null ? right : null;
+                            var scaled = pointer == left ? right : left;
+                            if (pointer is { Offset: 0, IndexStride: 0 } && scaled is { Type: null, Constant: null, IndexStride: > 0 })
+                                result = pointer with { IndexStride = scaled.IndexStride };
+                            else if (collect && pointer is not null) unresolved++;
                         }
                         else if (collect && (left?.Type is not null || right?.Type is not null)) unresolved++;
                         Set(binary.Destination, result);
@@ -227,6 +242,27 @@ public sealed class GuestLayoutAudit
         for (var index = 0; index < element; index++) prefix += $"+{type}.{field.Key}.stride";
         var nested = Locate(definition.Type, inner);
         return nested is { } child ? ($"{prefix}+{child.Symbol}", child.Addend) : (prefix, inner);
+    }
+
+    // Only infer an index scale when some declared player array keeps that stride.
+    private bool IsArrayStride(uint scale) => scale <= int.MaxValue && _definitions.Values.Any(type =>
+        type.Fields is not null && type.Fields.Any(field => field.PerPlayer &&
+            _original.Types[type.Name].Fields[field.Name].Stride == scale &&
+            _expanded.Types[type.Name].Fields[field.Name].Stride == scale));
+
+    private bool IsIndexedArrayField(string type, int offset, int stride)
+    {
+        var shape = _original.Types[type];
+        if (offset < 0 || offset >= shape.Size) return false;
+        foreach (var field in shape.Fields)
+        {
+            if (offset < field.Value.Offset || offset >= field.Value.Offset + field.Value.Size) continue;
+            var definition = _definitions[type].Fields!.Single(f => f.Name == field.Key);
+            if (definition.PerPlayer)
+                return field.Value.Stride == stride && _expanded.Types[type].Fields[field.Key].Stride == stride;
+            return IsIndexedArrayField(definition.Type, (offset - field.Value.Offset) % field.Value.Stride, stride);
+        }
+        return false;
     }
 
     private Fact? Narrow(string type, int offset)

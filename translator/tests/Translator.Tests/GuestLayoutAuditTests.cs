@@ -16,6 +16,24 @@ public class GuestLayoutAuditTests
     }
 
     [Fact]
+    public void ScaledPlayerIndicesRelocateOnlyDeclaredArrayFields()
+    {
+        // mulli r5,r4,240; add r5,r3,r5; lwz r6,menu.players[0].kart(r5); blr
+        var function = Discover(0x1ca400f0, 0x7ca32a14, 0x80c50c20, 0x4e800020);
+        var audit = new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24);
+        var candidate = Assert.Single(audit.Analyze(function, "Racedata").Candidates);
+        Assert.Equal(0xc20, candidate.Before);
+        Assert.Equal(0x1760, candidate.After);
+        Assert.Equal(240, candidate.IndexStride);
+        // Settings are not a player array, despite the same arithmetic.
+        Assert.Empty(audit.Analyze(Discover(0x1ca400f0, 0x7ca32a14, 0x80c51758, 0x4e800020), "Racedata").Candidates);
+        // A different scale, an interior array cursor, and a clobbered index remain unresolved.
+        Assert.Empty(audit.Analyze(Discover(0x1ca400ef, 0x7ca32a14, 0x80c50c20, 0x4e800020), "Racedata").Candidates);
+        Assert.Empty(audit.Analyze(Discover(0x38630008, 0x1ca400f0, 0x7ca32a14, 0x80c50c20, 0x4e800020), "Racedata").Candidates);
+        Assert.Empty(audit.Analyze(Discover(0x1ca400f0, 0x48000021, 0x7ca32a14, 0x80c50c20, 0x4e800020), "Racedata").Candidates);
+    }
+
+    [Fact]
     public void DeclaredReceiverFindsAFieldButDoesNotGuessOtherTwelves()
     {
         var function = Discover(0x80830b48, 0x38a0000c, 0x4e800020); // lwz r4,settings(r3); li r5,12; blr

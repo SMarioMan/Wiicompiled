@@ -17549,6 +17549,2582 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80518920",
+      "ExpectedWord": "0x88040CD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 184
+    },
+    {
+      "Instruction": "0x8051892C",
+      "ExpectedWord": "0x88640CC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 168
+    },
+    {
+      "Instruction": "0x80518934",
+      "ExpectedWord": "0x88040CC1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 169
+    },
+    {
+      "Instruction": "0x80518940",
+      "ExpectedWord": "0x88640CC2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 170
+    },
+    {
+      "Instruction": "0x80518944",
+      "ExpectedWord": "0x88040CC3",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 171
+    },
+    {
+      "Instruction": "0x80518950",
+      "ExpectedWord": "0x88640CC4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 172
+    },
+    {
+      "Instruction": "0x80518954",
+      "ExpectedWord": "0x88040CC5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 173
+    },
+    {
+      "Instruction": "0x80518960",
+      "ExpectedWord": "0x88640CC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 174
+    },
+    {
+      "Instruction": "0x80518964",
+      "ExpectedWord": "0x88040CC7",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 175
+    },
+    {
+      "Instruction": "0x8052332C",
+      "ExpectedWord": "0x88040CD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 184
+    },
+    {
+      "Instruction": "0x80523338",
+      "ExpectedWord": "0x88640CC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 168
+    },
+    {
+      "Instruction": "0x80523340",
+      "ExpectedWord": "0x88040CC1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 169
+    },
+    {
+      "Instruction": "0x8052334C",
+      "ExpectedWord": "0x88640CC2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 170
+    },
+    {
+      "Instruction": "0x80523350",
+      "ExpectedWord": "0x88040CC3",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 171
+    },
+    {
+      "Instruction": "0x8052335C",
+      "ExpectedWord": "0x88640CC4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 172
+    },
+    {
+      "Instruction": "0x80523360",
+      "ExpectedWord": "0x88040CC5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 173
+    },
+    {
+      "Instruction": "0x8052336C",
+      "ExpectedWord": "0x88640CC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 174
+    },
+    {
+      "Instruction": "0x80523370",
+      "ExpectedWord": "0x88040CC7",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 175
+    },
+    {
+      "Instruction": "0x80524554",
+      "ExpectedWord": "0x88040CD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 184
+    },
+    {
+      "Instruction": "0x80524560",
+      "ExpectedWord": "0x88640CC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 168
+    },
+    {
+      "Instruction": "0x80524568",
+      "ExpectedWord": "0x88040CC1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 169
+    },
+    {
+      "Instruction": "0x80524574",
+      "ExpectedWord": "0x88640CC2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 170
+    },
+    {
+      "Instruction": "0x80524578",
+      "ExpectedWord": "0x88040CC3",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 171
+    },
+    {
+      "Instruction": "0x80524584",
+      "ExpectedWord": "0x88640CC4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 172
+    },
+    {
+      "Instruction": "0x80524588",
+      "ExpectedWord": "0x88040CC5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 173
+    },
+    {
+      "Instruction": "0x80524594",
+      "ExpectedWord": "0x88640CC6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 174
+    },
+    {
+      "Instruction": "0x80524598",
+      "ExpectedWord": "0x88040CC7",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 175
+    },
+    {
+      "Instruction": "0x8052CAF0",
+      "ExpectedWord": "0x91090C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB00",
+      "ExpectedWord": "0x99490CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB10",
+      "ExpectedWord": "0x99490CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CB20",
+      "ExpectedWord": "0x91090D18",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB30",
+      "ExpectedWord": "0x98090DE9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB34",
+      "ExpectedWord": "0x98090DE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CB38",
+      "ExpectedWord": "0x91090E08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB3C",
+      "ExpectedWord": "0x98C90ED9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB40",
+      "ExpectedWord": "0x98C90ED8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CB44",
+      "ExpectedWord": "0x91090EF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB48",
+      "ExpectedWord": "0x98A90FC9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB4C",
+      "ExpectedWord": "0x98A90FC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CB50",
+      "ExpectedWord": "0x91090FE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB54",
+      "ExpectedWord": "0x988910B9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB58",
+      "ExpectedWord": "0x988910B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CB5C",
+      "ExpectedWord": "0x910910D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CB60",
+      "ExpectedWord": "0x986911A9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CB64",
+      "ExpectedWord": "0x986911A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CBB8",
+      "ExpectedWord": "0x91240C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052CBBC",
+      "ExpectedWord": "0x39840C3B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 35
+    },
+    {
+      "Instruction": "0x8052CBC4",
+      "ExpectedWord": "0x91240C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052CBC8",
+      "ExpectedWord": "0x99440CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CBCC",
+      "ExpectedWord": "0x99440CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CBD0",
+      "ExpectedWord": "0x90640C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CBD8",
+      "ExpectedWord": "0x91240C30",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8052CBE0",
+      "ExpectedWord": "0x99240C34",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052CBE8",
+      "ExpectedWord": "0x99240C35",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 29
+    },
+    {
+      "Instruction": "0x8052CBF0",
+      "ExpectedWord": "0x91240C38",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052CD68",
+      "ExpectedWord": "0x91640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052CD6C",
+      "ExpectedWord": "0x3AE40C3B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 35
+    },
+    {
+      "Instruction": "0x8052CD74",
+      "ExpectedWord": "0x91640C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052CD78",
+      "ExpectedWord": "0x99840CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8052CD7C",
+      "ExpectedWord": "0x99840CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8052CD80",
+      "ExpectedWord": "0x90640C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052CD88",
+      "ExpectedWord": "0x91640C30",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8052CD90",
+      "ExpectedWord": "0x99640C34",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052CD98",
+      "ExpectedWord": "0x99640C35",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 29
+    },
+    {
+      "Instruction": "0x8052CDA0",
+      "ExpectedWord": "0x91640C38",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052CDC4",
+      "ExpectedWord": "0x91640C88",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 112
+    },
+    {
+      "Instruction": "0x8052CDCC",
+      "ExpectedWord": "0x99640C8C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 116
+    },
+    {
+      "Instruction": "0x8052CDD4",
+      "ExpectedWord": "0x99640C8D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 117
+    },
+    {
+      "Instruction": "0x8052CDDC",
+      "ExpectedWord": "0x99640C8E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 118
+    },
+    {
+      "Instruction": "0x8052CDE4",
+      "ExpectedWord": "0x99640C8F",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 119
+    },
+    {
+      "Instruction": "0x8052CDEC",
+      "ExpectedWord": "0x91640C90",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 120
+    },
+    {
+      "Instruction": "0x8052CDF8",
+      "ExpectedWord": "0x91840C94",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 124
+    },
+    {
+      "Instruction": "0x8052CDFC",
+      "ExpectedWord": "0x91640C98",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 128
+    },
+    {
+      "Instruction": "0x8052CE08",
+      "ExpectedWord": "0x91840C9C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 132
+    },
+    {
+      "Instruction": "0x8052CE0C",
+      "ExpectedWord": "0x91640CA0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 136
+    },
+    {
+      "Instruction": "0x8052CE18",
+      "ExpectedWord": "0x91840CA4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 140
+    },
+    {
+      "Instruction": "0x8052CE1C",
+      "ExpectedWord": "0x91640CA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 144
+    },
+    {
+      "Instruction": "0x8052CE28",
+      "ExpectedWord": "0x91840CAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 148
+    },
+    {
+      "Instruction": "0x8052CE2C",
+      "ExpectedWord": "0x91640CB0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 152
+    },
+    {
+      "Instruction": "0x8052CE38",
+      "ExpectedWord": "0x91840CB4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x8052CE3C",
+      "ExpectedWord": "0x91640CB8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 160
+    },
+    {
+      "Instruction": "0x8052CE48",
+      "ExpectedWord": "0x91840CBC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 164
+    },
+    {
+      "Instruction": "0x8052CE4C",
+      "ExpectedWord": "0x91640CC0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 168
+    },
+    {
+      "Instruction": "0x8052CE58",
+      "ExpectedWord": "0x91840CC4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 172
+    },
+    {
+      "Instruction": "0x8052CE5C",
+      "ExpectedWord": "0x91640CC8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 176
+    },
+    {
+      "Instruction": "0x8052CE64",
+      "ExpectedWord": "0x91640CCC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 180
+    },
+    {
+      "Instruction": "0x8052CE6C",
+      "ExpectedWord": "0x99640CD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 184
+    },
+    {
+      "Instruction": "0x8052CE74",
+      "ExpectedWord": "0x99640CD1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 185
+    },
+    {
+      "Instruction": "0x8052CE7C",
+      "ExpectedWord": "0x99640CD2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 186
+    },
+    {
+      "Instruction": "0x8052CE84",
+      "ExpectedWord": "0x91640CD4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 188
+    },
+    {
+      "Instruction": "0x8052CE8C",
+      "ExpectedWord": "0x99640CD8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 192
+    },
+    {
+      "Instruction": "0x8052CE94",
+      "ExpectedWord": "0x99640CD9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 193
+    },
+    {
+      "Instruction": "0x8052CE9C",
+      "ExpectedWord": "0x99640CDA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 194
+    },
+    {
+      "Instruction": "0x8052CEA4",
+      "ExpectedWord": "0x91640CDC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 196
+    },
+    {
+      "Instruction": "0x8052CEAC",
+      "ExpectedWord": "0x90A40CE0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 200
+    },
+    {
+      "Instruction": "0x80532114",
+      "ExpectedWord": "0xA8640CF6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x8053211C",
+      "ExpectedWord": "0xB0040CF6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 222
+    },
+    {
+      "Instruction": "0x805CDC68",
+      "ExpectedWord": "0x90040C30",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x805CDC6C",
+      "ExpectedWord": "0x38E40C3B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 35
+    },
+    {
+      "Instruction": "0x805CDC74",
+      "ExpectedWord": "0x98040C34",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x805CDC7C",
+      "ExpectedWord": "0x98040C35",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 29
+    },
+    {
+      "Instruction": "0x805CDC84",
+      "ExpectedWord": "0x90040C38",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x805E58C8",
+      "ExpectedWord": "0x92E30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805E5924",
+      "ExpectedWord": "0xB0030D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x805E5944",
+      "ExpectedWord": "0xB0030D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x805E5954",
+      "ExpectedWord": "0xB3430D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x805E5984",
+      "ExpectedWord": "0x90660C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805E59AC",
+      "ExpectedWord": "0x90660C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805E5A44",
+      "ExpectedWord": "0xB3430D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x805E5A50",
+      "ExpectedWord": "0x93830C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805E5A5C",
+      "ExpectedWord": "0x93A30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805E5A88",
+      "ExpectedWord": "0x9B830CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x805E5A8C",
+      "ExpectedWord": "0xB3830CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x805E5AB8",
+      "ExpectedWord": "0x90640CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x805E5AC4",
+      "ExpectedWord": "0x91C30CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x805E5AE4",
+      "ExpectedWord": "0x90030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80609FD0",
+      "ExpectedWord": "0x93230C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8061C3BC",
+      "ExpectedWord": "0xA0050D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061C44C",
+      "ExpectedWord": "0xA0050D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061C548",
+      "ExpectedWord": "0xA0840D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061C580",
+      "ExpectedWord": "0xA0840D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061DFAC",
+      "ExpectedWord": "0x92E30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8061DFE4",
+      "ExpectedWord": "0x93230C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8061E024",
+      "ExpectedWord": "0x90660C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8061E04C",
+      "ExpectedWord": "0x90660C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8061E06C",
+      "ExpectedWord": "0x98060CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8061E074",
+      "ExpectedWord": "0xB0060CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x8061E118",
+      "ExpectedWord": "0x93250C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8061E148",
+      "ExpectedWord": "0x92E30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8061E154",
+      "ExpectedWord": "0x93A30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8061E160",
+      "ExpectedWord": "0x9AE30CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x8061E164",
+      "ExpectedWord": "0xB2E30CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x8061E1D4",
+      "ExpectedWord": "0xB0030D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061E1F0",
+      "ExpectedWord": "0xB0030D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061E200",
+      "ExpectedWord": "0xB1C30D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x8061E224",
+      "ExpectedWord": "0x90030CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8061E234",
+      "ExpectedWord": "0x90030CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8061E254",
+      "ExpectedWord": "0x90030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80621980",
+      "ExpectedWord": "0x801F1818",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x806219A8",
+      "ExpectedWord": "0x887F18E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x806219E8",
+      "ExpectedWord": "0x807F1814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80621A74",
+      "ExpectedWord": "0x801F1818",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80621A7C",
+      "ExpectedWord": "0x807F1814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80621B0C",
+      "ExpectedWord": "0xA35F18E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80621B4C",
+      "ExpectedWord": "0x801F1818",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80621B60",
+      "ExpectedWord": "0x801F18D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80621C98",
+      "ExpectedWord": "0x801F18D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80621D28",
+      "ExpectedWord": "0x801F1818",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80637A24",
+      "ExpectedWord": "0x93A30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80637A38",
+      "ExpectedWord": "0x93C30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80637AE4",
+      "ExpectedWord": "0x93A30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80637B04",
+      "ExpectedWord": "0x93C70C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x806386F4",
+      "ExpectedWord": "0x80040CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8064CC28",
+      "ExpectedWord": "0x88630CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8064CCF8",
+      "ExpectedWord": "0xA3640CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x8064D8EC",
+      "ExpectedWord": "0x88630CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8064DA14",
+      "ExpectedWord": "0x88630CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8064DA88",
+      "ExpectedWord": "0x88630CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80658170",
+      "ExpectedWord": "0x88030CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80658178",
+      "ExpectedWord": "0xA0030CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80658A70",
+      "ExpectedWord": "0x88030CF9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 225
+    },
+    {
+      "Instruction": "0x80658A78",
+      "ExpectedWord": "0xA0030CF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80673AA0",
+      "ExpectedWord": "0x90A30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80673ABC",
+      "ExpectedWord": "0x90830C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807CB7B0",
+      "ExpectedWord": "0x38030C2C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x807CB8F8",
+      "ExpectedWord": "0x38030C2C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x807CB9AC",
+      "ExpectedWord": "0x38030C2C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x807CBA0C",
+      "ExpectedWord": "0x38050C2C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x807DCCD4",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCCE0",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807DCCF8",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCD04",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807DCD1C",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCD28",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807DCD40",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCD4C",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807DCD64",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCD70",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807DCD88",
+      "ExpectedWord": "0x80040C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807DCD94",
+      "ExpectedWord": "0x90640C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807E0794",
+      "ExpectedWord": "0x80830CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x807E07A0",
+      "ExpectedWord": "0x82A30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807EC4B4",
+      "ExpectedWord": "0xA0630CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x807EC4FC",
+      "ExpectedWord": "0xA0030CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x807EC580",
+      "ExpectedWord": "0xA0630CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x807EC6D8",
+      "ExpectedWord": "0x98830CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x808213B0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808213C8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808213E0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808213F8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821410",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821428",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821440",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821450",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821478",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821508",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821520",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821538",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821550",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821568",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821580",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80821598",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808215A8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808215D0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808238B4",
+      "ExpectedWord": "0x90A30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808238C0",
+      "ExpectedWord": "0x80030C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x808238D0",
+      "ExpectedWord": "0x90030C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808238E4",
+      "ExpectedWord": "0x93A30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80823A68",
+      "ExpectedWord": "0x90E30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80824230",
+      "ExpectedWord": "0x80630C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80824370",
+      "ExpectedWord": "0x90C30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8082441C",
+      "ExpectedWord": "0x90C30C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80829F08",
+      "ExpectedWord": "0x90C30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8082A60C",
+      "ExpectedWord": "0x80030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082A618",
+      "ExpectedWord": "0x80630C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8082A684",
+      "ExpectedWord": "0x93630C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8082A718",
+      "ExpectedWord": "0x90C30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8082D2DC",
+      "ExpectedWord": "0x93830C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8082DF80",
+      "ExpectedWord": "0x90030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082E010",
+      "ExpectedWord": "0x90030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FF30",
+      "ExpectedWord": "0x90030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FF90",
+      "ExpectedWord": "0x90C50C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FF9C",
+      "ExpectedWord": "0x90C50D18",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFA8",
+      "ExpectedWord": "0x90C50E08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFB4",
+      "ExpectedWord": "0x90C50EF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFC0",
+      "ExpectedWord": "0x90C50FE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFCC",
+      "ExpectedWord": "0x90C510D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFD8",
+      "ExpectedWord": "0x90C511C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8082FFE4",
+      "ExpectedWord": "0x90C512B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8083001C",
+      "ExpectedWord": "0x90E50C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80830A80",
+      "ExpectedWord": "0x80030CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80830B2C",
+      "ExpectedWord": "0x91240CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80831858",
+      "ExpectedWord": "0x90870C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80831864",
+      "ExpectedWord": "0x90670C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80831870",
+      "ExpectedWord": "0x90670C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8083187C",
+      "ExpectedWord": "0x90070CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80831888",
+      "ExpectedWord": "0x90870D18",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80831894",
+      "ExpectedWord": "0x90670D14",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x808318A0",
+      "ExpectedWord": "0x90670D10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808318AC",
+      "ExpectedWord": "0x90070DD4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x808318B8",
+      "ExpectedWord": "0x90870E08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808318C4",
+      "ExpectedWord": "0x90670E04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x808318D0",
+      "ExpectedWord": "0x90670E00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808318DC",
+      "ExpectedWord": "0x90070EC4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x808318E8",
+      "ExpectedWord": "0x90870EF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808318F4",
+      "ExpectedWord": "0x90670EF4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80831900",
+      "ExpectedWord": "0x90670EF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8083190C",
+      "ExpectedWord": "0x90070FB4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80831918",
+      "ExpectedWord": "0x90870FE8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80831924",
+      "ExpectedWord": "0x90670FE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80831930",
+      "ExpectedWord": "0x90670FE0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8083193C",
+      "ExpectedWord": "0x900710A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80831948",
+      "ExpectedWord": "0x908710D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80831954",
+      "ExpectedWord": "0x906710D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80831960",
+      "ExpectedWord": "0x906710D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8083196C",
+      "ExpectedWord": "0x90051194",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride+Scenario.players.stride",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8083211C",
+      "ExpectedWord": "0x91030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80832138",
+      "ExpectedWord": "0x90E30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8083214C",
+      "ExpectedWord": "0x90C30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8083216C",
+      "ExpectedWord": "0x91030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80832188",
+      "ExpectedWord": "0x90E30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8083219C",
+      "ExpectedWord": "0x90C30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808321BC",
+      "ExpectedWord": "0x91030C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808321D8",
+      "ExpectedWord": "0x90E30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808321EC",
+      "ExpectedWord": "0x90C30C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80852128",
+      "ExpectedWord": "0x80630C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80852178",
+      "ExpectedWord": "0x93430C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80852188",
+      "ExpectedWord": "0x93630C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80852198",
+      "ExpectedWord": "0x93830C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808521C4",
+      "ExpectedWord": "0x93A30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808521D4",
+      "ExpectedWord": "0x93C30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x808521E4",
+      "ExpectedWord": "0x93E30C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80852220",
+      "ExpectedWord": "0x90030C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80852240",
+      "ExpectedWord": "0x90030C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80852260",
+      "ExpectedWord": "0x90030C20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80856D04",
+      "ExpectedWord": "0x90070CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D24",
+      "ExpectedWord": "0x90080CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D44",
+      "ExpectedWord": "0x900A0CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D60",
+      "ExpectedWord": "0x90090CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D74",
+      "ExpectedWord": "0x90080CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D84",
+      "ExpectedWord": "0x90070CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856D94",
+      "ExpectedWord": "0x90060CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856DA0",
+      "ExpectedWord": "0x90050CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856DD4",
+      "ExpectedWord": "0x90C30CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856E04",
+      "ExpectedWord": "0x80830CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80856F94",
+      "ExpectedWord": "0x93830CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8085706C",
+      "ExpectedWord": "0x80A50C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x808570CC",
+      "ExpectedWord": "0x93830CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x808571A4",
+      "ExpectedWord": "0x80A50C24",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80857200",
+      "ExpectedWord": "0x90E60CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80857574",
+      "ExpectedWord": "0x93830CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8085769C",
+      "ExpectedWord": "0x80050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808576C4",
+      "ExpectedWord": "0x90050CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80857700",
+      "ExpectedWord": "0x80060C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80857714",
+      "ExpectedWord": "0x90A60CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x8085773C",
+      "ExpectedWord": "0x90060CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80857778",
+      "ExpectedWord": "0x80060C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8085778C",
+      "ExpectedWord": "0x90A60CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x808577B4",
+      "ExpectedWord": "0x90060CE4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x808581D0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808581E8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858200",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858218",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858230",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858248",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858260",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858270",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858298",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858328",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858340",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858358",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858370",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80858388",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808583A0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808583B8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808583C8",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x808583F0",
+      "ExpectedWord": "0x91050C28",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8085A274",
+      "ExpectedWord": "0xA0040CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x8085A4B4",
+      "ExpectedWord": "0xA0040CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x8085A4D0",
+      "ExpectedWord": "0xA0050CF2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 218
+    },
+    {
+      "Instruction": "0x8085A590",
+      "ExpectedWord": "0x9B030CF8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x8085AD8C",
+      "ExpectedWord": "0xA0040D00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset",
+      "Addend": 232
     }
   ],
   "GlobalPointers": {
@@ -17690,6 +20266,21 @@
       "Name": "GhostData::Fill"
     },
     {
+      "Entry": "0x80523304",
+      "Receiver": null,
+      "Name": "MiiManager::CreatePlayerMiiFromOfficial"
+    },
+    {
+      "Entry": "0x80524348",
+      "Receiver": null,
+      "Name": "MiiManager::CreateMii(CreationParams)"
+    },
+    {
+      "Entry": "0x80529080",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::__ct"
+    },
+    {
       "Entry": "0x805291F8",
       "Name": "Racedata::Init",
       "Receiver": "Racedata"
@@ -17698,6 +20289,16 @@
       "Entry": "0x8052990C",
       "Receiver": "Racedata",
       "Name": "Racedata::ResetScenarios"
+    },
+    {
+      "Entry": "0x80529E08",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::UpdatePoints"
+    },
+    {
+      "Entry": "0x8052A1D0",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::GetGameType"
     },
     {
       "Entry": "0x8052A1E0",
@@ -17720,6 +20321,11 @@
       "Receiver": "Scenario"
     },
     {
+      "Entry": "0x8052AC40",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::ComputePlayerCounts"
+    },
+    {
       "Entry": "0x8052ADDC",
       "Name": "RacedataScenario::InitRng",
       "Receiver": "Scenario"
@@ -17735,9 +20341,24 @@
       "Receiver": "Scenario"
     },
     {
+      "Entry": "0x8052B4F0",
+      "Receiver": "Racedata",
+      "Name": "Racedata::__dt"
+    },
+    {
+      "Entry": "0x8052B614",
+      "Receiver": "Racedata",
+      "Name": "Racedata::__ct"
+    },
+    {
       "Entry": "0x8052B77C",
       "Name": "Racedata::InitRace",
       "Receiver": "Racedata"
+    },
+    {
+      "Entry": "0x8052BA64",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::operator="
     },
     {
       "Entry": "0x8052BD1C",
@@ -17745,9 +20366,19 @@
       "Receiver": "Racedata"
     },
     {
+      "Entry": "0x8052C3C4",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::AreTeamsEnabled"
+    },
+    {
       "Entry": "0x8052C528",
       "Name": "Racedata::InitCredits",
       "Receiver": "Racedata"
+    },
+    {
+      "Entry": "0x8052D19C",
+      "Receiver": "Racedata",
+      "Name": "Racedata::UpdatePrevFromCur"
     },
     {
       "Entry": "0x8052D29C",
@@ -17768,6 +20399,11 @@
       "Entry": "0x8052D480",
       "Receiver": "Racedata",
       "Name": "Racedata::LoadNextGPTrack"
+    },
+    {
+      "Entry": "0x8052D4E8",
+      "Receiver": "Racedata",
+      "Name": "Racedata::IsTTReplay"
     },
     {
       "Entry": "0x8052D70C",
@@ -18410,6 +21046,11 @@
       "Name": "Pages::GhostManager::SetupGhostReplay"
     },
     {
+      "Entry": "0x805CDBFC",
+      "Receiver": null,
+      "Name": "SectionParams::CopyMiisToRacedata"
+    },
+    {
       "Entry": "0x805E3BB4",
       "Receiver": null,
       "Name": "Pages::GlobeSearch::OnActivate"
@@ -18520,6 +21161,11 @@
       "Name": "Pages::AwardFade::AfterControlUpdate"
     },
     {
+      "Entry": "0x8062194C",
+      "Receiver": null,
+      "Name": "AwardDemoResultItem::SetValues"
+    },
+    {
       "Entry": "0x80621F2C",
       "Receiver": null,
       "Name": "Pages::AwardResults::OnInit"
@@ -18595,6 +21241,16 @@
       "Name": "Pages::GhostRaceMgr::PrepareRace"
     },
     {
+      "Entry": "0x80637714",
+      "Receiver": null,
+      "Name": "NoteModelControl::OnUpdate"
+    },
+    {
+      "Entry": "0x8063863C",
+      "Receiver": null,
+      "Name": "Pages::ModelRenderer::OnActivate"
+    },
+    {
       "Entry": "0x80642D20",
       "Receiver": null,
       "Name": ""
@@ -18606,6 +21262,11 @@
     },
     {
       "Entry": "0x80646C54",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8064CBC8",
       "Receiver": null,
       "Name": ""
     },
@@ -18623,6 +21284,16 @@
       "Entry": "0x8064D620",
       "Name": "",
       "Receiver": null
+    },
+    {
+      "Entry": "0x8064D748",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8064D988",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8064E9F8",
@@ -18658,6 +21329,16 @@
       "Entry": "0x80651018",
       "Name": "RKNet::PacketMgr::ProcessReceived",
       "Receiver": null
+    },
+    {
+      "Entry": "0x80658068",
+      "Receiver": null,
+      "Name": "RKNet::SELECTHandler::InitPackets"
+    },
+    {
+      "Entry": "0x80658978",
+      "Receiver": null,
+      "Name": "RKNet::SELECTHandler::ResetSendPacket"
     },
     {
       "Entry": "0x806599F8",
@@ -19515,6 +22196,26 @@
       "Name": ""
     },
     {
+      "Entry": "0x807CB734",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807CB874",
+      "Receiver": null,
+      "Name": "MiiHeadsModel::__ct(miiIdx, r9)"
+    },
+    {
+      "Entry": "0x807CB930",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807CB9E4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
       "Entry": "0x807CF2E8",
       "Receiver": null,
       "Name": "MinimapMgr::CreateInstance"
@@ -19565,6 +22266,11 @@
       "Receiver": null
     },
     {
+      "Entry": "0x807DCC88",
+      "Receiver": null,
+      "Name": "CtrlMenuCharacterSelect::InitSelf"
+    },
+    {
       "Entry": "0x807DF824",
       "Name": "CtrlMenuCupSelectCup::InitSelf",
       "Receiver": null
@@ -19573,6 +22279,11 @@
       "Entry": "0x807DFD58",
       "Name": "CtrlMenuCupSelectCup::IsCupUnlocked",
       "Receiver": null
+    },
+    {
+      "Entry": "0x807E06B0",
+      "Receiver": null,
+      "Name": "CtrlMenuTeamConfirmTeam::InitSelf"
     },
     {
       "Entry": "0x807E09D0",
@@ -19830,6 +22541,16 @@
       "Receiver": null
     },
     {
+      "Entry": "0x808241C8",
+      "Receiver": null,
+      "Name": "Pages::CharacterSelect::8083ec28"
+    },
+    {
+      "Entry": "0x808243BC",
+      "Receiver": null,
+      "Name": "Pages::CharacterSelect::8083ee1c"
+    },
+    {
       "Entry": "0x80824DD8",
       "Receiver": null,
       "Name": "Pages::GPClassSelect::OnActivate"
@@ -19885,6 +22606,16 @@
       "Name": "Pages::KartSelect::OnButtonClick"
     },
     {
+      "Entry": "0x8082A584",
+      "Receiver": null,
+      "Name": "Pages::KartSelect::8084745c"
+    },
+    {
+      "Entry": "0x8082A6B8",
+      "Receiver": null,
+      "Name": "Pages::KartSelect::80847590"
+    },
+    {
       "Entry": "0x8082D228",
       "Receiver": null,
       "Name": "Pages::MultiKartSelect::OnUpDownClick"
@@ -19928,6 +22659,11 @@
       "Entry": "0x8083179C",
       "Receiver": null,
       "Name": "Pages::MainMenu::OnActivate"
+    },
+    {
+      "Entry": "0x808320A8",
+      "Receiver": null,
+      "Name": "Pages::MainMenu::ResetSectionParamsAndRacedataScenario1"
     },
     {
       "Entry": "0x80832B70",
@@ -20140,6 +22876,11 @@
       "Name": ""
     },
     {
+      "Entry": "0x8083B8B4",
+      "Receiver": null,
+      "Name": "GetActiveRacedataPlayers"
+    },
+    {
       "Entry": "0x8083B9C8",
       "Receiver": null,
       "Name": ""
@@ -20265,6 +23006,11 @@
       "Name": "Pages::BattleKartSelect::OnExternalButtonSelect"
     },
     {
+      "Entry": "0x808520AC",
+      "Receiver": null,
+      "Name": "Pages::BattleKartSelect::Func_8083ad54"
+    },
+    {
       "Entry": "0x80852634",
       "Receiver": null,
       "Name": "Pages::BattleStageSelect::OnActivate"
@@ -20300,9 +23046,19 @@
       "Receiver": null
     },
     {
+      "Entry": "0x80856C28",
+      "Receiver": null,
+      "Name": "Pages::MultiTeamSelect::OnActivate"
+    },
+    {
       "Entry": "0x80856EFC",
       "Receiver": null,
       "Name": "Pages::MultiTeamSelect::OnButtonClick"
+    },
+    {
+      "Entry": "0x80857514",
+      "Receiver": null,
+      "Name": "Pages::MultiTeamSelect::OnResume"
     },
     {
       "Entry": "0x80857600",
@@ -20338,6 +23094,11 @@
       "Entry": "0x8085A1C8",
       "Name": "Pages::GPVSLeaderboardUpdate::FillRows",
       "Receiver": null
+    },
+    {
+      "Entry": "0x8085A458",
+      "Receiver": null,
+      "Name": "Pages::GPVSLeaderboardTotal::FillRows"
     },
     {
       "Entry": "0x8085A688",

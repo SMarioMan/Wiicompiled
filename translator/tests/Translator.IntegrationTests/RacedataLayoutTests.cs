@@ -7,9 +7,15 @@ namespace Translator.Tests;
 
 public class RacedataLayoutTests
 {
-    [Fact]
+    [Theory]
+    [InlineData(0x80529080u)] // Standalone Scenario constructor
+    [InlineData(0x8052b310u)] // CreateInstance and its inlined constructor
+    [InlineData(0x8052b4f0u)] // Racedata destructor
+    [InlineData(0x8052b5acu)] // Scenario destructor
+    [InlineData(0x8052b614u)] // Out-of-line Racedata constructor
+    [InlineData(0x8052ba64u)] // Scenario assignment
     [Trait("Requires", "USA game assets and Clang")]
-    public void OriginalConstructorIsUnchangedAtTwelveAndCompilesAtTwentyFour()
+    public void LifecycleIsUnchangedAtTwelveAndCompilesAtTwentyFour(uint entry)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "translator/Translator.sln")))
@@ -26,15 +32,16 @@ public class RacedataLayoutTests
         var map = FunctionMap.Load(Path.Combine(root, "projects/mkwii-ntsc-u/MAP.txt"));
         var options = new TranslationOptions(EnableLeafInlining: false,
             KnownFunctionEntryPoints: map.Addresses.ToHashSet());
-        var original = new FunctionTranslator(image).Translate(0x8052b310, options);
+        var original = new FunctionTranslator(image).Translate(entry, options);
         var twelve = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, 12))
-            .Translate(0x8052b310, options);
+            .Translate(entry, options);
         Assert.Equal(original.CxxCode, twelve.CxxCode);
         var expanded = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, 24))
-            .Translate(0x8052b310, options);
+            .Translate(entry, options);
         Assert.NotEqual(original.CxxCode, expanded.CxxCode);
-        Assert.Contains(expanded.LinearIr.Blocks.SelectMany(b => b.Instructions).OfType<Translator.Core.Ir.IrAssign>(),
-            node => node.Value.Constant == 0x95b0);
+        if (entry == 0x8052b310)
+            Assert.Contains(expanded.LinearIr.Blocks.SelectMany(b => b.Instructions).OfType<Translator.Core.Ir.IrAssign>(),
+                node => node.Value.Constant == 0x95b0);
 
         var temporary = Path.Combine(Path.GetTempPath(), "mkw-racedata-layout-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temporary);

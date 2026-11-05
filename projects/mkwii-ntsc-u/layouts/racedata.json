@@ -2,7 +2,7 @@
   "Version": 1,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: audited Racedata::CreateInstance references only. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: audited Racedata constructors/destructors and Scenario assignment. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -95,6 +95,79 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x8052909C",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x805290C8",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x805290D0",
+      "ExpectedWord": "0x38630008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x805290DC",
+      "ExpectedWord": "0x901D0B48",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x805290E0",
+      "ExpectedWord": "0x387D0B7C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x805290E8",
+      "ExpectedWord": "0x93FD0B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805290EC",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x805290F0",
+      "ExpectedWord": "0x93FD0B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x805290F4",
+      "ExpectedWord": "0x93FD0B68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x805290FC",
+      "ExpectedWord": "0x93DD0BEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.ghost.offset"
+    },
     {
       "Instruction": "0x8052B330",
       "ExpectedWord": "0x386073F0",
@@ -424,6 +497,790 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "Ghost.size"
+    },
+    {
+      "Instruction": "0x8052B514",
+      "ExpectedWord": "0x34631800",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "Racedata.awards.offset"
+    },
+    {
+      "Instruction": "0x8052B514",
+      "ExpectedWord": "0x34631800",
+      "Node": 2,
+      "Operand": "argument:1",
+      "Symbol": "Racedata.awards.offset"
+    },
+    {
+      "Instruction": "0x8052B520",
+      "ExpectedWord": "0x38630008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B528",
+      "ExpectedWord": "0x38A000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B52C",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B534",
+      "ExpectedWord": "0x347E0C10",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset"
+    },
+    {
+      "Instruction": "0x8052B534",
+      "ExpectedWord": "0x347E0C10",
+      "Node": 1,
+      "Operand": "argument:1",
+      "Symbol": "Racedata.menu.offset"
+    },
+    {
+      "Instruction": "0x8052B540",
+      "ExpectedWord": "0x38630008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B548",
+      "ExpectedWord": "0x38A000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B54C",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B554",
+      "ExpectedWord": "0x347E0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.race.offset"
+    },
+    {
+      "Instruction": "0x8052B554",
+      "ExpectedWord": "0x347E0020",
+      "Node": 1,
+      "Operand": "argument:1",
+      "Symbol": "Racedata.race.offset"
+    },
+    {
+      "Instruction": "0x8052B560",
+      "ExpectedWord": "0x38630008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B568",
+      "ExpectedWord": "0x38A000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B56C",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B5D4",
+      "ExpectedWord": "0x38A000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B5DC",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B5E0",
+      "ExpectedWord": "0x38630008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B660",
+      "ExpectedWord": "0x387A0028",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.race.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B670",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B674",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B678",
+      "ExpectedWord": "0x937A0020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset"
+    },
+    {
+      "Instruction": "0x8052B67C",
+      "ExpectedWord": "0x9B9A0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B680",
+      "ExpectedWord": "0x9B9A0025",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B68C",
+      "ExpectedWord": "0x93FA0B68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B690",
+      "ExpectedWord": "0x387A0B9C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.race.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B698",
+      "ExpectedWord": "0x939A0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B69C",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B6A0",
+      "ExpectedWord": "0x939A0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B6A4",
+      "ExpectedWord": "0x939A0B88",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B6AC",
+      "ExpectedWord": "0x381A23F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset"
+    },
+    {
+      "Instruction": "0x8052B6B0",
+      "ExpectedWord": "0x901A0C0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B6B4",
+      "ExpectedWord": "0x387A0C18",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B6BC",
+      "ExpectedWord": "0x937A0C10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset"
+    },
+    {
+      "Instruction": "0x8052B6C4",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B6C8",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B6CC",
+      "ExpectedWord": "0x9B9A0C14",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B6D0",
+      "ExpectedWord": "0x9B9A0C15",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B6D8",
+      "ExpectedWord": "0x93FA1758",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B6DC",
+      "ExpectedWord": "0x387A178C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B6E4",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B6E8",
+      "ExpectedWord": "0x939A1760",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B6EC",
+      "ExpectedWord": "0x939A1764",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B6F0",
+      "ExpectedWord": "0x939A1778",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B6F8",
+      "ExpectedWord": "0x381A4BF0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset+Ghost.size"
+    },
+    {
+      "Instruction": "0x8052B6FC",
+      "ExpectedWord": "0x901A17FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B700",
+      "ExpectedWord": "0x387A1808",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B708",
+      "ExpectedWord": "0x937A1800",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset"
+    },
+    {
+      "Instruction": "0x8052B710",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B714",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B718",
+      "ExpectedWord": "0x9B9A1804",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B71C",
+      "ExpectedWord": "0x9B9A1805",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B724",
+      "ExpectedWord": "0x93FA2348",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B728",
+      "ExpectedWord": "0x387A237C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.awards.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B730",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B734",
+      "ExpectedWord": "0x939A2350",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B738",
+      "ExpectedWord": "0x939A2354",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B73C",
+      "ExpectedWord": "0x939A2368",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B744",
+      "ExpectedWord": "0x939A23EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B748",
+      "ExpectedWord": "0x3B7A23F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset"
+    },
+    {
+      "Instruction": "0x8052B74C",
+      "ExpectedWord": "0x3BFA73F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.size"
+    },
+    {
+      "Instruction": "0x8052B758",
+      "ExpectedWord": "0x3B7B2800",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Ghost.size"
+    },
+    {
+      "Instruction": "0x8052BA68",
+      "ExpectedWord": "0x38A30008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052BA70",
+      "ExpectedWord": "0x38C40008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052BA74",
+      "ExpectedWord": "0x38E30B48",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.end"
+    },
+    {
+      "Instruction": "0x8052BC50",
+      "ExpectedWord": "0x38C600F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052BC58",
+      "ExpectedWord": "0x38A500F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052BC64",
+      "ExpectedWord": "0x80A40B48",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052BC6C",
+      "ExpectedWord": "0x90A30B48",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052BC70",
+      "ExpectedWord": "0x38E30B78",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x8052BC74",
+      "ExpectedWord": "0x38C40B78",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x8052BC78",
+      "ExpectedWord": "0x80A40B4C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052BC7C",
+      "ExpectedWord": "0x90A30B4C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052BC80",
+      "ExpectedWord": "0x80A40B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052BC84",
+      "ExpectedWord": "0x90A30B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052BC88",
+      "ExpectedWord": "0x80A40B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052BC8C",
+      "ExpectedWord": "0x90A30B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052BC90",
+      "ExpectedWord": "0x80A40B58",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052BC94",
+      "ExpectedWord": "0x90A30B58",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8052BC98",
+      "ExpectedWord": "0x80A40B5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x8052BC9C",
+      "ExpectedWord": "0x90A30B5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x8052BCA0",
+      "ExpectedWord": "0x80A40B60",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8052BCA4",
+      "ExpectedWord": "0x90A30B60",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8052BCA8",
+      "ExpectedWord": "0x88A40B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052BCAC",
+      "ExpectedWord": "0x98A30B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052BCB0",
+      "ExpectedWord": "0x88A40B65",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 29
+    },
+    {
+      "Instruction": "0x8052BCB4",
+      "ExpectedWord": "0x98A30B65",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 29
+    },
+    {
+      "Instruction": "0x8052BCB8",
+      "ExpectedWord": "0x88A40B66",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x8052BCBC",
+      "ExpectedWord": "0x98A30B66",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x8052BCC0",
+      "ExpectedWord": "0x88A40B67",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 31
+    },
+    {
+      "Instruction": "0x8052BCC4",
+      "ExpectedWord": "0x98A30B67",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 31
+    },
+    {
+      "Instruction": "0x8052BCC8",
+      "ExpectedWord": "0x80A40B68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052BCCC",
+      "ExpectedWord": "0x90A30B68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052BCD0",
+      "ExpectedWord": "0x88A40B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8052BCD4",
+      "ExpectedWord": "0x98A30B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8052BCD8",
+      "ExpectedWord": "0x88A40B6D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 37
+    },
+    {
+      "Instruction": "0x8052BCDC",
+      "ExpectedWord": "0x98A30B6D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 37
+    },
+    {
+      "Instruction": "0x8052BCE0",
+      "ExpectedWord": "0x80A40B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 40
+    },
+    {
+      "Instruction": "0x8052BCE4",
+      "ExpectedWord": "0x90A30B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 40
+    },
+    {
+      "Instruction": "0x8052BCE8",
+      "ExpectedWord": "0x80A40B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x8052BCEC",
+      "ExpectedWord": "0x90A30B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x8052BCF0",
+      "ExpectedWord": "0x80A40B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x8052BCF4",
+      "ExpectedWord": "0x90A30B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x8052BD10",
+      "ExpectedWord": "0x80040BEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052BD14",
+      "ExpectedWord": "0x90030BEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.ghost.offset"
     }
   ]
 }

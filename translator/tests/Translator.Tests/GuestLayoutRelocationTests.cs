@@ -99,6 +99,30 @@ public class GuestLayoutRelocationTests
         Assert.Equal(24, Assert.Single(instructions.OfType<IrSetCrField>()).Right.Constant);
     }
 
+    [Fact]
+    public void AddressArithmeticAndItsCarryHelperRelocateTogether()
+    {
+        const uint pc = 0x80001000;
+        const string symbol = "Racedata.scenarios.offset+Scenario.size+Scenario.size";
+        var image = TranslatorCppTestHarness.CreateImage((pc, 0x34631800), (pc+4, 0x4e800020));
+        var relocations = new GuestLayoutRelocations(RaceTypes(), 12, 24, new[]
+        {
+            new GuestLayoutReference(pc, 0x34631800, 1, "right", symbol),
+            new GuestLayoutReference(pc, 0x34631800, 2, "argument:1", symbol)
+        });
+        var translated = new FunctionTranslator(image, layoutRelocations: relocations).Discover(pc);
+        var instructions = translated.LinearIr.Blocks.SelectMany(b => b.Instructions).ToArray();
+        Assert.Equal(0x2e80, Assert.Single(instructions.OfType<IrBinary>()).Right.Constant);
+        var carry = Assert.Single(instructions.OfType<IrCall>(), call => call.Target == "PPC_UpdateCarryAdd");
+        Assert.Equal(0x2e80, carry.Arguments[1].Constant);
+        foreach (var operand in new[] { "argument:-1", "argument:99" })
+        {
+            var invalid = new GuestLayoutRelocations(RaceTypes(), 12, 24, new[]
+            { new GuestLayoutReference(pc, 0x34631800, 2, operand, symbol) });
+            Assert.Throws<InvalidDataException>(() => invalid.ValidateImage(image));
+        }
+    }
+
     internal static FunctionTranslationResult ExpandedAllocationFunction()
     {
         const uint pc = 0x80001000;

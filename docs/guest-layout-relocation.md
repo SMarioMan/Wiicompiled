@@ -24,14 +24,17 @@ Every reference specifies its original instruction word, lifted node and operand
 Both the word and the original operand value must match before substitution.
 Relocations run before SSA and inlining, including speculative callee decodes.
 Loads, stores, allocation constants, address arithmetic and comparison bounds are
-supported. The pass does not guess which occurrences of the number twelve are
+supported. `argument:N` also relocates a lifted helper argument; address additions
+that set carry relocate both their arithmetic operand and their carry helper.
+The pass does not guess which occurrences of the number twelve are
 player counts.
 
 ## Current migration status
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 45 references in `Racedata::CreateInstance`.
+menu and awards scenarios and audits 160 references across creation, construction,
+destruction and scenario assignment.
 It is **incomplete**: other race-data consumers, race state, karts, items, scoring,
 menus, starting grids and the LAN/game network layouts still require migration.
 It is not a playable 24-player profile. Existing release builds retain twelve
@@ -68,8 +71,12 @@ MKW_TEST_CXX=/absolute/path/to/clang++ \
   dotnet test translator/tests/Translator.IntegrationTests -c Release
 ```
 
-The game-backed check verifies that the twelve-player constructor emits exactly
-the same C++ as the original, and syntax-checks its relocated 24-player version.
+The game-backed checks verify that six twelve-player lifecycle/copy routines emit
+exactly the same C++ as the originals, and syntax-check their relocated 24-player
+versions. A native execution test runs the original scenario assignment at 12,
+24 and 48 players against the runtime's actual guest-memory implementation. It
+checks every player's selected fields, the settings/mission/ghost tail, preserved
+vtables and padding, and guard bytes before and after the destination.
 Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game

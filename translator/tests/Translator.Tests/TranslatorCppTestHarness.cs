@@ -14,6 +14,7 @@ internal static class TranslatorCppTestHarness
         Path.Combine("runtime", "src", "abi_bridge.cpp"),
         Path.Combine("runtime", "src", "fpu_helpers.cpp"),
         Path.Combine("runtime", "src", "memory.cpp"),
+        Path.Combine("runtime", "src", "guest_flat_memory.cpp"),
         Path.Combine("runtime", "src", "ppc_helpers.cpp"),
         Path.Combine("runtime", "src", "ppc_quantized.cpp"),
     };
@@ -29,7 +30,7 @@ internal static class TranslatorCppTestHarness
         var supportSource = EnsureSupportSource(tempRoot);
         var runtimeSources = LeanRuntimeSources.Select(path => Path.Combine(repoRoot, path));
         var args = new StringBuilder();
-        args.Append("-std=c++17 ");
+        args.Append("-std=c++20 ");
         args.Append("-D_CRT_SECURE_NO_WARNINGS ");
         args.Append("-march=x86-64-v3 ");
         args.Append("-fno-fast-math -ffp-contract=off ");
@@ -120,6 +121,7 @@ internal static class TranslatorCppTestHarness
             #include "system_bridge.h"
             #include "ppc_runtime.h"
             #include "recomp_mod_loader.h"
+            #include "guest_small_data.h"
 
             #include <csetjmp>
             #include <atomic>
@@ -130,7 +132,7 @@ internal static class TranslatorCppTestHarness
             #include <string_view>
 
             bool g_suppressSehReporting = false;
-            thread_local jmp_buf* g_sehJumpTarget = nullptr;
+            thread_local MkwJmpBuf* g_sehJumpTarget = nullptr;
             thread_local uint32_t g_sehLastExceptionCode = 0;
             thread_local uintptr_t g_sehLastExceptionAddress = 0;
             thread_local uintptr_t g_sehLastAccessedAddress = 0;
@@ -146,6 +148,19 @@ internal static class TranslatorCppTestHarness
             void MarkFatalErrorReported() {}
             extern "C" void DumpHostStackTraceForRuntimeHelper() {}
             extern "C" void OS_HLE_ProcessAlarms(int) {}
+            // This standalone harness has no game bootstrap. Tests that need
+            // small data set r2/r13 explicitly; MMIO is an unexpected access.
+            namespace GuestSmallData {
+            extern const uint32_t kSda1Base = 0;
+            extern const uint32_t kSda2Base = 0;
+            }
+            extern "C" const uint8_t kMkwGuestRegion = 0;
+            bool HollywoodGpio_Read32(uint32_t, uint32_t&) { std::abort(); }
+            bool HollywoodGpio_Write32(uint32_t, uint32_t) { std::abort(); }
+            extern "C" void GX_HLE_FIFO_Write8(uint8_t) { std::abort(); }
+            extern "C" void GX_HLE_FIFO_Write16(uint16_t) { std::abort(); }
+            extern "C" void GX_HLE_FIFO_Write32(uint32_t) { std::abort(); }
+            extern "C" void GX_HLE_FIFO_WriteFloat(float) { std::abort(); }
             void ShowRuntimeFatalPopup(std::string_view, std::string_view) noexcept
             {
                 std::abort();
@@ -156,18 +171,17 @@ internal static class TranslatorCppTestHarness
             std::atomic<uint8_t> g_executableWriteGuardPages[kExecutableWriteGuardPageCount]{};
             std::atomic<uint8_t> g_executableWriteGuardCoarsePages[kExecutableWriteGuardCoarsePageCount]{};
             std::atomic<uint8_t> g_executableWriteGuardMidPages[kExecutableWriteGuardMidPageCount]{};
-            ScopedTranslatedExecutionAddress::ScopedTranslatedExecutionAddress(uint32_t) noexcept {}
-            ScopedTranslatedExecutionAddress::~ScopedTranslatedExecutionAddress() noexcept {}
-            uint32_t CurrentTranslatedExecutionAddress() noexcept { return 0; }
+            uint32_t CurrentTranslatedExecutionAddress() noexcept { return g_currentTranslatedExecutionAddress; }
             bool HandleExecutableWrite(uint32_t, size_t, uint64_t) { return false; }
             void CheckExecutableWrite(uint32_t, size_t, uint64_t) {}
             }
 
-            RuntimeOptions SystemBridge::ParseCommandLine(int, char**) { return {}; }
-            void SystemBridge::Initialize(const RuntimeOptions&) {}
-            void SystemBridge::DumpRegisteredFunctions() {}
-            void SystemBridge::DumpMemoryLayout() {}
-            void SystemBridge::PrintUsage() {}
+            void SetRuntimeExitCode(int) {}
+            namespace RuntimeCrash {
+            void WriteCrashArtifacts(std::string_view, std::string_view, const uint32_t*) noexcept {}
+            [[noreturn]] void FatalMissingGuestTarget(uint32_t, CpuContext*) noexcept { std::abort(); }
+            }
+            void SystemBridge::Initialize() {}
             void SystemBridge::DumpCpuState(const CpuContext*) {}
             void SystemBridge::DumpCpuState(std::ostream&, const CpuContext*) {}
             """;

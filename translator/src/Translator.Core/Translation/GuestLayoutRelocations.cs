@@ -92,6 +92,16 @@ public sealed class GuestLayoutRelocations
                 return replacement;
             }
             InvalidDataException Mismatch() => new($"Guest layout operand mismatch at 0x{origin.Address:X8}: {site.Operand}, {site.Symbol}.");
+            if (site.Operand.StartsWith("argument:", StringComparison.Ordinal) &&
+                result[site.Node] is IrCall call &&
+                int.TryParse(site.Operand.AsSpan(9), NumberStyles.None, CultureInfo.InvariantCulture, out var argument) &&
+                argument < call.Arguments.Count)
+            {
+                var arguments = call.Arguments.ToArray();
+                arguments[argument] = Replace(arguments[argument]);
+                result[site.Node] = call with { Arguments = arguments };
+                continue;
+            }
             result[site.Node] = (site.Operand, result[site.Node]) switch
             {
                 ("value", IrAssign node) => node with { Value = Replace(node.Value) },

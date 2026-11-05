@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,719 references across creation, construction,
+menu and awards scenarios and audits 2,742 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 725 consumer entry points in `AuditedConsumers`.
+The manifest records 726 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -399,3 +399,13 @@ both link helpers and recursive search for every configured participant at
 12, 13, 24, 48 and 100 slots, with the online search option enabled and disabled.
 Geometry and holder lookup are fixtures; the reset, graph search, return values,
 per-call visited lifetime, saved registers and memory guards are checked.
+
+## Race position tracking
+
+The real position tracker uses capacity-sized player-ID and double-score arrays
+in a symbolic aligned stack frame. Sorting cursors, both conversion slots, LR,
+and the end-relative SDK register-save base move together. The existing
+eight-at-a-time output loop already handles its final scalar remainder.
+Native tests execute this routine at 12, 13, 24, 48 and 100 players with
+unfinished, finished, mixed and tied standings, checking every player/rank
+mapping, stable ties, callee-saved registers and stack/output boundaries.

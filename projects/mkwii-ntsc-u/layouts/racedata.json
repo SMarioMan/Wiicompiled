@@ -1,8 +1,8 @@
 {
-  "Version": 5,
+  "Version": 6,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: race-data lifecycle, selected readers, point updates, capacity scans, verified unrolled bookkeeping and expandable rank scoring. Other consumers and subsystems still need migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: uniform race-data and selected AI storage/loading, checked field consumers, initialization, bookkeeping and scoring. Input/controller storage, AI rank sorting, items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -293,6 +293,36 @@
         {
           "Name": "scratch",
           "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "AIAction",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "AIAuthoredAction",
+      "Alignment": 4,
+      "Size": 32
+    },
+    {
+      "Name": "AIArrayCookie",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "AIActionAllocation",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "cookie",
+          "Type": "AIArrayCookie"
+        },
+        {
+          "Name": "actions",
+          "Type": "AIAction",
+          "PerPlayer": true
         }
       ]
     }
@@ -21810,6 +21840,27 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x8072D588",
+      "ExpectedWord": "0x38600070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIActionAllocation.size"
+    },
+    {
+      "Instruction": "0x8072D59C",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIActionAllocation.actions.count"
+    },
+    {
+      "Instruction": "0x8072D9FC",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIActionAllocation.actions.count"
     }
   ],
   "GlobalPointers": {
@@ -23617,9 +23668,19 @@
       "Name": ""
     },
     {
+      "Entry": "0x8072D540",
+      "Receiver": null,
+      "Name": "AI::Params::__ct"
+    },
+    {
       "Entry": "0x8072D680",
       "Receiver": null,
       "Name": "AI::Params::Load"
+    },
+    {
+      "Entry": "0x8072D9F8",
+      "Receiver": null,
+      "Name": "AI::Params::LoadActions"
     },
     {
       "Entry": "0x8072EC98",
@@ -26330,6 +26391,18 @@
           "Width": 4
         }
       ]
+    }
+  ],
+  "ResampledCursors": [
+    {
+      "Instruction": "0x8072DAB0",
+      "ExpectedWord": "0x38840020",
+      "Cursor": "r4",
+      "NextIndex": "r6",
+      "IndexStride": "AIAction.size",
+      "SourceStride": "AIAuthoredAction.size",
+      "Count": "AIActionAllocation.actions.count",
+      "SourceCount": 12
     }
   ]
 }

@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,523 references across creation, construction,
+menu and awards scenarios and audits 2,526 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 673 consumer entry points in `AuditedConsumers`.
+The manifest records 675 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -110,7 +110,7 @@ bound uses the configured capacity. The subordinate GP/VS AI object's CPU record
 four local-screen records and following state move together. The constructor's
 full-chunk bounds use array ends rather than fixed original element offsets.
 Its private and virtual consumers and three cursor-based local-array accesses
-are included. Other AI data, including action parameter tables, rank sorting
+are included. Other AI data, including rank sorting
 scratch arrays and battle-specific structures, still require migration.
 
 Format version 5 adds `ArrayFills` for constructors that initialize every slot
@@ -139,6 +139,33 @@ their pointee types, including within indexed arrays. Missing target types,
 non-pointer widths, interior unaligned loads and undeclared pointees are rejected
 or left unresolved. These are explicit ABI declarations, never inferred from
 host pointer sizes.
+
+## Authored AI action profiles
+
+The AI action allocation is one capacity-sized array of eight-byte records with
+the original 16-byte SDK array cookie. Both allocation size and cookie count
+scale together, as does the original action-loader loop. The independent
+three-float speed allocation remains twelve **bytes**, and the source file keeps
+its three difficulty rows of twelve authored profiles.
+
+Format version 6 adds `ResampledCursors`. At a checked scalar cursor increment,
+`NextIndex` declares the already incremented destination byte index. The source
+cursor advances by the difference between successive closest authored ranks at
+normalized destination positions: `round(i * (sourceCount-1)/(count-1))`.
+This fills the uniform destination array without reading beyond an authored row
+or adding extra slot banks. The original float-to-byte conversions execute
+unchanged. Original-capacity code is byte-identical. Source/destination strides
+must stay positive and unchanged; stale words, extra instruction effects,
+shrinking dimensions and overlapping rewrites are rejected. Generated address
+scratch variables stay local to the lifted instruction, including inside loops.
+
+Native tests execute the original AI parameter constructor, actual SDK cookie
+routine and all three difficulty loaders at 12, 13, 24, 48 and 100 slots. The
+fixtures replace allocation and file I/O only. Every loaded byte is compared
+with independently normalized authored profiles, including fractional input
+conversion, and source data, stack, saved registers and allocation guards are
+checked. This verifies parameter storage/loading; AI sorting scratch arrays and
+complete racing still require migration.
 
 ## Private executable validation
 

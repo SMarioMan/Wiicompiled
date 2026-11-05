@@ -128,7 +128,7 @@ public class GuestLayoutRelocationTests
         var path = Path.GetTempFileName();
         try
         {
-            foreach (var version in new[] { 1, 2, 3, 4, 5, 6 })
+            foreach (var version in new[] { 1, 2, 3, 4, 5, 6, 7 })
             {
                 File.WriteAllText(path, JsonSerializer.Serialize(new {
                     Version = version, OriginalPlayers = 2,
@@ -140,7 +140,7 @@ public class GuestLayoutRelocationTests
                         Fields = new[] { new GuestArrayFieldCopy(0, 1, 1) }
                     } }
                 }));
-                if (version is 2 or 3 or 4 or 5) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
+                if (version is 2 or 3 or 4 or 5 or 6) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
                 else Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 4));
             }
         }

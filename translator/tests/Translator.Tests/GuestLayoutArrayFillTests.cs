@@ -29,14 +29,14 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {4,5,6})
+            foreach(var version in new[] {4,5,6,7})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=2,Types,References=Array.Empty<object>(),
                     ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays}}
                 }));
-                if(version==5) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 5 or 6) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,744 references across creation, construction,
+menu and awards scenarios and audits 2,778 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 727 consumer entry points in `AuditedConsumers`.
+The manifest records 735 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -417,5 +417,8 @@ four non-player roles after a uniform racer namespace. The SDK manager already
 allocates its pointer table from that requested count. Native tests execute the
 actual SDK allocation/initialization, game count argument and creator loop at
 12, 13, 24, 48 and 100 slots, checking every pointer, creator ID, group ID and
-boundary. Heap/OS support calls are fixtures. Relocating the reserved role IDs
-and their consumers is still required before expanded effects are complete.
+boundary. Heap/OS support calls are fixtures. The world and shared item role IDs move after the racer range through 34
+checked definitions feeding construction, calculation and drawing. Native tests
+execute real world/item construction sites and the SDK constructor, verifying
+that reserved IDs move and every racer ID stays unchanged; string-copy and
+virtual-reset support are fixtures. This does not verify every visual effect.

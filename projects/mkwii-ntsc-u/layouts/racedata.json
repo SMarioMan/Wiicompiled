@@ -23696,6 +23696,278 @@
       "Operand": "right",
       "Symbol": "players",
       "Addend": 4
+    },
+    {
+      "Instruction": "0x8067892C",
+      "ExpectedWord": "0x38C0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80678B48",
+      "ExpectedWord": "0x3880000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80678B68",
+      "ExpectedWord": "0x3880000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80678B74",
+      "ExpectedWord": "0x3880000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80678B94",
+      "ExpectedWord": "0x3880000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80679120",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80679748",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B3A0",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B3CC",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B40C",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B438",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B478",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B4A4",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B4E4",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B510",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B554",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B580",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B5B8",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B5E4",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B850",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B888",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x8068B8B4",
+      "ExpectedWord": "0x38A0000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x806BD220",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x806BD240",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x806BE078",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x806BE098",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x806E2420",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C4C4",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C4E8",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C510",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C538",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C560",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C588",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8074C5B0",
+      "ExpectedWord": "0x38A0000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2
     }
   ],
   "GlobalPointers": {
@@ -25189,6 +25461,21 @@
       "Name": "Effects::Mgr::Init"
     },
     {
+      "Entry": "0x80678818",
+      "Receiver": null,
+      "Name": "Effects::Mgr::CalcPlayerEffects"
+    },
+    {
+      "Entry": "0x80678AEC",
+      "Receiver": null,
+      "Name": "Effects::Mgr::Draw"
+    },
+    {
+      "Entry": "0x8067966C",
+      "Receiver": null,
+      "Name": "Effects::Mgr::DrawSelfItem"
+    },
+    {
       "Entry": "0x80688A54",
       "Receiver": null,
       "Name": "Effects::Items::__ct"
@@ -25197,6 +25484,11 @@
       "Entry": "0x80689B10",
       "Receiver": null,
       "Name": "Effects::Player::__ct"
+    },
+    {
+      "Entry": "0x8068ABBC",
+      "Receiver": null,
+      "Name": "Effects::Player::LoadEffects"
     },
     {
       "Entry": "0x80697670",
@@ -25259,6 +25551,16 @@
       "Name": ""
     },
     {
+      "Entry": "0x806BD180",
+      "Receiver": null,
+      "Name": "Objects::BossHanachanHead::__ct"
+    },
+    {
+      "Entry": "0x806BDE68",
+      "Receiver": null,
+      "Name": "Objects::Hanachan::__ct"
+    },
+    {
       "Entry": "0x806C70A4",
       "Receiver": null,
       "Name": "Objects::HighwayCar::__ct"
@@ -25297,6 +25599,11 @@
       "Entry": "0x806DC884",
       "Receiver": null,
       "Name": "RouteHolder::Init"
+    },
+    {
+      "Entry": "0x806E23DC",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806E4F3C",
@@ -26075,6 +26382,11 @@
     },
     {
       "Entry": "0x80746F00",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8074C488",
       "Receiver": null,
       "Name": ""
     },

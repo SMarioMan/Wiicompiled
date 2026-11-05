@@ -2,7 +2,7 @@
   "Version": 1,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: audited Racedata constructors/destructors and Scenario assignment. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: audited race-data lifecycle, scenario assignment and selected race/menu readers. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -167,6 +167,14 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052A1D0",
+      "ExpectedWord": "0x80630B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
     },
     {
       "Instruction": "0x8052B330",
@@ -1281,6 +1289,29 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052C3C4",
+      "ExpectedWord": "0x80030B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 40
+    },
+    {
+      "Instruction": "0x8052D4E8",
+      "ExpectedWord": "0x80030B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8083B8C8",
+      "ExpectedWord": "0x38A40C18",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset"
     }
   ],
   "GlobalPointers": {

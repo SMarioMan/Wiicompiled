@@ -14,8 +14,12 @@ public class RacedataLayoutTests
     [InlineData(0x8052b5acu)] // Scenario destructor
     [InlineData(0x8052b614u)] // Out-of-line Racedata constructor
     [InlineData(0x8052ba64u)] // Scenario assignment
+    [InlineData(0x8052a1d0u)] // Game-type reader
+    [InlineData(0x8052c3c4u)] // Team-mode reader
+    [InlineData(0x8052d4e8u)] // Replay predicate
+    [InlineData(0x8083b8b4u)] // Singleton-based menu player accessor
     [Trait("Requires", "USA game assets and Clang")]
-    public void LifecycleIsUnchangedAtTwelveAndCompilesAtTwentyFour(uint entry)
+    public void AuditedRoutinesAreUnchangedAtTwelveAndCompileAtTwentyFour(uint entry)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "translator/Translator.sln")))

@@ -2,6 +2,8 @@ using Translator.Core.Disassembly;
 using Translator.Core.Ir;
 using Translator.Core.Loading;
 using Translator.Core.Translation;
+using Translator.Core.Analysis.Ssa;
+using System.Globalization;
 
 namespace Translator.Core.Analysis;
 
@@ -11,8 +13,8 @@ public sealed record GuestLayoutAuditResult(IReadOnlyList<GuestLayoutCandidate> 
 
 /// <summary>
 /// Finds review candidates from declared receiver/global pointer types. It never applies patches.
-/// Facts are local to a basic block; unknown operations and guest calls discard affected facts.
-/// Dynamic indices, interior-pointer changes and unproven control-flow merges are not guessed.
+/// Facts cross control-flow edges only when every reachable predecessor agrees.
+/// Unknown operations discard affected facts; dynamic indices and array cursors are not guessed.
 /// </summary>
 public sealed class GuestLayoutAudit
 {
@@ -43,18 +45,65 @@ public sealed class GuestLayoutAudit
         var words = function.Instructions.ToDictionary(i => i.Address, i => i.Word);
         var candidates = new List<GuestLayoutCandidate>();
         var unresolved = 0;
-        // A receiver that is never written and crosses no guest calls is safe
-        // to seed at every block (e.g. the original Scenario assignment).
         var nodes = function.LinearIr.Blocks.SelectMany(b => b.Instructions).ToArray();
         var invariantReceiver = !nodes.Any(i => Defines(i) == "r3" ||
-            i is IrIndirectCall or IrUndefined || i is IrCall call && !PreservesGprs(call.Target));
+            i is IrIndirectCall or IrUndefined || i is IrCall call && (CallWrites(call) & 8) != 0);
+        var cfg = IrCfg.Build(function.LinearIr);
+        var inputs = new Dictionary<string, Dictionary<string, Fact>>(StringComparer.OrdinalIgnoreCase);
+        var outputs = new Dictionary<string, Dictionary<string, Fact>>(StringComparer.OrdinalIgnoreCase);
+        var closedControlFlow = !nodes.Any(node => node is IrIndirectJump or IrUndefined);
+        if (closedControlFlow)
+        {
+            // Start unvisited edges at top. Collect suggestions only after convergence:
+            // a back edge may invalidate an initially plausible receiver or constant.
+            var changed = true; var rounds = 0;
+            while (changed)
+            {
+                if (++rounds > 10000) throw new InvalidDataException("Guest pointer analysis did not converge.");
+                changed = false;
+                foreach (var block in function.LinearIr.Blocks)
+                {
+                    var incoming = cfg.Predecessors(block.Label).Where(outputs.ContainsKey)
+                        .Select(label => outputs[label]).ToList();
+                    if (block.Label.Equals(function.LinearIr.EntryLabel, StringComparison.OrdinalIgnoreCase))
+                        incoming.Add(Seeds(entry: true, invariant: false));
+                    if (incoming.Count == 0) continue;
+                    var facts = new Dictionary<string, Fact>(incoming[0], StringComparer.Ordinal);
+                    foreach (var predecessor in incoming.Skip(1))
+                        foreach (var name in facts.Keys.ToArray())
+                            if (!predecessor.TryGetValue(name, out var fact) || fact != facts[name]) facts.Remove(name);
+                    inputs[block.Label] = facts;
+                    var next = RunBlock(block, facts, collect: false);
+                    if (!outputs.TryGetValue(block.Label, out var previous) || previous.Count != next.Count ||
+                        previous.Any(pair => !next.TryGetValue(pair.Key, out var fact) || fact != pair.Value))
+                    {
+                        outputs[block.Label] = next;
+                        changed = true;
+                    }
+                }
+            }
+        }
         foreach (var block in function.LinearIr.Blocks)
+            RunBlock(block, inputs.GetValueOrDefault(block.Label) ?? Seeds(
+                block.Label.Equals(function.LinearIr.EntryLabel, StringComparison.OrdinalIgnoreCase), invariant: true), collect: true);
+        return new GuestLayoutAuditResult(candidates, unresolved,
+            "Review candidates only. No patches were applied; dynamic indices, bounds, interior pointers and unknown control flow need separate audit.");
+
+        Dictionary<string, Fact> Seeds(bool entry, bool invariant)
         {
             var facts = new Dictionary<string, Fact>(StringComparer.Ordinal);
-            if (_sda is { } sda) facts["r13"] = new Fact(Constant: sda);
-            if (_sda2 is { } sda2) facts["r2"] = new Fact(Constant: sda2);
-            if (receiverType is not null && (invariantReceiver || block.Label == function.LinearIr.EntryLabel))
+            bool Stable(string register, int index) => entry || !nodes.Any(node =>
+                Defines(node) == register || node is IrUndefined || node is IrCall call && (CallWrites(call) & (1u << index)) != 0);
+            if (_sda is { } sda && Stable("r13", 13)) facts["r13"] = new Fact(Constant: sda);
+            if (_sda2 is { } sda2 && Stable("r2", 2)) facts["r2"] = new Fact(Constant: sda2);
+            if (receiverType is not null && (entry || invariant && invariantReceiver))
                 facts["r3"] = new Fact(Type: receiverType);
+            return facts;
+        }
+
+        Dictionary<string, Fact> RunBlock(IrBasicBlock block, Dictionary<string, Fact> input, bool collect)
+        {
+            var facts = new Dictionary<string, Fact>(input, StringComparer.Ordinal);
             var pending = new List<IrInstruction>();
             foreach (var node in block.Instructions)
             {
@@ -87,6 +136,7 @@ public sealed class GuestLayoutAudit
             }
             void Propose(uint pc, int index, string operand, Fact? basis, int offset)
             {
+                if (!collect) return;
                 if (basis?.Type is not { } type) return;
                 // An interior pointer can also be an array cursor. Rebasing a
                 // cursor's final stride would skip the new elements; require review.
@@ -126,7 +176,7 @@ public sealed class GuestLayoutAudit
                             };
                             if (constant is { } value) result = new Fact(Constant: value);
                         }
-                        else if (left?.Type is not null || right?.Type is not null) unresolved++;
+                        else if (collect && (left?.Type is not null || right?.Type is not null)) unresolved++;
                         Set(binary.Destination, result);
                         break;
                     }
@@ -144,11 +194,9 @@ public sealed class GuestLayoutAudit
                         if (call.Target == "PPC_UpdateCarryAdd" && call.Arguments.Count == 3 &&
                             call.Arguments[1].Constant is { } carryOffset && carryOffset is >= int.MinValue and <= int.MaxValue)
                             Propose(pc, index, "argument:1", Value(call.Arguments[0]), (int)carryOffset);
-                        if (!PreservesGprs(call.Target))
-                        {
-                            facts.Remove("r0");
-                            for (var register = 3; register <= 12; register++) facts.Remove($"r{register}");
-                        }
+                        var writes = CallWrites(call);
+                        for (var register = 0; register < 32; register++)
+                            if ((writes & (1u << register)) != 0) facts.Remove($"r{register}");
                         Set(call.Destination, null);
                         break;
                     case IrIndirectCall:
@@ -160,9 +208,8 @@ public sealed class GuestLayoutAudit
                         break;
                 }
             }
+            return facts;
         }
-        return new GuestLayoutAuditResult(candidates, unresolved,
-            "Review candidates only. No patches were applied; unknown aliases, dynamic indices, bounds and inter-block facts need separate audit.");
     }
 
     private (string Symbol, int Addend)? Locate(string type, int offset)
@@ -203,6 +250,8 @@ public sealed class GuestLayoutAudit
         _ => null
     };
 
-    private static bool PreservesGprs(string helper) => helper is
-        "PPC_UpdateCarryAdd" or "PPC_UpdateCarrySub" or "PPC_UpdateCarryShiftRight" or "PPC_GetCarry";
+    private static uint CallWrites(IrCall call) => call.Target.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+        uint.TryParse(call.Target.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _)
+        ? 0x1ff9u // Guest ABI: r0 and r3-r12 are volatile.
+        : GuestHelperEffectCatalog.Analyze(call).GprWriteMask;
 }

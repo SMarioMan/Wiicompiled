@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 1,157 references across creation, construction,
+menu and awards scenarios and audits 1,863 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates.
-The manifest records 521 further consumer entry points in `AuditedConsumers`.
+The manifest records 568 further consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original,
@@ -118,7 +118,7 @@ Other scoring and UI consumers still require auditing.
 
 ## Finding additional consumers
 
-The audit command follows declared object pointers within basic blocks and emits
+The audit command follows declared object pointers through control flow and emits
 review candidates, without applying patches:
 
 ```sh
@@ -137,10 +137,14 @@ original instruction words, lifted operands and before/after values. Proposed
 references are checked against the original instruction and operand before the
 report is written.
 
-The analysis discards volatile pointer facts across guest calls and does not
-guess dynamic indices, interior array cursors, alignment padding or inter-block
-merges. A receiver unchanged throughout a call-free function can be carried into
-each block. Unrelated constants such as controller counts and mode identifiers
+The analysis discards volatile pointer facts across guest calls and applies the
+helper-effect catalog to host helpers; an unmodeled helper invalidates all GPR
+facts. Saved object pointers cross branches and loops only when all reachable
+incoming paths agree. Suggestions are collected after fixed-point convergence,
+so loop back edges can invalidate an initially plausible pointer. Unresolved
+indirect control flow and unsupported instructions prevent inter-block inference.
+Dynamic indices, interior array cursors and alignment padding remain unresolved.
+Unrelated constants such as controller counts and mode identifiers
 are left alone. The report is an aid to manual review, not a completeness proof;
 loop bounds, allocation sizes and unproven aliases still need separate auditing.
 

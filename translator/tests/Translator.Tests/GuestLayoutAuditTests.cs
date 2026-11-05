@@ -52,7 +52,7 @@ public class GuestLayoutAuditTests
     }
 
     [Fact]
-    public void InteriorArrayCursorsAndUnprovenBlockMergesAreNotRewritten()
+    public void InteriorArrayCursorsRemainUnresolvedWhileSavedReceiversCrossBranches()
     {
         var audit = new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24);
         var cursor = audit.Analyze(Discover(0x38a30008, 0x38a50b40, 0x4e800020), "Scenario");
@@ -60,7 +60,32 @@ public class GuestLayoutAuditTests
         Assert.True(cursor.UnresolvedPointerOperations > 0);
         var branches = audit.Analyze(Discover(0x7c7f1b78, 0x2c040000, 0x4182000c,
             0x807f0b48, 0x48000008, 0x807f0b48, 0x4e800020), "Scenario");
-        Assert.Empty(branches.Candidates);
+        Assert.Equal(2, branches.Candidates.Count);
+    }
+
+    [Fact]
+    public void ADisagreeingMergeOrLoopBackEdgeInvalidatesSavedReceiverKnowledge()
+    {
+        var audit = new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24);
+        var merge = Discover(0x7c7f1b78, 0x2c040000, 0x4182000c, 0x7cbf2b78,
+            0x48000008, 0x60000000, 0x80df0b48, 0x4e800020);
+        Assert.Empty(audit.Analyze(merge, "Scenario").Candidates);
+        var loop = Discover(0x7c7f1b78, 0x2c040000, 0x41820010, 0x80df0b48,
+            0x7cbf2b78, 0x4bfffff0, 0x4e800020);
+        Assert.Empty(audit.Analyze(loop, "Scenario").Candidates);
+        var stableLoop = Discover(0x7c7f1b78, 0x2c040000, 0x41820010, 0x80df0b48,
+            0x3884ffff, 0x4bfffff0, 0x4e800020);
+        Assert.Single(audit.Analyze(stableLoop, "Scenario").Candidates);
+    }
+
+    [Fact]
+    public void ConflictingGlobalAddressConstantsCannotInventAPointerAtAJoin()
+    {
+        var audit = new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24,
+            new Dictionary<uint, string> { [0x80002000] = "Racedata" });
+        var function = Discover(0x3ca08000, 0x2c040000, 0x4182000c, 0x3ca09000,
+            0x48000008, 0x60000000, 0x80652000, 0x80831758, 0x4e800020);
+        Assert.Empty(audit.Analyze(function).Candidates);
     }
 
     [Fact]
@@ -103,5 +128,12 @@ public class GuestLayoutAuditTests
         var result = new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24).Analyze(
             function with { LinearIr = function.LinearIr with { Blocks = blocks } }, "Scenario");
         Assert.Empty(result.Candidates);
+        var saved = Discover(0x7c7f1b78, 0x48000021, 0x809f0b48, 0x4e800020);
+        var savedBlocks = saved.LinearIr.Blocks.Select(block => block with {
+            Instructions = block.Instructions.Select(instruction => instruction is IrCall call
+                ? call with { Target = "PPC_Unmodeled" } : instruction).ToArray()
+        }).ToArray();
+        Assert.Empty(new GuestLayoutAudit(GuestLayoutRelocationTests.RaceTypes(), 12, 24).Analyze(
+            saved with { LinearIr = saved.LinearIr with { Blocks = savedBlocks } }, "Scenario").Candidates);
     }
 }

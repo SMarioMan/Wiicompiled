@@ -509,3 +509,12 @@ menu input. With `WIICOMPILED_TEST_PAD_FILE` set, the existing atomic input file
 can then confirm menus after the race. The ordinary `--race-cpu` benchmark keeps
 its detached-controller behavior. CPU finish state and successful results-menu
 interaction are separate validation milestones.
+
+Format version 11 adds checked `GridTables` for field-size/position lookup
+matrices. Every original byte and indexed-load instruction must match. Runtime
+fields within the original capacity preserve their authored rows exactly. Larger
+fields repeat the terminal lateral pattern and advance the terminal depth
+pattern by one full block of rows, using one uniform grid for all participants.
+The helper checks the field-size row offset and participant index before any
+lookup. Expanded depth values must fit the original signed-byte consumers;
+requesting a capacity beyond that range fails instead of wrapping positions.

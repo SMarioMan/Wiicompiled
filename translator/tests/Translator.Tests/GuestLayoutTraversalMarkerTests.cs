@@ -55,12 +55,12 @@ public class GuestLayoutTraversalMarkerTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {7,8,9,10,11})
+            foreach(var version in new[] {7,8,9,10,11,12})
             {
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,
                     References=Array.Empty<object>(),TraversalMarkers=new[] {new {Begin="0x80001000",
                         ExpectedWords=Words.Select(word=>$"0x{word:X8}"),Source="r0",Player="r4",Destination="r22"}}}));
-                if(version is 8 or 9 or 10)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 8 or 9 or 10 or 11)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

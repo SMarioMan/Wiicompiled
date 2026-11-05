@@ -24,6 +24,7 @@ public sealed partial class GuestLayoutRelocations
     public int OriginalPlayers => _original.Players;
     public int Players => _expanded.Players;
     public bool Complete { get; }
+    public string? ManifestSha256 { get; private set; }
 
     public GuestLayoutRelocations(IEnumerable<GuestLayoutType> types, int originalPlayers, int players,
         IEnumerable<GuestLayoutReference> references, bool complete = false,
@@ -155,7 +156,10 @@ public sealed partial class GuestLayoutRelocations
 
     public static GuestLayoutRelocations Read(string path, int players)
     {
-        var file = JsonSerializer.Deserialize<LayoutFile>(File.ReadAllText(path))
+        var bytes = File.ReadAllBytes(path);
+        ReadOnlySpan<byte> json = bytes;
+        if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
+        var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
         if (file.Version is not (1 or 2 or 3 or 4)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
@@ -175,7 +179,8 @@ public sealed partial class GuestLayoutRelocations
                 table.Lookups.Select(site => new GuestRankLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
                     site.Node, site.AddressBase, site.AddressOffset, site.Destination, site.Players, site.Position)).ToArray())),
             file.BoundedAccesses?.Select(site => new GuestBoundedAccess(Hex(site.Instruction), Hex(site.ExpectedWord),
-                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)));
+                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)))
+            { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
     private static uint Hex(string value) => uint.Parse(value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)

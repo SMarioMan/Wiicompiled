@@ -41,15 +41,21 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 var command = args.Length > 0 ? args[0] : "info";
 var (projectOption, tailWithoutProject) = ExtractOption(args.Skip(1).ToArray(), "--project");
 var (profileOption, tailWithoutProfile) = ExtractOption(tailWithoutProject, "--profile");
-var (layoutOption, tailWithoutLayouts) = ExtractOption(tailWithoutProfile, "--guest-layouts");
+var experimentalGuestLayouts = HasFlag(tailWithoutProfile, "--experimental-guest-layouts");
+var layoutArguments = tailWithoutProfile.Where(argument => argument != "--experimental-guest-layouts").ToArray();
+var (layoutOption, tailWithoutLayouts) = ExtractOption(layoutArguments, "--guest-layouts");
 var (layoutPlayersOption, tail) = ExtractOption(tailWithoutLayouts, "--layout-players");
 if ((layoutOption is null) != (layoutPlayersOption is null))
     throw new ArgumentException("--guest-layouts and --layout-players must be supplied together.");
 var layoutRelocations = layoutOption is null ? null : GuestLayoutRelocations.Read(layoutOption,
     int.Parse(layoutPlayersOption!, CultureInfo.InvariantCulture));
+var nativeLayoutConstants = new Lazy<string>(() => layoutRelocations?.EmitNativeConstants()
+    ?? "#pragma once\n#define MKW_GUEST_LAYOUT_EXPLICIT 0\n");
+if (experimentalGuestLayouts && (layoutRelocations is null || command is not ("translate-recursive" or "translate-mod")))
+    throw new ArgumentException("--experimental-guest-layouts requires a guest layout and a translation command.");
 if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "audit-guest-layouts") &&
-    (!layoutRelocations.Complete && layoutRelocations.Players != layoutRelocations.OriginalPlayers))
-    throw new InvalidOperationException("This guest layout manifest is incomplete. Use plan-guest-layouts to inspect it; it cannot produce an expanded game build.");
+    (!layoutRelocations.Complete && layoutRelocations.Players != layoutRelocations.OriginalPlayers) && !experimentalGuestLayouts)
+    throw new InvalidOperationException("This guest layout manifest is incomplete. Use plan-guest-layouts to inspect it or --experimental-guest-layouts for private development translation.");
 if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "audit-guest-layouts" or "translate-recursive" or "translate-mod"))
     throw new ArgumentException("Guest layout options apply to translation, plan-guest-layouts or audit-guest-layouts only.");
 var project = !string.IsNullOrWhiteSpace(projectOption)
@@ -207,6 +213,26 @@ int RunPlanGuestLayouts(string[] argsTail)
     Console.WriteLine($"[translator] validated guest layout plan for {layoutRelocations.Players} players: {output}");
     return 0;
 }
+
+void WriteGuestLayoutArtifacts(string directory)
+{
+    layoutRelocations?.ValidateImage(image.Value);
+    if (experimentalGuestLayouts)
+        Console.Error.WriteLine($"[translator] Experimental guest layout output; manifest Complete={layoutRelocations!.Complete}.");
+    FileOutput.WriteTextIfChanged(Path.Combine(directory, "guest_layout_constants.h"),
+        nativeLayoutConstants.Value);
+    FileOutput.WriteTextIfChanged(Path.Combine(directory, "guest_layout_context.json"), JsonSerializer.Serialize(new {
+        Format = "guest-layout-build-context-v1", Experimental = experimentalGuestLayouts,
+        ProgramImageSha256 = image.Value.Sha256,
+        ManifestSha256 = layoutRelocations?.ManifestSha256,
+        Layout = layoutRelocations?.Describe()
+    }, new JsonSerializerOptions { WriteIndented = true }));
+}
+
+GuestLayoutBuildMetadata? GuestLayoutBuildIdentity() => layoutRelocations is null ? null : new(
+    layoutRelocations.Players, layoutRelocations.OriginalPlayers, layoutRelocations.Complete, experimentalGuestLayouts,
+    "guest_layout_constants.h", ChecksumUtilities.Sha256Hex(Encoding.UTF8.GetBytes(nativeLayoutConstants.Value)),
+    layoutRelocations.ManifestSha256 ?? throw new InvalidDataException("Guest layout manifest fingerprint is missing."));
 
 int RunAuditGuestLayouts(string[] argsTail)
 {
@@ -475,6 +501,8 @@ byte[] LoadBinaryInput(string spec, string outDir, string downloadFileName)
         (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
     {
         Directory.CreateDirectory(outDir);
+
+        _ = nativeLayoutConstants.Value;
         var downloadPath = Path.Combine(outDir, downloadFileName);
         var cachedPath = ResolveCachedTranslateModInput(downloadPath, downloadFileName, spec);
         if (preferCachedInputs && cachedPath is not null)
@@ -1690,7 +1718,8 @@ int RunTranslateRecursive(string[] argsTail)
                         InvalidSsaFunctionCount: 0),
                     null,
                     bundleReference,
-                    BuildModPatchAwareness(modPatchProfiles.Value));
+                    BuildModPatchAwareness(modPatchProfiles.Value),
+                    GuestLayoutBuildIdentity());
                 // The digest stamp above answers "was this exact Code.pul present?". This record
                 // answers the question that actually decides reuse - "would a different Code.pul
                 // have changed anything here?" - by keeping the translated function ranges beside
@@ -1723,6 +1752,7 @@ int RunTranslateRecursive(string[] argsTail)
             var removed = PruneStaleGeneratedFiles(outDir, emittedPaths, previousOutputMetadata);
             Console.WriteLine($"[translator] Pruned {removed} stale generated file(s).");
         }
+        WriteGuestLayoutArtifacts(outDir);
         if (completedOutputMetadata is not null)
         {
             var updated = BaseTranslationOutputMetadataFile.WriteIfChangedAtomic(
@@ -1858,6 +1888,18 @@ int RunTranslateModCore(string[] argsTail, string? outputDirectoryOverride)
     if (File.Exists(baseTranslationOutputMetadataPath) && File.Exists(codePul))
     {
         var guardedBaseMetadata = ReadBaseMetadataCached(baseTranslationOutputMetadataPath);
+        var baseLayout = guardedBaseMetadata.GuestLayout;
+        var requestedPlayers = layoutRelocations?.Players ?? 12;
+        var requestedOriginal = layoutRelocations?.OriginalPlayers ?? 12;
+        if ((baseLayout?.Players ?? 12) != requestedPlayers ||
+            baseLayout is not null && layoutRelocations is not null &&
+                !string.Equals(baseLayout.ManifestSha256, layoutRelocations.ManifestSha256, StringComparison.OrdinalIgnoreCase) ||
+            baseLayout is not null && layoutRelocations is null && baseLayout.Players != baseLayout.OriginalPlayers ||
+            requestedPlayers != requestedOriginal && baseLayout is null)
+        {
+            Console.Error.WriteLine("[translator] Base and mod guest layouts differ. Retranslate both with the same manifest and capacity.");
+            return 1;
+        }
         var codePulSha256 = ChecksumUtilities.Sha256HexOfFile(codePul);
         var baseKnowsThisPul = guardedBaseMetadata.ModPatchAwareness is { } awareness &&
             awareness.Any(entry => string.Equals(entry.CodePulSha256, codePulSha256, StringComparison.OrdinalIgnoreCase));
@@ -1900,6 +1942,11 @@ int RunTranslateModCore(string[] argsTail, string? outputDirectoryOverride)
     }
     else if (!File.Exists(baseTranslationOutputMetadataPath))
     {
+        if (layoutRelocations is not null && layoutRelocations.Players != layoutRelocations.OriginalPlayers)
+        {
+            Console.Error.WriteLine("[translator] Expanded mod translation requires matching base translation output metadata.");
+            return 1;
+        }
         Console.Error.WriteLine(
             $"[translator] Warning: no base translation output metadata at {baseTranslationOutputMetadataPath}; " +
             "cannot verify the base translation is aware of this mod's patch set.");
@@ -1933,6 +1980,7 @@ int RunTranslateModCore(string[] argsTail, string? outputDirectoryOverride)
         ? ParseAddress(moduleLinkBaseText)
         : profile?.ModuleLinkBase ?? 0x803992E0u;
     Directory.CreateDirectory(outDir);
+    WriteGuestLayoutArtifacts(outDir);
 
     var pul = KamekPulFile.Load(codePul);
     var selected = pul.SelectRegion(region);
@@ -3802,6 +3850,7 @@ static void WriteUsage(TextWriter writer, IReadOnlyList<string> commands)
     }
     writer.WriteLine("Every command also accepts [--project path] [--profile name] [--prefer-cached-inputs] [--help].");
     writer.WriteLine("Translation, plan-guest-layouts and audit-guest-layouts also accept [--guest-layouts path --layout-players N].");
+    writer.WriteLine("Translation may use [--experimental-guest-layouts] for incomplete layouts during private development testing.");
 }
 
 static string[] KnownCommands() => new[]

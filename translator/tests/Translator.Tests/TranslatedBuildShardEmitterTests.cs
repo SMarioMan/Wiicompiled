@@ -11,6 +11,46 @@ namespace Translator.Tests;
 public sealed class TranslatedBuildShardEmitterTests
 {
     [Fact]
+    public void GuestLayoutHeaderIsBoundToTheTranslationAndStaleHeadersCannotPublishAShardGraph()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "translator-layout-shards-"+Guid.NewGuid().ToString("N"));
+        var functions = Path.Combine(root, "functions"); var native = Path.Combine(root, "native");
+        var output = Path.Combine(root, "out");
+        Directory.CreateDirectory(functions); Directory.CreateDirectory(native);
+        try
+        {
+            const string code = """
+                #include "abi_bridge.h"
+                extern "C" void func_80001000(CpuContext*) {}
+                // RECOMP_REGISTRATION base 0x80001000 func_80001000 preserves=true fpr_mask=0x00000000
+                """;
+            const string header = "#pragma once\n#define MKW_LAYOUT_PLAYER_CAPACITY 24u\n";
+            Write(Path.Combine(functions, "func_80001000.cpp"), code);
+            var headerPath = Path.Combine(functions, "guest_layout_constants.h"); Write(headerPath, header);
+            var identity = new GuestLayoutBuildMetadata(24, 12, false, true, "guest_layout_constants.h",
+                Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(header))).ToLowerInvariant(), new string('1', 64));
+            var metadata = BaseTranslationOutputMetadata.Create(new[] { Metadata("func_80001000.cpp", 0x80001000, code) },
+                TranslationQualityMetadata.Clean, guestLayout: identity);
+            var metadataPath = Path.Combine(root, "base.json");
+            BaseTranslationOutputMetadataFile.WriteIfChangedAtomic(metadataPath, metadata);
+            var options = new TranslatedBuildShardOptions(metadataPath, functions, output, native,
+                BaseShardCount: 1, ModShardCount: 1, RegistrationShardCount: 1);
+            TranslatedBuildShardEmitter.Emit(options);
+            var graph = Path.Combine(output, "shards.cmake"); var expected = File.ReadAllText(graph);
+            Assert.Contains("set(MKW_TRANSLATED_PLAYER_CAPACITY 24)", expected);
+            Assert.Contains(Path.GetFullPath(headerPath).Replace('\\', '/'), expected);
+            File.AppendAllText(headerPath, "// changed after translation\n");
+            Assert.Throws<InvalidDataException>(() => TranslatedBuildShardEmitter.Emit(options));
+            Assert.Equal(expected, File.ReadAllText(graph));
+            BaseTranslationOutputMetadataFile.WriteIfChangedAtomic(metadataPath, metadata with { FormatVersion = 2, GuestLayout = null });
+            Assert.Null(BaseTranslationOutputMetadataFile.Read(metadataPath).GuestLayout);
+            Assert.Throws<InvalidDataException>(() => BaseTranslationOutputMetadataFile.WriteIfChangedAtomic(metadataPath,
+                metadata with { FormatVersion = 2 }));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void RemainingWeightPartitionDoesNotCreateOversizedTailBin()
     {
         var weights = Enumerable.Repeat(300L, 10).ToArray();

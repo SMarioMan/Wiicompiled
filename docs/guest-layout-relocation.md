@@ -97,6 +97,28 @@ four-screen limit and original competition-mode participant limits. Race-info's
 rotation setup also receives the configured capacity; its separate mask/table
 representation still needs migration for capacities beyond 32.
 
+## Private executable validation
+
+Incomplete manifests reject expanded production translation. For development
+only, add `--experimental-guest-layouts` to a translation command with explicit
+`--guest-layouts` and `--layout-players`. This allows building an executable to
+find remaining migration problems; it does not mark the profile complete.
+
+A successful translation emits `guest_layout_constants.h` and
+`guest_layout_context.json` beside its function output. The constants describe
+one uniform player array and the resolved offsets, sizes, counts and strides.
+Base metadata version 3 records capacity, completion status, experimental status,
+and SHA-256 digests of the exact manifest snapshot and generated header.
+`emit-build-shards` verifies the header before publishing the build graph and
+records its path and capacity in CMake. Mod translation rejects a base with a
+different layout identity. Version 2 base metadata remains readable as the legacy
+12-player ABI, without an explicit layout.
+
+For example, a private full USA translation of 29,456 functions at capacity 24
+completed with no unsupported instructions or invalid SSA functions and produced
+72 shared native build shards. This establishes translation and artifact
+consistency, not working 24-player gameplay.
+
 ## Rank scoring
 
 `RankTables` requires manifest version 3; reference-only version 1 and array-copy

@@ -15,17 +15,19 @@ public sealed record BaseTranslationOutputMetadata(
     TranslationQualityMetadata Quality,
     IReadOnlyList<BaseTranslationFunctionMetadata> Functions,
     string? SourceBundlePath = null,
-    IReadOnlyList<BaseTranslationModPatchAwareness>? ModPatchAwareness = null)
+    IReadOnlyList<BaseTranslationModPatchAwareness>? ModPatchAwareness = null,
+    GuestLayoutBuildMetadata? GuestLayout = null)
 {
     public const string CurrentFormat = "mkw-base-translation-output";
-    public const int CurrentFormatVersion = 2;
+    public const int CurrentFormatVersion = 3;
 
     public static BaseTranslationOutputMetadata Create(
         IEnumerable<BaseTranslationFunctionMetadata> functions,
         TranslationQualityMetadata quality,
         string? translationIdentityHash = null,
         string? sourceBundlePath = null,
-        IReadOnlyList<BaseTranslationModPatchAwareness>? modPatchAwareness = null)
+        IReadOnlyList<BaseTranslationModPatchAwareness>? modPatchAwareness = null,
+        GuestLayoutBuildMetadata? guestLayout = null)
     {
         var ordered = functions
             .OrderBy(function => function.RelativePath, StringComparer.Ordinal)
@@ -35,6 +37,7 @@ public sealed record BaseTranslationOutputMetadata(
             throw new InvalidOperationException("Base translation output metadata cannot be empty.");
         }
         quality.Validate("base translation output metadata");
+        guestLayout?.Validate("base translation output metadata");
 
         var duplicatePath = ordered
             .GroupBy(function => function.RelativePath, StringComparer.OrdinalIgnoreCase)
@@ -52,7 +55,8 @@ public sealed record BaseTranslationOutputMetadata(
             quality,
             ordered,
             sourceBundlePath,
-            modPatchAwareness);
+            modPatchAwareness,
+            guestLayout);
     }
 
     public void RequireReleaseEligible(string source)
@@ -195,7 +199,8 @@ public static class BaseTranslationOutputMetadataFile
     private static void Validate(BaseTranslationOutputMetadata metadata, string source)
     {
         if (!string.Equals(metadata.Format, BaseTranslationOutputMetadata.CurrentFormat, StringComparison.Ordinal) ||
-            metadata.FormatVersion != BaseTranslationOutputMetadata.CurrentFormatVersion)
+            metadata.FormatVersion is not (2 or BaseTranslationOutputMetadata.CurrentFormatVersion) ||
+            metadata.FormatVersion == 2 && metadata.GuestLayout is not null)
         {
             throw new InvalidDataException(
                 $"Unsupported base translation output metadata in '{source}': {metadata.Format} v{metadata.FormatVersion}.");
@@ -205,6 +210,7 @@ public static class BaseTranslationOutputMetadataFile
             throw new InvalidDataException($"Base translation output metadata has no quality counters in '{source}'.");
         }
         metadata.Quality.Validate(source);
+        metadata.GuestLayout?.Validate(source);
 
         var seenPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var seenEntries = new HashSet<uint>();

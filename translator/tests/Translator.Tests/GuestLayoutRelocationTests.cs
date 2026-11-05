@@ -101,6 +101,28 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void ManifestFingerprintCapturesTheExactLoadedBytesIncludingAnOptionalBom()
+    {
+        const string json = """
+            {"Version":1,"OriginalPlayers":12,"Types":[{"Name":"Byte","Alignment":1,"Size":1}],"References":[]}
+            """;
+        var path = Path.GetTempFileName();
+        try
+        {
+            foreach (var bom in new[] { false, true })
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                if (bom) bytes = new byte[] { 0xef, 0xbb, 0xbf }.Concat(bytes).ToArray();
+                File.WriteAllBytes(path, bytes);
+                var layout = GuestLayoutRelocations.Read(path, 24);
+                File.WriteAllText(path, "changed after loading");
+                Assert.Equal(ChecksumUtilities.Sha256Hex(bytes), layout.ManifestSha256);
+            }
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
     public void ArrayCopiesRequireTheVersionTwoManifestContract()
     {
         var path = Path.GetTempFileName();

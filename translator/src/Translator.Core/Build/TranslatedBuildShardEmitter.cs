@@ -141,6 +141,7 @@ public static partial class TranslatedBuildShardEmitter
 
         var metadata = BaseTranslationOutputMetadataFile.Read(options.BaseMetadataPath);
         metadata.RequireReleaseEligible(options.BaseMetadataPath);
+        var layoutHeader = metadata.GuestLayout?.ResolveAndVerifyHeader(options.BaseFunctionsDirectory);
         TranslationSourceBundle? baseSourceBundle = null;
         if (!string.IsNullOrWhiteSpace(metadata.SourceBundlePath))
         {
@@ -258,7 +259,9 @@ public static partial class TranslatedBuildShardEmitter
             shards,
             baseRegistration,
             rrRegistration,
-            extraRetroSources);
+            extraRetroSources,
+            metadata.GuestLayout?.Players ?? 12,
+            layoutHeader);
         PruneStaleShardSources(outputRoot, shards, baseRegistration, rrRegistration);
 
         return new TranslatedBuildShardResult(
@@ -1051,12 +1054,16 @@ public static partial class TranslatedBuildShardEmitter
         IReadOnlyList<ShardInfo> shards,
         IReadOnlyList<string> baseRegistration,
         IReadOnlyList<string> rrRegistration,
-        IReadOnlyList<string> retroExtras)
+        IReadOnlyList<string> retroExtras,
+        int playerCapacity,
+        string? layoutHeader)
     {
         var output = new StringBuilder();
         output.AppendLine("# Translator-owned stable shard graph; do not edit.");
         output.AppendLine($"set(MKW_TRANSLATED_SHARD_ROOT \"{CMakePath(outputRoot)}\")");
         output.AppendLine($"set(MKW_TRANSLATED_GUEST_REGION {(int)region})");
+        output.AppendLine($"set(MKW_TRANSLATED_PLAYER_CAPACITY {playerCapacity})");
+        output.AppendLine($"set(MKW_TRANSLATED_GUEST_LAYOUT_HEADER \"{(layoutHeader is null ? "" : CMakePath(layoutHeader))}\")");
         output.AppendLine($"set(MKW_BASE_FUNCTION_COUNT {activeBaseCount})");
         output.AppendLine($"set(MKW_SHARED_BASE_FUNCTION_COUNT {sharedBaseCount})");
         output.AppendLine($"set(MKW_PORTABLE_SHARED_BASE_FUNCTION_COUNT {portableSharedBaseCount})");

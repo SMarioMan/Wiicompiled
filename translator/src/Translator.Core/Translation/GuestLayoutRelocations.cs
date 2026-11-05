@@ -32,7 +32,8 @@ public sealed partial class GuestLayoutRelocations
         IEnumerable<GuestRankTable>? rankTables = null,
         IEnumerable<GuestBoundedAccess>? boundedAccesses = null,
         IEnumerable<GuestArrayFill>? arrayFills = null,
-        IEnumerable<GuestResampledCursor>? resampledCursors = null)
+        IEnumerable<GuestResampledCursor>? resampledCursors = null,
+        IEnumerable<GuestTraversalMarker>? traversalMarkers = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -59,6 +60,8 @@ public sealed partial class GuestLayoutRelocations
         ValidateFillDefinitions(sites);
         _resampledCursors=(resampledCursors ?? Array.Empty<GuestResampledCursor>()).ToArray();
         ValidateCursorDefinitions(sites);
+        _traversalMarkers=(traversalMarkers ?? Array.Empty<GuestTraversalMarker>()).ToArray();
+        ValidateMarkerDefinitions(sites);
     }
 
     public void ValidateImage(ProgramImage image)
@@ -66,6 +69,7 @@ public sealed partial class GuestLayoutRelocations
         ValidateCopies(image);
         ValidateFills(image);
         ValidateCursors(image);
+        ValidateMarkers(image);
         ValidateRankTables(image);
         ValidateBoundedAccesses(image);
         foreach (var (address, sites) in _references)
@@ -94,6 +98,10 @@ public sealed partial class GuestLayoutRelocations
             table.Curve,
             Lookups = table.Lookups.Select(site => new { Instruction = $"0x{site.Instruction:X8}", site.Players, site.Position })
         }),
+        TraversalMarkers = _traversalMarkers.Select(site => new {
+            Begin=$"0x{site.Begin:X8}",ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"),
+            site.Source,site.Player,site.Destination,Lifetime="cleared-at-each-traversal-entry"
+        }),
         ResampledCursors = _resampledCursors.Select(site => new {
             Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",site.Cursor,site.NextIndex,
             site.IndexStride,site.SourceStride,site.Count,site.SourceCount,TargetCount=_expanded.Symbol(site.Count),
@@ -120,6 +128,8 @@ public sealed partial class GuestLayoutRelocations
 
     public IReadOnlyList<IrInstruction> Apply(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
+        var markerReplacement = ApplyMarker(origin, instructions);
+        if (markerReplacement is not null) return markerReplacement;
         var cursorReplacement = ApplyCursor(origin, instructions);
         if (cursorReplacement is not null) return cursorReplacement;
         var fillReplacement = ApplyFill(origin, instructions);
@@ -182,7 +192,7 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
@@ -195,6 +205,8 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Resampled authored-table cursors require layout format version 6.");
         if (file.Version < 7 && file.ArrayFills?.Any(fill => fill.Addresses is { Length: > 0 }) == true)
             throw new InvalidDataException("Array-fill address setup requires layout format version 7.");
+        if (file.Version < 8 && file.TraversalMarkers is { Length: > 0 })
+            throw new InvalidDataException("Per-traversal markers require layout format version 8.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
@@ -210,7 +222,9 @@ public sealed partial class GuestLayoutRelocations
             file.ArrayFills?.Select(fill => new GuestArrayFill(Hex(fill.Begin), fill.ExpectedWords.Select(Hex).ToArray(),
                 fill.BaseRegister, fill.ValueRegister, fill.Arrays, fill.Addresses)),
             file.ResampledCursors?.Select(site => new GuestResampledCursor(Hex(site.Instruction),Hex(site.ExpectedWord),
-                site.Cursor,site.NextIndex,site.IndexStride,site.SourceStride,site.Count,site.SourceCount)))
+                site.Cursor,site.NextIndex,site.IndexStride,site.SourceStride,site.Count,site.SourceCount)),
+            file.TraversalMarkers?.Select(site => new GuestTraversalMarker(Hex(site.Begin),site.ExpectedWords.Select(Hex).ToArray(),
+                site.Source,site.Player,site.Destination)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -218,7 +232,8 @@ public sealed partial class GuestLayoutRelocations
         ? value.AsSpan(2) : value.AsSpan(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
         ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null,
-        BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null);
+        BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null, TraversalMarkerFile[]? TraversalMarkers = null);
+    private sealed record TraversalMarkerFile(string Begin,string[] ExpectedWords,string Source,string Player,string Destination);
     private sealed record ResampledCursorFile(string Instruction,string ExpectedWord,string Cursor,string NextIndex,
         string IndexStride,string SourceStride,string Count,int SourceCount);
     private sealed record ArrayFillFile(string Begin, string[] ExpectedWords, string BaseRegister, string ValueRegister, GuestFillArray[] Arrays, GuestFillAddress[]? Addresses = null);

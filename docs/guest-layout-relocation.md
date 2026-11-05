@@ -375,3 +375,20 @@ Native tests execute both original routines at 12, 13, 24, 48 and 100 slots,
 checking reverse and sparse CPU ranks, local participants at high global ranks,
 rank compaction, preserved local ranks, stack restoration and neighboring memory.
 These tests verify sorting storage and behavior, not complete gameplay.
+
+## Checkpoint traversal markers
+
+Checkpoint search clears every checkpoint's visited state at the start of each
+`CalcNextCP` invocation. No visited state survives from one participant's search
+to the next. Its original `1 << playerId` marker therefore adds an unnecessary
+16-bit player limit: high IDs lose their bit when it is stored and cyclic
+checkpoint links can exhaust the native stack.
+
+Format version 8 adds audited `TraversalMarkers` for this lifetime contract.
+Each span pins its instruction words, unit assignment, intervening scalar read
+or sign extension, and final register shift. Expansion uses the existing unit
+register as the marker, preserving intervening operations and other registers.
+Partial spans, interior entries, modified shift inputs, extra effects and
+conflicting rewrites are rejected. Twelve-player emission stays unchanged.
+The reset-at-entry lifetime is a manually audited algorithm contract; this
+rewrite must not be used for persistent per-player flags.

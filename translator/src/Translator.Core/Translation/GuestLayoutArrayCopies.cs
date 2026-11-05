@@ -124,6 +124,7 @@ public sealed partial class GuestLayoutRelocations
     public void ValidateCopyControlFlow(IReadOnlyList<PpcInstruction> instructions, IReadOnlyList<BasicBlock> blocks)
     {
         ValidateFillControlFlow(instructions, blocks);
+        ValidateMarkerControlFlow(instructions, blocks);
         foreach (var copy in _arrayCopies)
         {
             var end = CopyEnd(copy);

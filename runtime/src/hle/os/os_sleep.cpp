@@ -342,7 +342,7 @@ bool SchedulerCanSwitchAway()
 // A blocking call from a non-switchable region can't park, so the caller's retry loop spins; that's
 // survivable if host-side work (alarm, IOS completion) eventually satisfies the wait, terminal if
 // not. Report once per wait queue and escalate if a site stays wedged long enough to read as a freeze.
-void ReportUnparkableSleep(uint32_t queuePtr, uint32_t thread)
+void ReportUnparkableSleep(uint32_t queuePtr, uint32_t thread, const CpuContext* cpu)
 {
     using Clock = std::chrono::steady_clock;
 
@@ -363,6 +363,10 @@ void ReportUnparkableSleep(uint32_t queuePtr, uint32_t thread)
         if (disableCount != 0) {
             std::cerr << " (OSDisableScheduler nesting count " << disableCount << ")";
         }
+        std::cerr << " (current context 0x" << std::hex << Memory::Read32(kOSCurrentContextAddr)
+                  << ", running context 0x" << Memory::Read32(kOSRunningContextAddr)
+                  << ", fiber 0x" << Fiber::GuestFiberManager::GetCurrentGuestThread()
+                  << ", caller LR 0x" << (cpu ? cpu->lr : 0) << std::dec << ")";
         std::cerr << ". Not parking - the caller retries instead of corrupting"
                      " the wait queue." << std::endl;
     }
@@ -431,7 +435,7 @@ extern "C" void OSSleepThread_HLE_801aa9b8(CpuContext* ctx)
         // permitted to switch. Otherwise leave the thread RUNNING and the wait
         // queue untouched and let the caller's retry loop re-test its condition.
         if (!SchedulerCanSwitchAway()) {
-            ReportUnparkableSleep(queuePtr, currentThread);
+            ReportUnparkableSleep(queuePtr, currentThread, cpu);
             OS__RestoreInterrupts_801a65d4(irqState);
             return;
         }
@@ -478,7 +482,7 @@ extern "C" void OSSleepThread_HLE_801aa9b8(CpuContext* ctx)
                 Fiber::GuestFiberManager::HasFiber(currentThread)) {
                 Fiber::GuestFiberManager::ResumeGuestThread(currentThread);
             }
-            ReportUnparkableSleep(queuePtr, currentThread);
+            ReportUnparkableSleep(queuePtr, currentThread, cpu);
         }
 
     } catch (const ::Memory::AccessViolation& e) {

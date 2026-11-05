@@ -18,7 +18,7 @@ public sealed record GuestLayoutAuditResult(IReadOnlyList<GuestLayoutCandidate> 
 /// </summary>
 public sealed class GuestLayoutAudit
 {
-    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0);
+    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0, int Rotation = 0);
     private readonly Dictionary<string, GuestLayoutType> _definitions;
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -183,6 +183,13 @@ public sealed class GuestLayoutAudit
                         {
                             result = new Fact(IndexStride: checked((int)(left?.Constant ?? right!.Constant!.Value)));
                         }
+                        else if (binary.Op is "shl" or "rotl" && left is null && binary.Left.RegisterName is not null &&
+                            right?.Constant is > 0 and < 31 && IsArrayStride(1u << (int)right.Constant.Value))
+                            result = binary.Op == "shl" ? new Fact(IndexStride: 1 << (int)right.Constant.Value)
+                                : new Fact(Rotation: (int)right.Constant.Value);
+                        else if (binary.Op == "and" && left is { Rotation: > 0 } && right?.Constant is { } mask &&
+                            (mask & ((1u << left.Rotation) - 1)) == 0)
+                            result = new Fact(IndexStride: 1 << left.Rotation);
                         else if (binary.Op == "add")
                         {
                             var pointer = left?.Type is not null ? left : right?.Type is not null ? right : null;

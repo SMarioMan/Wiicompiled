@@ -16,6 +16,19 @@ public class GuestLayoutAuditTests
     }
 
     [Fact]
+    public void RotatedIndicesRequireAMaskThatRemovesWrappedLowBits()
+    {
+        var types = new[] {new GuestLayoutType("Header",4,8), new GuestLayoutType("Word",4,4),
+            new GuestLayoutType("Object",4,Fields:new[] {new GuestLayoutField("header","Header"),
+                new GuestLayoutField("first","Word",PerPlayer:true), new GuestLayoutField("second","Word",PerPlayer:true)})};
+        var audit = new GuestLayoutAudit(types,2,4);
+        // rlwinm r5,r4,2,0,29; add r5,r3,r5; lwz r6,second(r5)
+        var candidate=Assert.Single(audit.Analyze(Discover(0x5485103a,0x7ca32a14,0x80c50010,0x4e800020),"Object").Candidates);
+        Assert.Equal(16,candidate.Before); Assert.Equal(24,candidate.After); Assert.Equal(4,candidate.IndexStride);
+        Assert.Empty(audit.Analyze(Discover(0x5485103e,0x7ca32a14,0x80c50010,0x4e800020),"Object").Candidates);
+    }
+
+    [Fact]
     public void ScaledPlayerIndicesRelocateOnlyDeclaredArrayFields()
     {
         // mulli r5,r4,240; add r5,r3,r5; lwz r6,menu.players[0].kart(r5); blr

@@ -1,0 +1,110 @@
+using System.Buffers.Binary;
+using Translator.Core.Analysis.BasicBlocks;
+using Translator.Core.Disassembly;
+using Translator.Core.Ir;
+using Translator.Core.Lifting;
+using Translator.Core.Loading;
+
+namespace Translator.Core.Translation;
+
+public sealed record GuestFillArray(string Array, string Stride, string Count, int Width);
+public sealed record GuestArrayFill(uint Begin, IReadOnlyList<uint> ExpectedWords,
+    string BaseRegister, string ValueRegister, IReadOnlyList<GuestFillArray> Arrays);
+
+public sealed partial class GuestLayoutRelocations
+{
+    private readonly GuestArrayFill[] _arrayFills;
+    private static uint FillEnd(GuestArrayFill fill) => checked(fill.Begin + (uint)fill.ExpectedWords.Count * 4);
+    private static bool IsGpr(string register) => register.Length >= 2 && register[0] == 'r' &&
+        int.TryParse(register.AsSpan(1), out var index) && index is >= 0 and < 32;
+
+    private void ValidateFillDefinitions(GuestLayoutReference[] references)
+    {
+        foreach (var fill in _arrayFills)
+        {
+            if (fill.Begin % 4 != 0 || fill.ExpectedWords.Count == 0 || fill.Arrays.Count == 0 ||
+                !IsGpr(fill.BaseRegister) || fill.BaseRegister == "r0" || !IsGpr(fill.ValueRegister))
+                throw new InvalidDataException("Invalid guest array-fill definition.");
+            foreach (var layout in new[] { _original, _expanded })
+            {
+                var intervals = new List<(int Begin, int End)>();
+                foreach (var array in fill.Arrays)
+                {
+                    var begin = layout.Symbol(array.Array); var stride = layout.Symbol(array.Stride);
+                    var count = layout.Symbol(array.Count);
+                    if (begin < 0 || count <= 0 || array.Width is not (1 or 2 or 4) || stride != array.Width)
+                        throw new InvalidDataException("Guest array-fill requires a dense scalar array.");
+                    var end = checked(begin + stride * count);
+                    if (intervals.Any(other => begin < other.End && end > other.Begin))
+                        throw new InvalidDataException("Overlapping guest fill arrays.");
+                    intervals.Add((begin, end));
+                }
+            }
+            if (fill.Arrays.Any(array => _expanded.Symbol(array.Count) < _original.Symbol(array.Count)) ||
+                fill.Arrays.Select(array => _original.Symbol(array.Count)).Distinct().Count() != 1 ||
+                fill.Arrays.Select(array => _expanded.Symbol(array.Count)).Distinct().Count() != 1)
+                throw new InvalidDataException("Guest fill arrays must grow together.");
+            var endPc = FillEnd(fill);
+            if (references.Any(site => site.Instruction >= fill.Begin && site.Instruction < endPc) ||
+                _arrayCopies.Any(copy => copy.Begin < endPc && CopyEnd(copy) > fill.Begin) ||
+                _rankTables.Any(table => table.Lookups.Any(site => site.Instruction >= fill.Begin && site.Instruction < endPc)) ||
+                _boundedAccesses.Any(site => site.Instruction >= fill.Begin && site.Instruction < endPc) ||
+                _arrayFills.Count(other => other.Begin < endPc && FillEnd(other) > fill.Begin) != 1)
+                throw new InvalidDataException("Overlapping guest array-fill relocations.");
+        }
+    }
+
+    private void ValidateFills(ProgramImage image)
+    {
+        foreach (var fill in _arrayFills)
+        {
+            var expected = FillStores(fill, _original).ToArray();
+            var observed = new List<IrStore>();
+            for (var index = 0; index < fill.ExpectedWords.Count; index++)
+            {
+                var pc = checked(fill.Begin + (uint)index * 4);
+                var word = BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(pc, 4), 4));
+                if (word != fill.ExpectedWords[index]) throw new InvalidDataException($"Guest array-fill word mismatch at 0x{pc:X8}.");
+                foreach (var node in new PpcLifter().Lift(new[] { PpcDecoder.Decode(pc, word) })[0].Ir)
+                {
+                    if (node is IrComment) continue;
+                    if (node is not IrStore store) throw new InvalidDataException("Guest array-fill span contains effects other than scalar stores.");
+                    observed.Add(store);
+                }
+            }
+            if (!observed.SequenceEqual(expected))
+                throw new InvalidDataException($"Unproven ordered guest array fill at 0x{fill.Begin:X8}.");
+        }
+    }
+
+    private static IEnumerable<IrStore> FillStores(GuestArrayFill fill, GuestLayouts layout)
+    {
+        for (var index = 0; index < layout.Symbol(fill.Arrays[0].Count); index++)
+            foreach (var array in fill.Arrays)
+                yield return new IrStore(new(fill.BaseRegister, checked(layout.Symbol(array.Array) + index * layout.Symbol(array.Stride))),
+                    IrValue.Register(fill.ValueRegister), array.Width);
+    }
+
+    private IReadOnlyList<IrInstruction>? ApplyFill(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
+    {
+        foreach (var fill in _arrayFills)
+        {
+            if (origin.Address < fill.Begin || origin.Address >= FillEnd(fill)) continue;
+            if (origin.Word != fill.ExpectedWords[checked((int)(origin.Address-fill.Begin)/4)])
+                throw new InvalidDataException($"Guest array-fill instruction mismatch at 0x{origin.Address:X8}.");
+            if (Players == OriginalPlayers) return instructions;
+            return origin.Address == fill.Begin ? FillStores(fill, _expanded).Cast<IrInstruction>().ToArray() : Array.Empty<IrInstruction>();
+        }
+        return null;
+    }
+
+    private void ValidateFillControlFlow(IReadOnlyList<PpcInstruction> instructions, IReadOnlyList<BasicBlock> blocks)
+    {
+        foreach (var fill in _arrayFills)
+        {
+            var end = FillEnd(fill); var inside = instructions.Count(instruction => instruction.Address >= fill.Begin && instruction.Address < end);
+            if (inside != 0 && (inside != fill.ExpectedWords.Count || blocks.Any(block => block.StartAddress > fill.Begin && block.StartAddress < end)))
+                throw new InvalidDataException($"Guest array-fill span is partial or has an interior branch target at 0x{fill.Begin:X8}.");
+        }
+    }
+}

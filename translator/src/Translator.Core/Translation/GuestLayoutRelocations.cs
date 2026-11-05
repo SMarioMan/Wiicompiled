@@ -30,7 +30,8 @@ public sealed partial class GuestLayoutRelocations
         IEnumerable<GuestLayoutReference> references, bool complete = false,
         IEnumerable<GuestArrayCopies>? arrayCopies = null,
         IEnumerable<GuestRankTable>? rankTables = null,
-        IEnumerable<GuestBoundedAccess>? boundedAccesses = null)
+        IEnumerable<GuestBoundedAccess>? boundedAccesses = null,
+        IEnumerable<GuestArrayFill>? arrayFills = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -53,11 +54,14 @@ public sealed partial class GuestLayoutRelocations
         ValidateRankDefinitions(sites);
         _boundedAccesses = (boundedAccesses ?? Array.Empty<GuestBoundedAccess>()).ToArray();
         ValidateBoundDefinitions();
+        _arrayFills = (arrayFills ?? Array.Empty<GuestArrayFill>()).ToArray();
+        ValidateFillDefinitions(sites);
     }
 
     public void ValidateImage(ProgramImage image)
     {
         ValidateCopies(image);
+        ValidateFills(image);
         ValidateRankTables(image);
         ValidateBoundedAccesses(image);
         foreach (var (address, sites) in _references)
@@ -86,6 +90,10 @@ public sealed partial class GuestLayoutRelocations
             table.Curve,
             Lookups = table.Lookups.Select(site => new { Instruction = $"0x{site.Instruction:X8}", site.Players, site.Position })
         }),
+        ArrayFills = _arrayFills.Select(fill => new {
+            Begin = $"0x{fill.Begin:X8}", End = $"0x{FillEnd(fill):X8}", fill.BaseRegister, fill.ValueRegister,
+            ExpectedWords = fill.ExpectedWords.Select(word => $"0x{word:X8}"), fill.Arrays
+        }),
         ArrayCopies = _arrayCopies.Select(copy => new {
             Begin = $"0x{copy.Begin:X8}", End = $"0x{CopyEnd(copy):X8}", copy.BaseRegister,
             ExpectedWords = copy.ExpectedWords.Select(word => $"0x{word:X8}"),
@@ -103,6 +111,8 @@ public sealed partial class GuestLayoutRelocations
 
     public IReadOnlyList<IrInstruction> Apply(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
+        var fillReplacement = ApplyFill(origin, instructions);
+        if (fillReplacement is not null) return fillReplacement;
         var rankReplacement = ApplyRankLookup(origin, instructions);
         if (rankReplacement is not null) return rankReplacement;
         foreach (var copy in _arrayCopies)
@@ -161,13 +171,15 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
             throw new InvalidDataException("Expandable rank tables require layout format version 3.");
         if (file.Version < 4 && file.BoundedAccesses is { Length: > 0 })
             throw new InvalidDataException("Bounded unrolled accesses require layout format version 4.");
+        if (file.Version < 5 && file.ArrayFills is { Length: > 0 })
+            throw new InvalidDataException("Unrolled array fills require layout format version 5.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
@@ -179,7 +191,9 @@ public sealed partial class GuestLayoutRelocations
                 table.Lookups.Select(site => new GuestRankLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
                     site.Node, site.AddressBase, site.AddressOffset, site.Destination, site.Players, site.Position)).ToArray())),
             file.BoundedAccesses?.Select(site => new GuestBoundedAccess(Hex(site.Instruction), Hex(site.ExpectedWord),
-                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)))
+                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)),
+            file.ArrayFills?.Select(fill => new GuestArrayFill(Hex(fill.Begin), fill.ExpectedWords.Select(Hex).ToArray(),
+                fill.BaseRegister, fill.ValueRegister, fill.Arrays)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -187,7 +201,8 @@ public sealed partial class GuestLayoutRelocations
         ? value.AsSpan(2) : value.AsSpan(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
         ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null,
-        BoundAccessFile[]? BoundedAccesses = null);
+        BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null);
+    private sealed record ArrayFillFile(string Begin, string[] ExpectedWords, string BaseRegister, string ValueRegister, GuestFillArray[] Arrays);
     private sealed record BoundAccessFile(string Instruction, string ExpectedWord, int Node, string Index,
         int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null);
     private sealed record RankTableFile(string Address, string ExpectedHex, int[] Curve, RankLookupFile[] Lookups);

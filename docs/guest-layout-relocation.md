@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,304 references across creation, construction,
+menu and awards scenarios and audits 2,384 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
-point updates.
-The manifest records 605 consumer entry points in `AuditedConsumers`.
+point updates, plus AI manager and route-holder storage.
+The manifest records 647 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -63,7 +63,8 @@ checking all 144 original table bytes and the original lookup instruction.
 It is **incomplete**: other race-data consumers, race state, karts, items, scoring,
 menus, starting grids and the LAN/game network layouts still require migration.
 It is not a playable 24-player profile. Existing release builds retain twelve
-players. The CLI rejects expanded builds from an incomplete manifest.
+players. The CLI rejects expanded builds from an incomplete manifest unless the explicit
+development-only opt-in below is supplied.
 
 Inspect a plan against the verified USA game inputs:
 
@@ -98,6 +99,30 @@ four-screen limit and original competition-mode participant limits. Race-info's
 rotation setup also receives the configured capacity; its separate mask/table
 representation still needs migration for capacities beyond 32.
 
+## AI storage and verified fills
+
+The AI manager has uniform controller and real-player-controller arrays. Its
+allocation and six following pointer fields move with capacity. The route
+holder's controller array, allocation and following count also move together.
+Their original layouts and stores are checked against the USA binary. The
+manager's cursor-based real-controller search is separately relocated and its
+bound uses the configured capacity. Other AI data, including action parameter
+tables and battle-specific structures, still require migration.
+
+Format version 5 adds `ArrayFills` for constructors that initialize every slot
+with unrolled scalar stores. Each span declares exact instruction words, base
+and value registers, and dense array offset/stride/count/width symbols. The
+validator proves the complete ordered store sequence and rejects other effects,
+overlapping arrays or rewrites, shrinkage, partial spans and interior branch
+targets. Expansion emits stores for the full arrays before SSA; original-capacity
+emission is unchanged. This avoids relying on allocator contents for new slots.
+
+Native integration checks execute the real route-holder constructor, the real AI
+manager initialization region before subordinate allocation, and both original
+controller accessors, including the parameter-dependent mode selector, checking every slot and neighboring memory at 12, 13, 24,
+48 and 100 slots. This verifies storage, not complete AI behavior or gameplay at
+those capacities.
+
 ## Private executable validation
 
 Incomplete manifests reject expanded production translation. For development
@@ -117,7 +142,8 @@ different layout identity. Version 2 base metadata remains readable as the legac
 
 For example, a private full USA translation of 29,456 functions at capacity 24
 completed with no unsupported instructions or invalid SSA functions and produced
-72 shared native build shards. This establishes translation and artifact
+72 shared native build shards. A private Linux executable also built in the
+Linux Docker toolchain; whole-game race validation remains incomplete. This establishes translation and artifact
 consistency, not working 24-player gameplay.
 
 The native runtime reads `MkwGuestLayout::kLayout`, defined by the per-game
@@ -187,7 +213,8 @@ indirect control flow and unsupported instructions prevent inter-block inference
 A variable index multiplied by a declared player-array stride can carry a typed
 base through addition. A proposed field must lie inside that declared array,
 including through nested scenario fields, and its element stride must be
-unchanged. The report records `IndexStride` for review. Bounds remain a separate
+unchanged. Masked rotates are accepted as a scale only when their mask removes
+the wrapped low bits. The report records `IndexStride` for review. Bounds remain a separate
 audit; settings outside the indexed array, differing scales, interior cursors and
 alignment padding remain unresolved.
 Unrelated constants such as controller counts and mode identifiers

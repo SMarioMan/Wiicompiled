@@ -33,6 +33,9 @@ public class RacedataConsumerTests
         var copies = definition.GetProperty("ArrayCopies").EnumerateArray().Select(copy => (
             Begin: Hex(copy.GetProperty("Begin").GetString()!),
             End: checked(Hex(copy.GetProperty("Begin").GetString()!)+(uint)copy.GetProperty("ExpectedWords").GetArrayLength()*4))).ToArray();
+        var fills = definition.GetProperty("ArrayFills").EnumerateArray().Select(fill => (
+            Begin: Hex(fill.GetProperty("Begin").GetString()!),
+            End: checked(Hex(fill.GetProperty("Begin").GetString()!)+(uint)fill.GetProperty("ExpectedWords").GetArrayLength()*4))).ToArray();
         var map = FunctionMap.Load(Path.Combine(root, "projects/mkwii-ntsc-u/MAP.txt"));
         var options = new TranslationOptions(EnableLeafInlining: false, KnownFunctionEntryPoints: map.Addresses.ToHashSet());
         var original = new FunctionTranslator(image);
@@ -61,7 +64,7 @@ public class RacedataConsumerTests
                     foreach (var candidate in proof.Candidates)
                     {
                         var reference = candidate.Reference;
-                        if (copies.Any(copy => reference.Instruction >= copy.Begin && reference.Instruction < copy.End)) continue;
+                        if (copies.Concat(fills).Any(span => reference.Instruction >= span.Begin && reference.Instruction < span.End)) continue;
                         Assert.True(sites.TryGetValue((reference.Instruction, reference.Node, reference.Operand), out var declared),
                             $"Missing proven reference at {reference.Instruction:X8} in {entry:X8} {name}");
                         var symbol = declared.GetProperty("Symbol").GetString()!;

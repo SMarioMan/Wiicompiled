@@ -1,5 +1,5 @@
 {
-  "Version": 4,
+  "Version": 5,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: race-data lifecycle, selected readers, point updates, capacity scans, verified unrolled bookkeeping and expandable rank scoring. Other consumers and subsystems still need migration; this is not a playable 24-player profile.",
@@ -149,6 +149,74 @@
         {
           "Name": "psq31",
           "Type": "FloatSlot"
+        }
+      ]
+    },
+    {
+      "Name": "AIManagerHeader",
+      "Alignment": 4,
+      "Size": 36
+    },
+    {
+      "Name": "AIManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "AIManagerHeader"
+        },
+        {
+          "Name": "controllers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "realControllers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "specialItem",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "enemyRoutes",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "params",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "objects",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "battle",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "unknown",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "AIEnemyRoutes",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "vtable",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "controllers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "count",
+          "Type": "Pointer"
         }
       ]
     }
@@ -20125,10 +20193,571 @@
       "Operand": "offset",
       "Symbol": "Racedata.menu.offset+Scenario.players.offset",
       "Addend": 232
+    },
+    {
+      "Instruction": "0x8072B844",
+      "ExpectedWord": "0x3860009C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIManager.size"
+    },
+    {
+      "Instruction": "0x8072BA00",
+      "ExpectedWord": "0x38600038",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIEnemyRoutes.size"
+    },
+    {
+      "Instruction": "0x8072BC4C",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIManager.controllers.count"
+    },
+    {
+      "Instruction": "0x807227E4",
+      "ExpectedWord": "0x83BB0098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.unknown.offset"
+    },
+    {
+      "Instruction": "0x80724698",
+      "ExpectedWord": "0x80630094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x807246B4",
+      "ExpectedWord": "0x83840094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x80724708",
+      "ExpectedWord": "0x80630094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072472C",
+      "ExpectedWord": "0x80630094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x807257BC",
+      "ExpectedWord": "0x83C50094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x80726C4C",
+      "ExpectedWord": "0x80630094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x80727B6C",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072B4A4",
+      "ExpectedWord": "0x80630084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072B8FC",
+      "ExpectedWord": "0x901F0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072B900",
+      "ExpectedWord": "0x901F0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072B904",
+      "ExpectedWord": "0x901F008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072B908",
+      "ExpectedWord": "0x901F0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072B90C",
+      "ExpectedWord": "0x901F0094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072B910",
+      "ExpectedWord": "0x901F0098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.unknown.offset"
+    },
+    {
+      "Instruction": "0x8072B9CC",
+      "ExpectedWord": "0x909F008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072B9FC",
+      "ExpectedWord": "0x907F0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BA14",
+      "ExpectedWord": "0x907F0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BA2C",
+      "ExpectedWord": "0x907F0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BA68",
+      "ExpectedWord": "0x907F0094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BAA8",
+      "ExpectedWord": "0x80030094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BAE0",
+      "ExpectedWord": "0x901E0094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BAE4",
+      "ExpectedWord": "0x807E008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072BB0C",
+      "ExpectedWord": "0x901E008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072BB10",
+      "ExpectedWord": "0x807E0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BB38",
+      "ExpectedWord": "0x901E0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BB3C",
+      "ExpectedWord": "0x807E0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BB5C",
+      "ExpectedWord": "0x807E0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BB64",
+      "ExpectedWord": "0x901E0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BB8C",
+      "ExpectedWord": "0x901E0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BC70",
+      "ExpectedWord": "0x93C30054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.realControllers.offset"
+    },
+    {
+      "Instruction": "0x8072BC84",
+      "ExpectedWord": "0x807D0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BC98",
+      "ExpectedWord": "0x807D0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BCA4",
+      "ExpectedWord": "0x807D0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BCF0",
+      "ExpectedWord": "0x80630054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.realControllers.offset"
+    },
+    {
+      "Instruction": "0x8072BCF8",
+      "ExpectedWord": "0x80630090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BD14",
+      "ExpectedWord": "0x80030084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BDBC",
+      "ExpectedWord": "0x807B0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BDC4",
+      "ExpectedWord": "0x807B0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BDD8",
+      "ExpectedWord": "0x807B0094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BDEC",
+      "ExpectedWord": "0x901B0098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.unknown.offset"
+    },
+    {
+      "Instruction": "0x8072BE24",
+      "ExpectedWord": "0x80030084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BE44",
+      "ExpectedWord": "0x807F0084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x8072BE90",
+      "ExpectedWord": "0x807F0088",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.enemyRoutes.offset"
+    },
+    {
+      "Instruction": "0x8072BE98",
+      "ExpectedWord": "0x807F0090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8072BEAC",
+      "ExpectedWord": "0x807F0094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BEBC",
+      "ExpectedWord": "0x809F0098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.unknown.offset"
+    },
+    {
+      "Instruction": "0x8072BEE4",
+      "ExpectedWord": "0x901F0098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.unknown.offset"
+    },
+    {
+      "Instruction": "0x8072ECA8",
+      "ExpectedWord": "0x90030034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIEnemyRoutes.count.offset"
+    },
+    {
+      "Instruction": "0x8072ED24",
+      "ExpectedWord": "0x80030034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIEnemyRoutes.count.offset"
+    },
+    {
+      "Instruction": "0x8072ED3C",
+      "ExpectedWord": "0x80030034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIEnemyRoutes.count.offset"
+    },
+    {
+      "Instruction": "0x8072ED54",
+      "ExpectedWord": "0x80830034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIEnemyRoutes.count.offset"
+    },
+    {
+      "Instruction": "0x8072ED5C",
+      "ExpectedWord": "0x90030034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIEnemyRoutes.count.offset"
+    },
+    {
+      "Instruction": "0x8072F028",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F15C",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F1E8",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F288",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F310",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F398",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F420",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8072F48C",
+      "ExpectedWord": "0x8065008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x80733658",
+      "ExpectedWord": "0x83630084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.specialItem.offset"
+    },
+    {
+      "Instruction": "0x807339F0",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x80733E40",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8073436C",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8073453C",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x807347D4",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x8073CB68",
+      "ExpectedWord": "0x83E50090",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.objects.offset"
+    },
+    {
+      "Instruction": "0x8073E8FC",
+      "ExpectedWord": "0x83E30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8073EA1C",
+      "ExpectedWord": "0x83E30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8073EB18",
+      "ExpectedWord": "0x83E30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8073ECCC",
+      "ExpectedWord": "0x83E30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8073EFEC",
+      "ExpectedWord": "0x83A30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8073F184",
+      "ExpectedWord": "0x83E30094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x80747254",
+      "ExpectedWord": "0x80630094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.battle.offset"
+    },
+    {
+      "Instruction": "0x8072BC5C",
+      "ExpectedWord": "0x80040054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.realControllers.offset"
+    },
+    {
+      "Instruction": "0x8072C1D8",
+      "ExpectedWord": "0x8063008C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIManager.params.offset"
     }
   ],
   "GlobalPointers": {
-    "0x809B8F68": "Racedata"
+    "0x809B8F68": "Racedata",
+    "0x809BE398": "AIManager"
   },
   "ArrayCopies": [
     {
@@ -20252,8 +20881,8 @@
     },
     {
       "Entry": "0x805133E4",
-      "Name": "KMP::Holder<ENPH>::ToggleENPHLink",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "KMP::Holder<ENPH>::ToggleENPHLink"
     },
     {
       "Entry": "0x805144F8",
@@ -20282,8 +20911,8 @@
     },
     {
       "Entry": "0x805291F8",
-      "Name": "Racedata::Init",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::Init"
     },
     {
       "Entry": "0x8052990C",
@@ -20307,8 +20936,8 @@
     },
     {
       "Entry": "0x8052A3A8",
-      "Name": "RacedataScenario::InitGhostPlayer",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::InitGhostPlayer"
     },
     {
       "Entry": "0x8052A698",
@@ -20317,8 +20946,8 @@
     },
     {
       "Entry": "0x8052A9A0",
-      "Name": "RacedataScenario::InitScreens",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::InitScreens"
     },
     {
       "Entry": "0x8052AC40",
@@ -20327,18 +20956,18 @@
     },
     {
       "Entry": "0x8052ADDC",
-      "Name": "RacedataScenario::InitRng",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::InitRng"
     },
     {
       "Entry": "0x8052AEC4",
-      "Name": "RacedataScenario::InitCompetitionSettings",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::InitCompetitionSettings"
     },
     {
       "Entry": "0x8052B048",
-      "Name": "RacedataScenario::Init",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::Init"
     },
     {
       "Entry": "0x8052B4F0",
@@ -20352,8 +20981,8 @@
     },
     {
       "Entry": "0x8052B77C",
-      "Name": "Racedata::InitRace",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::InitRace"
     },
     {
       "Entry": "0x8052BA64",
@@ -20362,8 +20991,8 @@
     },
     {
       "Entry": "0x8052BD1C",
-      "Name": "Racedata::InitAwards",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::InitAwards"
     },
     {
       "Entry": "0x8052C3C4",
@@ -20372,8 +21001,8 @@
     },
     {
       "Entry": "0x8052C528",
-      "Name": "Racedata::InitCredits",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::InitCredits"
     },
     {
       "Entry": "0x8052D19C",
@@ -20382,18 +21011,18 @@
     },
     {
       "Entry": "0x8052D29C",
-      "Name": "RacedataScenario::RegisterParameters",
-      "Receiver": "Scenario"
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::RegisterParameters"
     },
     {
       "Entry": "0x8052D3E4",
-      "Name": "Racedata::SetGhost",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::SetGhost"
     },
     {
       "Entry": "0x8052D438",
-      "Name": "Racedata::HandleRaceFinish?",
-      "Receiver": "Racedata"
+      "Receiver": "Racedata",
+      "Name": "Racedata::HandleRaceFinish?"
     },
     {
       "Entry": "0x8052D480",
@@ -20417,18 +21046,18 @@
     },
     {
       "Entry": "0x8052DBA4",
-      "Name": "Raceinfo::GetBattleDuration",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::GetBattleDuration"
     },
     {
       "Entry": "0x8052DC58",
-      "Name": "Raceinfo::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::__ct"
     },
     {
       "Entry": "0x8052E440",
-      "Name": "Raceinfo::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::Init"
     },
     {
       "Entry": "0x8052E548",
@@ -20442,13 +21071,13 @@
     },
     {
       "Entry": "0x8052E66C",
-      "Name": "Raceinfo::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::Update"
     },
     {
       "Entry": "0x8052EB5C",
-      "Name": "Raceinfo::GetLapCount",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::GetLapCount"
     },
     {
       "Entry": "0x8052EFB4",
@@ -20457,18 +21086,18 @@
     },
     {
       "Entry": "0x8052F7A0",
-      "Name": "RaceinfoPlayer::UpdateRealLocal",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceinfoPlayer::UpdateRealLocal"
     },
     {
       "Entry": "0x8052FE70",
-      "Name": "RaceinfoPlayer::EndLap",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceinfoPlayer::EndLap"
     },
     {
       "Entry": "0x80530184",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x805307BC",
@@ -20477,18 +21106,18 @@
     },
     {
       "Entry": "0x8053150C",
-      "Name": "GMDataVS::CanRaceEnd",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataVS::CanRaceEnd"
     },
     {
       "Entry": "0x80531794",
-      "Name": "Raceinfo::GetInitialPhysicsValues",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::GetInitialPhysicsValues"
     },
     {
       "Entry": "0x80531A80",
-      "Name": "Raceinfo::GetKTPTHolder",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Raceinfo::GetKTPTHolder"
     },
     {
       "Entry": "0x80531CE0",
@@ -20502,8 +21131,8 @@
     },
     {
       "Entry": "0x80531DB0",
-      "Name": "RaceinfoPlayer::ComputeGPRank",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceinfoPlayer::ComputeGPRank"
     },
     {
       "Entry": "0x8053213C",
@@ -20512,13 +21141,13 @@
     },
     {
       "Entry": "0x805348BC",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80534A2C",
-      "Name": "GMDataBalloonBattle::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataBalloonBattle::Update"
     },
     {
       "Entry": "0x80534C28",
@@ -20527,23 +21156,23 @@
     },
     {
       "Entry": "0x805370AC",
-      "Name": "GMDataOnlineBalloonBattle::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataOnlineBalloonBattle::Update"
     },
     {
       "Entry": "0x80537250",
-      "Name": "GMDataOnlineBalloonBattle::Update_case_4",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataOnlineBalloonBattle::Update_case_4"
     },
     {
       "Entry": "0x805372E4",
-      "Name": "GMDataOnlineBalloonBattle::Update_case_6",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataOnlineBalloonBattle::Update_case_6"
     },
     {
       "Entry": "0x80537334",
-      "Name": "GMDataOnlineBalloonBattle::Update_case_8",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "GMDataOnlineBalloonBattle::Update_case_8"
     },
     {
       "Entry": "0x80538E34",
@@ -20562,13 +21191,13 @@
     },
     {
       "Entry": "0x80539914",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80539A98",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80539C48",
@@ -20592,13 +21221,13 @@
     },
     {
       "Entry": "0x8054DC30",
-      "Name": "RaceScene::OnEnter",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceScene::OnEnter"
     },
     {
       "Entry": "0x8054E1E8",
-      "Name": "RaceScene::CreateAndInitInstances",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceScene::CreateAndInitInstances"
     },
     {
       "Entry": "0x8054E70C",
@@ -20632,8 +21261,8 @@
     },
     {
       "Entry": "0x8055008C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80550550",
@@ -20647,8 +21276,8 @@
     },
     {
       "Entry": "0x805506EC",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80563030",
@@ -20672,8 +21301,8 @@
     },
     {
       "Entry": "0x8056A9A0",
-      "Name": "Kart::Collision::CheckKartCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Collision::CheckKartCollision"
     },
     {
       "Entry": "0x8056CA84",
@@ -20682,13 +21311,13 @@
     },
     {
       "Entry": "0x8056D0C0",
-      "Name": "Kart::Collision::CheckObjectCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Collision::CheckObjectCollision"
     },
     {
       "Entry": "0x8056D72C",
-      "Name": "Kart::Collision::CheckItemCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Collision::CheckItemCollision"
     },
     {
       "Entry": "0x8056E40C",
@@ -20697,8 +21326,8 @@
     },
     {
       "Entry": "0x8056ECB0",
-      "Name": "Kart::Collision::ActivateOOB",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Collision::ActivateOOB"
     },
     {
       "Entry": "0x80570D6C",
@@ -20717,8 +21346,8 @@
     },
     {
       "Entry": "0x805731EC",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80575E38",
@@ -20742,8 +21371,8 @@
     },
     {
       "Entry": "0x8057A844",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8057AF14",
@@ -20762,18 +21391,18 @@
     },
     {
       "Entry": "0x8057B42C",
-      "Name": "Kart::Movement::SomethingRespawnBoost",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Movement::SomethingRespawnBoost"
     },
     {
       "Entry": "0x8057BA14",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8057C738",
-      "Name": "Kart::Movement::ReleaseMT",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Movement::ReleaseMT"
     },
     {
       "Entry": "0x8057F2D4",
@@ -20782,13 +21411,13 @@
     },
     {
       "Entry": "0x80580784",
-      "Name": "Kart::Movement::UpdateSlipStream",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Movement::UpdateSlipStream"
     },
     {
       "Entry": "0x80583168",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x805855FC",
@@ -20797,8 +21426,8 @@
     },
     {
       "Entry": "0x80585C9C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80587184",
@@ -20817,8 +21446,8 @@
     },
     {
       "Entry": "0x80588828",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80588D90",
@@ -20827,13 +21456,13 @@
     },
     {
       "Entry": "0x80589308",
-      "Name": "Kart::Manager::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Manager::__ct"
     },
     {
       "Entry": "0x805896BC",
-      "Name": "Kart::Manager::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Manager::Init"
     },
     {
       "Entry": "0x80589BF8",
@@ -20857,8 +21486,8 @@
     },
     {
       "Entry": "0x8058BFB0",
-      "Name": "Kart::Link::GetCameraParamBin",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Link::GetCameraParamBin"
     },
     {
       "Entry": "0x8058C0B8",
@@ -20867,18 +21496,18 @@
     },
     {
       "Entry": "0x8058C79C",
-      "Name": "Kart::Values::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Values::__ct"
     },
     {
       "Entry": "0x8058DB90",
-      "Name": "Kart::Status::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Status::__ct"
     },
     {
       "Entry": "0x8058E3B0",
-      "Name": "Kart::Status::UpdateCollisions",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Status::UpdateCollisions"
     },
     {
       "Entry": "0x8058F1B0",
@@ -20887,8 +21516,8 @@
     },
     {
       "Entry": "0x8058F2D4",
-      "Name": "Kart::Status::ApplyStartBoost",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Status::ApplyStartBoost"
     },
     {
       "Entry": "0x8058F4E0",
@@ -20897,8 +21526,8 @@
     },
     {
       "Entry": "0x8058FC5C",
-      "Name": "Kart::Sub::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Kart::Sub::Update"
     },
     {
       "Entry": "0x80591528",
@@ -20907,18 +21536,18 @@
     },
     {
       "Entry": "0x80596CD8",
-      "Name": "RaceCamera::_ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceCamera::_ct"
     },
     {
       "Entry": "0x80596FFC",
-      "Name": "RaceCamera::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceCamera::Init"
     },
     {
       "Entry": "0x80597198",
-      "Name": "RaceCamera::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceCamera::Update"
     },
     {
       "Entry": "0x80597CC4",
@@ -20927,8 +21556,8 @@
     },
     {
       "Entry": "0x80599BD0",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80599DFC",
@@ -20952,8 +21581,8 @@
     },
     {
       "Entry": "0x8059B5F0",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8059C068",
@@ -20967,8 +21596,8 @@
     },
     {
       "Entry": "0x8059D430",
-      "Name": "RaceCameraMgr::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceCameraMgr::__ct"
     },
     {
       "Entry": "0x8059DD5C",
@@ -20987,13 +21616,13 @@
     },
     {
       "Entry": "0x805A484C",
-      "Name": "ScnMgrCreator::CreateRace",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "ScnMgrCreator::CreateRace"
     },
     {
       "Entry": "0x805A65B8",
-      "Name": "ScnMgrRace::LoadPostEffects",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "ScnMgrRace::LoadPostEffects"
     },
     {
       "Entry": "0x805A6B4C",
@@ -21062,8 +21691,8 @@
     },
     {
       "Entry": "0x805E55B0",
-      "Name": "Pages::GlobeSearch::PrepareLiveView",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::GlobeSearch::PrepareLiveView"
     },
     {
       "Entry": "0x805F3918",
@@ -21097,8 +21726,8 @@
     },
     {
       "Entry": "0x80609D90",
-      "Name": "Pages::Title::PrepareDemo",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::Title::PrepareDemo"
     },
     {
       "Entry": "0x80613A20",
@@ -21112,23 +21741,23 @@
     },
     {
       "Entry": "0x80616D80",
-      "Name": "Pages::DisconnectMgr::OnUpdate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::DisconnectMgr::OnUpdate"
     },
     {
       "Entry": "0x8061C348",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8061DB10",
-      "Name": "Pages::SELECTStageMgr::PrepareRace",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace"
     },
     {
       "Entry": "0x8061DC54",
-      "Name": "Pages::SELECTStageMgr::PrepareRace_case62",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case62"
     },
     {
       "Entry": "0x8061DCA4",
@@ -21147,13 +21776,13 @@
     },
     {
       "Entry": "0x8061DE0C",
-      "Name": "Pages::SELECTStageMgr::PrepareRace_2case63",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_2case63"
     },
     {
       "Entry": "0x8061DE38",
-      "Name": "Pages::SELECTStageMgr::PrepareRace_2case5a",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_2case5a"
     },
     {
       "Entry": "0x806212AC",
@@ -21187,8 +21816,8 @@
     },
     {
       "Entry": "0x80622758",
-      "Name": "Pages::AwardResults::SetWinOrLose",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::AwardResults::SetWinOrLose"
     },
     {
       "Entry": "0x8062291C",
@@ -21197,13 +21826,13 @@
     },
     {
       "Entry": "0x806229A0",
-      "Name": "Pages::AwardResults::PrepareCongratulations",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::AwardResults::PrepareCongratulations"
     },
     {
       "Entry": "0x80622B40",
-      "Name": "Pages::AwardResults::PrepareResultItems",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::AwardResults::PrepareResultItems"
     },
     {
       "Entry": "0x80622CAC",
@@ -21212,8 +21841,8 @@
     },
     {
       "Entry": "0x80622DCC",
-      "Name": "Pages::AwardResults::InitRank",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::AwardResults::InitRank"
     },
     {
       "Entry": "0x806261E8",
@@ -21232,8 +21861,8 @@
     },
     {
       "Entry": "0x8062FE88",
-      "Name": "Pages::GhostRaceMgr::DownloadGhost",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::GhostRaceMgr::DownloadGhost"
     },
     {
       "Entry": "0x80630854",
@@ -21282,8 +21911,8 @@
     },
     {
       "Entry": "0x8064D620",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8064D748",
@@ -21317,18 +21946,18 @@
     },
     {
       "Entry": "0x80650880",
-      "Name": "RKNet::PacketMgr::CreateRH1AndExportRH1andUSERandRacedata",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RKNet::PacketMgr::CreateRH1AndExportRH1andUSERandRacedata"
     },
     {
       "Entry": "0x80650CDC",
-      "Name": "RKNet::PacketMgr::CreateAndExportRH1andUSER",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RKNet::PacketMgr::CreateAndExportRH1andUSER"
     },
     {
       "Entry": "0x80651018",
-      "Name": "RKNet::PacketMgr::ProcessReceived",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RKNet::PacketMgr::ProcessReceived"
     },
     {
       "Entry": "0x80658068",
@@ -21352,8 +21981,8 @@
     },
     {
       "Entry": "0x80659DAC",
-      "Name": "RKNet::SELECTHandler::DecideTrack",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RKNet::SELECTHandler::DecideTrack"
     },
     {
       "Entry": "0x8065D270",
@@ -21362,8 +21991,8 @@
     },
     {
       "Entry": "0x8067388C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80676E90",
@@ -21377,8 +22006,8 @@
     },
     {
       "Entry": "0x806770F8",
-      "Name": "Effects::Mgr::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Effects::Mgr::Init"
     },
     {
       "Entry": "0x80688A54",
@@ -21387,18 +22016,18 @@
     },
     {
       "Entry": "0x80689B10",
-      "Name": "Effects::Player::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Effects::Player::__ct"
     },
     {
       "Entry": "0x80697670",
-      "Name": "Effects::Player::UpdateGasSmokeEffects",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Effects::Player::UpdateGasSmokeEffects"
     },
     {
       "Entry": "0x8069B490",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806A7418",
@@ -21422,8 +22051,8 @@
     },
     {
       "Entry": "0x806B1E00",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806B23EC",
@@ -21442,13 +22071,13 @@
     },
     {
       "Entry": "0x806B5CBC",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806B5EF0",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806C70A4",
@@ -21457,8 +22086,8 @@
     },
     {
       "Entry": "0x806C9118",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806CBAD4",
@@ -21467,18 +22096,18 @@
     },
     {
       "Entry": "0x806CC0B4",
-      "Name": "Objects::Kuribo::OnCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::Kuribo::OnCollision"
     },
     {
       "Entry": "0x806CC3E8",
-      "Name": "Objects::Kuribo::OnItemCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::Kuribo::OnItemCollision"
     },
     {
       "Entry": "0x806CCDB0",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806D31E0",
@@ -21527,8 +22156,8 @@
     },
     {
       "Entry": "0x806EE8C8",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x806EF934",
@@ -21762,13 +22391,88 @@
     },
     {
       "Entry": "0x8071A208",
-      "Name": "Lakitu::Manager::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Lakitu::Manager::Init"
+    },
+    {
+      "Entry": "0x80722738",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80724678",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80725798",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80726C38",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8072780C",
+      "Receiver": null,
+      "Name": "AI::Player::__ct"
+    },
+    {
+      "Entry": "0x8072B448",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8072B8AC",
-      "Receiver": null,
+      "Receiver": "AIManager",
       "Name": "AI::Manager::__ct"
+    },
+    {
+      "Entry": "0x8072BA84",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::__dt"
+    },
+    {
+      "Entry": "0x8072BC04",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::AddKartAIController"
+    },
+    {
+      "Entry": "0x8072BCD8",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetKartAIController"
+    },
+    {
+      "Entry": "0x8072BCE8",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetRealPlayerKartAIController"
+    },
+    {
+      "Entry": "0x8072BCF8",
+      "Receiver": "AIManager",
+      "Name": "obj_checkIfSomething"
+    },
+    {
+      "Entry": "0x8072BD00",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::Init"
+    },
+    {
+      "Entry": "0x8072BE04",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::Update"
+    },
+    {
+      "Entry": "0x8072BF18",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetEngineClass"
+    },
+    {
+      "Entry": "0x8072BF20",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetDifficulty"
     },
     {
       "Entry": "0x8072C034",
@@ -21822,8 +22526,8 @@
     },
     {
       "Entry": "0x8072C194",
-      "Name": "AI::Manager::IsSpecialItemMode",
-      "Receiver": null
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::IsSpecialItemMode"
     },
     {
       "Entry": "0x8072C244",
@@ -21836,8 +22540,18 @@
       "Name": "AI::Manager::IsAwardsOrCredits"
     },
     {
+      "Entry": "0x8072C31C",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetRandomValue"
+    },
+    {
+      "Entry": "0x8072C344",
+      "Receiver": "AIManager",
+      "Name": "AI::Manager::GetRandomFloat"
+    },
+    {
       "Entry": "0x8072C374",
-      "Receiver": null,
+      "Receiver": "AIManager",
       "Name": "AI::Manager::SetCCAndDifficulty"
     },
     {
@@ -21847,8 +22561,63 @@
     },
     {
       "Entry": "0x8072D680",
-      "Name": "AI::Params::Load",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "AI::Params::Load"
+    },
+    {
+      "Entry": "0x8072EC98",
+      "Receiver": "AIEnemyRoutes",
+      "Name": "AI::EnemyRouteHolder::__ct"
+    },
+    {
+      "Entry": "0x8072ECE0",
+      "Receiver": "AIEnemyRoutes",
+      "Name": "AI::EnemyRouteHolder::__dt"
+    },
+    {
+      "Entry": "0x8072ED20",
+      "Receiver": "AIEnemyRoutes",
+      "Name": "AI::EnemyRouteHolder::AddKartAIController"
+    },
+    {
+      "Entry": "0x8072EFC0",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcStartBoost"
+    },
+    {
+      "Entry": "0x8072F0DC",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotDrift"
+    },
+    {
+      "Entry": "0x8072F198",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotMT"
+    },
+    {
+      "Entry": "0x8072F23C",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotTrick"
+    },
+    {
+      "Entry": "0x8072F2C4",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotWheelie"
+    },
+    {
+      "Entry": "0x8072F34C",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotParamAction6"
+    },
+    {
+      "Entry": "0x8072F3D4",
+      "Receiver": null,
+      "Name": "AI::ParamActionCalculator::CalcGotParamAction7"
+    },
+    {
+      "Entry": "0x8072F45C",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8073169C",
@@ -21861,9 +22630,44 @@
       "Name": ""
     },
     {
+      "Entry": "0x80733604",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807339C4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80733E08",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80734340",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073450C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807347A8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
       "Entry": "0x8073A3CC",
-      "Name": "Objects::Poihana::Topple",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::Poihana::Topple"
+    },
+    {
+      "Entry": "0x8073CB40",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8073D7F0",
@@ -21872,13 +22676,43 @@
     },
     {
       "Entry": "0x8073E0F0",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073E8C4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073E9F8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073EAEC",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073ECA8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073EFB4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073F160",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8073F70C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8073FE38",
@@ -21896,14 +22730,19 @@
       "Name": "AI::Character::Init"
     },
     {
+      "Entry": "0x80746F00",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
       "Entry": "0x8074CFD4",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80759F4C",
-      "Name": "Objects::Hanabi::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::Hanabi::Update"
     },
     {
       "Entry": "0x8075AF64",
@@ -21942,8 +22781,8 @@
     },
     {
       "Entry": "0x80766290",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80769354",
@@ -21967,23 +22806,23 @@
     },
     {
       "Entry": "0x807725E4",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80772AD8",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80772E00",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80774C60",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80775710",
@@ -21997,13 +22836,13 @@
     },
     {
       "Entry": "0x8077B584",
-      "Name": "Objects::ItemDropper::OnCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::ItemDropper::OnCollision"
     },
     {
       "Entry": "0x8077B6B4",
-      "Name": "Objects::ItemDropper::OnItemCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::ItemDropper::OnItemCollision"
     },
     {
       "Entry": "0x8077CA24",
@@ -22012,13 +22851,13 @@
     },
     {
       "Entry": "0x8077F2EC",
-      "Name": "RaceEndTallies::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceEndTallies::Init"
     },
     {
       "Entry": "0x8077F48C",
-      "Name": "RaceEndTallies::Init_caseD_4",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceEndTallies::Init_caseD_4"
     },
     {
       "Entry": "0x8077F928",
@@ -22027,13 +22866,13 @@
     },
     {
       "Entry": "0x8077F998",
-      "Name": "RaceEndTallies::SetTotalDistanceVS",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceEndTallies::SetTotalDistanceVS"
     },
     {
       "Entry": "0x8077FA78",
-      "Name": "RaceEndTallies::SetCourseId",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceEndTallies::SetCourseId"
     },
     {
       "Entry": "0x8077FAC8",
@@ -22042,18 +22881,18 @@
     },
     {
       "Entry": "0x80783A50",
-      "Name": "DriverMgr::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "DriverMgr::__ct"
     },
     {
       "Entry": "0x80783F98",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80784194",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80784610",
@@ -22087,18 +22926,18 @@
     },
     {
       "Entry": "0x8079B1B8",
-      "Name": "Item::ObjBomb::CreateArray",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Item::ObjBomb::CreateArray"
     },
     {
       "Entry": "0x8079B378",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8079B844",
-      "Name": "Item::ObjBomb::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Item::ObjBomb::__ct"
     },
     {
       "Entry": "0x807A1500",
@@ -22132,8 +22971,8 @@
     },
     {
       "Entry": "0x807ABF78",
-      "Name": "Item::SlotData::ProcessTable",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Item::SlotData::ProcessTable"
     },
     {
       "Entry": "0x807AC9CC",
@@ -22147,13 +22986,13 @@
     },
     {
       "Entry": "0x807AE770",
-      "Name": "DriverMgr::SetParams",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "DriverMgr::SetParams"
     },
     {
       "Entry": "0x807AE83C",
-      "Name": "DriverMgr::SetParams_caseD_1",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "DriverMgr::SetParams_caseD_1"
     },
     {
       "Entry": "0x807AE914",
@@ -22227,8 +23066,8 @@
     },
     {
       "Entry": "0x807CF584",
-      "Name": "MinimapMgr::Load",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "MinimapMgr::Load"
     },
     {
       "Entry": "0x807CF984",
@@ -22242,13 +23081,13 @@
     },
     {
       "Entry": "0x807CFF5C",
-      "Name": "MinimapMgr::ApplyAREAType5",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "MinimapMgr::ApplyAREAType5"
     },
     {
       "Entry": "0x807D07D4",
-      "Name": "AwardsMgr::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "AwardsMgr::Init"
     },
     {
       "Entry": "0x807D5220",
@@ -22257,13 +23096,13 @@
     },
     {
       "Entry": "0x807D6FF4",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x807D71C0",
-      "Name": "Item::ObjKumo::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Item::ObjKumo::Update"
     },
     {
       "Entry": "0x807DCC88",
@@ -22272,13 +23111,13 @@
     },
     {
       "Entry": "0x807DF824",
-      "Name": "CtrlMenuCupSelectCup::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlMenuCupSelectCup::InitSelf"
     },
     {
       "Entry": "0x807DFD58",
-      "Name": "CtrlMenuCupSelectCup::IsCupUnlocked",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlMenuCupSelectCup::IsCupUnlocked"
     },
     {
       "Entry": "0x807E06B0",
@@ -22287,8 +23126,8 @@
     },
     {
       "Entry": "0x807E09D0",
-      "Name": "CtrlRace2DMap::Load",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRace2DMap::Load"
     },
     {
       "Entry": "0x807E1B20",
@@ -22302,13 +23141,13 @@
     },
     {
       "Entry": "0x807E3100",
-      "Name": "CtrlRaceBattleAddPoint::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceBattleAddPoint::InitSelf"
     },
     {
       "Entry": "0x807E31E0",
-      "Name": "CtrlRaceBattleAddPoint::OnUpdate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceBattleAddPoint::OnUpdate"
     },
     {
       "Entry": "0x807E56F0",
@@ -22317,23 +23156,23 @@
     },
     {
       "Entry": "0x807E5A1C",
-      "Name": "CtrlRaceNameBalloon::UpdateInfo",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceNameBalloon::UpdateInfo"
     },
     {
       "Entry": "0x807E60C0",
-      "Name": "CtrlRaceNameBalloon::OnUpdate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceNameBalloon::OnUpdate"
     },
     {
       "Entry": "0x807E6A6C",
-      "Name": "CtrlRaceNameBalloon::UpdatePosition",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceNameBalloon::UpdatePosition"
     },
     {
       "Entry": "0x807E6D04",
-      "Name": "RaceBalloons::Update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "RaceBalloons::Update"
     },
     {
       "Entry": "0x807E778C",
@@ -22387,13 +23226,13 @@
     },
     {
       "Entry": "0x807EACCC",
-      "Name": "CtrlRaceResult::FillName",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceResult::FillName"
     },
     {
       "Entry": "0x807EB174",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x807EB6FC",
@@ -22407,13 +23246,13 @@
     },
     {
       "Entry": "0x807EB9C4",
-      "Name": "CtrlRaceResult::Fill",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceResult::Fill"
     },
     {
       "Entry": "0x807EC3BC",
-      "Name": "CtrlRaceResultTeam::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceResultTeam::InitSelf"
     },
     {
       "Entry": "0x807ECE40",
@@ -22432,13 +23271,13 @@
     },
     {
       "Entry": "0x80803924",
-      "Name": "obj_venice_hasi::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "obj_venice_hasi::__ct"
     },
     {
       "Entry": "0x80803D38",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8080418C",
@@ -22447,13 +23286,13 @@
     },
     {
       "Entry": "0x8080503C",
-      "Name": "Objects::VolcanoPiece::__ct",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::VolcanoPiece::__ct"
     },
     {
       "Entry": "0x80813378",
-      "Name": "ObjectsMgr::CreateAllObjects",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "ObjectsMgr::CreateAllObjects"
     },
     {
       "Entry": "0x80813FD8",
@@ -22472,8 +23311,8 @@
     },
     {
       "Entry": "0x808151A4",
-      "Name": "Objects::Itembox::OnCollision",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Objects::Itembox::OnCollision"
     },
     {
       "Entry": "0x80815948",
@@ -22512,8 +23351,8 @@
     },
     {
       "Entry": "0x80821288",
-      "Name": "Pages::BattleModeSelect::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::BattleModeSelect::OnActivate"
     },
     {
       "Entry": "0x80821758",
@@ -22522,8 +23361,8 @@
     },
     {
       "Entry": "0x80821E68",
-      "Name": "Pages::BattleSettings::CreateControl",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::BattleSettings::CreateControl"
     },
     {
       "Entry": "0x80822AFC",
@@ -22537,8 +23376,8 @@
     },
     {
       "Entry": "0x80823548",
-      "Name": "Pages::CharacterSelect::OnButtonDriverClick",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::CharacterSelect::OnButtonDriverClick"
     },
     {
       "Entry": "0x808241C8",
@@ -22557,13 +23396,13 @@
     },
     {
       "Entry": "0x80824F28",
-      "Name": "Pages::GPClassSelect::OnButtonClick",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::GPClassSelect::OnButtonClick"
     },
     {
       "Entry": "0x80825A40",
-      "Name": "Pages::CourseSelect::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::CourseSelect::OnActivate"
     },
     {
       "Entry": "0x80825CC8",
@@ -22582,13 +23421,13 @@
     },
     {
       "Entry": "0x808266B0",
-      "Name": "Pages::CupSelect::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::CupSelect::OnActivate"
     },
     {
       "Entry": "0x80826BB4",
-      "Name": "Pages::CupSelect::UpdateText",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::CupSelect::UpdateText"
     },
     {
       "Entry": "0x80826CE4",
@@ -22632,8 +23471,8 @@
     },
     {
       "Entry": "0x8082ED74",
-      "Name": "Pages::DriftSelect::OnButtonClick",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::DriftSelect::OnButtonClick"
     },
     {
       "Entry": "0x8082FAFC",
@@ -22642,8 +23481,8 @@
     },
     {
       "Entry": "0x8082FC84",
-      "Name": "Pages::SinglePlayer::OnButtonClick",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::SinglePlayer::OnButtonClick"
     },
     {
       "Entry": "0x8083089C",
@@ -22667,13 +23506,13 @@
     },
     {
       "Entry": "0x80832B70",
-      "Name": "Pages::VSSettings::CreateControl",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::VSSettings::CreateControl"
     },
     {
       "Entry": "0x80833770",
-      "Name": "Pages::RaceIntro::OnInit",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceIntro::OnInit"
     },
     {
       "Entry": "0x808340A0",
@@ -22682,8 +23521,8 @@
     },
     {
       "Entry": "0x808347E8",
-      "Name": "Pages::RaceHUD::OnInit",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceHUD::OnInit"
     },
     {
       "Entry": "0x80834BD4",
@@ -22697,8 +23536,8 @@
     },
     {
       "Entry": "0x8083525C",
-      "Name": "Pages::RaceHUD::BeforeControlUpdate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceHUD::BeforeControlUpdate"
     },
     {
       "Entry": "0x8083589C",
@@ -22707,8 +23546,8 @@
     },
     {
       "Entry": "0x80835A28",
-      "Name": "Pages::RaceHUD::AfterControlUpdate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceHUD::AfterControlUpdate"
     },
     {
       "Entry": "0x80836078",
@@ -22722,8 +23561,8 @@
     },
     {
       "Entry": "0x80836EDC",
-      "Name": "Pages::TournamentHUD::GetEnabledCtrlRaceBases",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::TournamentHUD::GetEnabledCtrlRaceBases"
     },
     {
       "Entry": "0x80837F9C",
@@ -22737,13 +23576,13 @@
     },
     {
       "Entry": "0x80838514",
-      "Name": "Pages::RaceMenu::OnDispose",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceMenu::OnDispose"
     },
     {
       "Entry": "0x80838808",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80838AF0",
@@ -22762,8 +23601,8 @@
     },
     {
       "Entry": "0x80838C4C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80838D7C",
@@ -22772,8 +23611,8 @@
     },
     {
       "Entry": "0x80838F20",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x808391C4",
@@ -22792,8 +23631,8 @@
     },
     {
       "Entry": "0x808396FC",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8083992C",
@@ -22812,8 +23651,8 @@
     },
     {
       "Entry": "0x80839B58",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80839C48",
@@ -22842,8 +23681,8 @@
     },
     {
       "Entry": "0x8083A180",
-      "Name": "Pages::RaceMenu::IsFinalRace",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::RaceMenu::IsFinalRace"
     },
     {
       "Entry": "0x8083A3B4",
@@ -22852,13 +23691,13 @@
     },
     {
       "Entry": "0x8083A504",
-      "Name": "Pages::Leaderboard::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::Leaderboard::OnActivate"
     },
     {
       "Entry": "0x8083AB38",
-      "Name": "Pages::TeamVSLeaderboardBase::CalcTeamScoreDiff",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::TeamVSLeaderboardBase::CalcTeamScoreDiff"
     },
     {
       "Entry": "0x8083AD30",
@@ -22867,8 +23706,8 @@
     },
     {
       "Entry": "0x8083AD40",
-      "Name": "Pages::BattleLeaderboardUpdate::FillRows",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::BattleLeaderboardUpdate::FillRows"
     },
     {
       "Entry": "0x8083B514",
@@ -22912,18 +23751,18 @@
     },
     {
       "Entry": "0x808403D4",
-      "Name": "CtrlMenuMovieButton::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlMenuMovieButton::InitSelf"
     },
     {
       "Entry": "0x80840884",
-      "Name": "CtrlMenuSingleTopMovieButton::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlMenuSingleTopMovieButton::InitSelf"
     },
     {
       "Entry": "0x80840D34",
-      "Name": "CtrlMenuMovieLayout::InitSelf",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlMenuMovieLayout::InitSelf"
     },
     {
       "Entry": "0x80841B78",
@@ -22937,8 +23776,8 @@
     },
     {
       "Entry": "0x80842030",
-      "Name": "CtrlRaceGhostDiffTime::Init",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceGhostDiffTime::Init"
     },
     {
       "Entry": "0x808428F4",
@@ -22952,13 +23791,13 @@
     },
     {
       "Entry": "0x80842DCC",
-      "Name": "CtrlRaceWifiStartMessage::Load",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceWifiStartMessage::Load"
     },
     {
       "Entry": "0x808431C8",
-      "Name": "CtrlRaceWifiFinishMessage::SetPanePosition",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "CtrlRaceWifiFinishMessage::SetPanePosition"
     },
     {
       "Entry": "0x80844E78",
@@ -23022,8 +23861,8 @@
     },
     {
       "Entry": "0x8085326C",
-      "Name": "Pages::StartRace::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::StartRace::OnActivate"
     },
     {
       "Entry": "0x80853554",
@@ -23042,8 +23881,8 @@
     },
     {
       "Entry": "0x80855CE4",
-      "Name": "Pages::MultiDriftSelect::OnButtonClick",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::MultiDriftSelect::OnButtonClick"
     },
     {
       "Entry": "0x80856C28",
@@ -23062,8 +23901,8 @@
     },
     {
       "Entry": "0x80857600",
-      "Name": "Pages::MultiTeamSelect::AssignCPUTeams",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::MultiTeamSelect::AssignCPUTeams"
     },
     {
       "Entry": "0x808577D8",
@@ -23072,8 +23911,8 @@
     },
     {
       "Entry": "0x80857FD8",
-      "Name": "Pages::VSModeSelect::OnActivate",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::VSModeSelect::OnActivate"
     },
     {
       "Entry": "0x80858588",
@@ -23092,8 +23931,8 @@
     },
     {
       "Entry": "0x8085A1C8",
-      "Name": "Pages::GPVSLeaderboardUpdate::FillRows",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::GPVSLeaderboardUpdate::FillRows"
     },
     {
       "Entry": "0x8085A458",
@@ -23107,8 +23946,8 @@
     },
     {
       "Entry": "0x8085A7FC",
-      "Name": "Pages::WWLeaderboardUpdate::FillRows",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::WWLeaderboardUpdate::FillRows"
     },
     {
       "Entry": "0x8085AED4",
@@ -23117,23 +23956,23 @@
     },
     {
       "Entry": "0x8085B0FC",
-      "Name": "Pages::TTLeaderboard::FillRows",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::TTLeaderboard::FillRows"
     },
     {
       "Entry": "0x8085B5B4",
-      "Name": "Pages::TTLeaderboard::GetNextPage",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Pages::TTLeaderboard::GetNextPage"
     },
     {
       "Entry": "0x8085B7A4",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8085F66C",
-      "Name": "Audio::CharacterActor::Link",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "Audio::CharacterActor::Link"
     },
     {
       "Entry": "0x808608BC",
@@ -23162,8 +24001,8 @@
     },
     {
       "Entry": "0x8086395C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086538C",
@@ -23172,8 +24011,8 @@
     },
     {
       "Entry": "0x808655A8",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x808656FC",
@@ -23182,18 +24021,18 @@
     },
     {
       "Entry": "0x80868040",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086B73C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086BB44",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086E684",
@@ -23202,28 +24041,28 @@
     },
     {
       "Entry": "0x8086E778",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086ED74",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x8086F28C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80871710",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80875E90",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x808766F4",
@@ -23232,18 +24071,18 @@
     },
     {
       "Entry": "0x80878F14",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80881D7C",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80881EA4",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x80883934",
@@ -23257,13 +24096,13 @@
     },
     {
       "Entry": "0x8088744C",
-      "Name": "obj_Twanwan_update",
-      "Receiver": null
+      "Receiver": null,
+      "Name": "obj_Twanwan_update"
     },
     {
       "Entry": "0x80887A84",
-      "Name": "",
-      "Receiver": null
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -24230,6 +25069,80 @@
       "IndexBias": 0,
       "GroupWidth": 4,
       "Fallback": 5
+    }
+  ],
+  "ArrayFills": [
+    {
+      "Begin": "0x8072B948",
+      "ExpectedWords": [
+        "0x901F0024",
+        "0x901F0054",
+        "0x901F0028",
+        "0x901F0058",
+        "0x901F002C",
+        "0x901F005C",
+        "0x901F0030",
+        "0x901F0060",
+        "0x901F0034",
+        "0x901F0064",
+        "0x901F0038",
+        "0x901F0068",
+        "0x901F003C",
+        "0x901F006C",
+        "0x901F0040",
+        "0x901F0070",
+        "0x901F0044",
+        "0x901F0074",
+        "0x901F0048",
+        "0x901F0078",
+        "0x901F004C",
+        "0x901F007C",
+        "0x901F0050",
+        "0x901F0080"
+      ],
+      "BaseRegister": "r31",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIManager.controllers.offset",
+          "Stride": "AIManager.controllers.stride",
+          "Count": "AIManager.controllers.count",
+          "Width": 4
+        },
+        {
+          "Array": "AIManager.realControllers.offset",
+          "Stride": "AIManager.realControllers.stride",
+          "Count": "AIManager.realControllers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x8072ECAC",
+      "ExpectedWords": [
+        "0x90030004",
+        "0x90030008",
+        "0x9003000C",
+        "0x90030010",
+        "0x90030014",
+        "0x90030018",
+        "0x9003001C",
+        "0x90030020",
+        "0x90030024",
+        "0x90030028",
+        "0x9003002C",
+        "0x90030030"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIEnemyRoutes.controllers.offset",
+          "Stride": "AIEnemyRoutes.controllers.stride",
+          "Count": "AIEnemyRoutes.controllers.count",
+          "Width": 4
+        }
+      ]
     }
   ]
 }

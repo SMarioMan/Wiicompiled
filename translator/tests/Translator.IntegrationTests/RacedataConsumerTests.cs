@@ -41,7 +41,7 @@ public class RacedataConsumerTests
         var original = new FunctionTranslator(image);
         var twelve = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, 12));
         var expanded = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, 24));
-        var audit = new GuestLayoutAudit(types, 12, 24, globals, 0x80388880, 0x8038ac20);
+        var audit = new GuestLayoutAudit(types, 12, 24, globals, 0x80388880, 0x8038ac20, image);
         var originalLayout = new GuestLayouts(types, 12); var expandedLayout = new GuestLayouts(types, 24);
         var consumers = definition.GetProperty("AuditedConsumers").EnumerateArray().ToArray();
         Assert.True(consumers.Length >= 600, "Consumer verification list unexpectedly lost coverage");

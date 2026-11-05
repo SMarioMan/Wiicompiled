@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,778 references across creation, construction,
+menu and awards scenarios and audits 2,817 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 735 consumer entry points in `AuditedConsumers`.
+The manifest records 778 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -437,3 +437,22 @@ through r11 followed by `blr` receive their precise GPR write masks. Saves and
 floating restores preserve GPR pointer facts; integer restores invalidate the
 registers they load. Missing images or altered sequences retain the conservative
 ordinary-call behavior. Function names alone never establish these effects.
+
+## Race balloon positions
+
+Each physical HUD view owns one `RaceBalloons` record with a uniform
+capacity-sized vector array. Its following selection, distance, targeting and
+item-balloon fields move with that array. The enclosing HUD allocation, SDK
+array cookie stride and every local-view cursor use the new record size; the
+number of physical views and the three simultaneous name labels remain fixed.
+Construction initializes all vectors, including the original reversed z/y/x
+scalar stores, and destruction visits all elements. Typed name/item controls
+retain the balloon pointer's provenance when accessing the moved fields.
+
+Native tests execute the real HUD allocation instructions, SDK array
+construction/destruction, balloon constructor/initializer/getter and item-pointer
+setter for all four physical views at 12, 13, 24, 48 and 100 players. They check
+every constructor/destructor callback, cookie, vector address, tail byte, saved
+register and allocation boundary. Allocation and focused-player lookup are
+fixtures. The stronger SDK-aware consumer audit also covers previously missed
+subordinate AI field references after its register-save prologue.

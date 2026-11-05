@@ -1,5 +1,5 @@
 {
-  "Version": 8,
+  "Version": 9,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -535,6 +535,151 @@
         {
           "Name": "gprs",
           "Type": "SavedGprs19"
+        }
+      ]
+    },
+    {
+      "Name": "GuestFloat32",
+      "Alignment": 4,
+      "Size": 4
+    },
+    {
+      "Name": "GuestVector3",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "x",
+          "Type": "GuestFloat32"
+        },
+        {
+          "Name": "y",
+          "Type": "GuestFloat32"
+        },
+        {
+          "Name": "z",
+          "Type": "GuestFloat32"
+        }
+      ]
+    },
+    {
+      "Name": "RaceBalloonsHeader",
+      "Alignment": 4,
+      "Size": 32
+    },
+    {
+      "Name": "RaceBalloons",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RaceBalloonsHeader"
+        },
+        {
+          "Name": "positions",
+          "Type": "GuestVector3",
+          "PerPlayer": true
+        },
+        {
+          "Name": "selectedPlayer",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "distance",
+          "Type": "GuestFloat32"
+        },
+        {
+          "Name": "fieldB8",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "fieldBC",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "itemBalloon",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "NameBalloonHeader",
+      "Alignment": 4,
+      "Size": 380
+    },
+    {
+      "Name": "NameBalloonTail",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "RaceNameBalloon",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "NameBalloonHeader"
+        },
+        {
+          "Name": "balloons",
+          "Type": "Pointer",
+          "PointerTo": "RaceBalloons"
+        },
+        {
+          "Name": "tail",
+          "Type": "NameBalloonTail"
+        }
+      ]
+    },
+    {
+      "Name": "ItemBalloonHeader",
+      "Alignment": 4,
+      "Size": 392
+    },
+    {
+      "Name": "ItemBalloonTail",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "RaceItemBalloon",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "ItemBalloonHeader"
+        },
+        {
+          "Name": "balloons",
+          "Type": "Pointer",
+          "PointerTo": "RaceBalloons"
+        },
+        {
+          "Name": "tail",
+          "Type": "ItemBalloonTail"
+        }
+      ]
+    },
+    {
+      "Name": "RaceHUDHeader",
+      "Alignment": 4,
+      "Size": 468
+    },
+    {
+      "Name": "RaceHUD",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RaceHUDHeader"
+        },
+        {
+          "Name": "balloonArray",
+          "Type": "Pointer",
+          "PointerTo": "RaceBalloons"
+        },
+        {
+          "Name": "itemBalloonArray",
+          "Type": "Pointer"
         }
       ]
     }
@@ -23968,12 +24113,344 @@
       "Operand": "value",
       "Symbol": "players",
       "Addend": 2
+    },
+    {
+      "Instruction": "0x807E765C",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80836E04",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8073313C",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80733158",
+      "ExpectedWord": "0x807D016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073316C",
+      "ExpectedWord": "0x807D0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807331E4",
+      "ExpectedWord": "0x801D0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80733290",
+      "ExpectedWord": "0x801D0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80733294",
+      "ExpectedWord": "0x807D0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073329C",
+      "ExpectedWord": "0x901D0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807332C0",
+      "ExpectedWord": "0x907D0188",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field188.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807332C4",
+      "ExpectedWord": "0x901D0174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E6D34",
+      "ExpectedWord": "0x920300B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.selectedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7324",
+      "ExpectedWord": "0x901E00B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.selectedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7410",
+      "ExpectedWord": "0x901E00B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.selectedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7628",
+      "ExpectedWord": "0x908300C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.itemBalloon.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E77E0",
+      "ExpectedWord": "0x801E00BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E783C",
+      "ExpectedWord": "0x93FE00BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7854",
+      "ExpectedWord": "0xD01E00B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7890",
+      "ExpectedWord": "0x93FE00BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E78A8",
+      "ExpectedWord": "0xD01E00B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E78C4",
+      "ExpectedWord": "0xC01E00B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E78D8",
+      "ExpectedWord": "0xD03E00B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E78DC",
+      "ExpectedWord": "0x93FE00B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldB8.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7E48",
+      "ExpectedWord": "0x83A400BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7E4C",
+      "ExpectedWord": "0x83C400B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.selectedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7E5C",
+      "ExpectedWord": "0x83A400B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldB8.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E7EB8",
+      "ExpectedWord": "0x800400BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E8068",
+      "ExpectedWord": "0xC02400B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E8258",
+      "ExpectedWord": "0x800300BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E8410",
+      "ExpectedWord": "0xC02300B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.distance.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807E86F8",
+      "ExpectedWord": "0x800300BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceBalloons.fieldBC.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80835A84",
+      "ExpectedWord": "0x1C0000C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x80836794",
+      "ExpectedWord": "0x1C7300C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x808367AC",
+      "ExpectedWord": "0x38C000C4",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x808367D0",
+      "ExpectedWord": "0x1C0400C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x80836854",
+      "ExpectedWord": "0x1E9600C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x80836958",
+      "ExpectedWord": "0x3A3100C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x80837030",
+      "ExpectedWord": "0x3BBD00C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x808370C8",
+      "ExpectedWord": "0x3BBD00C4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RaceBalloons.size"
     }
   ],
   "GlobalPointers": {
     "0x809B8F68": "Racedata",
     "0x809BE398": "AIManager",
-    "0x809B8F4C": "InputManager"
+    "0x809B8F4C": "InputManager",
+    "0x809BFDC0": "RaceHUD"
   },
   "ArrayCopies": [
     {
@@ -24316,9 +24793,24 @@
       "Name": "RacedataScenario::__ct"
     },
     {
+      "Entry": "0x80529160",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::BlueTeamHasMorePoints"
+    },
+    {
+      "Entry": "0x805291D8",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::GetPlayer(const)"
+    },
+    {
       "Entry": "0x805291F8",
       "Receiver": "Racedata",
       "Name": "Racedata::Init"
+    },
+    {
+      "Entry": "0x805298EC",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::GetPlayer"
     },
     {
       "Entry": "0x8052990C",
@@ -24381,6 +24873,11 @@
       "Name": "Racedata::__dt"
     },
     {
+      "Entry": "0x8052B5AC",
+      "Receiver": "Scenario",
+      "Name": "RacedataScenario::__dt"
+    },
+    {
       "Entry": "0x8052B614",
       "Receiver": "Racedata",
       "Name": "Racedata::__ct"
@@ -24421,9 +24918,19 @@
       "Name": "RacedataScenario::RegisterParameters"
     },
     {
+      "Entry": "0x8052D3D0",
+      "Receiver": "Racedata",
+      "Name": "Racedata::GetHudSlotId"
+    },
+    {
       "Entry": "0x8052D3E4",
       "Receiver": "Racedata",
       "Name": "Racedata::SetGhost"
+    },
+    {
+      "Entry": "0x8052D428",
+      "Receiver": "Racedata",
+      "Name": "Racedata::GetPlayerIdOfLocalPlayer"
     },
     {
       "Entry": "0x8052D438",
@@ -24439,6 +24946,21 @@
       "Entry": "0x8052D4E8",
       "Receiver": "Racedata",
       "Name": "Racedata::IsTTReplay"
+    },
+    {
+      "Entry": "0x8052D528",
+      "Receiver": "Racedata",
+      "Name": "Racedata::vf_0x18"
+    },
+    {
+      "Entry": "0x8052D52C",
+      "Receiver": "Racedata",
+      "Name": "Racedata::vf_0x14"
+    },
+    {
+      "Entry": "0x8052D530",
+      "Receiver": "Racedata",
+      "Name": "Racedata::vf_0x10"
     },
     {
       "Entry": "0x8052D70C",
@@ -25141,9 +25663,19 @@
       "Name": "SectionPad::GetControllerHolderByIdx"
     },
     {
+      "Entry": "0x805F38B0",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::__dt"
+    },
+    {
       "Entry": "0x805F3918",
       "Receiver": null,
       "Name": "Pages::TTHUD::__ct"
+    },
+    {
+      "Entry": "0x8060265C",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::GetNextPage"
     },
     {
       "Entry": "0x806029D4",
@@ -25154,6 +25686,11 @@
       "Entry": "0x80602A94",
       "Receiver": null,
       "Name": "Pages::BattleHUD::GetPausePageId"
+    },
+    {
+      "Entry": "0x80602E90",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::GetCtrlRaceNameBalloonCount"
     },
     {
       "Entry": "0x80607EC0",
@@ -26807,53 +27344,138 @@
     },
     {
       "Entry": "0x807E56F0",
-      "Receiver": null,
+      "Receiver": "RaceNameBalloon",
       "Name": "CtrlRaceNameBalloon::Load"
     },
     {
+      "Entry": "0x807E58A0",
+      "Receiver": "RaceNameBalloon",
+      "Name": "CtrlRaceNameBalloon::InitSelf"
+    },
+    {
       "Entry": "0x807E5A1C",
-      "Receiver": null,
+      "Receiver": "RaceNameBalloon",
       "Name": "CtrlRaceNameBalloon::UpdateInfo"
     },
     {
       "Entry": "0x807E60C0",
-      "Receiver": null,
+      "Receiver": "RaceNameBalloon",
       "Name": "CtrlRaceNameBalloon::OnUpdate"
     },
     {
+      "Entry": "0x807E6708",
+      "Receiver": "RaceNameBalloon",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807E68AC",
+      "Receiver": "RaceNameBalloon",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807E6970",
+      "Receiver": "RaceNameBalloon",
+      "Name": ""
+    },
+    {
       "Entry": "0x807E6A6C",
-      "Receiver": null,
+      "Receiver": "RaceNameBalloon",
       "Name": "CtrlRaceNameBalloon::UpdatePosition"
     },
     {
       "Entry": "0x807E6D04",
-      "Receiver": null,
+      "Receiver": "RaceBalloons",
       "Name": "RaceBalloons::Update"
     },
     {
-      "Entry": "0x807E778C",
-      "Receiver": null,
-      "Name": "RaceBalloons::OnItemObjTargeting"
+      "Entry": "0x807E760C",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::AddNameBalloon"
     },
     {
-      "Entry": "0x807E7928",
-      "Receiver": null,
-      "Name": "CtrlRaceItemBalloon::Load"
+      "Entry": "0x807E7628",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::AddItemBalloon"
     },
     {
-      "Entry": "0x807E865C",
-      "Receiver": null,
+      "Entry": "0x807E7630",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::__ct"
+    },
+    {
+      "Entry": "0x807E771C",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::Init"
+    },
+    {
+      "Entry": "0x807E777C",
+      "Receiver": "RaceBalloons",
       "Name": ""
     },
     {
+      "Entry": "0x807E778C",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::OnItemObjTargeting"
+    },
+    {
+      "Entry": "0x807E7918",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::GetClassName"
+    },
+    {
+      "Entry": "0x807E7928",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::Load"
+    },
+    {
+      "Entry": "0x807E7AF0",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::InitSelf"
+    },
+    {
+      "Entry": "0x807E7C94",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::OnUpdate"
+    },
+    {
+      "Entry": "0x807E865C",
+      "Receiver": "RaceItemBalloon",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807E8EC4",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::UpdateIcon"
+    },
+    {
       "Entry": "0x807E9064",
-      "Receiver": null,
+      "Receiver": "RaceItemBalloon",
       "Name": "CtrlRaceItemBalloon::UpdatePositionForPlayer"
     },
     {
       "Entry": "0x807E9740",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x807EA194",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::__dt"
+    },
+    {
+      "Entry": "0x807EA1EC",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x807EA1F8",
+      "Receiver": "RaceNameBalloon",
+      "Name": "CtrlRaceNameBalloon::__dt"
+    },
+    {
+      "Entry": "0x807EA250",
+      "Receiver": "RaceNameBalloon",
+      "Name": "CtrlRaceNameBalloon::GetRuntimeTypeInfo"
     },
     {
       "Entry": "0x807EA2D4",
@@ -27177,48 +27799,118 @@
     },
     {
       "Entry": "0x808347E8",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::OnInit"
     },
     {
       "Entry": "0x80834BD4",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::InitActions"
     },
     {
+      "Entry": "0x80834F1C",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::OnNextPlayerSwitch"
+    },
+    {
+      "Entry": "0x80834F24",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::OnPrevPlayerSwitch"
+    },
+    {
       "Entry": "0x80834F2C",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::OnPause"
     },
     {
+      "Entry": "0x808350E4",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::ChangeFocusedPlayer"
+    },
+    {
       "Entry": "0x8083525C",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::BeforeControlUpdate"
     },
     {
+      "Entry": "0x80835844",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::HasPlayerRaceEnded"
+    },
+    {
       "Entry": "0x8083589C",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::HasRaceEndedReplay"
     },
     {
+      "Entry": "0x8083591C",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::HasRaceEnded"
+    },
+    {
       "Entry": "0x80835A28",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::AfterControlUpdate"
     },
     {
       "Entry": "0x80836078",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::GetCtrlRaceBaseCount"
     },
     {
       "Entry": "0x80836230",
-      "Receiver": null,
+      "Receiver": "RaceHUD",
       "Name": "Pages::RaceHUD::InitCtrlRaceBase"
+    },
+    {
+      "Entry": "0x80836DD4",
+      "Receiver": "RaceBalloons",
+      "Name": "RaceBalloons::__dt"
+    },
+    {
+      "Entry": "0x80836E3C",
+      "Receiver": "RaceNameBalloon",
+      "Name": "CtrlRaceNameBalloon::__ct"
+    },
+    {
+      "Entry": "0x80836E8C",
+      "Receiver": "RaceItemBalloon",
+      "Name": "CtrlRaceItemBalloon::__ct"
     },
     {
       "Entry": "0x80836EDC",
       "Receiver": null,
       "Name": "Pages::TournamentHUD::GetEnabledCtrlRaceBases"
+    },
+    {
+      "Entry": "0x80836F88",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::OnDeactivate"
+    },
+    {
+      "Entry": "0x80836F94",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::OnDispose"
+    },
+    {
+      "Entry": "0x80836FA4",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::ChangeSectionByReinit"
+    },
+    {
+      "Entry": "0x80836FC0",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::OnItemObjTargeting"
+    },
+    {
+      "Entry": "0x80837054",
+      "Receiver": null,
+      "Name": "Pages::RaceHUD::UpdateRaceBalloons"
+    },
+    {
+      "Entry": "0x80837180",
+      "Receiver": "RaceHUD",
+      "Name": "Pages::RaceHUD::GetRuntimeTypeInfo"
     },
     {
       "Entry": "0x80837F9C",
@@ -29024,6 +29716,69 @@
         {
           "Register": "r5",
           "Array": "AIOrderFrame.slots.offset"
+        }
+      ]
+    },
+    {
+      "Begin": "0x807E7678",
+      "ExpectedWords": [
+        "0xD01F0028",
+        "0xD01F0024",
+        "0xD01F0020",
+        "0xD01F0034",
+        "0xD01F0030",
+        "0xD01F002C",
+        "0xD01F0040",
+        "0xD01F003C",
+        "0xD01F0038",
+        "0xD01F004C",
+        "0xD01F0048",
+        "0xD01F0044",
+        "0xD01F0058",
+        "0xD01F0054",
+        "0xD01F0050",
+        "0xD01F0064",
+        "0xD01F0060",
+        "0xD01F005C",
+        "0xD01F0070",
+        "0xD01F006C",
+        "0xD01F0068",
+        "0xD01F007C",
+        "0xD01F0078",
+        "0xD01F0074",
+        "0xD01F0088",
+        "0xD01F0084",
+        "0xD01F0080",
+        "0xD01F0094",
+        "0xD01F0090",
+        "0xD01F008C",
+        "0xD01F00A0",
+        "0xD01F009C",
+        "0xD01F0098",
+        "0xD01F00AC",
+        "0xD01F00A8",
+        "0xD01F00A4"
+      ],
+      "BaseRegister": "r31",
+      "ValueRegister": "f0",
+      "Arrays": [
+        {
+          "Array": "RaceBalloons.positions.offset+GuestVector3.z.offset",
+          "Stride": "RaceBalloons.positions.stride",
+          "Count": "RaceBalloons.positions.count",
+          "Width": 4
+        },
+        {
+          "Array": "RaceBalloons.positions.offset+GuestVector3.y.offset",
+          "Stride": "RaceBalloons.positions.stride",
+          "Count": "RaceBalloons.positions.count",
+          "Width": 4
+        },
+        {
+          "Array": "RaceBalloons.positions.offset+GuestVector3.x.offset",
+          "Stride": "RaceBalloons.positions.stride",
+          "Count": "RaceBalloons.positions.count",
+          "Width": 4
         }
       ]
     }

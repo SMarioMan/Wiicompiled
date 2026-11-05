@@ -37,7 +37,7 @@ public class DriverManagerStorageTests
         try
         {
             var entries=new uint[] {0x80020494,0x8002058c,0x80596f78,0x8050f18c,0x80517f00,0x80517ec0,
-                0x807839dc,0x80783a50,0x80783e18,0x80783f40,0x80784818,0x80783f98,0x80784194,0x8078436c};
+                0x807839dc,0x80783a50,0x80783e18,0x80783f40,0x80784818,0x80783f98,0x80784194,0x8078436c,0x80787e1c};
             var sources=new List<string>();
             foreach(var pc in entries)
             {
@@ -113,6 +113,11 @@ public class DriverManagerStorageTests
                     }
                     if(Memory::Read8(data+{{layout.Symbol("DriverManager.focusedPlayer.offset")}})!=n)return 6;
                     for(uint32_t i=0;i<5;i++)if(Memory::Read8(data+{{layout.Symbol("DriverManager.hasTime.offset")}}+i))return 7;
+                    for(auto awards:{0u,1u}){
+                        Memory::Write8(data+{{layout.Symbol("DriverManager.isAwards.offset")}},awards);
+                        ctx.gpr[3]=data;func_80787E1C(&ctx);if(ctx.gpr[3]!=awards)return 15;
+                    }
+                    Memory::Write8(data+{{layout.Symbol("DriverManager.isAwards.offset")}},0);
                     ctx.gpr[3]=data;func_80784818(&ctx);
                     for(uint32_t i=0;i<n;i++)if(Memory::Read32(data+frames+i*4)!=1 || Memory::Read32(data+inverted+i*4)!=0xffffffff ||
                         Memory::Read8(data+ranks+i)!=n-i || Memory::Read32(data+0x10+i*4)!=models+i*0x300)return 8;

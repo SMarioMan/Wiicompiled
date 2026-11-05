@@ -25194,6 +25194,13 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80787E1C",
+      "ExpectedWord": "0x88630160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset"
     }
   ],
   "GlobalPointers": {
@@ -27917,6 +27924,11 @@
       "Entry": "0x807851A4",
       "Receiver": null,
       "Name": "CourseMgr::LoadModels"
+    },
+    {
+      "Entry": "0x80787E1C",
+      "Receiver": "DriverManager",
+      "Name": "Item::IsAwards"
     },
     {
       "Entry": "0x80795380",

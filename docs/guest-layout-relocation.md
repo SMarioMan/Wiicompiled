@@ -119,6 +119,16 @@ completed with no unsupported instructions or invalid SSA functions and produced
 72 shared native build shards. This establishes translation and artifact
 consistency, not working 24-player gameplay.
 
+The native runtime reads `MkwGuestLayout::kLayout`, defined by the per-game
+object library from this generated header. Capacity changes therefore do not
+bake a game ABI into a reusable runtime archive. The original twelve-player
+fallback is centralized in that glue; expanded builds without a header fail at
+compile time. The race-start helper initializes every configured player and uses
+the resolved menu/settings offsets, controller-channel count and RNG offsets.
+Its twelve-entry character palette repeats cosmetically; storage and iteration
+use the full configured player capacity. Native integration tests execute the
+real race-start helper at 12, 24 and 48 players and check neighboring memory.
+
 ## Rank scoring
 
 `RankTables` requires manifest version 3; reference-only version 1 and array-copy

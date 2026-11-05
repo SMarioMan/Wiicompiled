@@ -88,6 +88,19 @@ if(MKW_SETUP_VERSION)
     set_property(SOURCE "${MKW_RUNTIME_SOURCE_DIR}/game/setup_version.cpp" APPEND PROPERTY
         COMPILE_DEFINITIONS "MKW_SETUP_VERSION=\"${MKW_SETUP_VERSION}\"")
 endif()
+# Older shard manifests describe the original twelve-player ABI.
+if(NOT DEFINED MKW_TRANSLATED_PLAYER_CAPACITY)
+    set(MKW_TRANSLATED_PLAYER_CAPACITY 12)
+endif()
+target_compile_definitions(mkw_game_data PRIVATE
+    MKW_TRANSLATED_PLAYER_CAPACITY=${MKW_TRANSLATED_PLAYER_CAPACITY})
+if(MKW_TRANSLATED_GUEST_LAYOUT_HEADER)
+    if(NOT EXISTS "${MKW_TRANSLATED_GUEST_LAYOUT_HEADER}")
+        message(FATAL_ERROR "Missing generated guest layout header; re-run emit-build-shards")
+    endif()
+    target_compile_definitions(mkw_game_data PRIVATE
+        MKW_TRANSLATED_GUEST_LAYOUT_HEADER="${MKW_TRANSLATED_GUEST_LAYOUT_HEADER}")
+endif()
 mkw_runtime_link_dependencies(mkw_game_data PRIVATE)
 set_target_properties(mkw_game_data PROPERTIES UNITY_BUILD OFF)
 mkw_apply_common_compile_options(mkw_game_data)

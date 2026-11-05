@@ -4,6 +4,7 @@
 #include "guest_abi/guest_region.h"
 #include "guest_function_imports.h"
 #include "memory.h"
+#include "mkw_guest_layout.h"
 #include "runtime_log.h"
 
 #include <array>
@@ -12,6 +13,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 
@@ -20,15 +22,11 @@ constexpr uint32_t kLuigiCircuit = 0x08;
 constexpr uint32_t kLastRaceCourse = 0x1F;
 
 // Racedata (menu scenario, copied into the race scenario by Racedata::InitRace)
-constexpr uint32_t kMenuScenarioOffset = 0xC10;
-constexpr uint32_t kPlayersOffset = 0x8;
-constexpr uint32_t kPlayerSize = 0xF0;
+const auto& kLayout = MkwGuestLayout::kLayout;
 constexpr uint32_t kPlayerKartOffset = 0x8;
 constexpr uint32_t kPlayerCharacterOffset = 0xC;
 constexpr uint32_t kPlayerTypeOffset = 0x10;
 constexpr uint32_t kPlayerControllerChannelOffset = 0x6;
-constexpr uint32_t kPlayerCount = 12;
-constexpr uint32_t kSettingsOffset = 0xB48;
 
 constexpr uint32_t kSectionPadOffset = 0x34;
 constexpr uint32_t kFirstGcnControllerId = 0x124;
@@ -80,14 +78,14 @@ void SetUpMenuScenario(uint32_t course) {
     if (racedata == 0) {
         throw std::runtime_error("--race: Racedata does not exist yet at SectionMgr::Init");
     }
-    const uint32_t scenario = racedata + kMenuScenarioOffset;
-    for (uint32_t i = 0; i < kRacers.size(); ++i) {
-        const uint32_t player = scenario + kPlayersOffset + i * kPlayerSize;
-        Memory::Write32(player + kPlayerKartOffset, kRacers[i].kart);
-        Memory::Write32(player + kPlayerCharacterOffset, kRacers[i].character);
+    const uint32_t scenario = racedata + kLayout.racedataMenu;
+    for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
+        const uint32_t player = scenario + kLayout.scenarioPlayers + i * kLayout.playerStride;
+        Memory::Write32(player + kPlayerKartOffset, kRacers[i % kRacers.size()].kart);
+        Memory::Write32(player + kPlayerCharacterOffset, kRacers[i % kRacers.size()].character);
         Memory::Write32(player + kPlayerTypeOffset, i == 0 ? kPlayerRealLocal : kPlayerCpu);
     }
-    const uint32_t settings = scenario + kSettingsOffset;
+    const uint32_t settings = scenario + kLayout.scenarioSettings;
     Memory::Write32(settings + 0x00, course);
     Memory::Write32(settings + 0x04, kCc150);
     Memory::Write32(settings + 0x08, kGameModeVs);
@@ -165,14 +163,14 @@ extern "C" void RacedataScenario_InitScreens_8052f4e8(CpuContext* ctx) {
         MKW_GUEST_NEXT(8052F4E8)(ctx);
         return;
     }
-    const uint32_t players = ctx->gpr[3] + kPlayersOffset;
-    std::array<uint8_t, kPlayerCount> channels{};
-    for (uint32_t i = 0; i < kPlayerCount; ++i) {
-        channels[i] = Memory::Read8(players + i * kPlayerSize + kPlayerControllerChannelOffset);
+    const uint32_t players = ctx->gpr[3] + kLayout.scenarioPlayers;
+    std::vector<uint8_t> channels(kLayout.playerCapacity);
+    for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
+        channels[i] = Memory::Read8(players + i * kLayout.playerStride + kPlayerControllerChannelOffset);
     }
     MKW_GUEST_NEXT(8052F4E8)(ctx);
-    for (uint32_t i = 0; i < kPlayerCount; ++i) {
-        const uint32_t player = players + i * kPlayerSize;
+    for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
+        const uint32_t player = players + i * kLayout.playerStride;
         if (Memory::Read32(player + kPlayerTypeOffset) == kPlayerRealLocal) {
             Memory::Write8(player + kPlayerControllerChannelOffset, channels[i]);
         }
@@ -203,8 +201,8 @@ extern "C" void RacedataScenario_InitRng_8052f924(CpuContext* ctx) {
     const uint32_t scenario = ctx->gpr[3];
     MKW_GUEST_FUNC(8052F924)(ctx);
     if (g_cpuDriven) {
-        Memory::Write32(scenario + kSettingsOffset + 0x2C, 0x74A1B095u);
-        Memory::Write32(scenario + kSettingsOffset + 0x30, 0x1234567u);
+        Memory::Write32(scenario + kLayout.scenarioSettings + 0x2C, 0x74A1B095u);
+        Memory::Write32(scenario + kLayout.scenarioSettings + 0x30, 0x1234567u);
     }
 }
 REGISTER_NATIVE_FUNCTION_AS(0x8052F924, RacedataScenario_InitRng_8052f924, "RacedataScenario_InitRng_8052f924");

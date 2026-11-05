@@ -251,7 +251,7 @@ int RunAuditGuestLayouts(string[] argsTail)
     var discovery = new FunctionTranslator(image.Value).Discover(address, new TranslationOptions(
         EnableLeafInlining: false, KnownFunctionEntryPoints: functionMap?.Addresses.ToHashSet()));
     var audit = new GuestLayoutAudit(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
-        globals, project?.Memory.SdaBase, project?.Memory.Sda2Base).Analyze(discovery, receiver);
+        globals, project?.Memory.SdaBase, project?.Memory.Sda2Base, image.Value).Analyze(discovery, receiver);
     new GuestLayoutRelocations(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
         audit.Candidates.Select(candidate => candidate.Reference)).ValidateImage(image.Value);
     var output = OptionValue(argsTail, "--out")!;

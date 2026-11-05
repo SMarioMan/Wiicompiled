@@ -430,3 +430,10 @@ stride, matching array counts and every occupied byte interval are checked;
 interleaved fields are allowed, overlapping bytes are rejected. Initialization
 still emits one contiguous capacity-sized collection of records and keeps
 original-capacity code unchanged.
+
+When the audit has the original program image, it verifies SDK save/restore
+sequences instruction by instruction. Only exact consecutive register accesses
+through r11 followed by `blr` receive their precise GPR write masks. Saves and
+floating restores preserve GPR pointer facts; integer restores invalidate the
+registers they load. Missing images or altered sequences retain the conservative
+ordinary-call behavior. Function names alone never establish these effects.

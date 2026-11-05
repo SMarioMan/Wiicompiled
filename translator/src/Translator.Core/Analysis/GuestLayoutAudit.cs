@@ -4,6 +4,8 @@ using Translator.Core.Loading;
 using Translator.Core.Translation;
 using Translator.Core.Analysis.Ssa;
 using System.Globalization;
+using System.Buffers.Binary;
+using System.Collections.Concurrent;
 
 namespace Translator.Core.Analysis;
 
@@ -25,9 +27,11 @@ public sealed class GuestLayoutAudit
     private readonly IReadOnlyDictionary<uint, string> _globals;
     private readonly uint? _sda;
     private readonly uint? _sda2;
+    private readonly ProgramImage? _image;
+    private readonly ConcurrentDictionary<uint,uint> _verifiedCallWrites = new();
 
     public GuestLayoutAudit(IEnumerable<GuestLayoutType> definitions, int originalPlayers, int players,
-        IReadOnlyDictionary<uint, string>? globalPointers = null, uint? sda = null, uint? sda2 = null)
+        IReadOnlyDictionary<uint, string>? globalPointers = null, uint? sda = null, uint? sda2 = null, ProgramImage? image = null)
     {
         var types = definitions.ToArray();
         _definitions = types.ToDictionary(t => t.Name, StringComparer.Ordinal);
@@ -37,6 +41,7 @@ public sealed class GuestLayoutAudit
         foreach (var type in _globals.Values) _ = _original.Types[type];
         _sda = sda;
         _sda2 = sda2;
+        _image = image;
     }
 
     public GuestLayoutAuditResult Analyze(FunctionDiscoveryResult function, string? receiverType = null)
@@ -314,8 +319,39 @@ public sealed class GuestLayoutAudit
         _ => null
     };
 
-    private static uint CallWrites(IrCall call) => call.Target.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
-        uint.TryParse(call.Target.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _)
-        ? 0x1ff9u // Guest ABI: r0 and r3-r12 are volatile.
-        : GuestHelperEffectCatalog.Analyze(call).GprWriteMask;
+    private uint CallWrites(IrCall call)
+    {
+        if(!call.Target.StartsWith("0x",StringComparison.OrdinalIgnoreCase) ||
+            !uint.TryParse(call.Target.AsSpan(2),NumberStyles.HexNumber,CultureInfo.InvariantCulture,out var address))
+            return GuestHelperEffectCatalog.Analyze(call).GprWriteMask;
+        return _verifiedCallWrites.GetOrAdd(address,VerifySaveRestoreWrites);
+    }
+
+    private uint VerifySaveRestoreWrites(uint address)
+    {
+        const uint volatileRegisters=0x1ff9u;
+        if(_image is null || address%4!=0)return volatileRegisters;
+        uint Word(uint pc)=>BinaryPrimitives.ReadUInt32BigEndian(_image.Memory.AsSpan(_image.GetOffset(pc,4),4));
+        try
+        {
+            var first=Word(address);var opcode=first>>26;var firstRegister=(int)((first>>21)&31);
+            if(firstRegister<14 || opcode is not (32 or 36 or 50 or 54))return volatileRegisters;
+            var floating=opcode is 50 or 54;
+            for(var register=firstRegister;register<32;register++)
+            {
+                var displacement=unchecked((ushort)(-(32-register)*(floating?8:4)));
+                var expected=(opcode<<26)|((uint)register<<21)|(11u<<16)|displacement;
+                if(Word(checked(address+(uint)(register-firstRegister)*4))!=expected)return volatileRegisters;
+            }
+            if(Word(checked(address+(uint)(32-firstRegister)*4))!=0x4e800020)return volatileRegisters;
+            // These exact SDK sequences only access memory through r11 and return.
+            // Saves and floating restores preserve every GPR; integer restores
+            // invalidate precisely their destination registers, including r30/r31.
+            return opcode==32 ? uint.MaxValue<<firstRegister : 0;
+        }
+        catch(Exception error) when(error is ArgumentException or OverflowException)
+        {
+            return volatileRegisters;
+        }
+    }
 }

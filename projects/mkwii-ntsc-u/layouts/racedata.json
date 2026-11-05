@@ -1,8 +1,8 @@
 {
-  "Version": 7,
+  "Version": 8,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: uniform race-data and selected AI storage/loading, checked field consumers, initialization, bookkeeping and scoring. Input/controller storage, AI rank sorting, items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -28489,6 +28489,52 @@
       "SourceStride": "AIAuthoredAction.size",
       "Count": "AIActionAllocation.actions.count",
       "SourceCount": 12
+    }
+  ],
+  "TraversalMarkers": [
+    {
+      "Begin": "0x8050CB24",
+      "ExpectedWords": [
+        "0x38000001",
+        "0x7CBF0734",
+        "0x7C162030"
+      ],
+      "Source": "r0",
+      "Player": "r4",
+      "Destination": "r22"
+    },
+    {
+      "Begin": "0x8050CC00",
+      "ExpectedWords": [
+        "0x38000001",
+        "0x7CBF0734",
+        "0x7C162030"
+      ],
+      "Source": "r0",
+      "Player": "r4",
+      "Destination": "r22"
+    },
+    {
+      "Begin": "0x8050CCF8",
+      "ExpectedWords": [
+        "0x38600001",
+        "0xA0080018",
+        "0x7C7F2030"
+      ],
+      "Source": "r3",
+      "Player": "r4",
+      "Destination": "r31"
+    },
+    {
+      "Begin": "0x8050D11C",
+      "ExpectedWords": [
+        "0x38800001",
+        "0xA01E0018",
+        "0x7C9FC030"
+      ],
+      "Source": "r4",
+      "Player": "r24",
+      "Destination": "r31"
     }
   ]
 }

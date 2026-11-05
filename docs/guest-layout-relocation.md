@@ -33,7 +33,7 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,703 references across creation, construction,
+menu and awards scenarios and audits 2,719 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
 The manifest records 725 consumer entry points in `AuditedConsumers`.
@@ -392,3 +392,10 @@ Partial spans, interior entries, modified shift inputs, extra effects and
 conflicting rewrites are rejected. Twelve-player emission stays unchanged.
 The reset-at-entry lifetime is a manually audited algorithm contract; this
 rewrite must not be used for persistent per-player flags.
+
+The USA profile applies the traversal marker rewrite to all four checkpoint
+search mask constructors. Native cycle tests run the actual entry reset loop,
+both link helpers and recursive search for every configured participant at
+12, 13, 24, 48 and 100 slots, with the online search option enabled and disabled.
+Geometry and holder lookup are fixtures; the reset, graph search, return values,
+per-call visited lifetime, saved registers and memory guards are checked.

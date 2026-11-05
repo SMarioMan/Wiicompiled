@@ -422,3 +422,11 @@ checked definitions feeding construction, calculation and drawing. Native tests
 execute real world/item construction sites and the SDK constructor, verifying
 that reserved IDs move and every racer ID stays unchanged; string-copy and
 virtual-reset support are fixtures. This does not verify every visual effect.
+
+Format version 9 extends verified `ArrayFills` to floating-point registers and
+strided scalar fields, such as the z/y/x stores for each vector. Floating stores
+retain their original widths and conversion semantics. Alignment, positive
+stride, matching array counts and every occupied byte interval are checked;
+interleaved fields are allowed, overlapping bytes are rejected. Initialization
+still emits one contiguous capacity-sized collection of records and keeps
+original-capacity code unchanged.

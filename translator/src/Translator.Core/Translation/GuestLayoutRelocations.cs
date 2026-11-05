@@ -192,7 +192,7 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
@@ -207,6 +207,12 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Array-fill address setup requires layout format version 7.");
         if (file.Version < 8 && file.TraversalMarkers is { Length: > 0 })
             throw new InvalidDataException("Per-traversal markers require layout format version 8.");
+        if (file.Version < 9 && file.ArrayFills is { Length: > 0 })
+        {
+            var original=new GuestLayouts(file.Types,file.OriginalPlayers);
+            if(file.ArrayFills.Any(fill=>IsFpr(fill.ValueRegister) || fill.Arrays.Any(array=>original.Symbol(array.Stride)!=array.Width)))
+                throw new InvalidDataException("Floating and strided scalar fills require layout format version 9.");
+        }
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,

@@ -19,12 +19,15 @@ public sealed partial class GuestLayoutRelocations
     private static bool IsGpr(string register) => register.Length >= 2 && register[0] == 'r' &&
         int.TryParse(register.AsSpan(1), out var index) && index is >= 0 and < 32;
 
+    private static bool IsFpr(string register) => register.Length >= 2 && register[0] == 'f' &&
+        int.TryParse(register.AsSpan(1), out var index) && index is >= 0 and < 32;
+
     private void ValidateFillDefinitions(GuestLayoutReference[] references)
     {
         foreach (var fill in _arrayFills)
         {
             if (fill.Begin % 4 != 0 || fill.ExpectedWords.Count == 0 || fill.Arrays.Count == 0 ||
-                !IsGpr(fill.BaseRegister) || fill.BaseRegister == "r0" || !IsGpr(fill.ValueRegister))
+                !IsGpr(fill.BaseRegister) || fill.BaseRegister == "r0" || !(IsGpr(fill.ValueRegister) || IsFpr(fill.ValueRegister)))
                 throw new InvalidDataException("Invalid guest array-fill definition.");
             var addresses = fill.Addresses ?? Array.Empty<GuestFillAddress>();
             if (addresses.Select(address => address.Register).Distinct().Count() != addresses.Count ||
@@ -40,13 +43,20 @@ public sealed partial class GuestLayoutRelocations
                 {
                     var begin = layout.Symbol(array.Array); var stride = layout.Symbol(array.Stride);
                     var count = layout.Symbol(array.Count);
-                    if (begin < 0 || count <= 0 || array.Width is not (1 or 2 or 4) || stride != array.Width)
-                        throw new InvalidDataException("Guest array-fill requires a dense scalar array.");
-                    var end = checked(begin + stride * count);
-                    if (intervals.Any(other => begin < other.End && end > other.Begin))
-                        throw new InvalidDataException("Overlapping guest fill arrays.");
-                    intervals.Add((begin, end));
+                    if (begin < 0 || count <= 0 ||
+                        (IsFpr(fill.ValueRegister) ? array.Width is not (4 or 8) : array.Width is not (1 or 2 or 4)) ||
+                        stride < array.Width || stride % array.Width != 0 || begin % array.Width != 0)
+                        throw new InvalidDataException("Guest array-fill requires aligned scalar array fields.");
+                    for (var index=0;index<count;index++)
+                    {
+                        var offset=checked(begin+stride*index);
+                        intervals.Add((offset,checked(offset+array.Width)));
+                    }
                 }
+                intervals.Sort((left,right)=>left.Begin.CompareTo(right.Begin));
+                for(var index=1;index<intervals.Count;index++)
+                    if(intervals[index].Begin<intervals[index-1].End)
+                        throw new InvalidDataException("Overlapping guest fill array fields.");
             }
             if (fill.Arrays.Any(array => _expanded.Symbol(array.Count) < _original.Symbol(array.Count)) ||
                 fill.Arrays.Select(array => _original.Symbol(array.Count)).Distinct().Count() != 1 ||

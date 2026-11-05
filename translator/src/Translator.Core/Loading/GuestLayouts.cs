@@ -65,6 +65,16 @@ public sealed class GuestLayouts
     {
         if (name.Contains('+'))
             return name.Split('+').Aggregate(0, (sum, term) => checked(sum + Symbol(term.Trim())));
+        if (name.Contains('/'))
+        {
+            var quotient = name.Split('/');
+            if (quotient.Length != 2 || !int.TryParse(quotient[1], out var divisor) || divisor <= 0)
+                throw new InvalidDataException($"Invalid guest layout divisor: {name}.");
+            var dividend = Symbol(quotient[0].Trim());
+            if (dividend % divisor != 0)
+                throw new InvalidDataException($"Guest layout expression requires an exact quotient: {name} ({dividend}/{divisor}).");
+            return dividend / divisor;
+        }
         if (name == "players") return Players;
         var parts = name.Split('.');
         if (parts.Length == 2 && parts[1] == "size" && Types.TryGetValue(parts[0], out var type))

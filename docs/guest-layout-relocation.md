@@ -33,8 +33,9 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 196 references across creation, construction,
-destruction, scenario assignment, selected mode/menu readers and point updates.
+menu and awards scenarios and audits 199 references across creation, construction,
+destruction, scenario assignment, selected mode/menu readers, capacity scans and
+point updates.
 The point updater's temporary score array grows with capacity. Its stack frame,
 conversion scratch space, saved registers and caller LR slot move together;
 increasing the loop alone would overwrite saved registers. The original Grand
@@ -61,6 +62,13 @@ scales express stack-frame allocation without hardcoded negative sizes.
 The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.
+
+Exact division by a positive integer expresses unrolled loop counts, such as
+`players/4` for the original four-player unrolled capacity scan. A capacity that
+does not divide exactly is rejected rather than silently skipping or overrunning
+slots. The current development manifest therefore requires multiples of four.
+This scan counts the expanded array while preserving the separate physical
+four-screen limit and the original competition-mode participant limits.
 
 ## Finding additional consumers
 
@@ -105,7 +113,7 @@ MKW_TEST_CXX=/absolute/path/to/clang++ \
   dotnet test translator/tests/Translator.IntegrationTests -c Release
 ```
 
-The game-backed checks verify that eleven twelve-player lifecycle/copy/reader/point routines emit
+The game-backed checks verify that twelve twelve-player lifecycle/copy/reader/point routines emit
 exactly the same C++ as the originals, and syntax-check their relocated 24-player
 versions. A native execution test runs the original scenario assignment at 12,
 24 and 48 players against the runtime's actual guest-memory implementation. It
@@ -122,6 +130,9 @@ separately, using varied initial ratings; the updater must include every player
 before applying ratings. These battle paths do not rely on the unmigrated Grand
 Prix table. They validate point updates, not a running online battle or its network
 synchronization.
+Capacity-count checks vary the number of occupied slots from zero to capacity,
+mix local and CPU players, isolate the final slot, and exercise mode-specific
+participant and split-screen rules against the expanded settings offsets.
 Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game

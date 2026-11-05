@@ -1609,6 +1609,29 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "Racedata.menu.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052AC40",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players/4"
+    },
+    {
+      "Instruction": "0x8052AD64",
+      "ExpectedWord": "0x80E30B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052AD94",
+      "ExpectedWord": "0x80030B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
     }
   ],
   "GlobalPointers": {

@@ -31,7 +31,7 @@ public class RacedataReaderTests
         try
         {
             var sources = new List<string>();
-            foreach (var entry in new uint[] { 0x8052a1d0, 0x8052c3c4, 0x8052d4e8, 0x80529160 })
+            foreach (var entry in new uint[] { 0x8052a1d0, 0x8052c3c4, 0x8052d4e8, 0x80529160, 0x8052ac40 })
             {
                 var code = translator.Translate(entry, new TranslationOptions(EnableLeafInlining: false,
                     KnownFunctionEntryPoints: map.Addresses.ToHashSet())).CxxCode;
@@ -47,6 +47,7 @@ public class RacedataReaderTests
                 extern "C" void func_8052C3C4(CpuContext*);
                 extern "C" void func_8052D4E8(CpuContext*);
                 extern "C" void func_80529160(CpuContext*);
+                extern "C" void func_8052AC40(CpuContext*);
                 int main() {
                     Memory::Init(16 * 1024 * 1024);
                     constexpr uint32_t data = 0x80010000;
@@ -90,7 +91,46 @@ public class RacedataReaderTests
                     if (ctx.gpr[3] != 1) return 5;
                     Memory::Write16(last+0xd8, 0);
                     ctx.gpr[3] = race; func_80529160(&ctx);
-                    return ctx.gpr[3] == 0 ? 0 : 6;
+                    if (ctx.gpr[3] != 0) return 6;
+                    constexpr uint32_t counts = 0x80040000;
+                    for (uint32_t active=0; active<={{players}}; active++) {
+                        Memory::Write32(settings+8, 0);
+                        Memory::Write32(settings+12, 0);
+                        for (uint32_t player=0; player<{{players}}; player++)
+                            Memory::Write32(array+player*0xf0+16,
+                                player >= active ? 5 : (player%3 == 0 ? 0 : 1));
+                        for (uint32_t i=0; i<6; i++) Memory::Write8(counts+i, 0x7e);
+                        ctx.gpr[3] = race; ctx.gpr[4] = counts;
+                        ctx.gpr[5] = counts+2; ctx.gpr[6] = counts+4;
+                        func_8052AC40(&ctx);
+                        uint32_t local = (active+2)/3;
+                        uint32_t screens = local == 0 ? 1 : (local >= 3 ? 4 : local);
+                        if (Memory::Read8(counts) != active || Memory::Read8(counts+2) != screens ||
+                            Memory::Read8(counts+4) != local) return 8;
+                        for (uint32_t i=1; i<6; i+=2) if (Memory::Read8(counts+i) != 0x7e) return 9;
+                    }
+                    // Only the final capacity slot is active, so a twelve-slot scan must fail.
+                    for (uint32_t player=0; player<{{players}}; player++)
+                        Memory::Write32(array+player*0xf0+16, player=={{players}}-1 ? 0 : 5);
+                    ctx.gpr[3] = race; ctx.gpr[4] = counts;
+                    ctx.gpr[5] = counts+2; ctx.gpr[6] = counts+4;
+                    func_8052AC40(&ctx);
+                    if (Memory::Read8(counts) != 1 || Memory::Read8(counts+2) != 1 ||
+                        Memory::Read8(counts+4) != 1) return 10;
+                    for (uint32_t player=0; player<{{players}}; player++)
+                        Memory::Write32(array+player*0xf0+16, 1);
+                    for (uint32_t mode=0; mode<=11; mode++) for (uint32_t type : {0u, 2u, 3u, 4u, 7u}) {
+                        Memory::Write32(settings+8, mode);
+                        Memory::Write32(settings+12, type);
+                        ctx.gpr[3] = race; ctx.gpr[4] = counts;
+                        ctx.gpr[5] = counts+2; ctx.gpr[6] = counts+4;
+                        func_8052AC40(&ctx);
+                        uint32_t total = mode == 11 ? (type == 7 ? 3 : 6) : {{players}};
+                        uint32_t screens = type == 3 ? 2 : (type == 4 ? 4 : 1);
+                        if (Memory::Read8(counts) != total || Memory::Read8(counts+2) != screens ||
+                            Memory::Read8(counts+4) != 0) return 11;
+                    }
+                    return 0;
                 }
                 """);
             var arguments = TranslatorCppTestHarness.BuildCompileArguments(root, temporary, sources,

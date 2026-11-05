@@ -19,6 +19,7 @@ public class RacedataLayoutTests
     [InlineData(0x8052d4e8u)] // Replay predicate
     [InlineData(0x8083b8b4u)] // Singleton-based menu player accessor
     [InlineData(0x80529e08u)] // Point updater and its per-player stack array
+    [InlineData(0x8052ac40u)] // Four-player unrolled capacity scan
     [Trait("Requires", "USA game assets and Clang")]
     public void AuditedRoutinesAreUnchangedAtTwelveAndCompileAtTwentyFour(uint entry)
     {

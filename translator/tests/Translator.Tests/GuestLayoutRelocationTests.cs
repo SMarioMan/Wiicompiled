@@ -100,6 +100,16 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void UnrolledLoopCountRequiresAnExactCapacityMultiple()
+    {
+        Assert.Equal(3, new GuestLayouts(RaceTypes(), 12).Symbol("players/4"));
+        Assert.Equal(6, new GuestLayouts(RaceTypes(), 24).Symbol("players/4"));
+        Assert.Equal(12, new GuestLayouts(RaceTypes(), 48).Symbol("players/4"));
+        foreach (var expression in new[] { "players/4", "players/0", "players/-1", "players/four", "players/2/2" })
+            Assert.Throws<InvalidDataException>(() => new GuestLayouts(RaceTypes(), 13).Symbol(expression));
+    }
+
+    [Fact]
     public void SignedFrameRelocationMovesBothStackStoreAndStackPointer()
     {
         const uint pc = 0x80001000;

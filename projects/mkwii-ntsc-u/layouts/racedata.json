@@ -1,5 +1,5 @@
 {
-  "Version": 9,
+  "Version": 10,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -680,6 +680,87 @@
         {
           "Name": "itemBalloonArray",
           "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "DriverManagerHeader",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "GuestTimer",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "DriverManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "DriverManagerHeader"
+        },
+        {
+          "Name": "models",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "positions",
+          "Type": "GuestVector3",
+          "PerPlayer": true
+        },
+        {
+          "Name": "targetingItemPosition",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "frameCounter",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "invertedFrameCounter",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "isAwards",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "racePositions",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "field170",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "field174",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "finishTypes",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "hasTime",
+          "Type": "InputByte",
+          "Count": 5
+        },
+        {
+          "Name": "top5",
+          "Type": "GuestTimer",
+          "Count": 5
+        },
+        {
+          "Name": "focusedPlayer",
+          "Type": "InputByte"
         }
       ]
     }
@@ -24444,13 +24525,683 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RaceBalloons.size"
+    },
+    {
+      "Instruction": "0x807839F8",
+      "ExpectedWord": "0x386001F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DriverManager.size"
+    },
+    {
+      "Instruction": "0x80783A8C",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80783DC4",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80783E68",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80783EB4",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80783A7C",
+      "ExpectedWord": "0x387B0040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.positions.offset+GuestVector3.x.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783A9C",
+      "ExpectedWord": "0x387B01B0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783BAC",
+      "ExpectedWord": "0x981B0160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783BBC",
+      "ExpectedWord": "0x981B0160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783D0C",
+      "ExpectedWord": "0x901B0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783DC8",
+      "ExpectedWord": "0x981B01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.focusedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783E70",
+      "ExpectedWord": "0x881C0160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783E90",
+      "ExpectedWord": "0x387C01B0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783EA8",
+      "ExpectedWord": "0x387C0040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.positions.offset+GuestVector3.x.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783FC8",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.finishTypes.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078416C",
+      "ExpectedWord": "0x907F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.finishTypes.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80784170",
+      "ExpectedWord": "0x807F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.finishTypes.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807844D0",
+      "ExpectedWord": "0x80080170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80784578",
+      "ExpectedWord": "0x90080170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078457C",
+      "ExpectedWord": "0xB1680174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field174.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078458C",
+      "ExpectedWord": "0x90080170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80784590",
+      "ExpectedWord": "0xB1880174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field174.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078459C",
+      "ExpectedWord": "0x90080170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807845A0",
+      "ExpectedWord": "0x80A80170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field170.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807845DC",
+      "ExpectedWord": "0xA0080174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.field174.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807847FC",
+      "ExpectedWord": "0x88030160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807848F4",
+      "ExpectedWord": "0x88030160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.isAwards.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80784DE0",
+      "ExpectedWord": "0x986401EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.focusedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80784DF0",
+      "ExpectedWord": "0x886301EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.focusedPlayer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80783C20",
+      "ExpectedWord": "0x98E50161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x80783C38",
+      "ExpectedWord": "0x98E50162",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80783C50",
+      "ExpectedWord": "0x98E50163",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80783C68",
+      "ExpectedWord": "0x98E50164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80783C80",
+      "ExpectedWord": "0x98E50165",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80783C98",
+      "ExpectedWord": "0x98E50166",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80783CB0",
+      "ExpectedWord": "0x98E50167",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80783CC8",
+      "ExpectedWord": "0x98050168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80783CF8",
+      "ExpectedWord": "0x98030161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x80783D84",
+      "ExpectedWord": "0x9B2401A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.hasTime.offset"
+    },
+    {
+      "Instruction": "0x80783DB0",
+      "ExpectedWord": "0x9B4301A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.hasTime.offset"
+    },
+    {
+      "Instruction": "0x80783D8C",
+      "ExpectedWord": "0xB00501B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80783D94",
+      "ExpectedWord": "0x980501B6",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80783D9C",
+      "ExpectedWord": "0xB00501B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80783DA4",
+      "ExpectedWord": "0x980501BA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.top5.offset",
+      "Addend": 10
+    },
+    {
+      "Instruction": "0x807840D4",
+      "ExpectedWord": "0x88030161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x807842B8",
+      "ExpectedWord": "0x88030161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x807843DC",
+      "ExpectedWord": "0x88030161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x8078494C",
+      "ExpectedWord": "0x98830161",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.racePositions.offset"
+    },
+    {
+      "Instruction": "0x80784870",
+      "ExpectedWord": "0x90E50100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x8078487C",
+      "ExpectedWord": "0x80A60100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784884",
+      "ExpectedWord": "0x90060100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x807849E4",
+      "ExpectedWord": "0x80080100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784A8C",
+      "ExpectedWord": "0x80050100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784BB0",
+      "ExpectedWord": "0x80040100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784D10",
+      "ExpectedWord": "0x80030100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.frameCounter.offset"
+    },
+    {
+      "Instruction": "0x8078488C",
+      "ExpectedWord": "0x80A60130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784898",
+      "ExpectedWord": "0x90060130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x807849D4",
+      "ExpectedWord": "0x90C30130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784A74",
+      "ExpectedWord": "0x90C40130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784AF4",
+      "ExpectedWord": "0x90C40130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784C3C",
+      "ExpectedWord": "0x93E30130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x80784D68",
+      "ExpectedWord": "0x93A30130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.invertedFrameCounter.offset"
+    },
+    {
+      "Instruction": "0x807848A4",
+      "ExpectedWord": "0x80A600D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x807848CC",
+      "ExpectedWord": "0x800600D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x807848D8",
+      "ExpectedWord": "0x90E600D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784980",
+      "ExpectedWord": "0x90A400D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784A18",
+      "ExpectedWord": "0x900800D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784A9C",
+      "ExpectedWord": "0x908500D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784BE4",
+      "ExpectedWord": "0x900400D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784D20",
+      "ExpectedWord": "0x936300D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.targetingItemPosition.offset"
+    },
+    {
+      "Instruction": "0x80784A04",
+      "ExpectedWord": "0xD0440040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x80784A0C",
+      "ExpectedWord": "0xD0240044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80784A10",
+      "ExpectedWord": "0xD0040048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80784A54",
+      "ExpectedWord": "0xC0040040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x80784A5C",
+      "ExpectedWord": "0xC0040044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80784A64",
+      "ExpectedWord": "0xC0040048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80784BD0",
+      "ExpectedWord": "0xD0430040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x80784BD8",
+      "ExpectedWord": "0xD0230044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80784BDC",
+      "ExpectedWord": "0xD0030048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80784C20",
+      "ExpectedWord": "0xC0030040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x80784C28",
+      "ExpectedWord": "0xC0030044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80784C30",
+      "ExpectedWord": "0xC0030048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DriverManager.positions.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80784A08",
+      "ExpectedWord": "0x38040040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x80784BD4",
+      "ExpectedWord": "0x38030040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DriverManager.positions.offset"
+    },
+    {
+      "Instruction": "0x807847B8",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8078482C",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {
     "0x809B8F68": "Racedata",
     "0x809BE398": "AIManager",
     "0x809B8F4C": "InputManager",
-    "0x809BFDC0": "RaceHUD"
+    "0x809BFDC0": "RaceHUD",
+    "0x809BE740": "DriverManager"
   },
   "ArrayCopies": [
     {
@@ -27073,9 +27824,24 @@
       "Name": "RaceEndTallies::SetWheelBool"
     },
     {
-      "Entry": "0x80783A50",
+      "Entry": "0x807839DC",
       "Receiver": null,
+      "Name": "DriverMgr::CreateInstance"
+    },
+    {
+      "Entry": "0x80783A50",
+      "Receiver": "DriverManager",
       "Name": "DriverMgr::__ct"
+    },
+    {
+      "Entry": "0x80783E18",
+      "Receiver": "DriverManager",
+      "Name": "DriverMgr::__dt"
+    },
+    {
+      "Entry": "0x80783F40",
+      "Receiver": "DriverManager",
+      "Name": "DriverMgr::SetController"
     },
     {
       "Entry": "0x80783F98",
@@ -27088,14 +27854,64 @@
       "Name": ""
     },
     {
+      "Entry": "0x807844C0",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
       "Entry": "0x80784610",
       "Receiver": null,
       "Name": ""
     },
     {
+      "Entry": "0x80784778",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
       "Entry": "0x807847DC",
-      "Receiver": null,
+      "Receiver": "DriverManager",
       "Name": "DriverMgr::InitAwards"
+    },
+    {
+      "Entry": "0x80784818",
+      "Receiver": "DriverManager",
+      "Name": "DriverMgr::Update"
+    },
+    {
+      "Entry": "0x80784974",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807849DC",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80784A84",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80784B04",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80784C60",
+      "Receiver": "DriverManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80784DD8",
+      "Receiver": null,
+      "Name": "DriverMgr::ChangeFocusedPlayer"
+    },
+    {
+      "Entry": "0x80784DE8",
+      "Receiver": null,
+      "Name": ""
     },
     {
       "Entry": "0x807851A4",
@@ -29781,6 +30597,121 @@
           "Width": 4
         }
       ]
+    },
+    {
+      "Begin": "0x80783AC0",
+      "ExpectedWords": [
+        "0x901B0010",
+        "0x3C60809C",
+        "0x901B00D0",
+        "0x901B0100",
+        "0x901B0130",
+        "0x901B0014",
+        "0x901B00D4",
+        "0x901B0104",
+        "0x901B0134",
+        "0x901B0018",
+        "0x901B00D8",
+        "0x901B0108",
+        "0x901B0138",
+        "0x901B001C",
+        "0x901B00DC",
+        "0x901B010C",
+        "0x901B013C",
+        "0x901B0020",
+        "0x901B00E0",
+        "0x901B0110",
+        "0x901B0140",
+        "0x901B0024",
+        "0x901B00E4",
+        "0x901B0114",
+        "0x901B0144",
+        "0x901B0028",
+        "0x901B00E8",
+        "0x901B0118",
+        "0x901B0148",
+        "0x901B002C",
+        "0x901B00EC",
+        "0x901B011C",
+        "0x901B014C",
+        "0x901B0030",
+        "0x901B00F0",
+        "0x901B0120",
+        "0x901B0150",
+        "0x901B0034",
+        "0x901B00F4",
+        "0x901B0124",
+        "0x901B0154",
+        "0x901B0038",
+        "0x901B00F8",
+        "0x901B0128",
+        "0x901B0158",
+        "0x901B003C",
+        "0x901B00FC",
+        "0x901B012C",
+        "0x901B015C"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "DriverManager.models.offset",
+          "Stride": "DriverManager.models.stride",
+          "Count": "DriverManager.models.count",
+          "Width": 4
+        },
+        {
+          "Array": "DriverManager.targetingItemPosition.offset",
+          "Stride": "DriverManager.targetingItemPosition.stride",
+          "Count": "DriverManager.targetingItemPosition.count",
+          "Width": 4
+        },
+        {
+          "Array": "DriverManager.frameCounter.offset",
+          "Stride": "DriverManager.frameCounter.stride",
+          "Count": "DriverManager.frameCounter.count",
+          "Width": 4
+        },
+        {
+          "Array": "DriverManager.invertedFrameCounter.offset",
+          "Stride": "DriverManager.invertedFrameCounter.stride",
+          "Count": "DriverManager.invertedFrameCounter.count",
+          "Width": 4
+        }
+      ],
+      "Constants": [
+        {
+          "Register": "r3",
+          "Value": 2157707264
+        }
+      ]
+    },
+    {
+      "Begin": "0x80783DD4",
+      "ExpectedWords": [
+        "0x901B0178",
+        "0x901B017C",
+        "0x901B0180",
+        "0x901B0184",
+        "0x901B0188",
+        "0x901B018C",
+        "0x901B0190",
+        "0x901B0194",
+        "0x901B0198",
+        "0x901B019C",
+        "0x901B01A0",
+        "0x901B01A4"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "DriverManager.finishTypes.offset",
+          "Stride": "DriverManager.finishTypes.stride",
+          "Count": "DriverManager.finishTypes.count",
+          "Width": 4
+        }
+      ]
     }
   ],
   "ResampledCursors": [
@@ -29839,6 +30770,51 @@
       "Source": "r4",
       "Player": "r24",
       "Destination": "r31"
+    }
+  ],
+  "CapacityTables": [
+    {
+      "Address": "0x808CD0B8",
+      "ExpectedValues": [
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        5,
+        5
+      ],
+      "Lookups": [
+        {
+          "Instruction": "0x8078410C",
+          "ExpectedWord": "0x7C04002E",
+          "Base": "r4",
+          "Index": "r0",
+          "Destination": "r0",
+          "Count": "r29"
+        },
+        {
+          "Instruction": "0x807842F0",
+          "ExpectedWord": "0x7C04002E",
+          "Base": "r4",
+          "Index": "r0",
+          "Destination": "r0",
+          "Count": "r30"
+        },
+        {
+          "Instruction": "0x80784414",
+          "ExpectedWord": "0x7C04002E",
+          "Base": "r4",
+          "Index": "r0",
+          "Destination": "r0",
+          "Count": "r30"
+        }
+      ]
     }
   ]
 }

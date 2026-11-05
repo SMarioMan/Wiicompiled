@@ -473,3 +473,23 @@ after the expanded stores only when their registers do not alias any fill base,
 value or address output. The source assignment, including its signed immediate,
 must match exactly. This handles constructor address setup without dropping its
 observable register value or treating it as another array store.
+
+## Driver manager and finish classification
+
+`DriverManager` owns uniform capacity-sized model pointers, positions, item
+target pointers, frame counters, previous race positions and finish categories.
+The awards state, cached team result, five personal records and focused-player
+sentinel follow those arrays at computed aligned offsets. Allocation,
+initialization, model update/destruction loops and SDK vector counts all use the
+same capacity. Vector and timer element strides and the five personal records
+retain their original meanings.
+
+All three rank-based finish classifiers use the checked capacity threshold
+curve, retaining the original twelve rows and extending the 5-of-12 final cutoff
+proportion (ten good finish positions for a 24-player field, including first).
+Native tests run the real allocation, constructor, SDK vector/timer lifecycle,
+controller setter, update, classifiers and destructor at 12, 13, 24, 48 and 100
+slots. They check every runtime field size and position in the four rank-based
+modes, cached finish results, memory boundaries and saved registers. Heap,
+disposer, save-record lookup and model destruction are fixtures. These tests do
+not establish complete gameplay, results menus or network correctness.

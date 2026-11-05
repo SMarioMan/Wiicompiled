@@ -1,5 +1,5 @@
 {
-  "Version": 10,
+  "Version": 11,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -30825,6 +30825,49 @@
           "Index": "r0",
           "Destination": "r0",
           "Count": "r30"
+        }
+      ]
+    }
+  ],
+  "GridTables": [
+    {
+      "Address": "0x8088B490",
+      "ExpectedHex": "000000000000000000000000FB0500000000000000000000F6000A000000000000000000F605FB0A0000000000000000F6000AFB0500000000000000F6FE06FA020A000000000000FB05F6000AFB050000000000F6000AFB05F6000A00000000F6FE06FA020AF6FE06000000F6000AFB05F6000AFB050000F6FE06FA020AF6FE06FA0200F6FE06FA020AF6FE06FA020A",
+      "AdvanceRows": false,
+      "Lookups": [
+        {
+          "Instruction": "0x805100E0",
+          "ExpectedWord": "0x7C1FE0AE",
+          "Base": "r31",
+          "Index": "r28",
+          "Destination": "r0",
+          "CountOffset": "r28",
+          "Position": null
+        },
+        {
+          "Instruction": "0x80510254",
+          "ExpectedWord": "0x7C1A00AE",
+          "Base": "r26",
+          "Index": "r0",
+          "Destination": "r0",
+          "CountOffset": "r28",
+          "Position": "r26"
+        }
+      ]
+    },
+    {
+      "Address": "0x8088B520",
+      "ExpectedHex": "000000000000000000000000000000000000000000000000000000000000000000000000000001010000000000000000000000010100000000000000000000010101000000000000000001010102020000000000000000010102020200000000000000010101020202000000000000010102020203030000000000010101020202030300000000010101020202030303",
+      "AdvanceRows": true,
+      "Lookups": [
+        {
+          "Instruction": "0x80510124",
+          "ExpectedWord": "0x7C1A00AE",
+          "Base": "r26",
+          "Index": "r0",
+          "Destination": "r0",
+          "CountOffset": "r28",
+          "Position": "r26"
         }
       ]
     }

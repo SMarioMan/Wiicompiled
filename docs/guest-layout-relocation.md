@@ -518,3 +518,21 @@ pattern by one full block of rows, using one uniform grid for all participants.
 The helper checks the field-size row offset and participant index before any
 lookup. Expanded depth values must fit the original signed-byte consumers;
 requesting a capacity beyond that range fails instead of wrapping positions.
+
+The USA grid migration covers the lateral-origin, depth and lateral-slot loads
+in the real KMP coordinate routine. The 12-player terminal pattern provides
+three staggered columns and four depth rows; 24 participants use eight rows.
+Native tests execute the complete coordinate routine and its real quaternion,
+trigonometric, vector and SDK register-save helpers at capacities 12, 13, 24, 48
+and 100. They compare every original field size exactly, verify distinct expanded
+positions in both grid orientations and four course yaw angles, and check
+register and memory boundaries. Course holders and the boot-initialized SDK unit
+axes are fixtures. This verifies geometry; it does not establish that every
+course supports every tested grid size.
+
+After this migration a private 24-participant Luigi Circuit run reports
+`min_lap=3 max_lap=3` before the local finish, then leaves the race scene on menu
+confirmation. The remaining CPUs can be forcibly finished at the local finish,
+as in the original game. Results-scene loading currently exposes a VI/scheduler
+wait that still needs diagnosis. Other courses, modes, rendering and 24-player
+LAN remain unverified.

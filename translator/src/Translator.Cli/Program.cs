@@ -40,7 +40,18 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var command = args.Length > 0 ? args[0] : "info";
 var (projectOption, tailWithoutProject) = ExtractOption(args.Skip(1).ToArray(), "--project");
-var (profileOption, tail) = ExtractOption(tailWithoutProject, "--profile");
+var (profileOption, tailWithoutProfile) = ExtractOption(tailWithoutProject, "--profile");
+var (layoutOption, tailWithoutLayouts) = ExtractOption(tailWithoutProfile, "--guest-layouts");
+var (layoutPlayersOption, tail) = ExtractOption(tailWithoutLayouts, "--layout-players");
+if ((layoutOption is null) != (layoutPlayersOption is null))
+    throw new ArgumentException("--guest-layouts and --layout-players must be supplied together.");
+var layoutRelocations = layoutOption is null ? null : GuestLayoutRelocations.Read(layoutOption,
+    int.Parse(layoutPlayersOption!, CultureInfo.InvariantCulture));
+if (layoutRelocations is not null && command != "plan-guest-layouts" &&
+    (!layoutRelocations.Complete && layoutRelocations.Players != layoutRelocations.OriginalPlayers))
+    throw new InvalidOperationException("This guest layout manifest is incomplete. Use plan-guest-layouts to inspect it; it cannot produce an expanded game build.");
+if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "translate-recursive" or "translate-mod"))
+    throw new ArgumentException("Guest layout options apply to translation or plan-guest-layouts only.");
 var project = !string.IsNullOrWhiteSpace(projectOption)
     ? TranslationProjectConfig.Load(projectOption)
     : null;
@@ -103,7 +114,7 @@ var translator = new Lazy<FunctionTranslator>(() =>
         providers.Add(nativeAbi);
     providers.Add(inferredAbi);
     var abiProvider = new CompositeGuestFunctionAbiProvider(providers.ToArray());
-    return new FunctionTranslator(image.Value, abiProvider);
+    return new FunctionTranslator(image.Value, abiProvider, layoutRelocations);
 });
 // The runtime source index is built lazily once and shared by every consumer,
 // so ABI/effect analysis never rescans the C++ within one translator run.
@@ -175,6 +186,7 @@ return command switch
     "translate-recursive" => RunTranslateRecursive(tail),
     "translate-mod" => RunTranslateMod(tail),
     "link-brainslug" => RunLinkBrainSlug(tail),
+    "plan-guest-layouts" => RunPlanGuestLayouts(tail),
     "emit-build-shards" => RunEmitBuildShards(tail),
     "emit-native-index" => RunEmitNativeIndex(tail),
     "emit-base-manifest" => RunEmitBaseManifest(tail),
@@ -182,6 +194,18 @@ return command switch
     "validate-retro-wfc-payload" => RunValidateRetroWfcPayload(tail),
     _ => ShowHelp(command)
 };
+
+int RunPlanGuestLayouts(string[] argsTail)
+{
+    if (layoutRelocations is null)
+        throw new ArgumentException("plan-guest-layouts requires --guest-layouts and --layout-players.");
+    layoutRelocations.ValidateImage(image.Value);
+    var output = OptionValue(argsTail, "--out") ?? throw new ArgumentException("An output path is required.");
+    FileOutput.WriteTextIfChanged(output, JsonSerializer.Serialize(layoutRelocations.Describe(),
+        new JsonSerializerOptions { WriteIndented = true }));
+    Console.WriteLine($"[translator] validated guest layout plan for {layoutRelocations.Players} players: {output}");
+    return 0;
+}
 
 int RunLinkBrainSlug(string[] argsTail)
 {
@@ -2433,7 +2457,7 @@ int EmitModCpp(
     var abiProvider = declaredNativeAbi.Value is { } nativeAbi
         ? new CompositeGuestFunctionAbiProvider(nativeAbi, inferredAbi)
         : new CompositeGuestFunctionAbiProvider(inferredAbi);
-    var modTranslator = new FunctionTranslator(modImage, abiProvider);
+    var modTranslator = new FunctionTranslator(modImage, abiProvider, layoutRelocations);
     var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxThreads };
     // Each wave drains its whole queue: a wave is a barrier that publishes newly discovered
     // entries, and draining everything makes the output independent of any wave size.
@@ -3745,6 +3769,7 @@ static void WriteUsage(TextWriter writer, IReadOnlyList<string> commands)
         writer.WriteLine(CommandUsage(name));
     }
     writer.WriteLine("Every command also accepts [--project path] [--profile name] [--prefer-cached-inputs] [--help].");
+    writer.WriteLine("Translation and plan-guest-layouts also accept [--guest-layouts path --layout-players N].");
 }
 
 static string[] KnownCommands() => new[]
@@ -3754,6 +3779,7 @@ static string[] KnownCommands() => new[]
     "translate-recursive",
     "translate-mod",
     "link-brainslug",
+    "plan-guest-layouts",
     "emit-base-manifest",
     "emit-build-shards",
     "emit-native-index",
@@ -3771,6 +3797,7 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
     "info" or "--info" or "--version" =>
         (null, Array.Empty<CommandOption>()),
     "generate-data-init" => (null, Array.Empty<CommandOption>()),
+    "plan-guest-layouts" => (null, new CommandOption[] { new("--out", "path", Required: true) }),
     "translate-recursive" => ("<start_addr>", new CommandOption[]
     {
         new("--outdir", "path"),

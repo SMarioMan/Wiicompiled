@@ -1,0 +1,429 @@
+{
+  "Version": 1,
+  "OriginalPlayers": 12,
+  "Complete": false,
+  "Note": "Development manifest: audited Racedata::CreateInstance references only. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
+  "Types": [
+    {
+      "Name": "Header",
+      "Alignment": 4,
+      "Size": 32
+    },
+    {
+      "Name": "ScenarioHeader",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "Player",
+      "Alignment": 4,
+      "Size": 240
+    },
+    {
+      "Name": "Settings",
+      "Alignment": 4,
+      "Size": 52
+    },
+    {
+      "Name": "Mission",
+      "Alignment": 4,
+      "Size": 112
+    },
+    {
+      "Name": "Pointer",
+      "Alignment": 4,
+      "Size": 4
+    },
+    {
+      "Name": "Ghost",
+      "Alignment": 4,
+      "Size": 10240
+    },
+    {
+      "Name": "Scenario",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "ScenarioHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "Player",
+          "PerPlayer": true
+        },
+        {
+          "Name": "settings",
+          "Type": "Settings"
+        },
+        {
+          "Name": "mission",
+          "Type": "Mission"
+        },
+        {
+          "Name": "ghost",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "Racedata",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "Header"
+        },
+        {
+          "Name": "race",
+          "Type": "Scenario"
+        },
+        {
+          "Name": "menu",
+          "Type": "Scenario"
+        },
+        {
+          "Name": "awards",
+          "Type": "Scenario"
+        },
+        {
+          "Name": "ghosts",
+          "Type": "Ghost",
+          "Count": 2
+        }
+      ]
+    }
+  ],
+  "References": [
+    {
+      "Instruction": "0x8052B330",
+      "ExpectedWord": "0x386073F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Racedata.size"
+    },
+    {
+      "Instruction": "0x8052B37C",
+      "ExpectedWord": "0x937A0020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset"
+    },
+    {
+      "Instruction": "0x8052B380",
+      "ExpectedWord": "0x387A0028",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.race.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B38C",
+      "ExpectedWord": "0x9B9A0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B390",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B394",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B398",
+      "ExpectedWord": "0x9B9A0025",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B3A4",
+      "ExpectedWord": "0x93FA0B68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B3A8",
+      "ExpectedWord": "0x387A0B9C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.race.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B3B0",
+      "ExpectedWord": "0x939A0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B3B4",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B3B8",
+      "ExpectedWord": "0x939A0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B3BC",
+      "ExpectedWord": "0x939A0B88",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B3C4",
+      "ExpectedWord": "0x381A23F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset"
+    },
+    {
+      "Instruction": "0x8052B3C8",
+      "ExpectedWord": "0x901A0C0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B3CC",
+      "ExpectedWord": "0x387A0C18",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B3D4",
+      "ExpectedWord": "0x937A0C10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset"
+    },
+    {
+      "Instruction": "0x8052B3DC",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B3E0",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B3E4",
+      "ExpectedWord": "0x9B9A0C14",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B3E8",
+      "ExpectedWord": "0x9B9A0C15",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B3F0",
+      "ExpectedWord": "0x93FA1758",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B3F4",
+      "ExpectedWord": "0x387A178C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.menu.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B3FC",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B400",
+      "ExpectedWord": "0x939A1760",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B404",
+      "ExpectedWord": "0x939A1764",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B408",
+      "ExpectedWord": "0x939A1778",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B410",
+      "ExpectedWord": "0x381A4BF0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset+Ghost.size"
+    },
+    {
+      "Instruction": "0x8052B414",
+      "ExpectedWord": "0x901A17FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B418",
+      "ExpectedWord": "0x387A1808",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.awards.offset+Scenario.players.offset"
+    },
+    {
+      "Instruction": "0x8052B420",
+      "ExpectedWord": "0x937A1800",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset"
+    },
+    {
+      "Instruction": "0x8052B428",
+      "ExpectedWord": "0x38C000F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.stride"
+    },
+    {
+      "Instruction": "0x8052B42C",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8052B430",
+      "ExpectedWord": "0x9B9A1804",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052B434",
+      "ExpectedWord": "0x9B9A1805",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x8052B43C",
+      "ExpectedWord": "0x93FA2348",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset"
+    },
+    {
+      "Instruction": "0x8052B440",
+      "ExpectedWord": "0x387A237C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.awards.offset+Scenario.mission.offset"
+    },
+    {
+      "Instruction": "0x8052B448",
+      "ExpectedWord": "0x38A00070",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.mission.size"
+    },
+    {
+      "Instruction": "0x8052B44C",
+      "ExpectedWord": "0x939A2350",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052B450",
+      "ExpectedWord": "0x939A2354",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8052B454",
+      "ExpectedWord": "0x939A2368",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.settings.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8052B45C",
+      "ExpectedWord": "0x939A23EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.awards.offset+Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x8052B460",
+      "ExpectedWord": "0x3B7A23F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.ghosts.offset"
+    },
+    {
+      "Instruction": "0x8052B464",
+      "ExpectedWord": "0x3BFA73F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Racedata.size"
+    },
+    {
+      "Instruction": "0x8052B470",
+      "ExpectedWord": "0x3B7B2800",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Ghost.size"
+    }
+  ]
+}

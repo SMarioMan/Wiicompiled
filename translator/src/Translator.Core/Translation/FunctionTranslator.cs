@@ -143,6 +143,7 @@ public sealed class FunctionTranslator
 {
     private readonly ProgramImage _image;
     private readonly IGuestFunctionAbiProvider _guestAbiProvider;
+    private readonly GuestLayoutRelocations? _layoutRelocations;
 
     /// <summary>
     /// Program-wide memo of speculative leaf-inline decodes, keyed by front-end context, so a
@@ -153,10 +154,13 @@ public sealed class FunctionTranslator
 
     public FunctionTranslator(
         ProgramImage image,
-        IGuestFunctionAbiProvider? guestAbiProvider = null)
+        IGuestFunctionAbiProvider? guestAbiProvider = null,
+        GuestLayoutRelocations? layoutRelocations = null)
     {
         _image = image;
         _guestAbiProvider = guestAbiProvider ?? new InferredGuestFunctionAbiProvider(_image);
+        _layoutRelocations = layoutRelocations;
+        _layoutRelocations?.ValidateImage(image);
     }
 
     /// <summary>
@@ -311,7 +315,7 @@ public sealed class FunctionTranslator
         var liftedByAddress = new Dictionary<uint, IReadOnlyList<IrInstruction>>(lifted.Count);
         foreach (var entry in lifted)
         {
-            liftedByAddress[entry.Origin.Address] = entry.Ir;
+            liftedByAddress[entry.Origin.Address] = _layoutRelocations?.Apply(entry.Origin, entry.Ir) ?? entry.Ir;
         }
 
         var decodedAddresses = new HashSet<uint>(instructions.Count);

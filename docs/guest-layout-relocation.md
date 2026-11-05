@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,384 references across creation, construction,
+menu and awards scenarios and audits 2,523 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 647 consumer entry points in `AuditedConsumers`.
+The manifest records 673 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -106,8 +106,12 @@ allocation and six following pointer fields move with capacity. The route
 holder's controller array, allocation and following count also move together.
 Their original layouts and stores are checked against the USA binary. The
 manager's cursor-based real-controller search is separately relocated and its
-bound uses the configured capacity. Other AI data, including action parameter
-tables and battle-specific structures, still require migration.
+bound uses the configured capacity. The subordinate GP/VS AI object's CPU records also grow uniformly; its separate
+four local-screen records and following state move together. The constructor's
+full-chunk bounds use array ends rather than fixed original element offsets.
+Its private and virtual consumers and three cursor-based local-array accesses
+are included. Other AI data, including action parameter tables, rank sorting
+scratch arrays and battle-specific structures, still require migration.
 
 Format version 5 adds `ArrayFills` for constructors that initialize every slot
 with unrolled scalar stores. Each span declares exact instruction words, base
@@ -122,6 +126,19 @@ manager initialization region before subordinate allocation, and both original
 controller accessors, including the parameter-dependent mode selector, checking every slot and neighboring memory at 12, 13, 24,
 48 and 100 slots. This verifies storage, not complete AI behavior or gameplay at
 those capacities.
+
+A separate native test executes the subordinate object's real initialization
+region and insertion routine at those same capacities, using external callback
+fixtures for CPU classification and action lookup. It fills every CPU record and
+all four local records, checks counters, callee-saved registers, stack and heap
+boundaries, and leaves neighboring state intact. This stresses storage roles;
+it does not authorize a race with more than the configured participant count.
+
+Declared `PointerTo` fields let the audit follow four-byte guest pointers to
+their pointee types, including within indexed arrays. Missing target types,
+non-pointer widths, interior unaligned loads and undeclared pointees are rejected
+or left unresolved. These are explicit ABI declarations, never inferred from
+host pointer sizes.
 
 ## Private executable validation
 

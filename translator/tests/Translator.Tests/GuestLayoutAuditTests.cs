@@ -16,6 +16,32 @@ public class GuestLayoutAuditTests
     }
 
     [Fact]
+    public void DeclaredPointerFieldsCarryPointeeIdentityIncludingIndexedPointerArrays()
+    {
+        var types=new[] {new GuestLayoutType("Word",4,4),
+            new GuestLayoutType("Leaf",4,Fields:new[] {new GuestLayoutField("players","Word",PerPlayer:true),new GuestLayoutField("tail","Word")}),
+            new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("pointers","Word",PerPlayer:true,PointerTo:"Leaf")})};
+        var audit=new GuestLayoutAudit(types,2,4);
+        var direct=Assert.Single(audit.Analyze(Discover(0x80a30000,0x80c50008,0x4e800020),"Owner").Candidates);
+        Assert.Equal("Leaf",direct.ReceiverType);Assert.Equal(8,direct.Before);Assert.Equal(16,direct.After);
+        var indexed=Assert.Single(audit.Analyze(Discover(0x1ca40004,0x7ca32a14,0x80a50000,0x80c50008,0x4e800020),"Owner").Candidates);
+        Assert.Equal("Leaf",indexed.ReceiverType);
+        var fixedTypes=types.Append(new GuestLayoutType("FixedOwner",4,Fields:new[] {
+            new GuestLayoutField("players","Word",PerPlayer:true),new GuestLayoutField("physical","Word",4,PointerTo:"Leaf")}));
+        var physical=new GuestLayoutAudit(fixedTypes,2,4).Analyze(
+            Discover(0x1ca40004,0x7ca32a14,0x80a50008,0x80c50008,0x4e800020),"FixedOwner");
+        Assert.Equal(2,physical.Candidates.Count);
+        Assert.Equal(new[] {"FixedOwner","Leaf"},physical.Candidates.Select(candidate=>candidate.ReceiverType));
+        Assert.Empty(audit.Analyze(Discover(0x80a30001,0x80c50008,0x4e800020),"Owner").Candidates);
+        var untyped=types.Select(type=>type.Name=="Owner" ? type with {Fields=new[] {new GuestLayoutField("pointers","Word",PerPlayer:true)}} : type);
+        Assert.Empty(new GuestLayoutAudit(untyped,2,4).Analyze(Discover(0x80a30000,0x80c50008,0x4e800020),"Owner").Candidates);
+        Assert.Throws<InvalidDataException>(()=>new GuestLayouts(types.Select(type=>type.Name=="Owner" ? type with {
+            Fields=new[] {new GuestLayoutField("pointer","Word",PointerTo:"Missing")}} : type),2));
+        Assert.Throws<InvalidDataException>(()=>new GuestLayouts(new[] {new GuestLayoutType("Wide",4,8),
+            new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("pointer","Wide",PointerTo:"Owner")})},2));
+    }
+
+    [Fact]
     public void RotatedIndicesRequireAMaskThatRemovesWrappedLowBits()
     {
         var types = new[] {new GuestLayoutType("Header",4,8), new GuestLayoutType("Word",4,4),

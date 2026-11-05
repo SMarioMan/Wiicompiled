@@ -177,11 +177,13 @@
         },
         {
           "Name": "specialItem",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PointerTo": "AIVsSub"
         },
         {
           "Name": "enemyRoutes",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PointerTo": "AIEnemyRoutes"
         },
         {
           "Name": "params",
@@ -216,6 +218,80 @@
         },
         {
           "Name": "count",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "AIVsHeader",
+      "Alignment": 4,
+      "Size": 232
+    },
+    {
+      "Name": "AIPair",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "AIVsSub",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "AIVsHeader"
+        },
+        {
+          "Name": "cpuPairs",
+          "Type": "AIPair",
+          "PerPlayer": true
+        },
+        {
+          "Name": "localPairs",
+          "Type": "AIPair",
+          "Count": 4
+        },
+        {
+          "Name": "primary",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "secondary",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "tertiary",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "state",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "cpuCount",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "localCount",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "field180",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "field184",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "field188",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "field18c",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "scratch",
           "Type": "Pointer"
         }
       ]
@@ -20753,6 +20829,987 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "AIManager.params.offset"
+    },
+    {
+      "Instruction": "0x80730E94",
+      "ExpectedWord": "0x38DE0148",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x807310D8",
+      "ExpectedWord": "0x387E0148",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x80731108",
+      "ExpectedWord": "0x38BE0150",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.localPairs.offset+AIVsSub.localPairs.stride"
+    },
+    {
+      "Instruction": "0x8073110C",
+      "ExpectedWord": "0x387E0168",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731118",
+      "ExpectedWord": "0x901E0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x8073111C",
+      "ExpectedWord": "0x901E014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80731124",
+      "ExpectedWord": "0x38DE0150",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.localPairs.offset+AIVsSub.localPairs.stride"
+    },
+    {
+      "Instruction": "0x80731218",
+      "ExpectedWord": "0x387E0168",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x8073124C",
+      "ExpectedWord": "0x901E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731254",
+      "ExpectedWord": "0x901E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80731258",
+      "ExpectedWord": "0x901E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x8073125C",
+      "ExpectedWord": "0x901E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731260",
+      "ExpectedWord": "0x901E017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80731264",
+      "ExpectedWord": "0x901E0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80731268",
+      "ExpectedWord": "0x901E0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x8073127C",
+      "ExpectedWord": "0x907E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731294",
+      "ExpectedWord": "0x907E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x807312AC",
+      "ExpectedWord": "0x907E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x807312B8",
+      "ExpectedWord": "0x907E0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x80731520",
+      "ExpectedWord": "0x80030168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731550",
+      "ExpectedWord": "0x807E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80731558",
+      "ExpectedWord": "0x901E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731578",
+      "ExpectedWord": "0x807E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80731580",
+      "ExpectedWord": "0x901E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x807315A0",
+      "ExpectedWord": "0x807E0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x807315A8",
+      "ExpectedWord": "0x901E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x807315C0",
+      "ExpectedWord": "0x901E0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x8073161C",
+      "ExpectedWord": "0x801E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731640",
+      "ExpectedWord": "0x807E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731648",
+      "ExpectedWord": "0x901E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731654",
+      "ExpectedWord": "0x801E017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80731674",
+      "ExpectedWord": "0x907F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x80731678",
+      "ExpectedWord": "0x807E017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80731680",
+      "ExpectedWord": "0x901E017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x807316B0",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807316C4",
+      "ExpectedWord": "0x807F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x807316D8",
+      "ExpectedWord": "0x807F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x807316EC",
+      "ExpectedWord": "0x809F0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x80731754",
+      "ExpectedWord": "0x90BF0174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.state.offset"
+    },
+    {
+      "Instruction": "0x80731760",
+      "ExpectedWord": "0x90BF0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80731764",
+      "ExpectedWord": "0x90BF0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80731768",
+      "ExpectedWord": "0x90BF0188",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field188.offset"
+    },
+    {
+      "Instruction": "0x8073176C",
+      "ExpectedWord": "0x981F018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x80731788",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807317BC",
+      "ExpectedWord": "0x80030178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x807317F0",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731824",
+      "ExpectedWord": "0x801F017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80731890",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x807318B0",
+      "ExpectedWord": "0x807F0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x8073190C",
+      "ExpectedWord": "0x807F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80731914",
+      "ExpectedWord": "0x901F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80731988",
+      "ExpectedWord": "0x801A0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x807319AC",
+      "ExpectedWord": "0x8063014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807319E0",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807319E8",
+      "ExpectedWord": "0x807F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x807319F0",
+      "ExpectedWord": "0x807F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80731A58",
+      "ExpectedWord": "0x801D0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80731A8C",
+      "ExpectedWord": "0x801D017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80731AE0",
+      "ExpectedWord": "0x8063014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80731BE8",
+      "ExpectedWord": "0x82F80168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731C7C",
+      "ExpectedWord": "0x80780168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731C88",
+      "ExpectedWord": "0x80780168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80731C98",
+      "ExpectedWord": "0x82D8016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80731D38",
+      "ExpectedWord": "0x8078016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80731D44",
+      "ExpectedWord": "0x8078016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80731D54",
+      "ExpectedWord": "0x82D80170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80731DF4",
+      "ExpectedWord": "0x80780170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80731E04",
+      "ExpectedWord": "0x80780170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x807320BC",
+      "ExpectedWord": "0x80990168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807320D4",
+      "ExpectedWord": "0x80790168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807320E0",
+      "ExpectedWord": "0x80790168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807320F4",
+      "ExpectedWord": "0x8099016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732114",
+      "ExpectedWord": "0x8079016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732120",
+      "ExpectedWord": "0x8079016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732134",
+      "ExpectedWord": "0x80990170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732154",
+      "ExpectedWord": "0x80790170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732164",
+      "ExpectedWord": "0x80790170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732724",
+      "ExpectedWord": "0x80030178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80732884",
+      "ExpectedWord": "0x8003017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80732AA0",
+      "ExpectedWord": "0x80A3017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80732AC8",
+      "ExpectedWord": "0x8084014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80732B6C",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80732CD0",
+      "ExpectedWord": "0x981C018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x80732D74",
+      "ExpectedWord": "0x901F0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80732DA4",
+      "ExpectedWord": "0x80830168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80732DA8",
+      "ExpectedWord": "0x8063016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732DBC",
+      "ExpectedWord": "0x807E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732DC8",
+      "ExpectedWord": "0x807E0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80732DCC",
+      "ExpectedWord": "0x801E0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80732E1C",
+      "ExpectedWord": "0x8083016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732E20",
+      "ExpectedWord": "0x80A30170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732E28",
+      "ExpectedWord": "0x807E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80732E5C",
+      "ExpectedWord": "0x801E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80732E68",
+      "ExpectedWord": "0x807E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732E9C",
+      "ExpectedWord": "0x801E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80732EA8",
+      "ExpectedWord": "0x807E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80732EDC",
+      "ExpectedWord": "0x801E0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80732EE8",
+      "ExpectedWord": "0x807E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80732EFC",
+      "ExpectedWord": "0x807E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80732F98",
+      "ExpectedWord": "0x901E0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80732FD4",
+      "ExpectedWord": "0x80A30168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80732FF4",
+      "ExpectedWord": "0x807F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x8073300C",
+      "ExpectedWord": "0x807F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x8073301C",
+      "ExpectedWord": "0x809F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80733034",
+      "ExpectedWord": "0x809F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x8073303C",
+      "ExpectedWord": "0x80BF0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80733044",
+      "ExpectedWord": "0x881F018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x80733064",
+      "ExpectedWord": "0x807F014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807330BC",
+      "ExpectedWord": "0x981F018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x807330C0",
+      "ExpectedWord": "0x881F018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x807330D0",
+      "ExpectedWord": "0x807F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x807330D4",
+      "ExpectedWord": "0x801F0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x8073330C",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x80733320",
+      "ExpectedWord": "0x807F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x80733334",
+      "ExpectedWord": "0x807F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x80733348",
+      "ExpectedWord": "0x801F0174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.state.offset"
+    },
+    {
+      "Instruction": "0x80733360",
+      "ExpectedWord": "0x807F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x80733364",
+      "ExpectedWord": "0x801F0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80733370",
+      "ExpectedWord": "0x807F0190",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.scratch.offset"
+    },
+    {
+      "Instruction": "0x80733388",
+      "ExpectedWord": "0x807F0174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.state.offset"
+    },
+    {
+      "Instruction": "0x80733390",
+      "ExpectedWord": "0x901F0174",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.state.offset"
+    },
+    {
+      "Instruction": "0x80733394",
+      "ExpectedWord": "0x809F0188",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field188.offset"
+    },
+    {
+      "Instruction": "0x807333A0",
+      "ExpectedWord": "0x807F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x807333DC",
+      "ExpectedWord": "0x801F017C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localCount.offset"
+    },
+    {
+      "Instruction": "0x80733430",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x8073343C",
+      "ExpectedWord": "0x807F0184",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field184.offset"
+    },
+    {
+      "Instruction": "0x80733440",
+      "ExpectedWord": "0x809F0180",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field180.offset"
+    },
+    {
+      "Instruction": "0x8073348C",
+      "ExpectedWord": "0x80630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.primary.offset"
+    },
+    {
+      "Instruction": "0x807334A0",
+      "ExpectedWord": "0x807F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.secondary.offset"
+    },
+    {
+      "Instruction": "0x807334B4",
+      "ExpectedWord": "0x807F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.tertiary.offset"
+    },
+    {
+      "Instruction": "0x807334F0",
+      "ExpectedWord": "0x801F0178",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.cpuCount.offset"
+    },
+    {
+      "Instruction": "0x80733500",
+      "ExpectedWord": "0x981F018C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.field18c.offset"
+    },
+    {
+      "Instruction": "0x80733660",
+      "ExpectedWord": "0x835B014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8072B9E8",
+      "ExpectedWord": "0x38600194",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIVsSub.size"
+    },
+    {
+      "Instruction": "0x80730FE8",
+      "ExpectedWord": "0x389E0108",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.cpuPairs.end",
+      "Addend": -64
+    },
+    {
+      "Instruction": "0x80731128",
+      "ExpectedWord": "0x389E0128",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIVsSub.localPairs.end",
+      "Addend": -64
+    },
+    {
+      "Instruction": "0x80731808",
+      "ExpectedWord": "0x807C0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x80731A70",
+      "ExpectedWord": "0x807F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset"
+    },
+    {
+      "Instruction": "0x80732860",
+      "ExpectedWord": "0x80E60148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIVsSub.localPairs.offset"
     }
   ],
   "GlobalPointers": {
@@ -22620,13 +23677,143 @@
       "Name": ""
     },
     {
+      "Entry": "0x80730E50",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807314FC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807315EC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
       "Entry": "0x8073169C",
-      "Receiver": null,
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731788",
+      "Receiver": "AIVsSub",
+      "Name": "GameInfoManager_SetUserSelectedCupSidekick"
+    },
+    {
+      "Entry": "0x80731794",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731938",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807319AC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807319B4",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807319BC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807319CC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731A14",
+      "Receiver": "AIVsSub",
       "Name": ""
     },
     {
       "Entry": "0x80731AB4",
       "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731ACC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731B44",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80731E20",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807326B8",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732818",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732A78",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732C44",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732CF4",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732D40",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732D8C",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732DFC",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80732FB4",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80733114",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807332F0",
+      "Receiver": "AIVsSub",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80733478",
+      "Receiver": "AIVsSub",
       "Name": ""
     },
     {

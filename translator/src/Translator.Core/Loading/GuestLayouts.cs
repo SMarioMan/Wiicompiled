@@ -1,7 +1,7 @@
 namespace Translator.Core.Loading;
 
 /// <summary>PowerPC ABI layouts, independent of the host compiler's pointer size and alignment.</summary>
-public sealed record GuestLayoutField(string Name, string Type, int Count = 1, bool PerPlayer = false);
+public sealed record GuestLayoutField(string Name, string Type, int Count = 1, bool PerPlayer = false, string? PointerTo = null);
 public sealed record GuestLayoutType(string Name, int Alignment, int Size = 0,
     IReadOnlyList<GuestLayoutField>? Fields = null);
 public sealed record ResolvedGuestField(int Offset, int Size, int Count, int Stride);
@@ -58,6 +58,11 @@ public sealed class GuestLayouts
             return result;
         }
         foreach (var name in source.Keys) Resolve(name);
+        foreach (var type in source.Values)
+            foreach (var field in type.Fields ?? Array.Empty<GuestLayoutField>())
+                if (field.PointerTo is { } target &&
+                    (!source.ContainsKey(target) || resolved[field.Type].Size != 4))
+                    throw new InvalidDataException($"Invalid guest pointer field: {type.Name}.{field.Name} -> {target}.");
         Types = resolved;
     }
 

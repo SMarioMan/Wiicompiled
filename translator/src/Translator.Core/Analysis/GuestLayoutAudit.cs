@@ -205,9 +205,16 @@ public sealed class GuestLayoutAudit
                     case IrLoad load:
                         Propose(pc, index, "offset", facts.GetValueOrDefault(load.Address.Base), load.Address.Offset);
                         var address = Address(load.Address);
-                        Set(load.Destination, load.Destination.StartsWith("r", StringComparison.Ordinal) &&
-                            load.SizeBytes == 4 && address?.Constant is { } location &&
-                            _globals.TryGetValue(location, out var pointedType) ? new Fact(Type: pointedType) : null);
+                        string? pointedType = null;
+                        if (load.Destination.StartsWith("r", StringComparison.Ordinal) && load.SizeBytes == 4)
+                        {
+                            if (address?.Constant is { } location) _globals.TryGetValue(location, out pointedType);
+                            var basis = facts.GetValueOrDefault(load.Address.Base);
+                            if (pointedType is null && basis is { Type: not null, Offset: 0 } &&
+                                (basis.IndexStride == 0 || IsIndexedArrayField(basis.Type, load.Address.Offset, basis.IndexStride)))
+                                pointedType = PointerAt(basis.Type, load.Address.Offset);
+                        }
+                        Set(load.Destination, pointedType is null ? null : new Fact(Type: pointedType));
                         break;
                     case IrStore store:
                         Propose(pc, index, "offset", facts.GetValueOrDefault(store.Address.Base), store.Address.Offset);
@@ -265,11 +272,25 @@ public sealed class GuestLayoutAudit
         {
             if (offset < field.Value.Offset || offset >= field.Value.Offset + field.Value.Size) continue;
             var definition = _definitions[type].Fields!.Single(f => f.Name == field.Key);
-            if (definition.PerPlayer)
-                return field.Value.Stride == stride && _expanded.Types[type].Fields[field.Key].Stride == stride;
+            if ((definition.PerPlayer || field.Value.Count > 1) && field.Value.Stride == stride &&
+                _expanded.Types[type].Fields[field.Key].Stride == stride) return true;
             return IsIndexedArrayField(definition.Type, (offset - field.Value.Offset) % field.Value.Stride, stride);
         }
         return false;
+    }
+
+    private string? PointerAt(string type, int offset)
+    {
+        var shape = _original.Types[type];
+        foreach (var field in shape.Fields)
+        {
+            if (offset < field.Value.Offset || offset >= field.Value.Offset + field.Value.Size) continue;
+            var definition = _definitions[type].Fields!.Single(member => member.Name == field.Key);
+            var inner = (offset - field.Value.Offset) % field.Value.Stride;
+            if (definition.PointerTo is not null) return inner == 0 ? definition.PointerTo : null;
+            return PointerAt(definition.Type, inner);
+        }
+        return null;
     }
 
     private Fact? Narrow(string type, int offset)

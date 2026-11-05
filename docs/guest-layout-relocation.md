@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,742 references across creation, construction,
+menu and awards scenarios and audits 2,744 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 726 consumer entry points in `AuditedConsumers`.
+The manifest records 727 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -409,3 +409,13 @@ eight-at-a-time output loop already handles its final scalar remainder.
 Native tests execute this routine at 12, 13, 24, 48 and 100 players with
 unfinished, finished, mixed and tied standings, checking every player/rank
 mapping, stable ties, callee-saved registers and stack/output boundaries.
+
+## Effect creator namespace
+
+The game requests and initializes `players + 4` effect creators, preserving its
+four non-player roles after a uniform racer namespace. The SDK manager already
+allocates its pointer table from that requested count. Native tests execute the
+actual SDK allocation/initialization, game count argument and creator loop at
+12, 13, 24, 48 and 100 slots, checking every pointer, creator ID, group ID and
+boundary. Heap/OS support calls are fixtures. Relocating the reserved role IDs
+and their consumers is still required before expanded effects are complete.

@@ -23680,6 +23680,22 @@
       "Operand": "offset",
       "Symbol": "PositionTrackingFrame.conversion.offset",
       "Addend": 8
+    },
+    {
+      "Instruction": "0x806770A4",
+      "ExpectedWord": "0x38600010",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8067713C",
+      "ExpectedWord": "0x2C180010",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 4
     }
   ],
   "GlobalPointers": {
@@ -25161,6 +25177,11 @@
       "Entry": "0x80676F40",
       "Receiver": null,
       "Name": "Effects::MGWhiteFog::Update"
+    },
+    {
+      "Entry": "0x80677040",
+      "Receiver": null,
+      "Name": "Effects::Mgr::CreateInstance"
     },
     {
       "Entry": "0x806770F8",

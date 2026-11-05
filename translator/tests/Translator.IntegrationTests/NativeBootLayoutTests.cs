@@ -39,11 +39,13 @@ public class NativeBootLayoutTests
                 extern "C" void RacedataScenario_InitRng_8052f924(CpuContext*);
                 extern "C" void Raceinfo_Update_805331b4(CpuContext*);
                 extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext*);
+                extern "C" void RealControllerHolder_SetController_80521554(CpuContext*);
                 unsigned updateCalls=0,holderCalls=0;
+                uint32_t expectedController=0;
                 constexpr uint32_t inputManager=0x80090000,sectionManager=0x800a0000;
                 void original_holders(CpuContext* ctx){if(ctx->gpr[3]!=inputManager)std::abort();ctx->gpr[3]=0x31415926;}
                 void set_controller(CpuContext* ctx){const auto& l=MkwGuestLayout::kLayout;
-                    if(ctx->gpr[3]!=inputManager+l.inputRealHolders || ctx->gpr[4]!=inputManager+l.inputGCNControllers || ctx->gpr[5]!=0)std::abort();
+                    if(ctx->gpr[3]!=inputManager+l.inputRealHolders || ctx->gpr[4]!=(expectedController?expectedController:inputManager+l.inputGCNControllers) || ctx->gpr[5]!=0)std::abort();
                     holderCalls++;Memory::Write32(ctx->gpr[3]+4,ctx->gpr[4]);ctx->gpr[3]=0xdeadbeef;ctx->gpr[4]=0;ctx->lr=0;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="boot input fixture";
@@ -103,13 +105,21 @@ public class NativeBootLayoutTests
                     if(l.inputRealHolders!=4 || l.inputGCNControllers!=0x3ba0+({{players}}-12)*0x180)return 13;
                     register_entry(0x805242d8,original_holders);register_entry(0x80521554,set_controller);
                     Memory::Write32(0x809c1e38,sectionManager);Memory::Write32(sectionManager+0x38,0x124);
+                    Memory::Write32(0x809bd70c,inputManager);
+                    expectedController=0x800b0000;ctx.gpr[3]=inputManager+l.inputRealHolders;ctx.gpr[4]=expectedController;ctx.gpr[5]=0;
+                    RealControllerHolder_SetController_80521554(&ctx);
+                    if(holderCalls!=1 || Memory::Read32(inputManager+l.inputRealHolders+4)!=expectedController)return 16;
+                    expectedController=0;
                     if(!BootRace::ParseArgument("--race-cpu-menu-input"))return 14;
                     ctx.gpr[3]=inputManager;const CpuContext before=ctx;
                     InputManager_InitControllerHolders_805242d8(&ctx);
                     CpuContext expected=before;expected.gpr[3]=0x31415926;
-                    if(std::memcmp(&ctx,&expected,sizeof(ctx)) || holderCalls!=1 ||
+                    if(std::memcmp(&ctx,&expected,sizeof(ctx)) || holderCalls!=2 ||
                         Memory::Read32(inputManager+l.inputRealHolders+4)!=inputManager+l.inputGCNControllers ||
                         Memory::Read32(sectionManager+0x44)!=inputManager+l.inputRealHolders || Memory::Read32(sectionManager+0x3c)!=0x124)return 15;
+                    ctx.gpr[3]=inputManager+l.inputRealHolders;ctx.gpr[4]=0x800b0000;ctx.gpr[5]=0;
+                    RealControllerHolder_SetController_80521554(&ctx);
+                    if(holderCalls!=3 || Memory::Read32(inputManager+l.inputRealHolders+4)!=inputManager+l.inputGCNControllers)return 17;
                     return 0;
                 }
                 """);

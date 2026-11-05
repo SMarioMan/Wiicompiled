@@ -294,3 +294,16 @@ extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x805242D8, InputManager_InitControllerHolders_805242d8,
                            "InputManager_InitControllerHolders_805242d8");
+
+// Race initialization can reset the real holder after the menu setup above.
+// Keep that holder available to menus while the racer uses its separate AI input.
+extern "C" void RealControllerHolder_SetController_80521554(CpuContext* ctx) {
+    if (g_cpuMenuInput) {
+        const uint32_t manager = Memory::Read32(MKW_GADDR(809BD70C));
+        if (manager && ctx->gpr[3] == manager + kLayout.inputRealHolders)
+            ctx->gpr[4] = manager + kLayout.inputGCNControllers;
+    }
+    MKW_GUEST_NEXT(80521554)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80521554, RealControllerHolder_SetController_80521554,
+                           "RealControllerHolder_SetController_80521554");

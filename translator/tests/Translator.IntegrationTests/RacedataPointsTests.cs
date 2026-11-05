@@ -23,8 +23,20 @@ public class RacedataPointsTests
     [InlineData(12, 10)]
     [InlineData(24, 10)]
     [InlineData(48, 10)]
+    [InlineData(12, 0)]
+    [InlineData(24, 0)]
+    [InlineData(48, 0)]
+    [InlineData(12, 1)]
+    [InlineData(24, 1)]
+    [InlineData(48, 1)]
+    [InlineData(12, 7)]
+    [InlineData(24, 7)]
+    [InlineData(48, 7)]
+    [InlineData(12, 8)]
+    [InlineData(24, 8)]
+    [InlineData(48, 8)]
     [Trait("Requires", "USA game assets and Clang")]
-    public void OriginalBattlePointUpdaterUsesExpandedStackWithoutClobberingSavedRegisters(int players, int mode)
+    public void OriginalPointUpdaterUsesExpandedScoresAndStackWithoutClobberingSavedRegisters(int players, int mode)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "translator/Translator.sln")))
@@ -64,6 +76,12 @@ public class RacedataPointsTests
                     new TranslationOptions(KnownFunctionEntryPoints: map.Addresses.ToHashSet())).CxxCode);
             }
             File.WriteAllBytes(binary, image.Memory);
+            var points = players switch {
+                12 => "15,12,10,8,7,6,5,4,3,2,1,0",
+                24 => "30,27,24,22,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0",
+                48 => "60,57,54,52,49,47,45,43,41,39,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0",
+                _ => throw new InvalidDataException("Missing independent scoring fixture")
+            };
             File.WriteAllText(harness, $$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
@@ -97,7 +115,8 @@ public class RacedataPointsTests
                     Memory::Write32(0x809b8f70, info);
                     Memory::Write8(race+4, {{players}});
                     Memory::Write32(settings+12, 0); // Ordinary race, not a replay.
-                    Memory::Write32(settings+8, {{mode}}); // Offline/online battle use battle scores, not the GP points table.
+                    Memory::Write32(settings+8, {{mode}});
+                    constexpr uint32_t pointTable[] = { {{points}} };
                     Memory::Write32(info+12, info+0x100);
                     for (uint32_t player=0; player<{{players}}; player++) {
                         uint32_t state = 0x80030000+player*0x54;
@@ -117,11 +136,12 @@ public class RacedataPointsTests
                         CpuContextScope scope(&oracle);
                         for (uint32_t player=0; player<{{players}}; player++) {
                             int delta = 0;
-                            if ({{mode}} >= 9) for (uint32_t other=0; other<{{players}}; other++) {
+                            if ({{mode}} >= 7) for (uint32_t other=0; other<{{players}}; other++) {
                                 if (player == other) continue;
                                 oracle.gpr[3] = array+player*0xf0+0xe4;
                                 oracle.gpr[4] = array+other*0xf0+0xe4;
-                                if (player > other) func_80528CA4(&oracle);
+                                bool beats = {{mode}} >= 9 ? player > other : player < other;
+                                if (beats) func_80528CA4(&oracle);
                                 else func_80528D4C(&oracle);
                                 delta += static_cast<int16_t>(oracle.gpr[3]);
                             }
@@ -143,7 +163,12 @@ public class RacedataPointsTests
                     for (uint32_t reg=14; reg<=31; reg++)
                         if (ctx.gpr[reg] != 0x12340000+reg) return 5;
                     for (uint32_t player=0; player<{{players}}; player++) {
-                        if (Memory::Read16(array+player*0xf0+0xda) != player+8) return 6;
+                        uint32_t award = ({{mode}} == 3 || {{mode}} >= 9) ? player+5 : pointTable[player];
+                        if (Memory::Read16(array+player*0xf0+0xda) != award+3) {
+                            std::fprintf(stderr, "player %u score %u, expected %u\n", player,
+                                Memory::Read16(array+player*0xf0+0xda), award+3);
+                            return 6;
+                        }
                         if (Memory::Read16(array+player*0xf0+0xe8) != expected[player]) {
                             std::fprintf(stderr, "player %u rating %u, expected %d\n", player,
                                 Memory::Read16(array+player*0xf0+0xe8), expected[player]);

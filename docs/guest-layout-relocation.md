@@ -49,8 +49,9 @@ instead of silently ignoring required code changes. Version 1 reference-only
 manifests remain supported.
 The point updater's temporary score array grows with capacity. Its stack frame,
 conversion scratch space, saved registers and caller LR slot move together;
-increasing the loop alone would overwrite saved registers. The original Grand
-Prix scoring table is still limited to twelve players and requires migration.
+increasing the loop alone would overwrite saved registers. The point updater's
+Grand Prix/VS lookup now uses an expandable rank policy, described below, after
+checking all 144 original table bytes and the original lookup instruction.
 It is **incomplete**: other race-data consumers, race state, karts, items, scoring,
 menus, starting grids and the LAN/game network layouts still require migration.
 It is not a playable 24-player profile. Existing release builds retain twelve
@@ -80,6 +81,33 @@ does not divide exactly is rejected rather than silently skipping or overrunning
 slots. The current development manifest therefore requires multiples of four.
 This scan counts the expanded array while preserving the separate physical
 four-screen limit and the original competition-mode participant limits.
+
+## Rank scoring
+
+`RankTables` requires manifest version 3; reference-only version 1 and array-copy
+version 2 manifests remain readable. The USA profile preserves every original
+scoring row for one through twelve participants, including when such a field
+races under a larger capacity profile. The original-capacity translation remains
+unchanged. Expanded translations replace the audited byte lookup with a generated
+native helper, so a larger field never reads past the original table.
+
+For larger fields, `Curve` supplies the original twelve-rank anchors
+`15,12,10,8,7,6,5,4,3,2,1,0`. The helper linearly interpolates the anchors across
+the field, scales points by participant count divided by twelve, and rounds to
+the nearest integer. Working backward, each rank receives at least one more
+point than the next rank. Equivalently, its score is the maximum of
+`interpolated(q) + q - rank` over ranks `q >= rank`. This prevents rounding from
+creating ties. The profile's resulting 24-player distribution is:
+
+```text
+30,27,24,22,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0
+```
+
+The curve is a profile setting and extends to other field sizes without an extra
+twelve-slot table. This is this project's scoring policy, not a claim to reproduce
+CTGP-R's implementation. The generated helper uses bounded integer arithmetic,
+checks field/rank bounds and needs no new fixed-address guest allocation.
+Other scoring and UI consumers still require auditing.
 
 ## Finding additional consumers
 
@@ -138,9 +166,11 @@ all three capacities. It checks every player's score and rating, restored stack
 pointer, saved integer/floating-point registers, and stack guard bytes. Rating
 expectations aggregate the original rating functions' per-opponent results
 separately, using varied initial ratings; the updater must include every player
-before applying ratings. These battle paths do not rely on the unmigrated Grand
-Prix table. They validate point updates, not a running online battle or its network
-synchronization.
+before applying ratings. These battle paths do not rely on the Grand Prix table.
+Additional checks run Grand Prix, offline VS and both online VS modes at all three
+capacities against independent expected point distributions and per-opponent
+rating calculations. These validate point updates, not a running online
+race/battle or its network synchronization.
 Capacity-count checks vary the number of occupied slots from zero to capacity,
 mix local and CPU players, isolate the final slot, and exercise mode-specific
 participant and split-screen rules against the expanded settings offsets.

@@ -1,8 +1,8 @@
 {
-  "Version": 2,
+  "Version": 3,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: race-data lifecycle, selected readers and point-updater frame/field references. GP point tables, other consumers and subsystems still need migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: race-data lifecycle, selected readers, point updates, capacity scans, verified unrolled bookkeeping and expandable rank scoring. Other consumers and subsystems still need migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -1742,6 +1742,38 @@
           "Source": 218,
           "Destination": 216,
           "Width": 2
+        }
+      ]
+    }
+  ],
+  "RankTables": [
+    {
+      "Address": "0x8088BBC0",
+      "ExpectedHex": "0F00000000000000000000000F07000000000000000000000F08020000000000000000000F09040100000000000000000F09050201000000000000000F0A060301000000000000000F0A070503010000000000000F0B080604020100000000000F0B080604030201000000000F0C0A0806040302010000000F0C0A0806050403020100000F0C0A080706050403020100",
+      "Curve": [
+        15,
+        12,
+        10,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      "Lookups": [
+        {
+          "Instruction": "0x8052A0F0",
+          "ExpectedWord": "0x8863FFFF",
+          "Node": 0,
+          "AddressBase": "r3",
+          "AddressOffset": -1,
+          "Destination": "r3",
+          "Players": "r22",
+          "Position": "r23"
         }
       ]
     }

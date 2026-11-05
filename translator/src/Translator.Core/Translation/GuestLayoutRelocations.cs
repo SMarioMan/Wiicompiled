@@ -101,7 +101,7 @@ public sealed partial class GuestLayoutRelocations
         }),
         ArrayFills = _arrayFills.Select(fill => new {
             Begin = $"0x{fill.Begin:X8}", End = $"0x{FillEnd(fill):X8}", fill.BaseRegister, fill.ValueRegister,
-            ExpectedWords = fill.ExpectedWords.Select(word => $"0x{word:X8}"), fill.Arrays
+            ExpectedWords = fill.ExpectedWords.Select(word => $"0x{word:X8}"), fill.Arrays, fill.Addresses
         }),
         ArrayCopies = _arrayCopies.Select(copy => new {
             Begin = $"0x{copy.Begin:X8}", End = $"0x{CopyEnd(copy):X8}", copy.BaseRegister,
@@ -182,7 +182,7 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
@@ -193,6 +193,8 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Unrolled array fills require layout format version 5.");
         if (file.Version < 6 && file.ResampledCursors is { Length: > 0 })
             throw new InvalidDataException("Resampled authored-table cursors require layout format version 6.");
+        if (file.Version < 7 && file.ArrayFills?.Any(fill => fill.Addresses is { Length: > 0 }) == true)
+            throw new InvalidDataException("Array-fill address setup requires layout format version 7.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
@@ -206,7 +208,7 @@ public sealed partial class GuestLayoutRelocations
             file.BoundedAccesses?.Select(site => new GuestBoundedAccess(Hex(site.Instruction), Hex(site.ExpectedWord),
                 site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)),
             file.ArrayFills?.Select(fill => new GuestArrayFill(Hex(fill.Begin), fill.ExpectedWords.Select(Hex).ToArray(),
-                fill.BaseRegister, fill.ValueRegister, fill.Arrays)),
+                fill.BaseRegister, fill.ValueRegister, fill.Arrays, fill.Addresses)),
             file.ResampledCursors?.Select(site => new GuestResampledCursor(Hex(site.Instruction),Hex(site.ExpectedWord),
                 site.Cursor,site.NextIndex,site.IndexStride,site.SourceStride,site.Count,site.SourceCount)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
@@ -219,7 +221,7 @@ public sealed partial class GuestLayoutRelocations
         BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null);
     private sealed record ResampledCursorFile(string Instruction,string ExpectedWord,string Cursor,string NextIndex,
         string IndexStride,string SourceStride,string Count,int SourceCount);
-    private sealed record ArrayFillFile(string Begin, string[] ExpectedWords, string BaseRegister, string ValueRegister, GuestFillArray[] Arrays);
+    private sealed record ArrayFillFile(string Begin, string[] ExpectedWords, string BaseRegister, string ValueRegister, GuestFillArray[] Arrays, GuestFillAddress[]? Addresses = null);
     private sealed record BoundAccessFile(string Instruction, string ExpectedWord, int Node, string Index,
         int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null);
     private sealed record RankTableFile(string Address, string ExpectedHex, int[] Curve, RankLookupFile[] Lookups);

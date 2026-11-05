@@ -52,7 +52,7 @@ public class GuestLayoutCursorTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {5,6,7})
+            foreach(var version in new[] {5,6,7,8})
             {
                 var site=Site();
                 File.WriteAllText(path,JsonSerializer.Serialize(new {
@@ -60,7 +60,7 @@ public class GuestLayoutCursorTests
                     ResampledCursors=new[] {new {Instruction="0x80001000",ExpectedWord="0x38840020",site.Cursor,
                         site.NextIndex,site.IndexStride,site.SourceStride,site.Count,site.SourceCount}}
                 }));
-                if(version==6)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 6 or 7)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

@@ -29,14 +29,14 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {4,5,6,7})
+            foreach(var version in new[] {4,5,6,7,8})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=2,Types,References=Array.Empty<object>(),
                     ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays}}
                 }));
-                if(version is 5 or 6) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 5 or 6 or 7) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
@@ -53,6 +53,46 @@ public class GuestLayoutArrayFillTests
         var stores = result.LinearIr.Blocks.SelectMany(block=>block.Instructions).OfType<IrStore>().ToArray();
         Assert.Equal(new[] {8,20,12,24,16,28}, stores.Select(store=>store.Address.Offset));
         Assert.All(stores,store=> {Assert.Equal("r3",store.Address.Base);Assert.Equal("r0",store.Source.RegisterName);Assert.Equal(4,store.SizeBytes);});
+    }
+
+    [Fact]
+    public void DeclaredInterleavedAddressSetupMovesWithItsArrayAndRejectsAliasing()
+    {
+        var words=new uint[] {Words[0],0x38a30010,Words[1],Words[2],Words[3]}; // addi r5,r3,16
+        var fill=Fill(words) with {Addresses=new[] {new GuestFillAddress("r5","Object.second.offset")}};
+        var baseline=new FunctionTranslator(Image(words)).Translate(Start,TranslationOptions.Default).CxxCode;
+        Assert.Equal(baseline,new FunctionTranslator(Image(words),layoutRelocations:Layout(2,fill)).Translate(Start,TranslationOptions.Default).CxxCode);
+        var nodes=new FunctionTranslator(Image(words),layoutRelocations:Layout(3,fill)).Discover(Start,TranslationOptions.Default)
+            .LinearIr.Blocks.SelectMany(block=>block.Instructions).ToArray();
+        var address=Assert.Single(nodes.OfType<IrBinary>());
+        Assert.Equal(new IrBinary("r5",IrValue.Register("r3"),IrValue.Imm(20),"add"),address);
+        Assert.Equal(6,nodes.OfType<IrStore>().Count());
+        foreach(var register in new[] {"r3","r0","r1","r14"})
+            Assert.Throws<InvalidDataException>(()=>Layout(3,fill with {Addresses=new[] {new GuestFillAddress(register,"Object.second.offset")}}));
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(Image(words),layoutRelocations:Layout(3,Fill(words))));
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(Image(words),layoutRelocations:Layout(3,
+            fill with {Addresses=new[] {new GuestFillAddress("r5","Object.first.offset")}})));
+    }
+
+    [Fact]
+    public void AddressSetupRequiresVersionSeven()
+    {
+        var path=Path.GetTempFileName();
+        try
+        {
+            foreach(var version in new[] {6,7,8})
+            {
+                File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {
+                    Version=version,OriginalPlayers=2,Types,References=Array.Empty<object>(),
+                    ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
+                        BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,
+                        Addresses=new[] {new GuestFillAddress("r5","Object.second.offset")}}}
+                }));
+                if(version==7)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
+            }
+        }
+        finally {File.Delete(path);}
     }
 
     [Fact]

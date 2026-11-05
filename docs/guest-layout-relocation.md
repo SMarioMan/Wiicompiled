@@ -352,3 +352,13 @@ Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game
 works; that requires the remaining migrations and gameplay tests.
+
+## Address setup inside verified fills
+
+Format version 7 allows `ArrayFills.Addresses` to declare scalar address setup
+interleaved with the checked stores. Each entry names a distinct volatile GPR
+and one declared array offset. Validation proves the exact base-plus-offset
+assignment; destinations may not alias the fill base or value registers.
+Expanded emission writes the full arrays, then computes the declared addresses
+using their expanded offsets. No other effects are allowed in the span, and
+original-capacity emission remains unchanged.

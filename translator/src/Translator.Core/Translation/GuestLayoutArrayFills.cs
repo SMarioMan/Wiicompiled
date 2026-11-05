@@ -8,8 +8,9 @@ using Translator.Core.Loading;
 namespace Translator.Core.Translation;
 
 public sealed record GuestFillArray(string Array, string Stride, string Count, int Width);
+public sealed record GuestFillAddress(string Register, string Array);
 public sealed record GuestArrayFill(uint Begin, IReadOnlyList<uint> ExpectedWords,
-    string BaseRegister, string ValueRegister, IReadOnlyList<GuestFillArray> Arrays);
+    string BaseRegister, string ValueRegister, IReadOnlyList<GuestFillArray> Arrays, IReadOnlyList<GuestFillAddress>? Addresses = null);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -25,6 +26,13 @@ public sealed partial class GuestLayoutRelocations
             if (fill.Begin % 4 != 0 || fill.ExpectedWords.Count == 0 || fill.Arrays.Count == 0 ||
                 !IsGpr(fill.BaseRegister) || fill.BaseRegister == "r0" || !IsGpr(fill.ValueRegister))
                 throw new InvalidDataException("Invalid guest array-fill definition.");
+            var addresses = fill.Addresses ?? Array.Empty<GuestFillAddress>();
+            if (addresses.Select(address => address.Register).Distinct().Count() != addresses.Count ||
+                addresses.Any(address => !IsGpr(address.Register) || address.Register == fill.BaseRegister ||
+                    address.Register == fill.ValueRegister ||
+                    !(address.Register == "r0" || int.Parse(address.Register.AsSpan(1)) is >= 3 and <= 12) ||
+                    !fill.Arrays.Any(array => array.Array == address.Array)))
+                throw new InvalidDataException("Guest fill address setup must use distinct volatile registers and declared arrays.");
             foreach (var layout in new[] { _original, _expanded })
             {
                 var intervals = new List<(int Begin, int End)>();
@@ -60,6 +68,7 @@ public sealed partial class GuestLayoutRelocations
         {
             var expected = FillStores(fill, _original).ToArray();
             var observed = new List<IrStore>();
+            var observedAddresses = new List<IrBinary>();
             for (var index = 0; index < fill.ExpectedWords.Count; index++)
             {
                 var pc = checked(fill.Begin + (uint)index * 4);
@@ -68,11 +77,12 @@ public sealed partial class GuestLayoutRelocations
                 foreach (var node in new PpcLifter().Lift(new[] { PpcDecoder.Decode(pc, word) })[0].Ir)
                 {
                     if (node is IrComment) continue;
-                    if (node is not IrStore store) throw new InvalidDataException("Guest array-fill span contains effects other than scalar stores.");
-                    observed.Add(store);
+                    if (node is IrStore store) observed.Add(store);
+                    else if (node is IrBinary address) observedAddresses.Add(address);
+                    else throw new InvalidDataException("Guest array-fill span contains effects other than declared scalar stores and addresses.");
                 }
             }
-            if (!observed.SequenceEqual(expected))
+            if (!observed.SequenceEqual(expected) || !observedAddresses.SequenceEqual(FillAddresses(fill, _original)))
                 throw new InvalidDataException($"Unproven ordered guest array fill at 0x{fill.Begin:X8}.");
         }
     }
@@ -85,6 +95,10 @@ public sealed partial class GuestLayoutRelocations
                     IrValue.Register(fill.ValueRegister), array.Width);
     }
 
+    private static IEnumerable<IrBinary> FillAddresses(GuestArrayFill fill, GuestLayouts layout) =>
+        (fill.Addresses ?? Array.Empty<GuestFillAddress>()).Select(address =>
+            new IrBinary(address.Register, IrValue.Register(fill.BaseRegister), IrValue.Imm(layout.Symbol(address.Array)), "add"));
+
     private IReadOnlyList<IrInstruction>? ApplyFill(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
         foreach (var fill in _arrayFills)
@@ -93,7 +107,7 @@ public sealed partial class GuestLayoutRelocations
             if (origin.Word != fill.ExpectedWords[checked((int)(origin.Address-fill.Begin)/4)])
                 throw new InvalidDataException($"Guest array-fill instruction mismatch at 0x{origin.Address:X8}.");
             if (Players == OriginalPlayers) return instructions;
-            return origin.Address == fill.Begin ? FillStores(fill, _expanded).Cast<IrInstruction>().ToArray() : Array.Empty<IrInstruction>();
+            return origin.Address == fill.Begin ? FillStores(fill, _expanded).Cast<IrInstruction>().Concat(FillAddresses(fill, _expanded)).ToArray() : Array.Empty<IrInstruction>();
         }
         return null;
     }

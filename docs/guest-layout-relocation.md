@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,526 references across creation, construction,
+menu and awards scenarios and audits 2,700 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 675 consumer entry points in `AuditedConsumers`.
+The manifest records 720 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -166,6 +166,23 @@ with independently normalized authored profiles, including fractional input
 conversion, and source data, stack, saved registers and allocation guards are
 checked. This verifies parameter storage/loading; AI sorting scratch arrays and
 complete racing still require migration.
+
+## Virtual controller storage
+
+`InputManager.virtualHolders` is one capacity-sized array of real 0x180-byte
+virtual-controller holders. The manager allocation, SDK construction/destruction
+counts, and fields after that array move together. Physical real controllers,
+Wii/GCN/ghost devices and pad-status arrays retain their four local channels.
+Fixed physical arrays with unchanged element strides can be indexed while their
+base offsets move after the virtual array.
+
+Native tests execute the original manager construction region, SDK array loop,
+and complete virtual-holder constructor chain at 12, 13, 24, 48 and 100 slots.
+They load the actual guest vtables, check each holder's controller bindings and
+verify that neighboring fields, registers and stack/heap guards remain intact.
+The default harness reports unexpected guest targets and MMIO before aborting;
+missing dependencies still fail immediately. Other controller consumers and the
+LAN module's explicit controller hook remain under migration.
 
 ## Private executable validation
 

@@ -325,6 +325,145 @@
           "PerPlayer": true
         }
       ]
+    },
+    {
+      "Name": "InputByte",
+      "Alignment": 1,
+      "Size": 1
+    },
+    {
+      "Name": "InputRealHolder",
+      "Alignment": 4,
+      "Size": 236
+    },
+    {
+      "Name": "InputAIHolder",
+      "Alignment": 4,
+      "Size": 384
+    },
+    {
+      "Name": "InputHolder",
+      "Alignment": 4,
+      "Size": 216
+    },
+    {
+      "Name": "InputDummyController",
+      "Alignment": 4,
+      "Size": 144
+    },
+    {
+      "Name": "InputWiiController",
+      "Alignment": 4,
+      "Size": 2336
+    },
+    {
+      "Name": "InputGCNController",
+      "Alignment": 4,
+      "Size": 176
+    },
+    {
+      "Name": "InputGhostController",
+      "Alignment": 4,
+      "Size": 168
+    },
+    {
+      "Name": "InputKrmManager",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "InputPadding",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "InputPadStatus",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "InputManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "vtable",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "realHolders",
+          "Type": "InputRealHolder",
+          "Count": 4
+        },
+        {
+          "Name": "virtualHolders",
+          "Type": "InputAIHolder",
+          "PerPlayer": true
+        },
+        {
+          "Name": "dummyHolder",
+          "Type": "InputHolder"
+        },
+        {
+          "Name": "field168c",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "dummyController",
+          "Type": "InputDummyController"
+        },
+        {
+          "Name": "wiiControllers",
+          "Type": "InputWiiController",
+          "Count": 4
+        },
+        {
+          "Name": "gcnControllers",
+          "Type": "InputGCNController",
+          "Count": 4
+        },
+        {
+          "Name": "ghostControllers",
+          "Type": "InputGhostController",
+          "Count": 4
+        },
+        {
+          "Name": "krm",
+          "Type": "InputKrmManager"
+        },
+        {
+          "Name": "padding4110",
+          "Type": "InputPadding"
+        },
+        {
+          "Name": "padStatuses",
+          "Type": "InputPadStatus",
+          "Count": 4
+        },
+        {
+          "Name": "field4150",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "paused",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "mirror",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "field4156",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "padding4157",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "syncStatus",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -21861,11 +22000,1303 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "AIActionAllocation.actions.count"
+    },
+    {
+      "Instruction": "0x8051ECE4",
+      "ExpectedWord": "0x3860415C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "InputManager.size"
+    },
+    {
+      "Instruction": "0x8051EEDC",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "InputManager.virtualHolders.count"
+    },
+    {
+      "Instruction": "0x8051EDF0",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "InputManager.virtualHolders.count"
+    },
+    {
+      "Instruction": "0x805170CC",
+      "ExpectedWord": "0x88034154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.paused.offset"
+    },
+    {
+      "Instruction": "0x805170D8",
+      "ExpectedWord": "0x98A34154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.paused.offset"
+    },
+    {
+      "Instruction": "0x80517110",
+      "ExpectedWord": "0x8803168C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field168c.offset"
+    },
+    {
+      "Instruction": "0x8051711C",
+      "ExpectedWord": "0x9883168C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field168c.offset"
+    },
+    {
+      "Instruction": "0x80519940",
+      "ExpectedWord": "0x881E1770",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x80519954",
+      "ExpectedWord": "0x881E180D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 237
+    },
+    {
+      "Instruction": "0x80519964",
+      "ExpectedWord": "0x9BFE180D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 237
+    },
+    {
+      "Instruction": "0x80519968",
+      "ExpectedWord": "0x9BFE180C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 236
+    },
+    {
+      "Instruction": "0x8051997C",
+      "ExpectedWord": "0x801E17B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 144
+    },
+    {
+      "Instruction": "0x80519994",
+      "ExpectedWord": "0x801E17B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 148
+    },
+    {
+      "Instruction": "0x8051999C",
+      "ExpectedWord": "0x801E17B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 152
+    },
+    {
+      "Instruction": "0x805199A4",
+      "ExpectedWord": "0x801E17C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 160
+    },
+    {
+      "Instruction": "0x805199A8",
+      "ExpectedWord": "0x80DE17BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x805199B4",
+      "ExpectedWord": "0x801E17C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 164
+    },
+    {
+      "Instruction": "0x805199BC",
+      "ExpectedWord": "0xC01E17C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 168
+    },
+    {
+      "Instruction": "0x805199C4",
+      "ExpectedWord": "0xC01E17CC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 172
+    },
+    {
+      "Instruction": "0x805199CC",
+      "ExpectedWord": "0x801E17D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 180
+    },
+    {
+      "Instruction": "0x805199D0",
+      "ExpectedWord": "0x80DE17D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 176
+    },
+    {
+      "Instruction": "0x805199DC",
+      "ExpectedWord": "0x801E17DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 188
+    },
+    {
+      "Instruction": "0x805199E0",
+      "ExpectedWord": "0x80DE17D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 184
+    },
+    {
+      "Instruction": "0x805199EC",
+      "ExpectedWord": "0xC01E17E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 192
+    },
+    {
+      "Instruction": "0x805199F4",
+      "ExpectedWord": "0x801E17E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 200
+    },
+    {
+      "Instruction": "0x805199F8",
+      "ExpectedWord": "0x80DE17E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 196
+    },
+    {
+      "Instruction": "0x80519A04",
+      "ExpectedWord": "0x801E17F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 208
+    },
+    {
+      "Instruction": "0x80519A08",
+      "ExpectedWord": "0x80DE17EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 204
+    },
+    {
+      "Instruction": "0x80519A14",
+      "ExpectedWord": "0xC01E17F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 212
+    },
+    {
+      "Instruction": "0x80519A1C",
+      "ExpectedWord": "0xC01E17F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 216
+    },
+    {
+      "Instruction": "0x80519A24",
+      "ExpectedWord": "0xC01E17FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 220
+    },
+    {
+      "Instruction": "0x80519A2C",
+      "ExpectedWord": "0xC01E1800",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 224
+    },
+    {
+      "Instruction": "0x80519A34",
+      "ExpectedWord": "0x801E1808",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 232
+    },
+    {
+      "Instruction": "0x80519A38",
+      "ExpectedWord": "0x80DE1804",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 228
+    },
+    {
+      "Instruction": "0x80519A44",
+      "ExpectedWord": "0x881E180C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 236
+    },
+    {
+      "Instruction": "0x80519A4C",
+      "ExpectedWord": "0x881E180D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 237
+    },
+    {
+      "Instruction": "0x80519A54",
+      "ExpectedWord": "0x881E180E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 238
+    },
+    {
+      "Instruction": "0x80519A5C",
+      "ExpectedWord": "0x881E180F",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 239
+    },
+    {
+      "Instruction": "0x80519A64",
+      "ExpectedWord": "0x801E1814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 244
+    },
+    {
+      "Instruction": "0x80519A68",
+      "ExpectedWord": "0x80DE1810",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 240
+    },
+    {
+      "Instruction": "0x80519A74",
+      "ExpectedWord": "0x801E181C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 252
+    },
+    {
+      "Instruction": "0x80519A78",
+      "ExpectedWord": "0x80DE1818",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 248
+    },
+    {
+      "Instruction": "0x80519A84",
+      "ExpectedWord": "0x801E1824",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 260
+    },
+    {
+      "Instruction": "0x80519A88",
+      "ExpectedWord": "0x80DE1820",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 256
+    },
+    {
+      "Instruction": "0x80519A94",
+      "ExpectedWord": "0x801E182C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 268
+    },
+    {
+      "Instruction": "0x80519A98",
+      "ExpectedWord": "0x80DE1828",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 264
+    },
+    {
+      "Instruction": "0x80519AA4",
+      "ExpectedWord": "0x801E1830",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 272
+    },
+    {
+      "Instruction": "0x80519AD0",
+      "ExpectedWord": "0xC01E17D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 176
+    },
+    {
+      "Instruction": "0x80519AD8",
+      "ExpectedWord": "0xC01E17D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 180
+    },
+    {
+      "Instruction": "0x80519DE8",
+      "ExpectedWord": "0xA0641740",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x80519DEC",
+      "ExpectedWord": "0xA0041780",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 96
+    },
+    {
+      "Instruction": "0x8051A4FC",
+      "ExpectedWord": "0x88054155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051A63C",
+      "ExpectedWord": "0x88054155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051A700",
+      "ExpectedWord": "0x88054155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051AF2C",
+      "ExpectedWord": "0x98031778",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 88
+    },
+    {
+      "Instruction": "0x8051AF34",
+      "ExpectedWord": "0x88032014",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 2292
+    },
+    {
+      "Instruction": "0x8051AF38",
+      "ExpectedWord": "0x90031774",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 84
+    },
+    {
+      "Instruction": "0x8051B21C",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B268",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B2B4",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B300",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B3F0",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B570",
+      "ExpectedWord": "0x88034155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051B6BC",
+      "ExpectedWord": "0x88034155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051BEC4",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051BF10",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051BF5C",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051BFA8",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051C020",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051C1CC",
+      "ExpectedWord": "0x88844155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051C7D0",
+      "ExpectedWord": "0x88044155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051C884",
+      "ExpectedWord": "0x88034155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8051CE78",
+      "ExpectedWord": "0x8803168C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field168c.offset"
+    },
+    {
+      "Instruction": "0x8051CF18",
+      "ExpectedWord": "0x88034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8051D718",
+      "ExpectedWord": "0x80034104",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.krm.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8051D740",
+      "ExpectedWord": "0x80634108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.krm.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8051D750",
+      "ExpectedWord": "0x8063410C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.krm.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8051EC7C",
+      "ExpectedWord": "0x80034158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x8051ECA8",
+      "ExpectedWord": "0x90034158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x8051ECB4",
+      "ExpectedWord": "0x90034158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x8051ECC0",
+      "ExpectedWord": "0x90034158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x8051ED90",
+      "ExpectedWord": "0x38634100",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.krm.offset"
+    },
+    {
+      "Instruction": "0x8051ED9C",
+      "ExpectedWord": "0x387E3E60",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.ghostControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EDB4",
+      "ExpectedWord": "0x387E3BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EDCC",
+      "ExpectedWord": "0x387E1720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EEE4",
+      "ExpectedWord": "0x387D15B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x8051EEEC",
+      "ExpectedWord": "0x3BDD1690",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyController.offset"
+    },
+    {
+      "Instruction": "0x8051EF10",
+      "ExpectedWord": "0x387D1720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EF34",
+      "ExpectedWord": "0x387D3BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EF54",
+      "ExpectedWord": "0x387D3E60",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.ghostControllers.offset"
+    },
+    {
+      "Instruction": "0x8051EF70",
+      "ExpectedWord": "0x387D4100",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.krm.offset"
+    },
+    {
+      "Instruction": "0x8051EF78",
+      "ExpectedWord": "0x909D4100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.krm.offset"
+    },
+    {
+      "Instruction": "0x8051EF90",
+      "ExpectedWord": "0x90FD1FF4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 2260
+    },
+    {
+      "Instruction": "0x8051EF94",
+      "ExpectedWord": "0x387D15B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x8051EF9C",
+      "ExpectedWord": "0x93FD2914",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride",
+      "Addend": 2260
+    },
+    {
+      "Instruction": "0x8051EFA4",
+      "ExpectedWord": "0x90DD3234",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride",
+      "Addend": 2260
+    },
+    {
+      "Instruction": "0x8051EFA8",
+      "ExpectedWord": "0x901D3B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride",
+      "Addend": 2260
+    },
+    {
+      "Instruction": "0x8051EFAC",
+      "ExpectedWord": "0x90FD3C3C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.gcnControllers.offset",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x8051EFB0",
+      "ExpectedWord": "0x93FD3CEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x8051EFB4",
+      "ExpectedWord": "0x90DD3D9C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x8051EFB8",
+      "ExpectedWord": "0x901D3E4C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride",
+      "Addend": 156
+    },
+    {
+      "Instruction": "0x8051EFC8",
+      "ExpectedWord": "0x389D1690",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyController.offset"
+    },
+    {
+      "Instruction": "0x8051F008",
+      "ExpectedWord": "0x901D4158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x8051F23C",
+      "ExpectedWord": "0x38634120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.padStatuses.offset"
+    },
+    {
+      "Instruction": "0x8051F280",
+      "ExpectedWord": "0x981E4156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8051F28C",
+      "ExpectedWord": "0x981E4154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.paused.offset"
+    },
+    {
+      "Instruction": "0x8051F290",
+      "ExpectedWord": "0x981E168C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field168c.offset"
+    },
+    {
+      "Instruction": "0x8051F2D8",
+      "ExpectedWord": "0x85831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051F304",
+      "ExpectedWord": "0x85833BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051F39C",
+      "ExpectedWord": "0x38631720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051F3CC",
+      "ExpectedWord": "0x38633BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051F3E0",
+      "ExpectedWord": "0x8803412A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 10
+    },
+    {
+      "Instruction": "0x8051F454",
+      "ExpectedWord": "0x38633E60",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.ghostControllers.offset"
+    },
+    {
+      "Instruction": "0x8051F498",
+      "ExpectedWord": "0x38634120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.padStatuses.offset"
+    },
+    {
+      "Instruction": "0x8051F4A0",
+      "ExpectedWord": "0x387D4120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.padStatuses.offset"
+    },
+    {
+      "Instruction": "0x8051F4AC",
+      "ExpectedWord": "0x889D4154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.paused.offset"
+    },
+    {
+      "Instruction": "0x8051F4C8",
+      "ExpectedWord": "0x889D4154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.paused.offset"
+    },
+    {
+      "Instruction": "0x8051F4E8",
+      "ExpectedWord": "0x819D15B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x8051F4EC",
+      "ExpectedWord": "0x387D15B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x8051FA38",
+      "ExpectedWord": "0x38831690",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyController.offset"
+    },
+    {
+      "Instruction": "0x8051FA40",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x8051FAB4",
+      "ExpectedWord": "0x3BE31720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051FBAC",
+      "ExpectedWord": "0x38833BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051FDF4",
+      "ExpectedWord": "0x38831690",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyController.offset"
+    },
+    {
+      "Instruction": "0x8051FE8C",
+      "ExpectedWord": "0x88031770",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8051FE90",
+      "ExpectedWord": "0x38831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8051FEFC",
+      "ExpectedWord": "0x88033BF0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.gcnControllers.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8051FF00",
+      "ExpectedWord": "0x38833BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x8051FF68",
+      "ExpectedWord": "0x389E1690",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyController.offset"
+    },
+    {
+      "Instruction": "0x805200DC",
+      "ExpectedWord": "0x38843E60",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.ghostControllers.offset"
+    },
+    {
+      "Instruction": "0x805201C4",
+      "ExpectedWord": "0xA0064120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset"
+    },
+    {
+      "Instruction": "0x805201CC",
+      "ExpectedWord": "0x88064122",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x805201D4",
+      "ExpectedWord": "0x88064123",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x805201DC",
+      "ExpectedWord": "0x88064124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x805201E4",
+      "ExpectedWord": "0x88064125",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x805201EC",
+      "ExpectedWord": "0x88064126",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x805201F4",
+      "ExpectedWord": "0x88064127",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x805201FC",
+      "ExpectedWord": "0x88064128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80520204",
+      "ExpectedWord": "0x88064129",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 9
+    },
+    {
+      "Instruction": "0x8052020C",
+      "ExpectedWord": "0x8806412A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 10
+    },
+    {
+      "Instruction": "0x8052021C",
+      "ExpectedWord": "0x8803412A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.padStatuses.offset",
+      "Addend": 10
+    },
+    {
+      "Instruction": "0x80520288",
+      "ExpectedWord": "0x387F4100",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.krm.offset"
+    },
+    {
+      "Instruction": "0x805202A4",
+      "ExpectedWord": "0x80034104",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.krm.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x805202B4",
+      "ExpectedWord": "0x38634100",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.krm.offset"
+    },
+    {
+      "Instruction": "0x80520328",
+      "ExpectedWord": "0x80034158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x80520354",
+      "ExpectedWord": "0x901F4158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.syncStatus.offset"
+    },
+    {
+      "Instruction": "0x80520400",
+      "ExpectedWord": "0x3BE31720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x80520498",
+      "ExpectedWord": "0x85831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x8052E950",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8052E964",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8052EA9C",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8052EAB0",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8052F02C",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8052F040",
+      "ExpectedWord": "0x98034156",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.field4156.offset"
+    },
+    {
+      "Instruction": "0x8054E340",
+      "ExpectedWord": "0x98034155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x8054E9E0",
+      "ExpectedWord": "0x98044155",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.mirror.offset"
+    },
+    {
+      "Instruction": "0x805BF048",
+      "ExpectedWord": "0x88031770",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "InputManager.wiiControllers.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x805BF04C",
+      "ExpectedWord": "0x3BA31720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x805EAFDC",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x805EB12C",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x805EB1BC",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x805EB298",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
+    },
+    {
+      "Instruction": "0x805EB4A4",
+      "ExpectedWord": "0x85831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x805EBAE0",
+      "ExpectedWord": "0x85831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x805EBAFC",
+      "ExpectedWord": "0x85832040",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBB18",
+      "ExpectedWord": "0x85832960",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBB34",
+      "ExpectedWord": "0x85833280",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride+InputManager.wiiControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBB90",
+      "ExpectedWord": "0x85833BA0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset"
+    },
+    {
+      "Instruction": "0x805EBBAC",
+      "ExpectedWord": "0x85833C50",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBBC8",
+      "ExpectedWord": "0x85833D00",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBBE4",
+      "ExpectedWord": "0x85833DB0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.gcnControllers.offset+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride+InputManager.gcnControllers.stride"
+    },
+    {
+      "Instruction": "0x805EBC44",
+      "ExpectedWord": "0x85831720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x805EBD08",
+      "ExpectedWord": "0x3BA31720",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.wiiControllers.offset"
+    },
+    {
+      "Instruction": "0x805EBDF4",
+      "ExpectedWord": "0x386315B4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "InputManager.dummyHolder.offset"
     }
   ],
   "GlobalPointers": {
     "0x809B8F68": "Racedata",
-    "0x809BE398": "AIManager"
+    "0x809BE398": "AIManager",
+    "0x809B8F4C": "InputManager"
   },
   "ArrayCopies": [
     {
@@ -21998,9 +23429,199 @@
       "Name": "KMP::Holder<JGPT>::GetPosition"
     },
     {
+      "Entry": "0x80516F54",
+      "Receiver": null,
+      "Name": "GameScene::calc"
+    },
+    {
       "Entry": "0x805186A8",
       "Receiver": null,
       "Name": "GhostData::Fill"
+    },
+    {
+      "Entry": "0x805198FC",
+      "Receiver": null,
+      "Name": "HomeMenuMgr::UpdateControllerData"
+    },
+    {
+      "Entry": "0x80519CA0",
+      "Receiver": null,
+      "Name": "HomeMenuMgr::Calc"
+    },
+    {
+      "Entry": "0x8051A4EC",
+      "Receiver": null,
+      "Name": "Input::State::SetStickXMirrorCheck"
+    },
+    {
+      "Entry": "0x8051A62C",
+      "Receiver": null,
+      "Name": "Input::UIState::SetStickXMirrorCheck"
+    },
+    {
+      "Entry": "0x8051A6F4",
+      "Receiver": null,
+      "Name": "Input::State::SetControlMotionFlick"
+    },
+    {
+      "Entry": "0x8051AF10",
+      "Receiver": null,
+      "Name": "Input::WiiController::WPADInfoCallback"
+    },
+    {
+      "Entry": "0x8051AF9C",
+      "Receiver": null,
+      "Name": "Input::WiiController::UpdateStatesClassic"
+    },
+    {
+      "Entry": "0x8051B608",
+      "Receiver": null,
+      "Name": "Input::WiiController::UpdateStatesNunchuck"
+    },
+    {
+      "Entry": "0x8051BD3C",
+      "Receiver": null,
+      "Name": "Input::GCNController::UpdateImpl"
+    },
+    {
+      "Entry": "0x8051C728",
+      "Receiver": null,
+      "Name": "Input::GhostController::UpdateImpl"
+    },
+    {
+      "Entry": "0x8051CD24",
+      "Receiver": null,
+      "Name": "Input::ControllerHolder::Update"
+    },
+    {
+      "Entry": "0x8051D658",
+      "Receiver": null,
+      "Name": "Input::ControllerHolder::RequestRumble(4args)"
+    },
+    {
+      "Entry": "0x8051EC6C",
+      "Receiver": null,
+      "Name": "Input::Manager::SyncSimpleCallback"
+    },
+    {
+      "Entry": "0x8051ED68",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::__dt"
+    },
+    {
+      "Entry": "0x8051EE7C",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::__ct"
+    },
+    {
+      "Entry": "0x8051F0AC",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::Init"
+    },
+    {
+      "Entry": "0x8051F138",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ResetIdleFrameCounter"
+    },
+    {
+      "Entry": "0x8051F21C",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::Prepare"
+    },
+    {
+      "Entry": "0x8051F2B0",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ResetSelfWiiAndGCNControllers"
+    },
+    {
+      "Entry": "0x8051F374",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::UpdateControllers"
+    },
+    {
+      "Entry": "0x8051F47C",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::Update"
+    },
+    {
+      "Entry": "0x8051FA38",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ResetDummyController"
+    },
+    {
+      "Entry": "0x8051FA48",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::TrySetController"
+    },
+    {
+      "Entry": "0x8051FDF0",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ResetRealController"
+    },
+    {
+      "Entry": "0x8051FE64",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::InitControllerHolders"
+    },
+    {
+      "Entry": "0x805200C8",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::InitGhostController"
+    },
+    {
+      "Entry": "0x805200E4",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::PrepareRealControllerHolderForRace"
+    },
+    {
+      "Entry": "0x805200F4",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::EnableGhostReading"
+    },
+    {
+      "Entry": "0x8052010C",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::StartGhostReading"
+    },
+    {
+      "Entry": "0x80520158",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::EndGhostWriting"
+    },
+    {
+      "Entry": "0x80520168",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::EndAllGhostWriting"
+    },
+    {
+      "Entry": "0x805201B4",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::CopyPADStatus"
+    },
+    {
+      "Entry": "0x8052024C",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::InitRumble"
+    },
+    {
+      "Entry": "0x805202A4",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ResetRumble"
+    },
+    {
+      "Entry": "0x80520314",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::SyncWiimotes"
+    },
+    {
+      "Entry": "0x805203CC",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::EnableAllPointers"
+    },
+    {
+      "Entry": "0x80520464",
+      "Receiver": "InputManager",
+      "Name": "Input::Manager::ToggleAllPointers"
     },
     {
       "Entry": "0x80523304",
@@ -22763,6 +24384,11 @@
       "Name": ""
     },
     {
+      "Entry": "0x805BEF0C",
+      "Receiver": null,
+      "Name": "DpdPointerControl::OnUpdate"
+    },
+    {
       "Entry": "0x805CB220",
       "Receiver": null,
       "Name": "Pages::GhostManager::OnActivate"
@@ -22801,6 +24427,36 @@
       "Entry": "0x805E55B0",
       "Receiver": null,
       "Name": "Pages::GlobeSearch::PrepareLiveView"
+    },
+    {
+      "Entry": "0x805EAEE4",
+      "Receiver": null,
+      "Name": "SectionPad::Update"
+    },
+    {
+      "Entry": "0x805EB46C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x805EBA44",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x805EBC18",
+      "Receiver": null,
+      "Name": "SectionPad::Has4WiimotePads"
+    },
+    {
+      "Entry": "0x805EBCD8",
+      "Receiver": null,
+      "Name": "SectionPad::EnablePointer"
+    },
+    {
+      "Entry": "0x805EBD80",
+      "Receiver": null,
+      "Name": "SectionPad::GetControllerHolderByIdx"
     },
     {
       "Entry": "0x805F3918",

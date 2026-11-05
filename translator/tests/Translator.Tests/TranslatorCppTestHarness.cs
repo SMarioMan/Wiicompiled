@@ -155,8 +155,12 @@ internal static class TranslatorCppTestHarness
             extern const uint32_t kSda2Base = 0;
             }
             extern "C" const uint8_t kMkwGuestRegion = 0;
-            bool HollywoodGpio_Read32(uint32_t, uint32_t&) { std::abort(); }
-            bool HollywoodGpio_Write32(uint32_t, uint32_t) { std::abort(); }
+            bool HollywoodGpio_Read32(uint32_t address, uint32_t&) {
+                std::fprintf(stderr, "Unexpected MMIO read 0x%08X\n", address); std::abort();
+            }
+            bool HollywoodGpio_Write32(uint32_t address, uint32_t) {
+                std::fprintf(stderr, "Unexpected MMIO write 0x%08X\n", address); std::abort();
+            }
             extern "C" void GX_HLE_FIFO_Write8(uint8_t) { std::abort(); }
             extern "C" void GX_HLE_FIFO_Write16(uint16_t) { std::abort(); }
             extern "C" void GX_HLE_FIFO_Write32(uint32_t) { std::abort(); }
@@ -179,7 +183,10 @@ internal static class TranslatorCppTestHarness
             void SetRuntimeExitCode(int) {}
             namespace RuntimeCrash {
             void WriteCrashArtifacts(std::string_view, std::string_view, const uint32_t*) noexcept {}
-            [[noreturn]] void FatalMissingGuestTarget(uint32_t, CpuContext*) noexcept { std::abort(); }
+            [[noreturn]] void FatalMissingGuestTarget(uint32_t address, CpuContext* ctx) noexcept {
+                std::fprintf(stderr, "Unexpected guest target 0x%08X (LR=0x%08X)\n", address, ctx ? ctx->lr : 0);
+                std::abort();
+            }
             }
             void SystemBridge::Initialize() {}
             void SystemBridge::DumpCpuState(const CpuContext*) {}

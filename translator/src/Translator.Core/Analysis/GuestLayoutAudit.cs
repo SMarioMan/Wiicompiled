@@ -258,9 +258,9 @@ public sealed class GuestLayoutAudit
         return nested is { } child ? ($"{prefix}+{child.Symbol}", child.Addend) : (prefix, inner);
     }
 
-    // Only infer an index scale when some declared player array keeps that stride.
+    // Only infer an index scale when a declared array keeps that stride.
     private bool IsArrayStride(uint scale) => scale <= int.MaxValue && _definitions.Values.Any(type =>
-        type.Fields is not null && type.Fields.Any(field => field.PerPlayer &&
+        type.Fields is not null && type.Fields.Any(field => (field.PerPlayer || _original.Types[type.Name].Fields[field.Name].Count > 1) &&
             _original.Types[type.Name].Fields[field.Name].Stride == scale &&
             _expanded.Types[type.Name].Fields[field.Name].Stride == scale));
 

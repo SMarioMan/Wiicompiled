@@ -16,6 +16,18 @@ public class GuestLayoutAuditTests
     }
 
     [Fact]
+    public void AFixedPhysicalArrayCanMoveAfterAPlayerArrayWithADifferentStride()
+    {
+        var types=new[] {new GuestLayoutType("Byte",1,1),new GuestLayoutType("Word",4,4),
+            new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("players","Byte",PerPlayer:true),
+                new GuestLayoutField("physical","Word",4)})};
+        var audit=new GuestLayoutAudit(types,12,24);
+        var candidate=Assert.Single(audit.Analyze(Discover(0x1ca40004,0x7ca32a14,0x80c5000c,0x4e800020),"Owner").Candidates);
+        Assert.Equal(12,candidate.Before);Assert.Equal(24,candidate.After);Assert.Equal(4,candidate.IndexStride);
+        Assert.Empty(audit.Analyze(Discover(0x1ca40003,0x7ca32a14,0x80c5000c,0x4e800020),"Owner").Candidates);
+    }
+
+    [Fact]
     public void DeclaredPointerFieldsCarryPointeeIdentityIncludingIndexedPointerArrays()
     {
         var types=new[] {new GuestLayoutType("Word",4,4),

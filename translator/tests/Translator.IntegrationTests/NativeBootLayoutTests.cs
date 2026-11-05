@@ -31,11 +31,16 @@ public class NativeBootLayoutTests
             var harness = Path.Combine(temp, "harness.cpp"); var exe = Path.Combine(temp, "test");
             File.WriteAllText(harness, $$"""
                 #include "ppc_runtime.h"
+                #include "abi_bridge.h"
                 #include "boot_race.h"
                 #include "mkw_guest_layout.h"
                 #include <cstring>
                 extern "C" void ArgumentParser_Parse_805b9344(CpuContext*);
                 extern "C" void RacedataScenario_InitRng_8052f924(CpuContext*);
+                extern "C" void Raceinfo_Update_805331b4(CpuContext*);
+                unsigned updateCalls=0;
+                void original_update(CpuContext* ctx) {++updateCalls;Memory::Write32(ctx->gpr[3]+0x20,180);ctx->gpr[3]=0x31415926;}
+
                 int main() {
                     Memory::Init(16*1024*1024);
                     const auto& l=MkwGuestLayout::kLayout;
@@ -66,6 +71,24 @@ public class NativeBootLayoutTests
                         if(Memory::Read8(a)!=0x7e) return 7;
                     for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(data-16+i)!=0x55 || Memory::Read8(data+l.racedataSize+i)!=0x55) return 8;
+                    constexpr uint32_t info=0x80050000,array=0x80060000,nodes=0x80070000;
+                    Memory::Write8(data+l.racedataRace+4,{{players}});
+                    Memory::Write32(data+l.racedataRace+l.scenarioSettings,8);
+                    Memory::Write32(data+l.racedataRace+l.scenarioSettings+8,1);
+                    Memory::Write32(info+0xc,array);Memory::Write32(info+0x28,2);
+                    for(uint32_t i=0;i<{{players}};i++){Memory::Write32(array+i*4,nodes+i*0x80);Memory::Write32(nodes+i*0x80+0x2c,120+i);}
+                    TranslatedFunctionInfo original{};original.address=0x805331b4;original.name="original update fixture";
+                    original.rawCpuInvoker=original_update;original.entryPoint=reinterpret_cast<void*>(original_update);
+                    TranslatedFunctionRegistry::Register(original);
+                    ctx.gpr[3]=info;Raceinfo_Update_805331b4(&ctx);
+                    if(updateCalls!=1 || ctx.gpr[3]!=0x31415926)return 9;
+                    const auto progress=BootRace::ReadProgress(info);
+                    if(!progress || progress->players!={{players}} || progress->capacity!={{players}} ||
+                        progress->observedPlayers!={{players}} || progress->minPlayerFrames!=120 ||
+                        progress->stage!=2 || progress->frames!=180 || progress->course!=8 || progress->mode!=1)return 10;
+                    Memory::Write8(data+l.racedataRace+4,{{players}}+1);
+                    if(BootRace::ReadProgress(info)->observedPlayers!=0)return 11;
+                    Memory::Write32(0x809bd728,0);if(BootRace::ReadProgress(info))return 12;
                     return 0;
                 }
                 """);

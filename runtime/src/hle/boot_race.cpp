@@ -8,6 +8,8 @@
 #include "runtime_log.h"
 
 #include <array>
+#include <algorithm>
+#include <limits>
 #include <charconv>
 #include <cstdint>
 #include <optional>
@@ -127,6 +129,28 @@ bool Requested() {
     return g_course.has_value();
 }
 
+std::optional<Progress> ReadProgress(uint32_t raceinfo) {
+    const uint32_t data = Memory::Read32(MKW_GADDR(809BD728));
+    if (!raceinfo || !data) return std::nullopt;
+    const uint32_t scenario = data + kLayout.racedataRace;
+    const uint32_t settings = scenario + kLayout.scenarioSettings;
+    Progress result{kLayout.playerCapacity, Memory::Read8(scenario + 4),
+        Memory::Read32(settings), Memory::Read32(settings + 8),
+        Memory::Read32(raceinfo + 0x28), Memory::Read32(raceinfo + 0x20), 0, 0};
+    const uint32_t players = Memory::Read32(raceinfo + 0xC);
+    if (players && result.players && result.players <= result.capacity) {
+        uint32_t minimum = std::numeric_limits<uint32_t>::max();
+        for (uint32_t i = 0; i < result.players; ++i) {
+            const uint32_t player = Memory::Read32(players + i * 4);
+            if (!player) continue;
+            ++result.observedPlayers;
+            minimum = std::min(minimum, Memory::Read32(player + 0x2C));
+        }
+        if (result.observedPlayers == result.players) result.minPlayerFrames = minimum;
+    }
+    return result;
+}
+
 } // namespace BootRace
 
 // ArgumentParser::parse, picks the boot section in SectionMgr::Init.
@@ -216,3 +240,23 @@ extern "C" void SectionPad_GetFirstDeactivatedPad_8061b9bc(CpuContext* ctx) {
 }
 REGISTER_NATIVE_FUNCTION_AS(0x8061B9BC, SectionPad_GetFirstDeactivatedPad_8061b9bc,
                             "SectionPad_GetFirstDeactivatedPad_8061b9bc");
+
+// Evidence comes from the real simulation update; process survival alone is not
+// a successful race test. Ordinary interactive runs keep their usual logging.
+extern "C" void Raceinfo_Update_805331b4(CpuContext* ctx) {
+    const uint32_t raceinfo = ctx->gpr[3];
+    MKW_GUEST_NEXT(805331B4)(ctx);
+    if (!g_cpuDriven) return;
+    static uint32_t previous = 0, lastStage = std::numeric_limits<uint32_t>::max(), ticks = 0;
+    const auto progress = BootRace::ReadProgress(raceinfo);
+    if (!progress) return;
+    ++ticks;
+    if (raceinfo != previous || progress->stage != lastStage || ticks % 60 == 0) {
+        RT_LOGF("race-progress", "stage=%u frames=%u players=%u capacity=%u observed=%u min_player_frames=%u course=%u mode=%u\n",
+            progress->stage, progress->frames, progress->players, progress->capacity,
+            progress->observedPlayers, progress->minPlayerFrames, progress->course, progress->mode);
+        previous = raceinfo;
+        lastStage = progress->stage;
+    }
+}
+REGISTER_NATIVE_WRAPPER_AS(0x805331B4, Raceinfo_Update_805331b4, "Raceinfo_Update_805331b4");

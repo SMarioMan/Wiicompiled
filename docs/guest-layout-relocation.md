@@ -217,7 +217,14 @@ different layout identity. Version 2 base metadata remains readable as the legac
 For example, a private full USA translation of 29,456 functions at capacity 24
 completed with no unsupported instructions or invalid SSA functions and produced
 72 shared native build shards. A private Linux executable also built in the
-Linux Docker toolchain; whole-game race validation remains incomplete. This establishes translation and artifact
+Linux Docker toolchain; whole-game race validation remains incomplete.
+`--race-cpu` reports `[race-progress]` from the original simulation update:
+stage, simulation frames, active/capacity counts, observed player records,
+minimum per-player update frames, course and mode. The native wrapper calls
+through to the winning original/mod implementation and preserves its CPU result.
+Missing state is omitted and invalid participant counts are not traversed.
+Use these records to establish race progress; a surviving process alone is not
+proof of a functioning expanded race. This establishes translation and artifact
 consistency, not working 24-player gameplay.
 
 The native runtime reads `MkwGuestLayout::kLayout`, defined by the per-game

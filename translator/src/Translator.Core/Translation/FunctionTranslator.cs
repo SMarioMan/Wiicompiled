@@ -566,7 +566,7 @@ public sealed class FunctionTranslator
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentException
                                           or IndexOutOfRangeException or NotSupportedException
-                                          or OverflowException)
+                                          or OverflowException or InvalidDataException)
             {
                 // Speculative decoding is extra work the caller's own translation never depended
                 // on, so a failure here must never abort that translation; treat it as "not a

@@ -30,7 +30,7 @@ public class DriverManagerStorageTests
         var layout=new GuestLayouts(doc.RootElement.GetProperty("Types").Deserialize<GuestLayoutType[]>()!,players);
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
-        var options=new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet());
+        var options=new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet());
         var relocations=GuestLayoutRelocations.Read(manifest,players);
         var translator=new FunctionTranslator(image,layoutRelocations:relocations);
         var temp=Path.Combine(Path.GetTempPath(),"mkw-driver-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);

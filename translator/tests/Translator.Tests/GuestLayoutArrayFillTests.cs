@@ -145,6 +145,23 @@ public class GuestLayoutArrayFillTests
     }
 
     [Fact]
+    public void SpeculativeLeafDecodeOfPartialFillKeepsTheOrdinaryCall()
+    {
+        const uint caller=Start-0x100;
+        var image=TranslatorCppTestHarness.CreateImage(
+            new[] {(caller,0x48000101u),(caller+4,0x4e800020u)}.Concat(
+                Words.Append(0x4e800020u).Select((word,index)=>(Start+(uint)index*4,word))).ToArray());
+        var translator=new FunctionTranslator(image,layoutRelocations:Layout(3));
+        var options=TranslationOptions.Default with {LeafInliningMaxCalleeInstructions=2};
+        var result=translator.Discover(caller,options);
+        Assert.Contains(result.LinearIr.Blocks.SelectMany(block=>block.Instructions),
+            instruction=>instruction is IrCall {Target:"0x80001000"});
+        // Actual translation still requires the entire verified span.
+        Assert.Throws<InvalidDataException>(()=>translator.Discover(Start+4,options));
+        Assert.NotEmpty(translator.Translate(Start,options).CxxCode);
+    }
+
+    [Fact]
     public void BranchIntoTheMiddlePartialFunctionsOverlapAndShrinkAreRejected()
     {
         var image=TranslatorCppTestHarness.CreateImage((Start-4,0x4800000cu), (Start,Words[0]),

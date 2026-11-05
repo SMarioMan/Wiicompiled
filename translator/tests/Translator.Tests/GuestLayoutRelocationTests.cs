@@ -100,6 +100,31 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void SignedFrameRelocationMovesBothStackStoreAndStackPointer()
+    {
+        const uint pc = 0x80001000;
+        var types = new[]
+        {
+            new GuestLayoutType("Score", 2, 2),
+            new GuestLayoutType("Frame", 16, Fields: new[]
+            { new GuestLayoutField("scores", "Score", PerPlayer: true) })
+        };
+        var image = TranslatorCppTestHarness.CreateImage((pc, 0x9421ffe0), (pc+4, 0x4e800020));
+        var relocations = new GuestLayoutRelocations(types, 12, 24, new[]
+        {
+            new GuestLayoutReference(pc, 0x9421ffe0, 0, "offset", "Frame.size", Scale: -1),
+            new GuestLayoutReference(pc, 0x9421ffe0, 1, "right", "Frame.size", Scale: -1)
+        });
+        relocations.ValidateImage(image);
+        var translated = new FunctionTranslator(image, layoutRelocations: relocations).Discover(pc);
+        var instructions = translated.LinearIr.Blocks.SelectMany(b => b.Instructions).ToArray();
+        Assert.Equal(-48, Assert.Single(instructions.OfType<IrStore>()).Address.Offset);
+        Assert.Equal(-48, Assert.Single(instructions.OfType<IrBinary>()).Right.Constant);
+        Assert.Throws<OverflowException>(() => new GuestLayoutRelocations(types, 12, 24, new[]
+        { new GuestLayoutReference(pc, 0x9421ffe0, 0, "offset", "Frame.size", Scale: int.MaxValue) }));
+    }
+
+    [Fact]
     public void AddressArithmeticAndItsCarryHelperRelocateTogether()
     {
         const uint pc = 0x80001000;

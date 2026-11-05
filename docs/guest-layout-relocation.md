@@ -33,8 +33,12 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 164 references across creation, construction,
-destruction, scenario assignment and selected mode/menu readers.
+menu and awards scenarios and audits 196 references across creation, construction,
+destruction, scenario assignment, selected mode/menu readers and point updates.
+The point updater's temporary score array grows with capacity. Its stack frame,
+conversion scratch space, saved registers and caller LR slot move together;
+increasing the loop alone would overwrite saved registers. The original Grand
+Prix scoring table is still limited to twelve players and requires migration.
 It is **incomplete**: other race-data consumers, race state, karts, items, scoring,
 menus, starting grids and the LAN/game network layouts still require migration.
 It is not a playable 24-player profile. Existing release builds retain twelve
@@ -52,7 +56,9 @@ dotnet run --project translator/src/Translator.Cli -c Release -- \
 The output records the computed layouts and each checked before/after operand.
 Symbols include `Type.size`, `Type.field.offset`, `.size`, `.count`, `.stride`
 and `.end`; `+` composes nested offsets. A reference may add a fixed field offset
-with `Addend`. The original player count is declared in the manifest. `Complete`
+with `Addend`, after multiplying the symbol by `Scale` (default one). Negative
+scales express stack-frame allocation without hardcoded negative sizes.
+The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.
 
@@ -99,7 +105,7 @@ MKW_TEST_CXX=/absolute/path/to/clang++ \
   dotnet test translator/tests/Translator.IntegrationTests -c Release
 ```
 
-The game-backed checks verify that ten twelve-player lifecycle/copy/reader routines emit
+The game-backed checks verify that eleven twelve-player lifecycle/copy/reader/point routines emit
 exactly the same C++ as the originals, and syntax-check their relocated 24-player
 versions. A native execution test runs the original scenario assignment at 12,
 24 and 48 players against the runtime's actual guest-memory implementation. It
@@ -108,6 +114,10 @@ vtables and padding, and guard bytes before and after the destination.
 Additional native checks exercise the original mode/team/replay readers and
 two-team score aggregation at 12, 24 and 48 players. The aggregation test makes
 the final player determine the result, so a truncated twelve-slot loop fails.
+The original offline battle point updater also runs at all three capacities,
+checking every player's updated score, unchanged rating, restored stack pointer
+and saved registers, and guard bytes around the expanded stack frame. This path
+uses battle scores, so it does not rely on the unmigrated Grand Prix table.
 Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game

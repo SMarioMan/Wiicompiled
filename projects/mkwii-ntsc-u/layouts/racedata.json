@@ -2,7 +2,7 @@
   "Version": 1,
   "OriginalPlayers": 12,
   "Complete": false,
-  "Note": "Development manifest: audited race-data lifecycle, scenario assignment and selected race/menu readers. Other consumers and subsystems still require migration; this is not a playable 24-player profile.",
+  "Note": "Development manifest: race-data lifecycle, selected readers and point-updater frame/field references. GP point tables, other consumers and subsystems still need migration; this is not a playable 24-player profile.",
   "Types": [
     {
       "Name": "Header",
@@ -92,6 +92,65 @@
           "Count": 2
         }
       ]
+    },
+    {
+      "Name": "Score",
+      "Alignment": 2,
+      "Size": 2
+    },
+    {
+      "Name": "StackHeader",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "FloatSlot",
+      "Alignment": 8,
+      "Size": 8
+    },
+    {
+      "Name": "SavedGprs",
+      "Alignment": 4,
+      "Size": 72
+    },
+    {
+      "Name": "PointsFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "StackHeader"
+        },
+        {
+          "Name": "scores",
+          "Type": "Score",
+          "PerPlayer": true
+        },
+        {
+          "Name": "conversion",
+          "Type": "FloatSlot"
+        },
+        {
+          "Name": "gprs",
+          "Type": "SavedGprs"
+        },
+        {
+          "Name": "fpr30",
+          "Type": "FloatSlot"
+        },
+        {
+          "Name": "psq30",
+          "Type": "FloatSlot"
+        },
+        {
+          "Name": "fpr31",
+          "Type": "FloatSlot"
+        },
+        {
+          "Name": "psq31",
+          "Type": "FloatSlot"
+        }
+      ]
     }
   ],
   "References": [
@@ -167,6 +226,244 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "Scenario.ghost.offset"
+    },
+    {
+      "Instruction": "0x80529E08",
+      "ExpectedWord": "0x9421FF70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80529E08",
+      "ExpectedWord": "0x9421FF70",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "PointsFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80529E10",
+      "ExpectedWord": "0x90010094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80529E14",
+      "ExpectedWord": "0xDBE10080",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x80529E18",
+      "ExpectedWord": "0xF3E10088",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "PointsFrame.psq31.offset"
+    },
+    {
+      "Instruction": "0x80529E1C",
+      "ExpectedWord": "0xDBC10070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.fpr30.offset"
+    },
+    {
+      "Instruction": "0x80529E20",
+      "ExpectedWord": "0xF3C10078",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "PointsFrame.psq30.offset"
+    },
+    {
+      "Instruction": "0x80529E24",
+      "ExpectedWord": "0x39610070",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "PointsFrame.fpr30.offset"
+    },
+    {
+      "Instruction": "0x80529E2C",
+      "ExpectedWord": "0x80030B54",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80529E5C",
+      "ExpectedWord": "0x3A410008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "PointsFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x80529E98",
+      "ExpectedWord": "0x80660B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80529ED4",
+      "ExpectedWord": "0x806F0B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80529F34",
+      "ExpectedWord": "0x80840B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80529FDC",
+      "ExpectedWord": "0x93E10020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x80529FE4",
+      "ExpectedWord": "0x90010024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80529FE8",
+      "ExpectedWord": "0xC8010020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8052A01C",
+      "ExpectedWord": "0x93E10020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8052A024",
+      "ExpectedWord": "0x90010024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052A028",
+      "ExpectedWord": "0xC8010020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8052A050",
+      "ExpectedWord": "0x80630B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052A054",
+      "ExpectedWord": "0xD8010020",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8052A060",
+      "ExpectedWord": "0x80610024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052A0BC",
+      "ExpectedWord": "0x800F0B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052A110",
+      "ExpectedWord": "0x39C10008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "PointsFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x8052A148",
+      "ExpectedWord": "0x800F0B50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8052A1A8",
+      "ExpectedWord": "0xE3E10088",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "PointsFrame.psq31.offset"
+    },
+    {
+      "Instruction": "0x8052A1AC",
+      "ExpectedWord": "0xCBE10080",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x8052A1B0",
+      "ExpectedWord": "0xE3C10078",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "PointsFrame.psq30.offset"
+    },
+    {
+      "Instruction": "0x8052A1B4",
+      "ExpectedWord": "0x39610070",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "PointsFrame.fpr30.offset"
+    },
+    {
+      "Instruction": "0x8052A1B8",
+      "ExpectedWord": "0xCBC10070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.fpr30.offset"
+    },
+    {
+      "Instruction": "0x8052A1C0",
+      "ExpectedWord": "0x80010094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PointsFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8052A1C8",
+      "ExpectedWord": "0x38210090",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "PointsFrame.size"
     },
     {
       "Instruction": "0x8052A1D0",

@@ -9,7 +9,7 @@ using Translator.Core.Lifting;
 namespace Translator.Core.Translation;
 
 public sealed record GuestLayoutReference(uint Instruction, uint ExpectedWord, int Node,
-    string Operand, string Symbol, int Addend = 0);
+    string Operand, string Symbol, int Addend = 0, int Scale = 1);
 
 /// <summary>
 /// Checked semantic relocations applied before SSA, inlining, ABI analysis and C++ emission.
@@ -39,8 +39,8 @@ public sealed class GuestLayoutRelocations
         {
             if (site.Instruction % 4 != 0 || site.Node < 0)
                 throw new InvalidDataException("Invalid guest layout relocation site.");
-            _ = checked(_original.Symbol(site.Symbol) + site.Addend);
-            _ = checked(_expanded.Symbol(site.Symbol) + site.Addend);
+            _ = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend);
+            _ = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend);
         }
         _references = sites.GroupBy(r => r.Instruction).ToDictionary(g => g.Key, g => g.ToArray());
     }
@@ -65,9 +65,9 @@ public sealed class GuestLayoutRelocations
         References = _references.OrderBy(p => p.Key).SelectMany(p => p.Value).Select(site => new
         {
             Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
-            site.Node, site.Operand, site.Symbol, site.Addend,
-            Before = checked(_original.Symbol(site.Symbol) + site.Addend),
-            After = checked(_expanded.Symbol(site.Symbol) + site.Addend)
+            site.Node, site.Operand, site.Symbol, site.Addend, site.Scale,
+            Before = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend),
+            After = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend)
         })
     };
 
@@ -79,8 +79,8 @@ public sealed class GuestLayoutRelocations
         {
             if (origin.Word != site.ExpectedWord || site.Node >= result.Length)
                 throw new InvalidDataException($"Guest layout instruction mismatch at 0x{origin.Address:X8}.");
-            var expected = checked(_original.Symbol(site.Symbol) + site.Addend);
-            var replacement = checked(_expanded.Symbol(site.Symbol) + site.Addend);
+            var expected = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend);
+            var replacement = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend);
             IrValue Replace(IrValue value)
             {
                 if (value.Kind != "const" || value.Constant != expected) throw Mismatch();
@@ -122,7 +122,7 @@ public sealed class GuestLayoutRelocations
         if (file.Version != 1) throw new InvalidDataException("Unsupported guest layout format.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
-                r.Node, r.Operand, r.Symbol, r.Addend)), file.Complete);
+                r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete);
     }
 
     private static uint Hex(string value) => uint.Parse(value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
@@ -130,5 +130,5 @@ public sealed class GuestLayoutRelocations
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
         ReferenceFile[] References, bool Complete = false);
     private sealed record ReferenceFile(string Instruction, string ExpectedWord, int Node,
-        string Operand, string Symbol, int Addend = 0);
+        string Operand, string Symbol, int Addend = 0, int Scale = 1);
 }

@@ -753,7 +753,7 @@ public sealed class FunctionTranslator
             enableLeafAbiSpillElision: options.EnableLeafAbiSpillElision,
             modOverridableCallTargets: options.ModOverridableCallTargets);
         return _layoutRelocations is null ? emission : emission with {
-            Code = _layoutRelocations.EmitRankHelpers(ssa.Function) + _layoutRelocations.EmitBoundHelpers(ssa.Function) + emission.Code
+            Code = _layoutRelocations.EmitCapacityHelpers(ssa.Function) + _layoutRelocations.EmitRankHelpers(ssa.Function) + _layoutRelocations.EmitBoundHelpers(ssa.Function) + emission.Code
         };
     }
 

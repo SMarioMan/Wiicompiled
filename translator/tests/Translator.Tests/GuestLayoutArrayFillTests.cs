@@ -29,14 +29,14 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {4,5,6,7,8,9,10})
+            foreach(var version in new[] {4,5,6,7,8,9,10,11})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=2,Types,References=Array.Empty<object>(),
                     ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays}}
                 }));
-                if(version is 5 or 6 or 7 or 8 or 9) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 5 or 6 or 7 or 8 or 9 or 10) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
@@ -80,7 +80,7 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {6,7,8,9,10})
+            foreach(var version in new[] {6,7,8,9,10,11})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=2,Types,References=Array.Empty<object>(),
@@ -88,11 +88,48 @@ public class GuestLayoutArrayFillTests
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,
                         Addresses=new[] {new GuestFillAddress("r5","Object.second.offset")}}}
                 }));
-                if(version is 7 or 8 or 9)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 7 or 8 or 9 or 10)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
         finally {File.Delete(path);}
+    }
+
+    [Fact]
+    public void DeclaredConstantSetupPreservesItsValueWithoutAliasingFillInputs()
+    {
+        var words=new uint[] {Words[0],0x3ca0809c,Words[1],Words[2],Words[3]};
+        var fill=Fill(words) with {Constants=new[] {new GuestFillConstant("r5",0x809c0000)}};
+        var image=Image(words);
+        Assert.Equal(new FunctionTranslator(image).Translate(Start,TranslationOptions.Default).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:Layout(2,fill)).Translate(Start,TranslationOptions.Default).CxxCode);
+        var nodes=new FunctionTranslator(image,layoutRelocations:Layout(3,fill)).Discover(Start,TranslationOptions.Default)
+            .LinearIr.Blocks.SelectMany(block=>block.Instructions).ToArray();
+        Assert.Contains(nodes,node=>node is IrAssign {Destination:"r5",Value.Constant:-2137260032});
+        Assert.Equal(6,nodes.OfType<IrStore>().Count());
+        foreach(var register in new[] {"r0","r3","r14","f5"})
+            Assert.Throws<InvalidDataException>(()=>Layout(3,fill with {Constants=new[] {new GuestFillConstant(register,0x809c0000)}}));
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:Layout(3,
+            fill with {Constants=new[] {new GuestFillConstant("r5",0x809d0000)}})));
+        Assert.Throws<InvalidDataException>(()=>Layout(3,fill with {Addresses=new[] {new GuestFillAddress("r5","Object.first.offset")}}));
+    }
+
+    [Fact]
+    public void ConstantSetupRequiresVersionTen()
+    {
+        var path=Path.GetTempFileName();
+        try
+        {
+            foreach(var version in new[] {9,10,11})
+            {
+                File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
+                    References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
+                        BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,Constants=new[] {new GuestFillConstant("r5",0x809c0000)}}}}));
+                if(version==10)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
+            }
+        }
+        finally{File.Delete(path);}
     }
 
     [Fact]

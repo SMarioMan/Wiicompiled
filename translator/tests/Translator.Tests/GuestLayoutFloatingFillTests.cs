@@ -39,13 +39,13 @@ public class GuestLayoutFloatingFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {8,9,10})
+            foreach(var version in new[] {8,9,10,11})
             foreach(var valueRegister in new[] {"f0","r0"})
             {
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",
                         ExpectedWords=Words.Select(word=>$"0x{word:X8}"),BaseRegister="r3",ValueRegister=valueRegister,Arrays=Fill().Arrays}}}));
-                if(version==9)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 9 or 10)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

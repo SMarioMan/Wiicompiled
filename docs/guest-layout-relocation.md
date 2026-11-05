@@ -456,3 +456,20 @@ every constructor/destructor callback, cookie, vector address, tail byte, saved
 register and allocation boundary. Allocation and focused-player lookup are
 fixtures. The stronger SDK-aware consumer audit also covers previously missed
 subordinate AI field references after its register-save prologue.
+
+## Capacity-dependent finish thresholds
+
+Format version 10 adds checked `CapacityTables`. Each definition pins the
+original word table and the exact indexed load instruction and registers. For
+field sizes within the original capacity, every authored threshold is preserved.
+Larger fields use the terminal threshold's proportion of the original capacity,
+rounded down with a minimum of one. Invalid counts return zero. The generated
+helper uses a wide intermediate and never reads beyond the original table.
+Original-capacity translation remains unchanged.
+
+Version 10 also permits `ArrayFills.Constants`: verified pure assignments to
+volatile integer registers interleaved with the original stores. They may move
+after the expanded stores only when their registers do not alias any fill base,
+value or address output. The source assignment, including its signed immediate,
+must match exactly. This handles constructor address setup without dropping its
+observable register value or treating it as another array store.

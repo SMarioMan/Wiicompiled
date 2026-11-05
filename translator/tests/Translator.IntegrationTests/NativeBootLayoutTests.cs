@@ -38,7 +38,17 @@ public class NativeBootLayoutTests
                 extern "C" void ArgumentParser_Parse_805b9344(CpuContext*);
                 extern "C" void RacedataScenario_InitRng_8052f924(CpuContext*);
                 extern "C" void Raceinfo_Update_805331b4(CpuContext*);
-                unsigned updateCalls=0;
+                extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext*);
+                unsigned updateCalls=0,holderCalls=0;
+                constexpr uint32_t inputManager=0x80090000,sectionManager=0x800a0000;
+                void original_holders(CpuContext* ctx){if(ctx->gpr[3]!=inputManager)std::abort();ctx->gpr[3]=0x31415926;}
+                void set_controller(CpuContext* ctx){const auto& l=MkwGuestLayout::kLayout;
+                    if(ctx->gpr[3]!=inputManager+l.inputRealHolders || ctx->gpr[4]!=inputManager+l.inputGCNControllers || ctx->gpr[5]!=0)std::abort();
+                    holderCalls++;Memory::Write32(ctx->gpr[3]+4,ctx->gpr[4]);ctx->gpr[3]=0xdeadbeef;ctx->gpr[4]=0;ctx->lr=0;}
+                void register_entry(uint32_t address,void(*entry)(CpuContext*)){
+                    TranslatedFunctionInfo info{};info.address=address;info.name="boot input fixture";
+                    info.rawCpuInvoker=entry;info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
+
                 void original_update(CpuContext* ctx) {++updateCalls;Memory::Write32(ctx->gpr[3]+0x20,180);ctx->gpr[3]=0x31415926;}
 
                 int main() {
@@ -76,7 +86,7 @@ public class NativeBootLayoutTests
                     Memory::Write32(data+l.racedataRace+l.scenarioSettings,8);
                     Memory::Write32(data+l.racedataRace+l.scenarioSettings+8,1);
                     Memory::Write32(info+0xc,array);Memory::Write32(info+0x28,2);
-                    for(uint32_t i=0;i<{{players}};i++){Memory::Write32(array+i*4,nodes+i*0x80);Memory::Write32(nodes+i*0x80+0x2c,120+i);}
+                    for(uint32_t i=0;i<{{players}};i++){Memory::Write32(array+i*4,nodes+i*0x80);Memory::Write32(nodes+i*0x80+0x2c,120+i);Memory::Write16(nodes+i*0x80+0x24,i%4);Memory::Write32(nodes+i*0x80+0x38,i%2?3:1);}
                     TranslatedFunctionInfo original{};original.address=0x805331b4;original.name="original update fixture";
                     original.rawCpuInvoker=original_update;original.entryPoint=reinterpret_cast<void*>(original_update);
                     TranslatedFunctionRegistry::Register(original);
@@ -85,10 +95,21 @@ public class NativeBootLayoutTests
                     const auto progress=BootRace::ReadProgress(info);
                     if(!progress || progress->players!={{players}} || progress->capacity!={{players}} ||
                         progress->observedPlayers!={{players}} || progress->minPlayerFrames!=120 ||
+                        progress->finishedPlayers!={{players}}/2 || progress->minLap!=0 || progress->maxLap!=3 ||
                         progress->stage!=2 || progress->frames!=180 || progress->course!=8 || progress->mode!=1)return 10;
                     Memory::Write8(data+l.racedataRace+4,{{players}}+1);
                     if(BootRace::ReadProgress(info)->observedPlayers!=0)return 11;
                     Memory::Write32(0x809bd728,0);if(BootRace::ReadProgress(info))return 12;
+                    if(l.inputRealHolders!=4 || l.inputGCNControllers!=0x3ba0+({{players}}-12)*0x180)return 13;
+                    register_entry(0x805242d8,original_holders);register_entry(0x80521554,set_controller);
+                    Memory::Write32(0x809c1e38,sectionManager);Memory::Write32(sectionManager+0x38,0x124);
+                    if(!BootRace::ParseArgument("--race-cpu-menu-input"))return 14;
+                    ctx.gpr[3]=inputManager;const CpuContext before=ctx;
+                    InputManager_InitControllerHolders_805242d8(&ctx);
+                    CpuContext expected=before;expected.gpr[3]=0x31415926;
+                    if(std::memcmp(&ctx,&expected,sizeof(ctx)) || holderCalls!=1 ||
+                        Memory::Read32(inputManager+l.inputRealHolders+4)!=inputManager+l.inputGCNControllers ||
+                        Memory::Read32(sectionManager+0x44)!=inputManager+l.inputRealHolders || Memory::Read32(sectionManager+0x3c)!=0x124)return 15;
                     return 0;
                 }
                 """);

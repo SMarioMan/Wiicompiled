@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,817 references across creation, construction,
+menu and awards scenarios and audits 2,904 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 778 consumer entry points in `AuditedConsumers`.
+The manifest records 792 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -218,7 +218,10 @@ completed with no unsupported instructions or invalid SSA functions and produced
 Linux Docker toolchain; whole-game race validation remains incomplete.
 `--race-cpu` reports `[race-progress]` from the original simulation update:
 stage, simulation frames, active/capacity counts, observed player records,
-minimum per-player update frames, course and mode. The native wrapper calls
+minimum per-player update frames, course and mode, finished-participant count,
+and minimum/maximum lap. Completion uses the finish flag set by the real
+`RaceinfoPlayer::EndRace`, rather than inferring completion from the local race
+stage or update counters. The native wrapper calls
 through to the winning original/mod implementation and preserves its CPU result.
 Missing state is omitted and invalid participant counts are not traversed.
 Use these records to establish race progress; a surviving process alone is not
@@ -474,6 +477,12 @@ value or address output. The source assignment, including its signed immediate,
 must match exactly. This handles constructor address setup without dropping its
 observable register value or treating it as another array store.
 
+A private 24-participant VS run now reaches the game's finished stage with all
+24 records observed and continues through a 240-second run without an unmapped
+access warning or crash. This uses the CPU benchmark path; results confirmation,
+rendering, other modes and 24-player LAN remain unverified. The development
+manifest remains incomplete and release products retain twelve-player layouts.
+
 ## Driver manager and finish classification
 
 `DriverManager` owns uniform capacity-sized model pointers, positions, item
@@ -493,3 +502,10 @@ slots. They check every runtime field size and position in the four rank-based
 modes, cached finish results, memory boundaries and saved registers. Heap,
 disposer, save-record lookup and model destruction are fixtures. These tests do
 not establish complete gameplay, results menus or network correctness.
+
+For results-flow testing, `--race-cpu-menu-input` uses the same CPU driving
+hooks while attaching the normal first GameCube controller and preserving its
+menu input. With `WIICOMPILED_TEST_PAD_FILE` set, the existing atomic input file
+can then confirm menus after the race. The ordinary `--race-cpu` benchmark keeps
+its detached-controller behavior. CPU finish state and successful results-menu
+interaction are separate validation milestones.

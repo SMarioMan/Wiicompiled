@@ -60,6 +60,7 @@ constexpr std::array<Racer, 12> kRacers{{
 
 std::optional<uint32_t> g_course;
 bool g_cpuDriven = false;
+bool g_cpuMenuInput = false;
 
 uint32_t ParseCourse(std::string_view text) {
     int base = 10;
@@ -104,8 +105,9 @@ void SetUpMenuScenario(uint32_t course) {
 namespace BootRace {
 
 bool ParseArgument(std::string_view arg) {
-    if (arg == "--race-cpu") {
+    if (arg == "--race-cpu" || arg == "--race-cpu-menu-input") {
         g_cpuDriven = true;
+        g_cpuMenuInput = arg == "--race-cpu-menu-input" || g_cpuMenuInput;
         if (!g_course) {
             g_course = kLuigiCircuit;
         }
@@ -140,13 +142,22 @@ std::optional<Progress> ReadProgress(uint32_t raceinfo) {
     const uint32_t players = Memory::Read32(raceinfo + 0xC);
     if (players && result.players && result.players <= result.capacity) {
         uint32_t minimum = std::numeric_limits<uint32_t>::max();
+        uint32_t minimumLap = std::numeric_limits<uint32_t>::max(), maximumLap = 0;
         for (uint32_t i = 0; i < result.players; ++i) {
             const uint32_t player = Memory::Read32(players + i * 4);
             if (!player) continue;
             ++result.observedPlayers;
             minimum = std::min(minimum, Memory::Read32(player + 0x2C));
+            const uint32_t lap = Memory::Read16(player + 0x24);
+            minimumLap = std::min(minimumLap, lap);
+            maximumLap = std::max(maximumLap, lap);
+            if (Memory::Read32(player + 0x38) & 2u) ++result.finishedPlayers;
         }
-        if (result.observedPlayers == result.players) result.minPlayerFrames = minimum;
+        if (result.observedPlayers == result.players) {
+            result.minPlayerFrames = minimum;
+            result.minLap = minimumLap;
+            result.maxLap = maximumLap;
+        }
     }
     return result;
 }
@@ -163,7 +174,7 @@ extern "C" void ArgumentParser_Parse_805b9344(CpuContext* ctx) {
     consumed = true;
     SetUpMenuScenario(*g_course);
 
-    if (!g_cpuDriven) {
+    if (!g_cpuDriven || g_cpuMenuInput) {
         const uint32_t sectionMgr = Memory::Read32(MKW_GADDR(809C1E38));
         if (sectionMgr == 0) {
             throw std::runtime_error("--race: SectionMgr instance is not set at SectionMgr::Init");
@@ -234,7 +245,7 @@ REGISTER_NATIVE_FUNCTION_AS(0x8052F924, RacedataScenario_InitRng_8052f924, "Race
 // SectionPad::GetFirstDeactivatedPad; a CPU driven racer needs no controller.
 extern "C" void SectionPad_GetFirstDeactivatedPad_8061b9bc(CpuContext* ctx) {
     MKW_GUEST_FUNC(8061B9BC)(ctx);
-    if (g_cpuDriven) {
+    if (g_cpuDriven && !g_cpuMenuInput) {
         ctx->gpr[3] = static_cast<uint32_t>(-1);
     }
 }
@@ -252,11 +263,34 @@ extern "C" void Raceinfo_Update_805331b4(CpuContext* ctx) {
     if (!progress) return;
     ++ticks;
     if (raceinfo != previous || progress->stage != lastStage || ticks % 60 == 0) {
-        RT_LOGF("race-progress", "stage=%u frames=%u players=%u capacity=%u observed=%u min_player_frames=%u course=%u mode=%u\n",
+        RT_LOGF("race-progress", "stage=%u frames=%u players=%u capacity=%u observed=%u min_player_frames=%u course=%u mode=%u finished=%u min_lap=%u max_lap=%u\n",
             progress->stage, progress->frames, progress->players, progress->capacity,
-            progress->observedPlayers, progress->minPlayerFrames, progress->course, progress->mode);
+            progress->observedPlayers, progress->minPlayerFrames, progress->course, progress->mode,
+            progress->finishedPlayers, progress->minLap, progress->maxLap);
         previous = raceinfo;
         lastStage = progress->stage;
     }
 }
 REGISTER_NATIVE_WRAPPER_AS(0x805331B4, Raceinfo_Update_805331b4, "Raceinfo_Update_805331b4");
+
+// Keep a real menu controller while the CPU drives the local racer. The regular
+// holder initializer can otherwise select the dummy controller on direct boot.
+extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext* ctx) {
+    const uint32_t manager = ctx->gpr[3];
+    MKW_GUEST_NEXT(805242D8)(ctx);
+    if (!g_cpuMenuInput) return;
+    const CpuContext result = *ctx;
+    const uint32_t holder = manager + kLayout.inputRealHolders;
+    ctx->gpr[3] = holder;
+    ctx->gpr[4] = manager + kLayout.inputGCNControllers;
+    ctx->gpr[5] = 0;
+    MKW_GUEST_FUNC(80521554)(ctx);
+    const uint32_t section = Memory::Read32(MKW_GADDR(809C1E38));
+    if (section) {
+        Memory::Write32(section + 0x44, holder);
+        Memory::Write32(section + 0x3C, Memory::Read32(section + 0x38));
+    }
+    *ctx = result;
+}
+REGISTER_NATIVE_WRAPPER_AS(0x805242D8, InputManager_InitControllerHolders_805242d8,
+                           "InputManager_InitControllerHolders_805242d8");

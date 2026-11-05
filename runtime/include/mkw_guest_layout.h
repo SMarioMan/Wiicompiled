@@ -16,6 +16,8 @@ struct Layout {
     uint32_t racedataAwards;
     uint32_t racedataGhosts;
     uint32_t racedataSize;
+    uint32_t inputRealHolders;
+    uint32_t inputGCNControllers;
 };
 extern const Layout kLayout;
 }

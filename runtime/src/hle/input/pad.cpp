@@ -172,6 +172,8 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     MotionTrick::Apply(statuses);
     ApplyLanMenuInput(statuses[0], rumbleMask);
     if (const auto input = TestPadInput::ReadConfigured()) {
+        statuses[0].err = PAD_ERR_NONE;
+        rumbleMask |= 0x80000000u;
         statuses[0].button |= input->buttons;
         statuses[0].stickX = input->stickX;
         statuses[0].stickY = input->stickY;

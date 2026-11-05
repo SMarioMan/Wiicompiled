@@ -552,3 +552,18 @@ confirmation. The remaining CPUs can be forcibly finished at the local finish,
 as in the original game. Results-scene loading currently exposes a VI/scheduler
 wait that still needs diagnosis. Other courses, modes, rendering and 24-player
 LAN remain unverified.
+
+The portable VS round-trip regression driver requires a saved license zero and
+an available graphics backend (Xvfb works for Linux automation):
+
+```sh
+python3 runtime/tests/boot_round_trip.py --product /path/to/portable-product \
+  --players 12 --log /tmp/race-round-trip.log
+```
+
+It requires the requested number of observed racers, a completed race, menu
+confirmation, and a new race reaching at least frame 300 in the racing stage.
+It rejects guest faults and an unsatisfiable scheduler wait. The 12-active-player
+case passes in the capacity-24 development build. A full 24-player round trip
+currently fails in the original item-position tables; this remains an incomplete
+profile. Loading a new race scene alone does not pass the check.

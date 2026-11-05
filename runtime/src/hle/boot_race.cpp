@@ -34,7 +34,7 @@ constexpr uint32_t kSectionPadOffset = 0x34;
 constexpr uint32_t kFirstGcnControllerId = 0x124;
 constexpr uint32_t kSectionP1Vs = 0x20;
 
-enum : uint32_t { kPlayerRealLocal = 0, kPlayerCpu = 1 };
+enum : uint32_t { kPlayerRealLocal = 0, kPlayerCpu = 1, kPlayerNone = 5 };
 enum : uint32_t { kGameModeVs = 1, kCc150 = 2, kCpuHard = 2, kItemsBalanced = 0 };
 
 struct Racer {
@@ -61,6 +61,8 @@ constexpr std::array<Racer, 12> kRacers{{
 std::optional<uint32_t> g_course;
 bool g_cpuDriven = false;
 bool g_cpuMenuInput = false;
+std::optional<uint32_t> g_players;
+std::optional<uint32_t> g_laps;
 
 uint32_t ParseCourse(std::string_view text) {
     int base = 10;
@@ -86,7 +88,8 @@ void SetUpMenuScenario(uint32_t course) {
         const uint32_t player = scenario + kLayout.scenarioPlayers + i * kLayout.playerStride;
         Memory::Write32(player + kPlayerKartOffset, kRacers[i % kRacers.size()].kart);
         Memory::Write32(player + kPlayerCharacterOffset, kRacers[i % kRacers.size()].character);
-        Memory::Write32(player + kPlayerTypeOffset, i == 0 ? kPlayerRealLocal : kPlayerCpu);
+        Memory::Write32(player + kPlayerTypeOffset, i >= g_players.value_or(kLayout.playerCapacity)
+            ? kPlayerNone : i == 0 ? kPlayerRealLocal : kPlayerCpu);
     }
     const uint32_t settings = scenario + kLayout.scenarioSettings;
     Memory::Write32(settings + 0x00, course);
@@ -96,7 +99,7 @@ void SetUpMenuScenario(uint32_t course) {
     Memory::Write32(settings + 0x14, kCpuHard);
     Memory::Write32(settings + 0x18, kItemsBalanced);
     Memory::Write8(settings + 0x24, 0);
-    Memory::Write8(settings + 0x25, 3);
+    Memory::Write8(settings + 0x25, static_cast<uint8_t>(g_laps.value_or(3)));
     Memory::Write32(settings + 0x28, 0);
 }
 
@@ -105,6 +108,19 @@ void SetUpMenuScenario(uint32_t course) {
 namespace BootRace {
 
 bool ParseArgument(std::string_view arg) {
+    for (const auto option : {std::string_view("--race-players="), std::string_view("--race-laps=")}) {
+        if (!arg.starts_with(option)) continue;
+        const auto text = arg.substr(option.size());
+        uint32_t value = 0;
+        const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+        const uint32_t maximum = option == "--race-laps=" ? 9u : std::min(kLayout.playerCapacity, 255u);
+        if (text.empty() || error != std::errc{} || end != text.data() + text.size() || value < 1 || value > maximum)
+            throw std::invalid_argument(std::string(option) + " expects an integer from 1 to " + std::to_string(maximum));
+        if (option == "--race-laps=") g_laps = value;
+        else g_players = value;
+        if (!g_course) g_course = kLuigiCircuit;
+        return true;
+    }
     if (arg == "--race-cpu" || arg == "--race-cpu-menu-input") {
         g_cpuDriven = true;
         g_cpuMenuInput = arg == "--race-cpu-menu-input" || g_cpuMenuInput;
@@ -307,3 +323,20 @@ extern "C" void RealControllerHolder_SetController_80521554(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x80521554, RealControllerHolder_SetController_80521554,
                            "RealControllerHolder_SetController_80521554");
+
+// Scenario initialization reloads the course's authored lap count. Apply an
+// explicit test override immediately before finish timers and splits allocate.
+extern "C" void Raceinfo_CreateInstance_80532084(CpuContext* ctx) {
+    if (g_laps) {
+        const uint32_t data = Memory::Read32(MKW_GADDR(809BD728));
+        if (data) {
+            const uint32_t settings = data + kLayout.racedataRace + kLayout.scenarioSettings;
+            Memory::Write8(settings + 0x25, static_cast<uint8_t>(*g_laps));
+            // Raceinfo reads the authored count unless the custom-lap flag is set.
+            Memory::Write32(settings + 0x28, Memory::Read32(settings + 0x28) | 4u);
+        }
+    }
+    MKW_GUEST_NEXT(80532084)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80532084, Raceinfo_CreateInstance_80532084,
+                           "Raceinfo_CreateInstance_80532084");

@@ -510,6 +510,15 @@ can then confirm menus after the race. The ordinary `--race-cpu` benchmark keeps
 its detached-controller behavior. CPU finish state and successful results-menu
 interaction are separate validation milestones.
 
+For shorter regression runs, `--race-players=N` selects an active field from 1
+through the translated capacity (up to the current 8-bit scenario limit), and
+`--race-laps=N` selects 1 through 9 laps. Either option also requests a boot
+race; combine them with `--race-cpu-menu-input` to automate driving and menu
+confirmation. Unused participants are marked absent in the same expanded
+scenario array. The lap override is applied before Raceinfo allocates its lap
+splits, with the game's custom-lap flag set. These options help compare smaller
+and full fields within one build; they do not change the translated capacity.
+
 Format version 11 adds checked `GridTables` for field-size/position lookup
 matrices. Every original byte and indexed-load instruction must match. Runtime
 fields within the original capacity preserve their authored rows exactly. Larger

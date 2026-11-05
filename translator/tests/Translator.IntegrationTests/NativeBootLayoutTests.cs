@@ -7,11 +7,13 @@ namespace Translator.Tests;
 public class NativeBootLayoutTests
 {
     [Theory]
-    [InlineData(12, false)]
-    [InlineData(12, true)]
-    [InlineData(24, true)]
-    [InlineData(48, true)]
-    public void RealNativeBootUsesTheTranslatedGuestLayout(int players, bool explicitLayout)
+    [InlineData(12, false, 12)]
+    [InlineData(12, true, 12)]
+    [InlineData(24, true, 24)]
+    [InlineData(24, true, 13)]
+    [InlineData(48, true, 48)]
+    [InlineData(48, true, 24)]
+    public void RealNativeBootUsesTheTranslatedGuestLayout(int players, bool explicitLayout, int activePlayers)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "translator/Translator.sln")))
@@ -40,6 +42,7 @@ public class NativeBootLayoutTests
                 extern "C" void Raceinfo_Update_805331b4(CpuContext*);
                 extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext*);
                 extern "C" void RealControllerHolder_SetController_80521554(CpuContext*);
+                extern "C" void Raceinfo_CreateInstance_80532084(CpuContext*);
                 unsigned updateCalls=0,holderCalls=0;
                 uint32_t expectedController=0;
                 constexpr uint32_t inputManager=0x80090000,sectionManager=0x800a0000;
@@ -51,6 +54,9 @@ public class NativeBootLayoutTests
                     TranslatedFunctionInfo info{};info.address=address;info.name="boot input fixture";
                     info.rawCpuInvoker=entry;info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
 
+                void create_raceinfo(CpuContext* ctx){const auto& l=MkwGuestLayout::kLayout;
+                    auto data=Memory::Read32(0x809bd728);
+                    if(Memory::Read8(data+l.racedataRace+l.scenarioSettings+0x25)!=1 || Memory::Read32(data+l.racedataRace+l.scenarioSettings+0x28)!=0x104)std::abort();ctx->gpr[3]=0x80050000;}
                 void original_update(CpuContext* ctx) {++updateCalls;Memory::Write32(ctx->gpr[3]+0x20,180);ctx->gpr[3]=0x31415926;}
 
                 int main() {
@@ -68,16 +74,21 @@ public class NativeBootLayoutTests
                         Memory::Write8(data-16+i, 0x55); Memory::Write8(data+l.racedataSize+i, 0x55);
                     }
                     if (!BootRace::ParseArgument("--race-cpu")) return 2;
+                    if(!BootRace::ParseArgument("--race-players={{activePlayers}}") || !BootRace::ParseArgument("--race-laps=1"))return 18;
+                    for(const char* bad:{"--race-players=0","--race-players={{players+1}}","--race-laps=0","--race-laps=10","--race-laps=1x"}){
+                        bool rejected=false;try{BootRace::ParseArgument(bad);}catch(const std::invalid_argument&){rejected=true;}
+                        if(!rejected)return 19;
+                    }
                     CpuContext ctx{}; ArgumentParser_Parse_805b9344(&ctx);
                     if(ctx.gpr[3]!=0x20) return 3;
                     const uint32_t menu=data+l.racedataMenu, settings=menu+l.scenarioSettings;
                     for(uint32_t i=0;i<l.playerCapacity;i++) {
                         const uint32_t p=menu+l.scenarioPlayers+i*l.playerStride;
-                        if(Memory::Read32(p+0x10)!=(i==0?0:1) || Memory::Read32(p+8)>2 ||
+                        if(Memory::Read32(p+0x10)!=(i>={{activePlayers}}?5:i==0?0:1) || Memory::Read32(p+8)>2 ||
                            Memory::Read32(p+0xc)>0x16 || Memory::Read8(p)!=0x7e) return 4;
                     }
                     if(Memory::Read32(settings)!=8 || Memory::Read32(settings+8)!=1 ||
-                       Memory::Read32(settings+0x14)!=2 || Memory::Read32(settings+0x18)!=0) return 5;
+                       Memory::Read32(settings+0x14)!=2 || Memory::Read32(settings+0x18)!=0 || Memory::Read8(settings+0x25)!=1) return 5;
                     for(uint32_t a=data+l.racedataRace;a<menu;a++) if(Memory::Read8(a)!=0x7e) return 6;
                     for(uint32_t a=menu+l.scenarioMission;a<data+l.racedataSize;a++)
                         if(Memory::Read8(a)!=0x7e) return 7;
@@ -120,6 +131,10 @@ public class NativeBootLayoutTests
                     ctx.gpr[3]=inputManager+l.inputRealHolders;ctx.gpr[4]=0x800b0000;ctx.gpr[5]=0;
                     RealControllerHolder_SetController_80521554(&ctx);
                     if(holderCalls!=3 || Memory::Read32(inputManager+l.inputRealHolders+4)!=inputManager+l.inputGCNControllers)return 17;
+                    Memory::Write32(0x809bd728,data);Memory::Write8(data+l.racedataRace+l.scenarioSettings+0x25,3);
+                    Memory::Write32(data+l.racedataRace+l.scenarioSettings+0x28,0x100);
+                    register_entry(0x80532084,create_raceinfo);Raceinfo_CreateInstance_80532084(&ctx);
+                    if(ctx.gpr[3]!=info)return 20;
                     return 0;
                 }
                 """);

@@ -1,5 +1,5 @@
 {
-  "Version": 1,
+  "Version": 2,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: race-data lifecycle, selected readers and point-updater frame/field references. GP point tables, other consumers and subsystems still need migration; this is not a playable 24-player profile.",
@@ -1632,9 +1632,118 @@
       "Operand": "offset",
       "Symbol": "Scenario.settings.offset",
       "Addend": 8
+    },
+    {
+      "Instruction": "0x8052D19C",
+      "ExpectedWord": "0x8883177C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8052D1AC",
+      "ExpectedWord": "0x9803177C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8052D1B8",
+      "ExpectedWord": "0x9803177C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8052D294",
+      "ExpectedWord": "0x8863177C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.menu.offset+Scenario.settings.offset",
+      "Addend": 36
     }
   ],
   "GlobalPointers": {
     "0x809B8F68": "Racedata"
-  }
+  },
+  "ArrayCopies": [
+    {
+      "Begin": "0x8052D1BC",
+      "ExpectedWords": [
+        "0x38C00000",
+        "0x1CA600F0",
+        "0x38C00006",
+        "0x7C832A14",
+        "0x88040CFA",
+        "0x1CA600F0",
+        "0x98040CF9",
+        "0xA0040CF2",
+        "0xB0040CF0",
+        "0x88040DEA",
+        "0x98040DE9",
+        "0xA0040DE2",
+        "0xB0040DE0",
+        "0x88040EDA",
+        "0x98040ED9",
+        "0xA0040ED2",
+        "0xB0040ED0",
+        "0x88040FCA",
+        "0x98040FC9",
+        "0xA0040FC2",
+        "0xB0040FC0",
+        "0x880410BA",
+        "0x980410B9",
+        "0xA00410B2",
+        "0xB00410B0",
+        "0x880411AA",
+        "0x980411A9",
+        "0xA00411A2",
+        "0xB00411A0",
+        "0x7C832A14",
+        "0x88040CFA",
+        "0x98040CF9",
+        "0xA0040CF2",
+        "0xB0040CF0",
+        "0x88040DEA",
+        "0x98040DE9",
+        "0xA0040DE2",
+        "0xB0040DE0",
+        "0x88040EDA",
+        "0x98040ED9",
+        "0xA0040ED2",
+        "0xB0040ED0",
+        "0x88040FCA",
+        "0x98040FC9",
+        "0xA0040FC2",
+        "0xB0040FC0",
+        "0x880410BA",
+        "0x980410B9",
+        "0xA00410B2",
+        "0xB00410B0",
+        "0x880411AA",
+        "0x980411A9",
+        "0xA00411A2",
+        "0xB00411A0"
+      ],
+      "BaseRegister": "r3",
+      "Array": "Racedata.menu.offset+Scenario.players.offset",
+      "Stride": "Player.size",
+      "Count": "players",
+      "Fields": [
+        {
+          "Source": 226,
+          "Destination": 225,
+          "Width": 1
+        },
+        {
+          "Source": 218,
+          "Destination": 216,
+          "Width": 2
+        }
+      ]
+    }
+  ]
 }

@@ -1,4 +1,5 @@
 using Translator.Core.Disassembly;
+using System.Text.Json;
 using Translator.Core.Ir;
 using Translator.Core.Loading;
 using Translator.Core.Translation;
@@ -97,6 +98,59 @@ public class GuestLayoutRelocationTests
         Assert.Equal(0x1688, Assert.Single(instructions.OfType<IrLoad>()).Address.Offset);
         Assert.Equal(0x1688, Assert.Single(instructions.OfType<IrStore>()).Address.Offset);
         Assert.Equal(24, Assert.Single(instructions.OfType<IrSetCrField>()).Right.Constant);
+    }
+
+    [Fact]
+    public void ArrayCopiesRequireTheVersionTwoManifestContract()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            foreach (var version in new[] { 1, 2, 3 })
+            {
+                File.WriteAllText(path, JsonSerializer.Serialize(new {
+                    Version = version, OriginalPlayers = 2,
+                    Types = new[] { new GuestLayoutType("Element", 1, 4) },
+                    References = Array.Empty<object>(),
+                    ArrayCopies = new[] { new {
+                        Begin = "0x80001000", ExpectedWords = new[] { "0x88030000", "0x98030001" },
+                        BaseRegister = "r3", Array = "Element.size", Stride = "Element.size", Count = "players",
+                        Fields = new[] { new GuestArrayFieldCopy(0, 1, 1) }
+                    } }
+                }));
+                if (version == 2) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
+                else Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 4));
+            }
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public void ProvenUnrolledCopiesExpandOneArrayAndRejectChangedFieldsOrControlFlow()
+    {
+        const uint pc = 0x80001000;
+        var words = new uint[] { 0x88030008, 0x98030009, 0x8803000c, 0x9803000d };
+        var types = new[] {
+            new GuestLayoutType("ByteElement", 1, 4), new GuestLayoutType("Prefix", 1, 8),
+            new GuestLayoutType("Root", 1, Fields: new[] {
+                new GuestLayoutField("header", "Prefix"),
+                new GuestLayoutField("players", "ByteElement", PerPlayer: true) }) };
+        var copy = new GuestArrayCopies(pc, words, "r3", "Root.players.offset", "ByteElement.size",
+            "players", new[] { new GuestArrayFieldCopy(0, 1, 1) });
+        var image = TranslatorCppTestHarness.CreateImage((pc-4, 0x4082000c),
+            (pc, words[0]), (pc+4, words[1]), (pc+8, words[2]), (pc+12, words[3]), (pc+16, 0x4e800020));
+        var relocations = new GuestLayoutRelocations(types, 2, 4, Array.Empty<GuestLayoutReference>(), arrayCopies: new[] { copy });
+        var translated = new FunctionTranslator(image, layoutRelocations: relocations).Discover(pc);
+        var stores = translated.LinearIr.Blocks.SelectMany(b => b.Instructions).OfType<IrStore>().ToArray();
+        Assert.Equal(new[] { 9, 13, 17, 21 }, stores.Select(store => store.Address.Offset));
+        Assert.Throws<InvalidDataException>(() => new FunctionTranslator(image, layoutRelocations: relocations).Discover(pc-4));
+        Assert.Throws<InvalidDataException>(() => new FunctionTranslator(image, layoutRelocations: relocations).Discover(pc+8));
+        var incorrect = copy with { Fields = new[] { new GuestArrayFieldCopy(0, 2, 1) } };
+        Assert.Throws<InvalidDataException>(() => new FunctionTranslator(image,
+            layoutRelocations: new GuestLayoutRelocations(types, 2, 4, Array.Empty<GuestLayoutReference>(), arrayCopies: new[] { incorrect })));
+        var changed = TranslatorCppTestHarness.CreateImage((pc, words[0]), (pc+4, words[1]+1),
+            (pc+8, words[2]), (pc+12, words[3]), (pc+16, 0x4e800020));
+        Assert.Throws<InvalidDataException>(() => new FunctionTranslator(changed, layoutRelocations: relocations));
     }
 
     [Fact]

@@ -16,7 +16,7 @@ public sealed record GuestLayoutReference(uint Instruction, uint ExpectedWord, i
 /// Expanded values need not fit the original instruction's immediate encoding. Guest PCs remain
 /// stable identities; C++ labels and symbols determine the expanded native control flow.
 /// </summary>
-public sealed class GuestLayoutRelocations
+public sealed partial class GuestLayoutRelocations
 {
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -26,7 +26,8 @@ public sealed class GuestLayoutRelocations
     public bool Complete { get; }
 
     public GuestLayoutRelocations(IEnumerable<GuestLayoutType> types, int originalPlayers, int players,
-        IEnumerable<GuestLayoutReference> references, bool complete = false)
+        IEnumerable<GuestLayoutReference> references, bool complete = false,
+        IEnumerable<GuestArrayCopies>? arrayCopies = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -43,10 +44,13 @@ public sealed class GuestLayoutRelocations
             _ = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend);
         }
         _references = sites.GroupBy(r => r.Instruction).ToDictionary(g => g.Key, g => g.ToArray());
+        _arrayCopies = (arrayCopies ?? Array.Empty<GuestArrayCopies>()).ToArray();
+        ValidateCopyDefinitions(sites);
     }
 
     public void ValidateImage(ProgramImage image)
     {
+        ValidateCopies(image);
         foreach (var (address, sites) in _references)
         {
             var word = BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(address, 4), 4));
@@ -60,8 +64,14 @@ public sealed class GuestLayoutRelocations
 
     public object Describe() => new
     {
-        Format = "guest-layout-plan-v1", OriginalPlayers, Players, Complete,
+        Format = "guest-layout-plan-v2", OriginalPlayers, Players, Complete,
         Types = _expanded.Types,
+        ArrayCopies = _arrayCopies.Select(copy => new {
+            Begin = $"0x{copy.Begin:X8}", End = $"0x{CopyEnd(copy):X8}", copy.BaseRegister,
+            ExpectedWords = copy.ExpectedWords.Select(word => $"0x{word:X8}"),
+            copy.Array, copy.Stride, copy.Count, copy.Fields,
+            BeforeCount = _original.Symbol(copy.Count), AfterCount = _expanded.Symbol(copy.Count)
+        }),
         References = _references.OrderBy(p => p.Key).SelectMany(p => p.Value).Select(site => new
         {
             Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
@@ -73,6 +83,13 @@ public sealed class GuestLayoutRelocations
 
     public IReadOnlyList<IrInstruction> Apply(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
+        foreach (var copy in _arrayCopies)
+            if (origin.Address >= copy.Begin && origin.Address < CopyEnd(copy))
+            {
+                if (origin.Word != copy.ExpectedWords[checked((int)(origin.Address-copy.Begin)/4)])
+                    throw new InvalidDataException($"Guest array-copy instruction mismatch at 0x{origin.Address:X8}.");
+                return origin.Address == copy.Begin ? ExpandCopies(copy) : Array.Empty<IrInstruction>();
+            }
         if (!_references.TryGetValue(origin.Address, out var sites)) return instructions;
         var result = instructions.ToArray();
         foreach (var site in sites)
@@ -119,16 +136,23 @@ public sealed class GuestLayoutRelocations
     {
         var file = JsonSerializer.Deserialize<LayoutFile>(File.ReadAllText(path))
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version != 1) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
+            throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
-                r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete);
+                r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
+            file.ArrayCopies?.Select(copy => new GuestArrayCopies(Hex(copy.Begin),
+                copy.ExpectedWords.Select(Hex).ToArray(), copy.BaseRegister, copy.Array,
+                copy.Stride, copy.Count, copy.Fields)));
     }
 
     private static uint Hex(string value) => uint.Parse(value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
         ? value.AsSpan(2) : value.AsSpan(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
-        ReferenceFile[] References, bool Complete = false);
+        ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null);
+    private sealed record ArrayCopyFile(string Begin, string[] ExpectedWords, string BaseRegister,
+        string Array, string Stride, string Count, GuestArrayFieldCopy[] Fields);
     private sealed record ReferenceFile(string Instruction, string ExpectedWord, int Node,
         string Operand, string Symbol, int Addend = 0, int Scale = 1);
 }

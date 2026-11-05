@@ -33,9 +33,20 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 199 references across creation, construction,
+menu and awards scenarios and audits 203 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates.
+It also binds the 54 original instruction words of the race-to-race bookkeeping
+copy to a capacity-dependent array operation. Every original load and store must
+prove the declared ordered field copies; branches, calls, extra memory accesses,
+overlapping fields, partial spans and interior branch targets are rejected.
+The replacement emits one copy per player before SSA while retaining the
+original scratch-register outputs. This handles fully unrolled code that has no
+loop-bound constant to relocate. `ArrayCopies` declares the original words,
+base register, array/stride/count symbols and source/destination field widths.
+These rewrites require manifest version 2, so older translators reject them
+instead of silently ignoring required code changes. Version 1 reference-only
+manifests remain supported.
 The point updater's temporary score array grows with capacity. Its stack frame,
 conversion scratch space, saved registers and caller LR slot move together;
 increasing the loop alone would overwrite saved registers. The original Grand
@@ -133,6 +144,10 @@ synchronization.
 Capacity-count checks vary the number of occupied slots from zero to capacity,
 mix local and CPU players, isolate the final slot, and exercise mode-specific
 participant and split-screen rules against the expanded settings offsets.
+Race-to-race bookkeeping checks every player's previous score and finish
+position, race-number rollover and neighboring-field guards at all three
+capacities. At twelve players, it also compares the complete race-data object,
+all GPRs and control registers against execution of the unmodified function.
 Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game

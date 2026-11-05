@@ -275,6 +275,7 @@ public sealed class FunctionTranslator
         // Build CFG-ready basic blocks.
         var bbSw = Stopwatch.StartNew();
         basicBlocks = BasicBlockBuilder.Build(instructions, new[] { entryPoint });
+        _layoutRelocations?.ValidateCopyControlFlow(instructions, basicBlocks);
         bbSw.Stop();
         if (metrics is not null)
         {

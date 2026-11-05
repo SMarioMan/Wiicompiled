@@ -31,23 +31,31 @@ public class RacedataReaderTests
         try
         {
             var sources = new List<string>();
-            foreach (var entry in new uint[] { 0x8052a1d0, 0x8052c3c4, 0x8052d4e8, 0x80529160, 0x8052ac40 })
+            foreach (var entry in new uint[] { 0x8052a1d0, 0x8052c3c4, 0x8052d4e8, 0x80529160, 0x8052ac40, 0x8052d19c })
             {
                 var code = translator.Translate(entry, new TranslationOptions(EnableLeafInlining: false,
                     KnownFunctionEntryPoints: map.Addresses.ToHashSet())).CxxCode;
                 var source = Path.Combine(temporary, $"reader_{entry:X8}.cpp");
                 File.WriteAllText(source, code); sources.Add(source);
             }
+            var originalPrevious = Path.Combine(temporary, "original_previous.cpp");
+            File.WriteAllText(originalPrevious, "#define func_8052D19C original_previous\n" + new FunctionTranslator(image).Translate(0x8052d19c,
+                new TranslationOptions(EnableLeafInlining: false,
+                    KnownFunctionEntryPoints: map.Addresses.ToHashSet())).CxxCode);
+            sources.Add(originalPrevious);
             var harness = Path.Combine(temporary, "harness.cpp");
             var executable = Path.Combine(temporary, "test");
             File.WriteAllText(harness, $$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include <cstring>
                 extern "C" void func_8052A1D0(CpuContext*);
                 extern "C" void func_8052C3C4(CpuContext*);
                 extern "C" void func_8052D4E8(CpuContext*);
                 extern "C" void func_80529160(CpuContext*);
                 extern "C" void func_8052AC40(CpuContext*);
+                extern "C" void func_8052D19C(CpuContext*);
+                extern "C" void original_previous(CpuContext*);
                 int main() {
                     Memory::Init(16 * 1024 * 1024);
                     constexpr uint32_t data = 0x80010000;
@@ -129,6 +137,47 @@ public class RacedataReaderTests
                         uint32_t screens = type == 3 ? 2 : (type == 4 ? 4 : 1);
                         if (Memory::Read8(counts) != total || Memory::Read8(counts+2) != screens ||
                             Memory::Read8(counts+4) != 0) return 11;
+                    }
+                    constexpr uint32_t menu = data + {{layout.Symbol("Racedata.menu.offset")}};
+                    constexpr uint32_t menuSettings = menu + {{layout.Symbol("Scenario.settings.offset")}};
+                    constexpr uint32_t menuPlayers = menu + {{layout.Symbol("Scenario.players.offset")}};
+                    for (uint32_t counter : {0u, 99u, 100u}) {
+                        Memory::Write8(menuSettings+0x24, counter);
+                        for (uint32_t player=0; player<{{players}}; player++) {
+                            uint32_t address = menuPlayers+player*0xf0;
+                            Memory::Write16(address+0xda, 100+player);
+                            Memory::Write16(address+0xd8, 0xbeef);
+                            Memory::Write8(address+0xe2, player+1);
+                            Memory::Write8(address+0xe1, 0xaa);
+                            Memory::Write8(address+0xdc, 0x7e);
+                        }
+                        // Neither settings nor the neighboring race scenario may be used as an extra slot.
+                        Memory::Write8(menuSettings, 0x7e);
+                        Memory::Write8(menuPlayers-1, 0x7e);
+                        CpuContext baseline = ctx;
+                        constexpr uint32_t backup = 0x80060000, rootSize = {{layout.Symbol("Racedata.size")}};
+                        if ({{players}} == 12) {
+                            std::memcpy(Memory::GetPointer(backup, rootSize), Memory::GetPointer(data, rootSize), rootSize);
+                            baseline.gpr[3] = backup; original_previous(&baseline);
+                        }
+                        ctx.gpr[3] = data; func_8052D19C(&ctx);
+                        if ({{players}} == 12) {
+                            if (std::memcmp(Memory::GetPointer(backup, rootSize), Memory::GetPointer(data, rootSize), rootSize) != 0) return 15;
+                            for (uint32_t reg=0; reg<32; reg++) {
+                                uint32_t expected = baseline.gpr[reg];
+                                if (expected >= backup && expected < backup+rootSize) expected = data+(expected-backup);
+                                if (ctx.gpr[reg] != expected) return 16;
+                            }
+                            if (ctx.cr != baseline.cr || ctx.lr != baseline.lr || ctx.ctr != baseline.ctr ||
+                                ctx.xer != baseline.xer || ctx.fpscr != baseline.fpscr) return 17;
+                        }
+                        if (ctx.gpr[3] != (counter < 100 ? counter+1 : 0)) return 12;
+                        for (uint32_t player=0; player<{{players}}; player++) {
+                            uint32_t address = menuPlayers+player*0xf0;
+                            if (Memory::Read16(address+0xd8) != 100+player ||
+                                Memory::Read8(address+0xe1) != player+1 || Memory::Read8(address+0xdc) != 0x7e) return 13;
+                        }
+                        if (Memory::Read8(menuSettings) != 0x7e || Memory::Read8(menuPlayers-1) != 0x7e) return 14;
                     }
                     return 0;
                 }

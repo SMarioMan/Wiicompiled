@@ -519,6 +519,13 @@ scenario array. The lap override is applied before Raceinfo allocates its lap
 splits, with the game's custom-lap flag set. These options help compare smaller
 and full fields within one build; they do not change the translated capacity.
 
+Direct race boot follows the original debug boot's license-zero and Mii setup
+before filling the scenario. This is required when returning to menu models
+after a race. If license zero is absent, boot enters the normal license menu
+first; create the license there, then restart with the race options. Temporary
+debug arguments use a guest stack frame and the previous argument pointer is
+restored before the boot hook returns.
+
 Format version 11 adds checked `GridTables` for field-size/position lookup
 matrices. Every original byte and indexed-load instruction must match. Runtime
 fields within the original capacity preserve their authored rows exactly. Larger

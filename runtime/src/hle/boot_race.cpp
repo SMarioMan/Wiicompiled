@@ -78,6 +78,42 @@ uint32_t ParseCourse(std::string_view text) {
     return course;
 }
 
+// Follow the game's debug-boot license/Mii initialization before entering a
+// race directly. Skipping it leaves the menu's Mii model uninitialized when a
+// completed race returns to the menu scene.
+bool InitializeBootLicense(CpuContext* ctx) {
+    const uint32_t save = Memory::Read32(MKW_GADDR(809BD748));
+    if (!save) return false;
+    ctx->gpr[3] = save;
+    ctx->gpr[4] = 0;
+    MKW_GUEST_FUNC(80544D10)(ctx);
+    if (!ctx->gpr[3]) return false;
+
+    const uint32_t system = Memory::Read32(MKW_GADDR(80386000));
+    if (!system) throw std::runtime_error("--race: RKSystem does not exist at boot");
+    const uint32_t oldArgs = Memory::Read32(system + 0x98);
+    const uint32_t oldStack = ctx->gpr[1];
+    const uint32_t stack = (oldStack - 128u) & ~15u;
+    // This supported debug section executes the complete license/Mii path.
+    // The caller replaces its returned section with the requested VS race.
+    constexpr char arguments[] = "-s132 -l0 -p292 -r0";
+    Memory::Write32(stack, oldStack);
+    std::copy(std::begin(arguments), std::end(arguments),
+              Memory::GetPointer(stack + 32, sizeof(arguments)));
+    Memory::Write32(system + 0x98, stack + 32);
+    ctx->gpr[1] = stack;
+    try {
+        MKW_GUEST_FUNC(805B9344)(ctx);
+    } catch (...) {
+        ctx->gpr[1] = oldStack;
+        Memory::Write32(system + 0x98, oldArgs);
+        throw;
+    }
+    ctx->gpr[1] = oldStack;
+    Memory::Write32(system + 0x98, oldArgs);
+    return ctx->gpr[3] == 0x84;
+}
+
 void SetUpMenuScenario(uint32_t course) {
     const uint32_t racedata = Memory::Read32(MKW_GADDR(809BD728));
     if (racedata == 0) {
@@ -188,6 +224,13 @@ extern "C" void ArgumentParser_Parse_805b9344(CpuContext* ctx) {
         return;
     }
     consumed = true;
+    if (!InitializeBootLicense(ctx)) {
+        RT_LOGF("boot-race", "create a license in the normal menu before booting a race\n");
+        g_cpuDriven = false;
+        g_cpuMenuInput = false;
+        ctx->gpr[3] = 0x3f;
+        return;
+    }
     SetUpMenuScenario(*g_course);
 
     if (!g_cpuDriven || g_cpuMenuInput) {

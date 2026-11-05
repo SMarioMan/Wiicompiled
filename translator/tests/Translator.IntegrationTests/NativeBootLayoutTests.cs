@@ -43,7 +43,8 @@ public class NativeBootLayoutTests
                 extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext*);
                 extern "C" void RealControllerHolder_SetController_80521554(CpuContext*);
                 extern "C" void Raceinfo_CreateInstance_80532084(CpuContext*);
-                unsigned updateCalls=0,holderCalls=0;
+                unsigned updateCalls=0,holderCalls=0,bootCalls=0;
+                bool hasLicense=true,rejectBoot=false;
                 uint32_t expectedController=0;
                 constexpr uint32_t inputManager=0x80090000,sectionManager=0x800a0000;
                 void original_holders(CpuContext* ctx){if(ctx->gpr[3]!=inputManager)std::abort();ctx->gpr[3]=0x31415926;}
@@ -59,7 +60,13 @@ public class NativeBootLayoutTests
                     if(Memory::Read8(data+l.racedataRace+l.scenarioSettings+0x25)!=1 || Memory::Read32(data+l.racedataRace+l.scenarioSettings+0x28)!=0x104)std::abort();ctx->gpr[3]=0x80050000;}
                 void original_update(CpuContext* ctx) {++updateCalls;Memory::Write32(ctx->gpr[3]+0x20,180);ctx->gpr[3]=0x31415926;}
 
-                int main() {
+                void license_exists(CpuContext* ctx){if(ctx->gpr[3]!=0x800d0000 || ctx->gpr[4]!=0)std::abort();ctx->gpr[3]=hasLicense;}
+                void original_boot(CpuContext* ctx){
+                    auto args=Memory::Read32(0x800c0098);
+                    if(args!=ctx->gpr[1]+32 || std::strcmp(reinterpret_cast<const char*>(Memory::GetPointer(args)),"-s132 -l0 -p292 -r0"))std::abort();
+                    ++bootCalls;ctx->gpr[3]=rejectBoot ? 0xffffffffu : 0x84;
+                }
+                int main(int argc,char** argv) {
                     Memory::Init(16*1024*1024);
                     const auto& l=MkwGuestLayout::kLayout;
                     constexpr uint32_t data=0x80010000;
@@ -79,7 +86,16 @@ public class NativeBootLayoutTests
                         bool rejected=false;try{BootRace::ParseArgument(bad);}catch(const std::invalid_argument&){rejected=true;}
                         if(!rejected)return 19;
                     }
-                    CpuContext ctx{}; ArgumentParser_Parse_805b9344(&ctx);
+                    CpuContext ctx{};ctx.gpr[1]=0x80080000;
+                    Memory::Write32(0x809bd748,0x800d0000);Memory::Write32(0x80386000,0x800c0000);
+                    Memory::Write32(0x800c0098,0x800e0000);
+                    register_entry(0x80544d10,license_exists);register_entry(0x805b9344,original_boot);
+                    hasLicense=argc==1 || std::strcmp(argv[1],"missing-license");
+                    rejectBoot=argc>1 && !std::strcmp(argv[1],"rejected-args");
+                    ArgumentParser_Parse_805b9344(&ctx);
+                    if(ctx.gpr[1]!=0x80080000 || Memory::Read32(0x800c0098)!=0x800e0000)return 21;
+                    if(!hasLicense || rejectBoot)return ctx.gpr[3]==0x3f && bootCalls==(rejectBoot?1:0) ? 0 : 22;
+                    if(bootCalls!=1)return 23;
                     if(ctx.gpr[3]!=0x20) return 3;
                     const uint32_t menu=data+l.racedataMenu, settings=menu+l.scenarioSettings;
                     for(uint32_t i=0;i<l.playerCapacity;i++) {
@@ -155,6 +171,14 @@ public class NativeBootLayoutTests
             if(!finished) run.Kill(entireProcessTree:true);
             Assert.True(finished, "Native boot execution timed out");
             Assert.True(run.ExitCode==0, $"Native boot returned {run.ExitCode}: {output.GetAwaiter().GetResult()}");
+            foreach(var variant in new[]{"missing-license","rejected-args"})
+            {
+                using var fallback=Process.Start(new ProcessStartInfo(exe,variant) {RedirectStandardError=true,UseShellExecute=false})!;
+                var fallbackOutput=fallback.StandardError.ReadToEndAsync();var fallbackFinished=fallback.WaitForExit(5000);
+                if(!fallbackFinished)fallback.Kill(entireProcessTree:true);
+                Assert.True(fallbackFinished,$"{variant} boot timed out");
+                Assert.True(fallback.ExitCode==0,fallbackOutput.GetAwaiter().GetResult());
+            }
         }
         finally { Directory.Delete(temp, recursive:true); }
     }

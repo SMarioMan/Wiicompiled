@@ -114,10 +114,14 @@ vtables and padding, and guard bytes before and after the destination.
 Additional native checks exercise the original mode/team/replay readers and
 two-team score aggregation at 12, 24 and 48 players. The aggregation test makes
 the final player determine the result, so a truncated twelve-slot loop fails.
-The original offline battle point updater also runs at all three capacities,
-checking every player's updated score, unchanged rating, restored stack pointer
-and saved registers, and guard bytes around the expanded stack frame. This path
-uses battle scores, so it does not rely on the unmigrated Grand Prix table.
+The original point updater runs offline battle and both online battle modes at
+all three capacities. It checks every player's score and rating, restored stack
+pointer, saved integer/floating-point registers, and stack guard bytes. Rating
+expectations aggregate the original rating functions' per-opponent results
+separately, using varied initial ratings; the updater must include every player
+before applying ratings. These battle paths do not rely on the unmigrated Grand
+Prix table. They validate point updates, not a running online battle or its network
+synchronization.
 Native execution checks both branches of a synthetic relocated function. The
 growth case inserts 96 arithmetic IR operations while retaining the original
 block identities. These checks do not establish that a complete 24-player game

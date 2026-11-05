@@ -33,10 +33,10 @@ player counts.
 
 The initial USA manifest at
 [`racedata.json`](../projects/mkwii-ntsc-u/layouts/racedata.json) describes the race,
-menu and awards scenarios and audits 2,700 references across creation, construction,
+menu and awards scenarios and audits 2,703 references across creation, construction,
 destruction, scenario assignment, selected mode/menu readers, capacity scans and
 point updates, plus AI manager and route-holder storage.
-The manifest records 720 consumer entry points in `AuditedConsumers`.
+The manifest records 725 consumer entry points in `AuditedConsumers`.
 Their declared receiver or singleton-pointer provenance is reproduced by the
 integration suite. Every discovered field move must match its declared original
 and expanded values. Their twelve-player C++ remains identical to the original (the verified copy
@@ -183,6 +183,19 @@ verify that neighboring fields, registers and stack/heap guards remain intact.
 The default harness reports unexpected guest targets and MMIO before aborting;
 missing dependencies still fail immediately. Other controller consumers and the
 LAN module's explicit controller hook remain under migration.
+
+## AI object ownership
+
+The AI per-racer object owner has one pointer per configured participant after
+its vtable. Its allocation, verified unrolled initialization, initialization loop
+and destruction loop all use the same capacity. This corrects an observed heap
+overwrite: pointers for later racers previously replaced the neighboring Lakitu
+manager's fields. Lakitu retains its four local-player entries.
+
+Native tests run the original owner constructor, insertion, initializer, lookup,
+leaf destructor and owner destructor at 12, 13, 24, 48 and 100 slots. External
+allocation/free and kart lookup are fixtures; every object and lifecycle step is
+checked, with saved-register, stack and neighboring-allocation guards.
 
 ## Private executable validation
 

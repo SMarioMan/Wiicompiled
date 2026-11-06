@@ -21,8 +21,10 @@ public sealed record GuestLayoutAuditResult(IReadOnlyList<GuestLayoutCandidate> 
 public sealed class GuestLayoutAudit
 {
     private sealed record ScaleOrigin(uint Instruction, uint Word, int Node, string Operand);
+    private sealed record IndexTerm(int Stride, ScaleOrigin? Scale, IndexTerm? Next = null);
+    private sealed record IndexBinding(int Stride, ScaleOrigin? Scale, string Symbol, string Element);
     private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0, int Rotation = 0,
-        ScaleOrigin? Scale = null);
+        ScaleOrigin? Scale = null, IndexTerm? ExtraIndices = null);
     private readonly Dictionary<string, GuestLayoutType> _definitions;
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -149,9 +151,11 @@ public sealed class GuestLayoutAudit
                 // An interior pointer can also be an array cursor. Rebasing a
                 // cursor's final stride would skip the new elements; require review.
                 if (basis.Offset != 0) { unresolved++; return; }
-                var indexed = basis.IndexStride == 0 ? null : IndexedArray(type,offset,basis.IndexStride);
-                if (indexed is { } array && basis.Scale is { } scale)
+                var bindings = BindIndices(basis,type,offset);
+                if (bindings is null) { unresolved++; return; }
+                foreach (var array in bindings)
                 {
+                    if (array.Scale is not { } scale) continue;
                     var beforeStride = _original.Symbol(array.Symbol);
                     var afterStride = _expanded.Symbol(array.Symbol);
                     // One multiply shared by different record types may need two
@@ -162,11 +166,9 @@ public sealed class GuestLayoutAudit
                     scaleUses[scale]=(array.Element,beforeStride,afterStride);
                     if (afterStride != beforeStride)
                         candidates.Add(new GuestLayoutCandidate(new(scale.Instruction,scale.Word,scale.Node,scale.Operand,array.Symbol),
-                            beforeStride,afterStride,type,basis.IndexStride));
+                            beforeStride,afterStride,type,array.Stride));
                 }
-                var path = basis.IndexStride == 0 || indexed is { } field &&
-                    (basis.Scale is not null || _expanded.Symbol(field.Symbol) == basis.IndexStride)
-                    ? Locate(type, offset) : null;
+                var path = Locate(type, offset);
                 if (path is null) { unresolved++; return; }
                 if (checked(_original.Symbol(path.Value.Symbol) + path.Value.Addend) != offset)
                     throw new InvalidDataException("Layout audit produced an inconsistent original field path.");
@@ -220,8 +222,10 @@ public sealed class GuestLayoutAudit
                         {
                             var pointer = left?.Type is not null ? left : right?.Type is not null ? right : null;
                             var scaled = pointer == left ? right : left;
-                            if (pointer is { Offset: 0, IndexStride: 0 } && scaled is { Type: null, Constant: null, IndexStride: > 0 })
-                                result = pointer with { IndexStride = scaled.IndexStride, Scale = scaled.Scale };
+                            if (pointer is { Offset: 0 } && scaled is { Type: null, Constant: null, IndexStride: > 0, ExtraIndices: null })
+                                result = pointer.IndexStride == 0
+                                    ? pointer with { IndexStride = scaled.IndexStride, Scale = scaled.Scale }
+                                    : pointer with { ExtraIndices = new IndexTerm(scaled.IndexStride,scaled.Scale,pointer.ExtraIndices) };
                             else if (collect && pointer is not null) unresolved++;
                         }
                         else if (collect && (left?.Type is not null || right?.Type is not null)) unresolved++;
@@ -237,8 +241,7 @@ public sealed class GuestLayoutAudit
                             if (address?.Constant is { } location) _globals.TryGetValue(location, out pointedType);
                             var basis = facts.GetValueOrDefault(load.Address.Base);
                             if (pointedType is null && basis is { Type: not null, Offset: 0 } &&
-                                (basis.IndexStride == 0 || IsIndexedArrayField(basis.Type, load.Address.Offset, basis.IndexStride) ||
-                                    basis.Scale is not null && IndexedArray(basis.Type,load.Address.Offset,basis.IndexStride) is not null))
+                                BindIndices(basis,basis.Type,load.Address.Offset) is not null)
                                 pointedType = PointerAt(basis.Type, load.Address.Offset);
                         }
                         Set(load.Destination, pointedType is null ? null : new Fact(Type: pointedType));
@@ -291,8 +294,43 @@ public sealed class GuestLayoutAudit
             _original.Types[type.Name].Fields[field.Name].Stride == scale &&
             (allowChanging || _expanded.Types[type.Name].Fields[field.Name].Stride == scale)));
 
-    private bool IsIndexedArrayField(string type,int offset,int stride) =>
-        IndexedArray(type,offset,stride) is { } array && _expanded.Symbol(array.Symbol)==stride;
+    private IReadOnlyList<IndexBinding>? BindIndices(Fact basis,string type,int offset)
+    {
+        if (basis.IndexStride == 0) return Array.Empty<IndexBinding>();
+        if (basis.ExtraIndices is null)
+        {
+            var array=IndexedArray(type,offset,basis.IndexStride);
+            return array is { } field && (basis.Scale is not null || _expanded.Symbol(field.Symbol)==basis.IndexStride)
+                ? new[] {new IndexBinding(basis.IndexStride,basis.Scale,field.Symbol,field.Element)} : null;
+        }
+        // Each independent index must identify a different array dimension on
+        // this exact field path. Equal strides are ambiguous, even when one
+        // possible assignment happens to produce the desired expanded size.
+        var dimensions=new List<(string Symbol,string Element)>();
+        void Visit(string owner,int at)
+        {
+            var shape=_original.Types[owner];
+            foreach (var field in shape.Fields)
+            {
+                if (at<field.Value.Offset || at>=field.Value.Offset+field.Value.Size) continue;
+                var definition=_definitions[owner].Fields!.Single(f=>f.Name==field.Key);
+                if (definition.PerPlayer || field.Value.Count>1)
+                    dimensions.Add(($"{owner}.{field.Key}.stride",definition.Type));
+                Visit(definition.Type,(at-field.Value.Offset)%field.Value.Stride);
+                return;
+            }
+        }
+        Visit(type,offset);
+        var bindings=new List<IndexBinding>();var used=new HashSet<string>(StringComparer.Ordinal);
+        for (IndexTerm? term=new(basis.IndexStride,basis.Scale,basis.ExtraIndices);term is not null;term=term.Next)
+        {
+            var matches=dimensions.Where(d=>_original.Symbol(d.Symbol)==term.Stride).ToArray();
+            if (matches.Length!=1 || !used.Add(matches[0].Symbol) ||
+                term.Scale is null && _expanded.Symbol(matches[0].Symbol)!=term.Stride) return null;
+            bindings.Add(new(term.Stride,term.Scale,matches[0].Symbol,matches[0].Element));
+        }
+        return bindings;
+    }
 
     private (string Symbol,string Element)? IndexedArray(string type,int offset,int stride)
     {

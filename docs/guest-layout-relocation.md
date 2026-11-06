@@ -1178,3 +1178,12 @@ both buffer directions, zero/nonzero sections and initial/subsequent timestamps.
 It compares section contents, lengths, toggles, timestamp deltas, the whole
 controller and allocation/register guards. All five capacities and the consumer
 audit pass. Wire payload formats still require their separate participant migration.
+
+The pointer audit can now retain independent row and element indices on a typed
+pointer. Every index must match a distinct array dimension along the exact field
+path. Changing strides still require a literal multiply; ambiguous equal strides,
+reused dimensions, unknown indexing and interior cursors remain unresolved.
+Pointee identity survives the proved indexed load. Tests cover both index orders,
+original-capacity emission, expanded expressions and rejected ambiguous cases.
+All 876 default translator tests pass. This only broadens review candidates;
+applying and validating the newly found game references is a separate step.

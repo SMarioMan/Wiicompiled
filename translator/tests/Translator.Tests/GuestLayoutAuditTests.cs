@@ -89,6 +89,55 @@ public class GuestLayoutAuditTests
         new GuestLayoutType("Entry",4,Fields:new[] {new GuestLayoutField("players","Byte",PerPlayer:true),new GuestLayoutField("tail","Word")}),
         new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("header","Header"),new GuestLayoutField("entries","Entry",PerPlayer:true)})};
 
+    private static GuestLayoutType[] NestedIndexTypes() => new[] {
+        new GuestLayoutType("Byte",1,1),new GuestLayoutType("Word",4,4),
+        new GuestLayoutType("Leaf",4,Fields:new[] {new GuestLayoutField("players","Word",PerPlayer:true),new GuestLayoutField("tail","Word")}),
+        new GuestLayoutType("Row",4,Fields:new[] {new GuestLayoutField("players","Word",PerPlayer:true,PointerTo:"Leaf")}),
+        new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("prefix","Byte",PerPlayer:true),new GuestLayoutField("rows","Row",2)})};
+
+    private static uint Add(uint destination,uint left,uint right) =>
+        (31u<<26)|(destination<<21)|(left<<16)|(right<<11)|(266u<<1);
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void IndependentRowAndElementIndicesProveBothDimensionsAndTheirPointee(bool reverse)
+    {
+        var words=new uint[] {0x1ce40008,0x1d050004,Add(6,3,reverse?8u:7u),Add(6,6,reverse?7u:8u),
+            0x81260004,0x81490008,0x4e800020};
+        var types=NestedIndexTypes();
+        var report=new GuestLayoutAudit(types,2,5).Analyze(Discover(words),"Owner");
+        Assert.Equal(3,report.Candidates.Count);
+        Assert.Contains(report.Candidates,c=>c.Reference.Instruction==Start && c.Before==8 && c.After==20);
+        Assert.Contains(report.Candidates,c=>c.Reference.Instruction==Start+16 && c.Before==4 && c.After==8);
+        Assert.Contains(report.Candidates,c=>c.Reference.Instruction==Start+20 && c.ReceiverType=="Leaf" && c.Before==8 && c.After==20);
+        var image=TranslatorCppTestHarness.CreateImage(words.Select((word,index)=>(Start+(uint)index*4,word)).ToArray());
+        var references=report.Candidates.Select(c=>c.Reference).ToArray();
+        Assert.Equal(new FunctionTranslator(image).Translate(Start).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,2,references)).Translate(Start).CxxCode);
+        var nodes=new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,5,references))
+            .Discover(Start,TranslationOptions.Default).LinearIr.Blocks.SelectMany(b=>b.Instructions).ToArray();
+        Assert.Contains(nodes,n=>n is IrBinary {Op:"mul",Right.Constant:20});
+        Assert.Equal(new[] {8,20},nodes.OfType<IrLoad>().Select(load=>load.Address.Offset));
+    }
+
+    [Fact]
+    public void NestedIndicesRejectAmbiguousRepeatedAndUnprovedDimensions()
+    {
+        var types=NestedIndexTypes();
+        var audit=new GuestLayoutAudit(types,2,5);
+        Assert.Empty(audit.Analyze(Discover(0x1ce40008,Add(6,3,7),Add(6,6,7),0x81260004,0x4e800020),"Owner").Candidates);
+        Assert.Empty(audit.Analyze(Discover(0x1ce40008,0x1d050004,Add(6,3,7),Add(6,6,8),0x81260000,0x4e800020),"Owner").Candidates);
+        // At original capacity one, both the row and its element are four
+        // bytes. Their expanded strides differ, so assigning either index
+        // to a dimension would guess at program intent.
+        Assert.Empty(new GuestLayoutAudit(types,1,5).Analyze(Discover(
+            0x1ce40004,0x1d050004,Add(6,3,7),Add(6,6,8),0x81260004,0x4e800020),"Owner").Candidates);
+        // A register-held changing row multiplier has no relocatable literal.
+        Assert.Empty(audit.Analyze(Discover(0x39400008,0x7ce451d6,0x1d050004,
+            Add(6,3,7),Add(6,6,8),0x81260004,0x4e800020),"Owner").Candidates);
+    }
+
     [Fact]
     public void ChangingRecordStrideAndFollowingFieldAreProvedTogether()
     {

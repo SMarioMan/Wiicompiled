@@ -94,7 +94,7 @@ public class GuestLayoutGridTableTests
                     References = Array.Empty<object>(), GridTables = new[] { new { Address = "0x80003000", ExpectedHex = Convert.ToHexString(Values(false)),
                         AdvanceRows = false, Lookups = new[] { new { Instruction = "0x80001000", ExpectedWord = "0x7C1FE0AE",
                             Base = "r31", Index = "r28", Destination = "r0", CountOffset = "r28", Position = "r26" } } } } }));
-                if (version == 11) Assert.Equal(24, GuestLayoutRelocations.Read(path, 24).Players);
+                if (version is 11 or 12) Assert.Equal(24, GuestLayoutRelocations.Read(path, 24).Players);
                 else Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 24));
             }
         }

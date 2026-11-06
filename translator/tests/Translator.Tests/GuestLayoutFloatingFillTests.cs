@@ -45,7 +45,7 @@ public class GuestLayoutFloatingFillTests
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",
                         ExpectedWords=Words.Select(word=>$"0x{word:X8}"),BaseRegister="r3",ValueRegister=valueRegister,Arrays=Fill().Arrays}}}));
-                if(version is 9 or 10 or 11)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 9 or 10 or 11 or 12)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

@@ -140,7 +140,7 @@ public class GuestLayoutRelocationTests
                         Fields = new[] { new GuestArrayFieldCopy(0, 1, 1) }
                     } }
                 }));
-                if (version is 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
+                if (version is 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12) Assert.Equal(4, GuestLayoutRelocations.Read(path, 4).Players);
                 else Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 4));
             }
         }

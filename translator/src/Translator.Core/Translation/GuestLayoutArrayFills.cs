@@ -10,8 +10,10 @@ namespace Translator.Core.Translation;
 public sealed record GuestFillArray(string Array, string Stride, string Count, int Width);
 public sealed record GuestFillConstant(string Register, uint Value);
 public sealed record GuestFillAddress(string Register, string Array);
+public sealed record GuestFillCopy(string Register, string Source);
 public sealed record GuestArrayFill(uint Begin, IReadOnlyList<uint> ExpectedWords,
-    string BaseRegister, string ValueRegister, IReadOnlyList<GuestFillArray> Arrays, IReadOnlyList<GuestFillAddress>? Addresses = null, IReadOnlyList<GuestFillConstant>? Constants = null);
+    string BaseRegister, string ValueRegister, IReadOnlyList<GuestFillArray> Arrays, IReadOnlyList<GuestFillAddress>? Addresses = null, IReadOnlyList<GuestFillConstant>? Constants = null,
+    IReadOnlyList<GuestFillCopy>? Copies = null);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -43,6 +45,12 @@ public sealed partial class GuestLayoutRelocations
                     !(item.Register=="r0" || int.Parse(item.Register.AsSpan(1)) is >=3 and <=12) ||
                     addresses.Any(address=>address.Register==item.Register)))
                 throw new InvalidDataException("Guest fill constants require distinct volatile registers independent of the stores.");
+            var copies = fill.Copies ?? Array.Empty<GuestFillCopy>();
+            if (copies.Select(copy => copy.Register).Distinct().Count() != copies.Count ||
+                copies.Any(copy => !IsGpr(copy.Register) || copy.Register is "r1" or "r2" ||
+                    copy.Register == fill.BaseRegister || copy.Register == fill.ValueRegister || copy.Source != fill.BaseRegister ||
+                    addresses.Any(address => address.Register == copy.Register) || constants.Any(item => item.Register == copy.Register)))
+                throw new InvalidDataException("Guest fill copies must preserve the unchanged base in distinct registers independent of stores and setup.");
             foreach (var layout in new[] { _original, _expanded })
             {
                 var intervals = new List<(int Begin, int End)>();
@@ -87,6 +95,7 @@ public sealed partial class GuestLayoutRelocations
             var observed = new List<IrStore>();
             var observedAddresses = new List<IrBinary>();
             var observedConstants = new List<IrAssign>();
+            var observedCopies = new List<GuestFillCopy>();
             for (var index = 0; index < fill.ExpectedWords.Count; index++)
             {
                 var pc = checked(fill.Begin + (uint)index * 4);
@@ -96,13 +105,17 @@ public sealed partial class GuestLayoutRelocations
                 {
                     if (node is IrComment) continue;
                     if (node is IrStore store) observed.Add(store);
+                    else if (node is IrAssign { Value.RegisterName: { } source } assignmentCopy)
+                        observedCopies.Add(new(assignmentCopy.Destination, source));
+                    else if (node is IrBinary { Op: "or", Left.RegisterName: { } left, Right.RegisterName: { } right } binaryCopy && left == right)
+                        observedCopies.Add(new(binaryCopy.Destination, left));
                     else if (node is IrBinary address) observedAddresses.Add(address);
                     else if (node is IrAssign constant) observedConstants.Add(constant);
                     else throw new InvalidDataException("Guest array-fill span contains effects other than declared scalar stores and addresses.");
                 }
             }
             if (!observed.SequenceEqual(expected) || !observedAddresses.SequenceEqual(FillAddresses(fill, _original)) ||
-                !observedConstants.SequenceEqual(FillConstants(fill)))
+                !observedConstants.SequenceEqual(FillConstants(fill)) || !observedCopies.SequenceEqual(fill.Copies ?? Array.Empty<GuestFillCopy>()))
                 throw new InvalidDataException($"Unproven ordered guest array fill at 0x{fill.Begin:X8}.");
         }
     }
@@ -131,7 +144,8 @@ public sealed partial class GuestLayoutRelocations
             if (origin.Word != fill.ExpectedWords[checked((int)(origin.Address-fill.Begin)/4)])
                 throw new InvalidDataException($"Guest array-fill instruction mismatch at 0x{origin.Address:X8}.");
             if (Players == OriginalPlayers) return instructions;
-            return origin.Address == fill.Begin ? FillStores(fill, _expanded).Cast<IrInstruction>().Concat(FillAddresses(fill, _expanded)).Concat(FillConstants(fill)).ToArray() : Array.Empty<IrInstruction>();
+            return origin.Address == fill.Begin ? FillStores(fill, _expanded).Cast<IrInstruction>().Concat(FillAddresses(fill, _expanded)).Concat(FillConstants(fill))
+                .Concat((fill.Copies ?? Array.Empty<GuestFillCopy>()).Select(copy => new IrAssign(copy.Register, IrValue.Register(copy.Source)))).ToArray() : Array.Empty<IrInstruction>();
         }
         return null;
     }

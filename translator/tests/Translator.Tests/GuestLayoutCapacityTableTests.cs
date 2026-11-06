@@ -59,7 +59,7 @@ public class GuestLayoutCapacityTableTests
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,
                     References=Array.Empty<object>(),CapacityTables=new[] {new {Address="0x80003000",ExpectedValues=Values,
                         Lookups=new[] {new {Instruction="0x80001000",ExpectedWord="0x7CA4002E",Base="r4",Index="r0",Destination="r5",Count="r6"}}}}}));
-                if(version is 10 or 11)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 10 or 11 or 12)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

@@ -36,7 +36,7 @@ public class GuestLayoutArrayFillTests
                     ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays}}
                 }));
-                if(version is 5 or 6 or 7 or 8 or 9 or 10 or 11) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12) Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
@@ -88,7 +88,7 @@ public class GuestLayoutArrayFillTests
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,
                         Addresses=new[] {new GuestFillAddress("r5","Object.second.offset")}}}
                 }));
-                if(version is 7 or 8 or 9 or 10 or 11)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 7 or 8 or 9 or 10 or 11 or 12)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
@@ -125,8 +125,48 @@ public class GuestLayoutArrayFillTests
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,Constants=new[] {new GuestFillConstant("r5",0x809c0000)}}}}));
-                if(version is 10 or 11)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 10 or 11 or 12)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
+            }
+        }
+        finally{File.Delete(path);}
+    }
+
+    [Fact]
+    public void InterleavedBaseCopySurvivesExpandedStoresWithoutChangingTheBase()
+    {
+        var words=new uint[] {Words[0],0x7c781b78,Words[1],Words[2],Words[3]}; // mr r24,r3
+        var fill=Fill(words) with {Copies=new[] {new GuestFillCopy("r24","r3")}};
+        var image=Image(words);
+        Assert.Equal(new FunctionTranslator(image).Translate(Start,TranslationOptions.Default).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:Layout(2,fill)).Translate(Start,TranslationOptions.Default).CxxCode);
+        var nodes=new FunctionTranslator(image,layoutRelocations:Layout(24,fill)).Discover(Start,TranslationOptions.Default)
+            .LinearIr.Blocks.SelectMany(block=>block.Instructions).ToArray();
+        Assert.Equal(48,nodes.OfType<IrStore>().Count());
+        Assert.Contains(new IrAssign("r24",IrValue.Register("r3")),nodes);
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:Layout(24,Fill(words))));
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:Layout(24,
+            fill with {Copies=new[] {new GuestFillCopy("r25","r3")}})));
+        foreach(var register in new[] {"r0","r1","r2","r3","f5"})
+            Assert.Throws<InvalidDataException>(()=>Layout(24,fill with {Copies=new[] {new GuestFillCopy(register,"r3")}}));
+        Assert.Throws<InvalidDataException>(()=>Layout(24,fill with {Copies=new[] {new GuestFillCopy("r24","r4")}}));
+        Assert.Throws<InvalidDataException>(()=>Layout(24,fill with {Constants=new[] {new GuestFillConstant("r5",1)},
+            Copies=new[] {new GuestFillCopy("r5","r3")}}));
+    }
+
+    [Fact]
+    public void BaseCopySetupRequiresVersionTwelve()
+    {
+        var path=Path.GetTempFileName();
+        try
+        {
+            foreach(var version in new[] {11,12})
+            {
+                File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
+                    References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
+                        BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays,Copies=new[] {new GuestFillCopy("r24","r3")}}}}));
+                if(version==12) Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }
         finally{File.Delete(path);}

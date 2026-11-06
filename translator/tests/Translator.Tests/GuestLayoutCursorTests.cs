@@ -60,7 +60,7 @@ public class GuestLayoutCursorTests
                     ResampledCursors=new[] {new {Instruction="0x80001000",ExpectedWord="0x38840020",site.Cursor,
                         site.NextIndex,site.IndexStride,site.SourceStride,site.Count,site.SourceCount}}
                 }));
-                if(version is 6 or 7 or 8 or 9 or 10 or 11)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 6 or 7 or 8 or 9 or 10 or 11 or 12)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

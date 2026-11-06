@@ -619,3 +619,18 @@ Native tests exercise the real callback thunk for all fifteen item types at
 all five capacities. A longer three-lap 24-player run passes that callback path
 but still exposes the original POW manager's affected-player storage; that
 separate layout remains to be migrated.
+
+Format version 12 adds checked `NormalizedRanks`: an audited one-based rank is
+converted to the original authored rank axis before its existing bucket logic.
+The rewrite requires the exact original `addi register,register,-1`, preserves
+original-capacity code, and scales expanded indices with unsigned multiplication
+and division. The caller must establish that incoming ranks are in `1..players`.
+This allows a fixed number of effect severity bands to cover an expanded field
+without treating severity bands as additional player slots.
+
+Version 12 also permits declared base-register `Copies` inside an array-fill
+span. Every original copy must match; its destination cannot alias the stores,
+address setup, constants, or stack registers. Expanded fills preserve that base
+in the declared register after filling the uniform arrays. This handles original
+constructors that save their receiver between unrolled stores without accepting
+unproven instructions in the rewritten span.

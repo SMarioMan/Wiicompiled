@@ -32,7 +32,7 @@ public class BattleCoinStorageTests
         {
             // The two reset regions end at test-only BLRs. Neither exit is a
             // referenced instruction; production image files remain untouched.
-            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014,0x80872068})
+            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014,0x80872068,0x80876328})
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(exit,4),4),0x4e800020);
             // Keep the real prologue, scratch initialization and epilogue;
             // skip the rendering/network body after the first complete loop.
@@ -40,7 +40,7 @@ public class BattleCoinStorageTests
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
             const uint modelSeam=0x80874c5c,modelTail=0x80875bc8;
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(modelSeam,4),4),0x48000000|((modelTail-modelSeam)&0x03fffffc));
-            var entries=new uint[]{0x80534f3c,0x808764f8,0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            var entries=new uint[]{0x808762fc,0x80534f3c,0x808764f8,0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -214,6 +214,25 @@ public class BattleCoinStorageTests
                             Memory::Read8(root+{{layout.Symbol("BattleCoinManager.changed.offset")}}+i)!=0)return 27;
                         calls=0;ctx.gpr[3]=root;func_80875E00(&ctx);
                         if(calls!=local*2 || !guards())return 28;
+                        // A real collision-event emission writes four floats
+                        // through an indexed manager pointer. Check every byte of
+                        // every event slot and the surrounding participant arrays.
+                        for(uint32_t slot=0;slot<64;slot++){
+                            std::memcpy(expected.data(),Memory::GetPointer(root,size),size);
+                            auto offset={{layout.Symbol("BattleCoinManager.events.offset+BattleCoinEvents.entries.offset")}}+slot*136;
+                            auto expectedWord=[&](uint32_t off,uint32_t value){for(uint32_t j=0;j<4;j++)expected[off+j]=value>>(24-j*8);};
+                            expectedWord(offset,0x11223344);expectedWord(offset+28,Memory::Read32(tick));
+                            expected[offset+32]=0x67;expected[offset+133]=0x89;expected[offset+24]=0xab;
+                            for(uint32_t j=0;j<4;j++){
+                                float value=j==0?12.5f:j==1?-30.25f:j==2?100.125f:.5f;
+                                uint32_t bits;std::memcpy(&bits,&value,4);expectedWord(offset+8+j*4,bits);
+                            }
+                            ctx.gpr[28]=root;ctx.gpr[7]=root+slot*136;ctx.gpr[5]=0x11223344;
+                            ctx.gpr[3]=0x67;ctx.gpr[9]=0x89;ctx.gpr[30]=0xab;
+                            ctx.fpr[2].d=12.5;ctx.fpr[1].d=-30.25;ctx.fpr[0].d=100.125;ctx.fpr[3].d=.5;
+                            func_808762FC(&ctx);
+                            if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size) || !guards())return 36;
+                        }
                         // Completion must scan every active player before it
                         // checks all coin animations. Unused capacity is excluded.
                         for(uint32_t done=0;done<=active;done++){

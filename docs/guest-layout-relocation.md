@@ -988,3 +988,15 @@ Five native capacity cases and the 952-consumer audit pass. The first playable
 retry reached the real battle timer with all 24 racers and no guest fault, but
 remained in the completion phase; the retry with the additional scratch-array
 migration is running. A complete coin-battle round trip is not yet established.
+
+Coin-event storage is declared as a fixed 36-byte header, 64 event records of
+136 bytes, and a 16-byte tail. That lets the pointer audit follow indexed event
+accesses, including floating-point loads/stores. Sixteen such accesses now use
+the relocated event base; the old float stores could overwrite the expanded
+eligibility-index array with coordinates and prevent race completion.
+
+The native coin test executes the real mixed integer/float event-emission region
+for all 64 slots and compares the entire manager allocation, including neighboring
+participant arrays and heap guards. All five capacities and the 952-consumer
+audit pass. The full battle/menus/next-battle retry with these corrections is
+running; these checks still do not establish complete 24-player LAN or UI support.

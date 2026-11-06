@@ -1206,8 +1206,22 @@
     },
     {
       "Name": "BattleCoinEvents",
-      "Size": 8756,
-      "Alignment": 4
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "BattleCoinEventHeader"
+        },
+        {
+          "Name": "entries",
+          "Type": "BattleCoinEvent",
+          "Count": 64
+        },
+        {
+          "Name": "tail",
+          "Type": "BattleCoinEventTail"
+        }
+      ]
     },
     {
       "Name": "BattleCoinConfig",
@@ -1490,6 +1504,21 @@
       "Name": "BattleCoinUpdateCoinBuffers",
       "Size": 304,
       "Alignment": 8
+    },
+    {
+      "Name": "BattleCoinEventHeader",
+      "Size": 36,
+      "Alignment": 4
+    },
+    {
+      "Name": "BattleCoinEvent",
+      "Size": 136,
+      "Alignment": 4
+    },
+    {
+      "Name": "BattleCoinEventTail",
+      "Size": 16,
+      "Alignment": 4
     }
   ],
   "References": [
@@ -37376,6 +37405,134 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "BattleCoinUpdateFrame.scalars.offset"
+    },
+    {
+      "Instruction": "0x80870800",
+      "ExpectedWord": "0xC043211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80870844",
+      "ExpectedWord": "0xC0432120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x8087088C",
+      "ExpectedWord": "0xC0472124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x808708C8",
+      "ExpectedWord": "0xC0432128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x80870DA4",
+      "ExpectedWord": "0xC0442124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x80870DAC",
+      "ExpectedWord": "0xC0242128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x80870DB0",
+      "ExpectedWord": "0xC004212C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 60
+    },
+    {
+      "Instruction": "0x80875714",
+      "ExpectedWord": "0xD0042124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x8087571C",
+      "ExpectedWord": "0xD0042128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x80875724",
+      "ExpectedWord": "0xD004212C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 60
+    },
+    {
+      "Instruction": "0x808759E8",
+      "ExpectedWord": "0xC0042128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x808759F0",
+      "ExpectedWord": "0xD0042128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x80876310",
+      "ExpectedWord": "0xD047211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80876314",
+      "ExpectedWord": "0xD0272120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x80876318",
+      "ExpectedWord": "0xD0072124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x8087631C",
+      "ExpectedWord": "0xD0672128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 56
     }
   ],
   "GlobalPointers": {
@@ -41418,11 +41575,6 @@
     },
     {
       "Entry": "0x80875E90",
-      "Receiver": "BattleCoinManager",
-      "Name": ""
-    },
-    {
-      "Entry": "0x808766F4",
       "Receiver": "BattleCoinManager",
       "Name": ""
     },

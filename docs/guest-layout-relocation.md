@@ -749,3 +749,12 @@ larger storage cases still use at most 24 active participants: the original
 manager and balloon-object byte counters require a separate width migration
 before supporting more than 25 active players. Those cases are storage-layout
 checks, not claims of playable 48/100-player battles.
+
+Format version 14 adds checked `HeapRoutes`. A complete five-instruction span
+must load two backing heaps, initialize its existing zero register, and store
+them in two allocation slots. Expanded profiles may route the primary slot to
+the existing secondary heap while preserving both backing ownership fields and
+all original register effects. Original-capacity code is unchanged. Partial
+spans, interior entries, mismatching effects and overlapping relocations fail.
+The caller must audit that heap destruction uses the separate ownership fields;
+redirecting allocation slots does not transfer ownership or create another heap.

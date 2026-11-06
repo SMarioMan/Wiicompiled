@@ -187,6 +187,38 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void BitWidthsRepresentEveryChoiceWithoutTruncatingAtPowersOfTwo()
+    {
+        foreach (var (choices, bits) in new[] { (1,1),(2,1),(3,2),(12,4),(13,4),(16,4),(17,5),(24,5),(32,5),(33,6),(48,6),(100,7),(256,8),(257,9) })
+            Assert.Equal(bits,new GuestLayouts(RaceTypes(),choices).Symbol("bits(players)"));
+        var layout=new GuestLayouts(RaceTypes(),24);
+        Assert.Equal(5,layout.Symbol("bits(Scenario.players.count)"));
+        Assert.Equal(31,layout.Symbol("bits(2147483647)"));
+        foreach(var expression in new[] { "bits()","bits(0)","bits(-1)","bits(unknown)","bits(players","bits(2147483648)" })
+            Assert.Throws<InvalidDataException>(()=>layout.Symbol(expression));
+    }
+
+    [Fact]
+    public void BitWidthRelocationsRequireTheirFormatAndPreserveOriginalEmission()
+    {
+        const uint pc=0x80001000;
+        var image=TranslatorCppTestHarness.CreateImage((pc,0x38600004),(pc+4,0x4e800020));
+        var types=new[] {new GuestLayoutType("Word",4,4)};
+        var references=new[] {new {Instruction="0x80001000",ExpectedWord="0x38600004",Node=0,Operand="value",Symbol="bits(players)"}};
+        var path=Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path,JsonSerializer.Serialize(new{Version=17,OriginalPlayers=12,Types=types,References=references}));
+            Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            File.WriteAllText(path,JsonSerializer.Serialize(new{Version=18,OriginalPlayers=12,Types=types,References=references}));
+            Assert.Equal(new FunctionTranslator(image).Translate(pc).CxxCode,
+                new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(path,12)).Translate(pc).CxxCode);
+            Assert.Contains("r3 = 5",new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(path,24)).Translate(pc).CxxCode);
+        }
+        finally {File.Delete(path);}
+    }
+
+    [Fact]
     public void FloorBudgetsDivideByCapacityAndKeepExplicitRounding()
     {
         var types = new[] { new GuestLayoutType("Budget", 1, 23_322_624) };

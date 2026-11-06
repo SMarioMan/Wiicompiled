@@ -71,6 +71,16 @@ public sealed class GuestLayouts
     {
         if (name.Contains('+'))
             return name.Split('+').Aggregate(0, (sum, term) => checked(sum + Symbol(term.Trim())));
+        if (name.StartsWith("bits(", StringComparison.Ordinal))
+        {
+            if (!name.EndsWith(')')) throw new InvalidDataException($"Invalid guest bit-width expression: {name}.");
+            var argument = name[5..^1].Trim();
+            var choices = int.TryParse(argument, out var literal) ? literal : Symbol(argument);
+            if (choices <= 0) throw new InvalidDataException($"Guest bit-width choices must be positive: {name}.");
+            // A one-choice field retains one bit so the game's bit-stream
+            // readers/writers never receive an empty field.
+            return choices <= 2 ? 1 : 32 - System.Numerics.BitOperations.LeadingZeroCount((uint)(choices - 1));
+        }
         if (name.Contains('/') || name.StartsWith("ceil(", StringComparison.Ordinal) || name.StartsWith("floor(", StringComparison.Ordinal))
         {
             var ceiling = name.StartsWith("ceil(", StringComparison.Ordinal);

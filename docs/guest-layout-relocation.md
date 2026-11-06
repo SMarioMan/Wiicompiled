@@ -1000,3 +1000,14 @@ for all 64 slots and compares the entire manager allocation, including neighbori
 participant arrays and heap guards. All five capacities and the 952-consumer
 audit pass. The full battle/menus/next-battle retry with these corrections is
 running; these checks still do not establish complete 24-player LAN or UI support.
+
+Format version 18 adds `bits(symbol)`: the number of bits needed for the symbol's
+number of choices, with a minimum of one bit. For example, `bits(players)` is four
+at capacities 12 through 16, five at 17 through 32, and seven at 100. Counts and
+IDs encoded as values from zero through capacity minus one can use the same
+capacity-derived width without changing their original twelve-player code.
+Nonpositive choices, unknown symbols and malformed expressions fail validation.
+Reference manifests using this expression require version 18 so older readers
+reject the required migration. Unit cases cover power-of-two boundaries, format
+validation and unchanged original-capacity emission.
+All 868 default tests pass with this extension.

@@ -855,3 +855,26 @@ operand. This covers remaining-capacity expressions such as `capacity - used`;
 when the original instruction sets carry, its helper argument must be relocated
 as a separate checked operand too. Tests preserve original emission, check both
 operands at expanded capacities, and reject a mismatching original constant.
+
+Team-result pages now store `ceil(players/2)` complete participant records in each
+team column. Their following team field, six authored child controls, text state
+and add-point pointers move together. The two embedded columns' construction,
+destruction and traversal strides, the page's following race-count pointer, and
+all three page allocations use the resulting sizes. At capacity 24 each column
+grows from 0xB90 to 0xC08 and its page from 0x18C4 to 0x19B4.
+
+The unused-record clear loop uses the same capacity, including both subtraction
+and carry operands. Its formerly unreachable eight-row unroll is verified as a
+mixed-source fill with relative record offsets, so its stores cannot be mistaken
+for fields following the original six records.
+
+`TeamResultStorageTests` executes the real page factory and all three relevant
+page construction/destruction paths. Rendering controls, text and array dispatch
+are fixtures. It also isolates the original unused-record loop from the rendering
+tail with an explicit test-only return, checking every used-row count and every
+page byte against the expected score/sentinel stores. Five capacities (12, 13,
+24, 48 and 100) and the 932-consumer audit pass. A real 24-player team-VS round
+trip now passes finish, menus and a second advancing race. Balloon battle passes
+its former results failure but still finds a separate blooper reset issue before
+the next battle. The six visible authored rows per team remain a presentation
+window; showing all expanded rows still requires presentation work.

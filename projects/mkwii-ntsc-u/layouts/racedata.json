@@ -1077,6 +1077,132 @@
       "Name": "NdevDebugReserveUnits",
       "Alignment": 1,
       "Size": 23322624
+    },
+    {
+      "Name": "TeamResultHeader",
+      "Alignment": 4,
+      "Size": 372
+    },
+    {
+      "Name": "TeamResultPlayer",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "score",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "previousScore",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "animation",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "playerId",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "unknown",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "TeamResultItem",
+      "Alignment": 4,
+      "Size": 372
+    },
+    {
+      "Name": "TeamResultText",
+      "Alignment": 4,
+      "Size": 196
+    },
+    {
+      "Name": "TeamResult",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "TeamResultHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "TeamResultPlayer",
+          "PerPlayer": true,
+          "PlayersPerElement": 2
+        },
+        {
+          "Name": "team",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "items",
+          "Type": "TeamResultItem",
+          "Count": 6
+        },
+        {
+          "Name": "resultTeamPoint",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "text",
+          "Type": "TeamResultText"
+        },
+        {
+          "Name": "currentScore",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "teamScore",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "addPoints",
+          "Type": "Pointer",
+          "Count": 6
+        }
+      ]
+    },
+    {
+      "Name": "TeamResultClearSpan",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "TeamResultHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "TeamResultPlayer",
+          "Count": 8
+        }
+      ]
+    },
+    {
+      "Name": "TeamResultPageHeader",
+      "Alignment": 4,
+      "Size": 416
+    },
+    {
+      "Name": "TeamResultPage",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "TeamResultPageHeader"
+        },
+        {
+          "Name": "results",
+          "Type": "TeamResult",
+          "Count": 2
+        },
+        {
+          "Name": "raceCount",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -27524,6 +27650,732 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "BattleBalloonManager.changed.offset"
+    },
+    {
+      "Instruction": "0x805F44A4",
+      "ExpectedWord": "0x38C00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x805F45D4",
+      "ExpectedWord": "0x38A00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x805F466C",
+      "ExpectedWord": "0x38C00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x805F46D4",
+      "ExpectedWord": "0x38C00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x8083A99C",
+      "ExpectedWord": "0x1C000B90",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x8083AB10",
+      "ExpectedWord": "0x3BFF0B90",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x8083B1B8",
+      "ExpectedWord": "0x38A00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x8083B250",
+      "ExpectedWord": "0x38A00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x8083B2E8",
+      "ExpectedWord": "0x38A00B90",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.size"
+    },
+    {
+      "Instruction": "0x805F2958",
+      "ExpectedWord": "0x386018C4",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResultPage.size"
+    },
+    {
+      "Instruction": "0x805F2970",
+      "ExpectedWord": "0x386018C4",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResultPage.size"
+    },
+    {
+      "Instruction": "0x805F2988",
+      "ExpectedWord": "0x386018C4",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResultPage.size"
+    },
+    {
+      "Instruction": "0x807EC5D4",
+      "ExpectedWord": "0x2C120006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.players.count"
+    },
+    {
+      "Instruction": "0x807EC5D8",
+      "ExpectedWord": "0x20720006",
+      "Node": 0,
+      "Operand": "left",
+      "Symbol": "TeamResult.players.count"
+    },
+    {
+      "Instruction": "0x807EC5D8",
+      "ExpectedWord": "0x20720006",
+      "Node": 1,
+      "Operand": "argument:0",
+      "Symbol": "TeamResult.players.count"
+    },
+    {
+      "Instruction": "0x805F4500",
+      "ExpectedWord": "0x387F01F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805F4518",
+      "ExpectedWord": "0x387F0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805F456C",
+      "ExpectedWord": "0x386301F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EBF14",
+      "ExpectedWord": "0x908301EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC008",
+      "ExpectedWord": "0x3BDB01F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC0C0",
+      "ExpectedWord": "0x801B01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC154",
+      "ExpectedWord": "0x935B0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC160",
+      "ExpectedWord": "0x38DB0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC1E0",
+      "ExpectedWord": "0x809B01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC228",
+      "ExpectedWord": "0x90BB0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC23C",
+      "ExpectedWord": "0x809B0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC274",
+      "ExpectedWord": "0x801B01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC2AC",
+      "ExpectedWord": "0x807B0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC2EC",
+      "ExpectedWord": "0x807B0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC36C",
+      "ExpectedWord": "0x92F80B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC37C",
+      "ExpectedWord": "0x80780B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC384",
+      "ExpectedWord": "0x809B01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC3F0",
+      "ExpectedWord": "0x90030B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC400",
+      "ExpectedWord": "0xD0030B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC434",
+      "ExpectedWord": "0x386F0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC448",
+      "ExpectedWord": "0x806F01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC4D0",
+      "ExpectedWord": "0xC00F0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC4D8",
+      "ExpectedWord": "0x808F0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC4F0",
+      "ExpectedWord": "0xD00F0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC504",
+      "ExpectedWord": "0x900F0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC53C",
+      "ExpectedWord": "0x808F0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC550",
+      "ExpectedWord": "0x900F0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC66C",
+      "ExpectedWord": "0x3AAF01F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC8B0",
+      "ExpectedWord": "0x38CF0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC8C4",
+      "ExpectedWord": "0x900F0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC8D4",
+      "ExpectedWord": "0x38CF0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC8FC",
+      "ExpectedWord": "0x800F0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC908",
+      "ExpectedWord": "0x386F0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC910",
+      "ExpectedWord": "0x806F0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC918",
+      "ExpectedWord": "0xC00F0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC91C",
+      "ExpectedWord": "0x386F0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC92C",
+      "ExpectedWord": "0x900F0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC934",
+      "ExpectedWord": "0x800F01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC948",
+      "ExpectedWord": "0x906F0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC94C",
+      "ExpectedWord": "0x806F0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC960",
+      "ExpectedWord": "0x38CF0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807EC9E4",
+      "ExpectedWord": "0x3B4301F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA34",
+      "ExpectedWord": "0x38DE0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA5C",
+      "ExpectedWord": "0x3B4301F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA70",
+      "ExpectedWord": "0x901E0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA80",
+      "ExpectedWord": "0x38DE0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA90",
+      "ExpectedWord": "0x907E0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECA9C",
+      "ExpectedWord": "0x38DE0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECABC",
+      "ExpectedWord": "0x801E0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECAC8",
+      "ExpectedWord": "0x387E0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECAD0",
+      "ExpectedWord": "0x807E0B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECAE8",
+      "ExpectedWord": "0xC05E0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECB18",
+      "ExpectedWord": "0xD01E0B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECB28",
+      "ExpectedWord": "0x901E0AAC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECB30",
+      "ExpectedWord": "0x801E01EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.team.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECB3C",
+      "ExpectedWord": "0x807E0AA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.resultTeamPoint.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECB54",
+      "ExpectedWord": "0x38DE0AAC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.text.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECCD4",
+      "ExpectedWord": "0x80A30B74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.teamScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ECCF4",
+      "ExpectedWord": "0xC0230B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.currentScore.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AA04",
+      "ExpectedWord": "0x93FC18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AA1C",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AA40",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AA90",
+      "ExpectedWord": "0x808318C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083ADA0",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083ADA8",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083ADE8",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083ADF0",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AE1C",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8083AE24",
+      "ExpectedWord": "0x807C18C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResultPage.raceCount.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -30685,7 +31537,7 @@
     },
     {
       "Entry": "0x807EC3BC",
-      "Receiver": null,
+      "Receiver": "TeamResult",
       "Name": "CtrlRaceResultTeam::InitSelf"
     },
     {
@@ -31205,12 +32057,12 @@
     },
     {
       "Entry": "0x8083AD30",
-      "Receiver": null,
+      "Receiver": "TeamResultPage",
       "Name": "Pages::BattleLeaderboardTotal::FillRows"
     },
     {
       "Entry": "0x8083AD40",
-      "Receiver": null,
+      "Receiver": "TeamResultPage",
       "Name": "Pages::BattleLeaderboardUpdate::FillRows"
     },
     {
@@ -32172,6 +33024,141 @@
       "Entry": "0x8073ED1C",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x805F24DC",
+      "Receiver": null,
+      "Name": "Section::CreatePageById"
+    },
+    {
+      "Entry": "0x805F2958",
+      "Receiver": null,
+      "Name": "Section::CreatePageById_case32"
+    },
+    {
+      "Entry": "0x805F2970",
+      "Receiver": null,
+      "Name": "Section::CreatePageById_case33"
+    },
+    {
+      "Entry": "0x805F2988",
+      "Receiver": null,
+      "Name": "Section::CreatePageById_case34"
+    },
+    {
+      "Entry": "0x805F446C",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardTotal::__ct"
+    },
+    {
+      "Entry": "0x805F44D4",
+      "Receiver": "TeamResult",
+      "Name": "CtrlRaceResultTeam::__ct"
+    },
+    {
+      "Entry": "0x805F4538",
+      "Receiver": "TeamResult",
+      "Name": "CtrlRaceResultTeam::__dt"
+    },
+    {
+      "Entry": "0x805F45AC",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardBase::__dt"
+    },
+    {
+      "Entry": "0x805F4634",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardUpdate::__ct"
+    },
+    {
+      "Entry": "0x805F469C",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardTotal::__ct"
+    },
+    {
+      "Entry": "0x807EBEF4",
+      "Receiver": "TeamResult",
+      "Name": "CtrlRaceResultTeam::Load"
+    },
+    {
+      "Entry": "0x807EC990",
+      "Receiver": "TeamResult",
+      "Name": "CtrlRaceResultTeam::OnUpdate"
+    },
+    {
+      "Entry": "0x807ECBFC",
+      "Receiver": "TeamResult",
+      "Name": "CtrlRaceResultTeam::IsResultAnimDone"
+    },
+    {
+      "Entry": "0x8083A950",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardBase::OnInit"
+    },
+    {
+      "Entry": "0x8083AA7C",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardBase::AfterControlUpdate"
+    },
+    {
+      "Entry": "0x8083AAD8",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardBase::CanEnd"
+    },
+    {
+      "Entry": "0x8083ACC0",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardTotal::FillRows"
+    },
+    {
+      "Entry": "0x8083B090",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardTotal::GetNextPage"
+    },
+    {
+      "Entry": "0x8083B0C0",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardUpdate::GetNextPage"
+    },
+    {
+      "Entry": "0x8083B0F0",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardTotal::GetNextPage"
+    },
+    {
+      "Entry": "0x8083B18C",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardTotal::__dt"
+    },
+    {
+      "Entry": "0x8083B218",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardTotal::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x8083B224",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardUpdate::__dt"
+    },
+    {
+      "Entry": "0x8083B2B0",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::BattleLeaderboardUpdate::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x8083B2BC",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardTotal::__dt"
+    },
+    {
+      "Entry": "0x8083B348",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardTotal::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x8083B354",
+      "Receiver": "TeamResultPage",
+      "Name": "Pages::TeamVSLeaderboardBase::GetRuntimeTypeInfo"
     }
   ],
   "BoundedAccesses": [
@@ -33817,6 +34804,44 @@
           "Array": "AIBattleTeamRoster.controllers.offset",
           "Stride": "AIBattleTeamRoster.controllers.stride",
           "Count": "AIBattleTeamRoster.controllers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x807EC5F8",
+      "ExpectedWords": [
+        "0x90A60180",
+        "0x90860174",
+        "0x90A60194",
+        "0x90860188",
+        "0x90A601A8",
+        "0x9086019C",
+        "0x90A601BC",
+        "0x908601B0",
+        "0x90A601D0",
+        "0x908601C4",
+        "0x90A601E4",
+        "0x908601D8",
+        "0x90A601F8",
+        "0x908601EC",
+        "0x90A6020C",
+        "0x90860200"
+      ],
+      "BaseRegister": "r6",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "TeamResultClearSpan.players.offset+TeamResultPlayer.playerId.offset",
+          "Stride": "TeamResultClearSpan.players.stride",
+          "Count": "TeamResultClearSpan.players.count",
+          "Width": 4,
+          "ValueRegister": "r5"
+        },
+        {
+          "Array": "TeamResultClearSpan.players.offset+TeamResultPlayer.score.offset",
+          "Stride": "TeamResultClearSpan.players.stride",
+          "Count": "TeamResultClearSpan.players.count",
           "Width": 4
         }
       ]

@@ -25201,6 +25201,22 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "DriverManager.isAwards.offset"
+    },
+    {
+      "Instruction": "0x807AC520",
+      "ExpectedWord": "0x386003D0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Scale": 80,
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x807AC538",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {
@@ -29279,6 +29295,11 @@
       "Entry": "0x80887A84",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x807AC4E8",
+      "Receiver": null,
+      "Name": "Item::SlotData::Init"
     }
   ],
   "BoundedAccesses": [

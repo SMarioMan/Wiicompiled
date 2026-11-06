@@ -565,5 +565,32 @@ It requires the requested number of observed racers, a completed race, menu
 confirmation, and a new race reaching at least frame 300 in the racing stage.
 It rejects guest faults and an unsatisfiable scheduler wait. The 12-active-player
 case passes in the capacity-24 development build. A full 24-player round trip
-currently fails in the original item-position tables; this remains an incomplete
+remains blocked by unmigrated item-manager storage; this remains an incomplete
 profile. Loading a new race scene alone does not pass the check.
+
+Normal item probabilities retain the game's item-mode modifiers, then expand
+the authored rank axis into one capacity-sized table by linear interpolation.
+The roulette array uses that same capacity, with visual lists drawn from the
+nearest authored rank. Battle tables have three columns and special-box tables
+have sixteen; neither column count represents a player limit, so both retain
+their original format. The original table cursor still advances over the
+unmodified input bytes.
+
+VS probability updates snapshot the table before mapping active positions,
+then clear inactive positions. Fields within twelve participants retain the
+game's authored rank-selection curve; larger fields spread the full rank curve
+across the active participants. Native glue decodes and checks the original
+regional function's table-address instructions instead of assuming a shared
+data-address offset. A normal twelve-slot build delegates to the original code.
+This migrates item probabilities and roulette storage, not every item object or
+network packet that can refer to participants.
+
+Native item tests execute the original probability conversion, VS rank mapping
+and roulette selection at capacities 12, 13, 24, 48 and 100. They cover every
+active field size including zero, repeated online-style refreshes, allocation
+reuse, interpolation endpoints, roulette reads at every position, unchanged
+battle/special column counts, rejected mismatched layouts, and memory/register
+boundaries. Heap allocation and random selection are fixtures. The whole-game
+24-player run reaches item use, where the item manager's remaining twelve-entry
+local-online-player cache overwrites the first object holders. That separate
+layout migration is still required before the full round trip can pass.

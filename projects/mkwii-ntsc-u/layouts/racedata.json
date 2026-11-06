@@ -959,6 +959,27 @@
           "Type": "RaceinfoTail"
         }
       ]
+    },
+    {
+      "Name": "ObjectPoolCourseReserve",
+      "Alignment": 4,
+      "Size": 320
+    },
+    {
+      "Name": "ObjectPoolCapacity",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "courseReserve",
+          "Type": "ObjectPoolCourseReserve"
+        },
+        {
+          "Name": "participantObjects",
+          "Type": "Pointer",
+          "Count": 10,
+          "PerPlayer": true
+        }
+      ]
     }
   ],
   "References": [
@@ -26474,6 +26495,71 @@
       "Symbol": "RaceinfoPlayer.finishOrder.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x80816A40",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A4C",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A58",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A64",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A70",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A7C",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816AB0",
+      "ExpectedWord": "0x38600320",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size"
+    },
+    {
+      "Instruction": "0x80816A88",
+      "ExpectedWord": "0x38600970",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size",
+      "Scale": 3,
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80816AA4",
+      "ExpectedWord": "0x38E000C8",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ObjectPoolCapacity.size/4"
     }
   ],
   "GlobalPointers": {

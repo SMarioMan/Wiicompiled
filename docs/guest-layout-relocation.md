@@ -713,3 +713,20 @@ setups and invalid mode/course/count/lap combinations. These controls enable
 mode-specific regression work; they do not certify those modes. In particular,
 the first expanded balloon-battle run stopped during object-manager creation,
 so expanded battle support remains incomplete.
+
+Expanded battles also exceed the original 200-object pool budget: a 24-player
+Block Plaza setup registered 262 objects, compared with 142 for twelve active
+players. `ObjectPoolCapacity` now describes a single budget of `80 + 10*capacity`
+entries (200 at the original capacity, 320 at 24). All seven object-pointer and
+interaction allocations and the collision-speed vector allocation/constructor
+count use that budget consistently. The five fixed registry categories remain
+categories, and the twelve-byte vector stride remains a vector stride.
+
+`ObjectPoolCapacityTests` executes the original manager constructor, full-budget
+registration, duplicate rejection and destruction at capacities 12, 13, 24, 48
+and 100. It checks allocation requests, every registry entry, vector construction,
+registers and allocation guards. Object properties, resource setup and allocation
+are fixtures. All five cases and the consumer proof audit pass. A real expanded
+battle still exposes another setup overwrite after this change; these pool
+checks therefore do not establish complete expanded battle support. The
+original-capacity twelve-player Delfino Pier battle completed its round trip.

@@ -1031,3 +1031,13 @@ several coin counts and offline/online eligibility configurations, checking the
 whole manager and every cached start/length. All five capacities and the
 954-consumer audit pass. The playable retry has advanced beyond 7,000 frames
 with the full participant format; completion is still being checked.
+
+The corrected experimental 24-player coin-battle product now passes its full
+playable round trip: all 24 racers finish Delfino Pier, results and menus complete,
+and a second battle advances on Block Plaza with all 24 racers observed. The
+second battle reaches frame 324 in stage two. This joins the earlier complete
+24-player VS, team-VS, Grand Prix and balloon-battle round trips. It does not
+complete the remaining presentation, Mii and LAN migrations. Time-trial CPU
+benchmarking still attempts to save an uninitialized ghost and reaches the
+corrupt-save dialog, including with original twelve-player capacity and the
+course's authored three laps; this is separate from coin storage and packet fixes.

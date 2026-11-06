@@ -564,9 +564,10 @@ python3 runtime/tests/boot_round_trip.py --product /path/to/portable-product \
 It requires the requested number of observed racers, a completed race, menu
 confirmation, and a new race reaching at least frame 300 in the racing stage.
 It rejects guest faults and an unsatisfiable scheduler wait. The 12-active-player
-case passes in the capacity-24 development build. A full 24-player round trip
-remains blocked by unmigrated item-manager storage; this remains an incomplete
-profile. Loading a new race scene alone does not pass the check.
+and full 24-player cases pass in the capacity-24 development build. The full
+24-player check observes all participants through a finished race, menus, and a
+second race advancing past frame 300. This remains an incomplete profile: other
+modes, finish-state masks, menu details and expanded networking still need work. Loading a new race scene alone does not pass the check.
 
 Normal item probabilities retain the game's item-mode modifiers, then expand
 the authored rank axis into one capacity-sized table by linear interpolation.
@@ -590,7 +591,23 @@ and roulette selection at capacities 12, 13, 24, 48 and 100. They cover every
 active field size including zero, repeated online-style refreshes, allocation
 reuse, interpolation endpoints, roulette reads at every position, unchanged
 battle/special column counts, rejected mismatched layouts, and memory/register
-boundaries. Heap allocation and random selection are fixtures. The whole-game
-24-player run reaches item use, where the item manager's remaining twelve-entry
-local-online-player cache overwrites the first object holders. That separate
-layout migration is still required before the full round trip can pass.
+boundaries. Heap allocation and random selection are fixtures. The item-manager
+layout migration below keeps the player cache separate from object holders
+during the whole-game round trip.
+
+The item manager now stores one local-online-player cache sized to the resolved
+capacity. Its fifteen object holders, sixteen temporary collision-object
+pointers, dummy object and total-item counter move after that cache while
+retaining their separate roles and counts. At capacity 24 the manager grows
+from 0x430 to 0x460 bytes. The two-local-player pairing sentinel also follows
+the configured capacity, so player slot 12 is usable.
+
+Native tests execute manager allocation, construction, dummy-object setup,
+initialization, update paths and destruction at capacities 12, 13, 24, 48 and
+100, with offline and online flags. They verify the complete cache, local pairing
+including slot 12, every object-holder call, player loops, moved counters,
+allocation sizes and memory/register boundaries. Object, network and subsystem
+work is supplied by fixtures; the original dummy-object methods execute.
+The real 24-player VS round-trip driver passes with item use enabled. This does
+not establish correctness of every item effect, battle mode, results layout or
+network packet at the expanded capacity.

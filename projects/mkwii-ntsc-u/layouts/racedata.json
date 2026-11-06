@@ -763,6 +763,66 @@
           "Type": "InputByte"
         }
       ]
+    },
+    {
+      "Name": "ItemManagerHeader",
+      "Alignment": 4,
+      "Size": 20
+    },
+    {
+      "Name": "ItemPlayer",
+      "Alignment": 4,
+      "Size": 584
+    },
+    {
+      "Name": "ItemObjHolder",
+      "Alignment": 4,
+      "Size": 36
+    },
+    {
+      "Name": "ItemObj",
+      "Alignment": 4,
+      "Size": 392
+    },
+    {
+      "Name": "ItemManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "ItemManagerHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "Pointer",
+          "PointerTo": "ItemPlayer"
+        },
+        {
+          "Name": "otherLocalOnlinePlayers",
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PointerTo": "ItemPlayer"
+        },
+        {
+          "Name": "holders",
+          "Type": "ItemObjHolder",
+          "Count": 15
+        },
+        {
+          "Name": "currentObjects",
+          "Type": "Pointer",
+          "Count": 16,
+          "PointerTo": "ItemObj"
+        },
+        {
+          "Name": "dummy",
+          "Type": "ItemObj"
+        },
+        {
+          "Name": "totalItemCountMinus30",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -25217,6 +25277,701 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80788A38",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789164",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789254",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789458",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789DA8",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789EC8",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80789FEC",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078A074",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078A198",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078AD98",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078B038",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078B19C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078B978",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078BB34",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078BBE0",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078BCBC",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078C30C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078C708",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078C7E8",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078CAEC",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078CBD8",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078D50C",
+      "ExpectedWord": "0x8003042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8078D594",
+      "ExpectedWord": "0x8003042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790008",
+      "ExpectedWord": "0x387F0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079006C",
+      "ExpectedWord": "0x387E02A4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.dummy.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079007C",
+      "ExpectedWord": "0x387E0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807901D0",
+      "ExpectedWord": "0x387F0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790234",
+      "ExpectedWord": "0x387E02A4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.dummy.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790244",
+      "ExpectedWord": "0x387E0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790300",
+      "ExpectedWord": "0x387F0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790318",
+      "ExpectedWord": "0x387F02A4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.dummy.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807904A0",
+      "ExpectedWord": "0x387F02A4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.dummy.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807904AC",
+      "ExpectedWord": "0x901F042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807906B0",
+      "ExpectedWord": "0x387D0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790714",
+      "ExpectedWord": "0x387F02A4",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.dummy.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790724",
+      "ExpectedWord": "0x387F0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807907A0",
+      "ExpectedWord": "0x3BC30048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807908A4",
+      "ExpectedWord": "0x3BFE0048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790924",
+      "ExpectedWord": "0x901E042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807909A4",
+      "ExpectedWord": "0x3BE30048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807909FC",
+      "ExpectedWord": "0x3BE30048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790AA8",
+      "ExpectedWord": "0x901A042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790B6C",
+      "ExpectedWord": "0x3BA40048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790C20",
+      "ExpectedWord": "0x3BC30048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790DC4",
+      "ExpectedWord": "0x93C30264",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.currentObjects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791154",
+      "ExpectedWord": "0x3B830048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079119C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807911D4",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807912E0",
+      "ExpectedWord": "0x38640240",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791304",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807913FC",
+      "ExpectedWord": "0x38640240",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791420",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807914DC",
+      "ExpectedWord": "0x38640240",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791500",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791594",
+      "ExpectedWord": "0x839F0254",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079159C",
+      "ExpectedWord": "0x807F0244",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079160C",
+      "ExpectedWord": "0x839F0154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791614",
+      "ExpectedWord": "0x807F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.holders.offset+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride+ItemManager.holders.stride",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80791CFC",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80792F78",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079B820",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079D71C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8079DD60",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807A374C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807A8050",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ACC0C",
+      "ExpectedWord": "0x8003042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.totalItemCountMinus30.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ACD68",
+      "ExpectedWord": "0x3A630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807AD760",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ADA30",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ADC0C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807ADFE4",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80790148",
+      "ExpectedWord": "0x38600430",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ItemManager.size"
+    },
+    {
+      "Instruction": "0x8079036C",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset"
+    },
+    {
+      "Instruction": "0x80790420",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8079044C",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807908F4",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset"
+    },
+    {
+      "Instruction": "0x80790A78",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset"
+    },
+    {
+      "Instruction": "0x807916F8",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset"
+    },
+    {
+      "Instruction": "0x8056D7A4",
+      "ExpectedWord": "0x83E40264",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ItemManager.currentObjects.offset"
     }
   ],
   "GlobalPointers": {
@@ -25224,7 +25979,8 @@
     "0x809BE398": "AIManager",
     "0x809B8F4C": "InputManager",
     "0x809BFDC0": "RaceHUD",
-    "0x809BE740": "DriverManager"
+    "0x809BE740": "DriverManager",
+    "0x809BEE20": "ItemManager"
   },
   "ArrayCopies": [
     {
@@ -29300,6 +30056,271 @@
       "Entry": "0x807AC4E8",
       "Receiver": null,
       "Name": "Item::SlotData::Init"
+    },
+    {
+      "Entry": "0x80788904",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::UseItem"
+    },
+    {
+      "Entry": "0x80789134",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807891E4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80789310",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::UpdateTetheredItems"
+    },
+    {
+      "Entry": "0x80789C5C",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::TrailUpdate"
+    },
+    {
+      "Entry": "0x80789FBC",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078A024",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078A158",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078A560",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::TripleTrailUpdate"
+    },
+    {
+      "Entry": "0x8078AF68",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078B688",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::SpinUpdate"
+    },
+    {
+      "Entry": "0x8078BAA4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078BBA0",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078BC38",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078C2D0",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078C65C",
+      "Receiver": null,
+      "Name": "Item::PlayerObj::UpdateRemote"
+    },
+    {
+      "Entry": "0x8078C83C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078CB54",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8078D464",
+      "Receiver": null,
+      "Name": "Item::ObjHolder::Update"
+    },
+    {
+      "Entry": "0x8078FF90",
+      "Receiver": null,
+      "Name": "Item::Manager::Disposer__dt"
+    },
+    {
+      "Entry": "0x8079017C",
+      "Receiver": null,
+      "Name": "Item::Manager::DestroyInstance"
+    },
+    {
+      "Entry": "0x807902CC",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::__ct"
+    },
+    {
+      "Entry": "0x80790664",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::__dt"
+    },
+    {
+      "Entry": "0x80790788",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::Init"
+    },
+    {
+      "Entry": "0x80790844",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::Update"
+    },
+    {
+      "Entry": "0x80790994",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::UpdateAllObjModelPos"
+    },
+    {
+      "Entry": "0x807909EC",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::UpdateObjHolders"
+    },
+    {
+      "Entry": "0x80790A44",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::UpdateTotalItemCountMinus30"
+    },
+    {
+      "Entry": "0x80790AC0",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::UpdatePlayers"
+    },
+    {
+      "Entry": "0x80790B20",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80790BDC",
+      "Receiver": null,
+      "Name": "Item::Manager::IsThereCapacityForItem"
+    },
+    {
+      "Entry": "0x80790CA0",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::CheckKartCollision"
+    },
+    {
+      "Entry": "0x80790E44",
+      "Receiver": "ItemManager",
+      "Name": "ItemManager::InitItemDirect"
+    },
+    {
+      "Entry": "0x80790FB0",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::CreateItemDirect"
+    },
+    {
+      "Entry": "0x80791120",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::GenerateItemDirect"
+    },
+    {
+      "Entry": "0x8079128C",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::SpawnCloudForLocal"
+    },
+    {
+      "Entry": "0x807913AC",
+      "Receiver": "ItemManager",
+      "Name": "Item::Manager::SpawnCloudForRemote"
+    },
+    {
+      "Entry": "0x8079148C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8079156C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807915E8",
+      "Receiver": null,
+      "Name": "Item::Manager::DoSomethingWithFIBObjTevColors"
+    },
+    {
+      "Entry": "0x80791CB4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80792EC4",
+      "Receiver": null,
+      "Name": "Item::EVENTBuffer::UpdateReceive"
+    },
+    {
+      "Entry": "0x8079B728",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8079D6F4",
+      "Receiver": null,
+      "Name": "Item::Obj::UpdateKill"
+    },
+    {
+      "Entry": "0x8079DC84",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807A36A4",
+      "Receiver": null,
+      "Name": "Item::ObjKouraTogezo::UpdateExplosion"
+    },
+    {
+      "Entry": "0x807A7EB0",
+      "Receiver": null,
+      "Name": "Item::ObjThrowable::OnFinishThrow"
+    },
+    {
+      "Entry": "0x807AD710",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807AD8F0",
+      "Receiver": null,
+      "Name": "Item::PlayerInventory::EjectItems"
+    },
+    {
+      "Entry": "0x807ADBB0",
+      "Receiver": null,
+      "Name": "Item::PlayerInventory::LoseItemFromDmg"
+    },
+    {
+      "Entry": "0x807ADF94",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8079012C",
+      "Receiver": null,
+      "Name": "Item::Manager::CreateInstance"
+    },
+    {
+      "Entry": "0x807916C4",
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [

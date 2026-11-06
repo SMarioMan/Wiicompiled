@@ -1131,3 +1131,17 @@ whole-controller contents and allocation guards. All five capacities and the
 consumer audit pass. The race-header cache build separately passes a complete
 24-player offline round trip, reaching frame 339 of a second race. Live LAN is
 being retried; expanded interoperability remains unverified.
+
+The next live LAN attempt reached the controller's separate inline initialization
+clear, which still used the old packet rows. Initialization now derives those
+bases, strides, peer bounds and receive-buffer size from the layout. Its four-peer
+index unroll bounds the final group; timestamp and player-map fills cover the
+whole capacity. Fixed thirty-entry friend records remain thirty entries, with
+symbolic addresses after the expanded arrays, including thirteen newly proved
+friend accessors. Rating defaults and disconnect fields move with them.
+The native fixture executes the real initialization data path (with a seam over
+hardware thread/mutex/license setup), both SDK rating outcomes and both local
+player counts, then the real friend reset. Whole-controller/packet comparisons,
+register and allocation guards pass at capacities 12, 13, 24, 48 and 100; the
+1,183-consumer proof/original-emission/expanded-compilation audit also passes.
+These checks verify initialization, not expanded LAN gameplay.

@@ -26,12 +26,16 @@ public class NetworkControllerStorageTests
         var plan=GuestLayoutRelocations.Read(manifest,players);
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
+        // Keep the real Init prologue/data initialization/epilogue. Skip the
+        // hardware thread/mutex and license lookup before the data region.
+        const uint seam=0x806517a0,dataStart=0x8065183c;
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((dataStart-seam)&0x03fffffc));
         var translator=new FunctionTranslator(image,layoutRelocations:plan);
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
-            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -81,6 +85,20 @@ public class NetworkControllerStorageTests
                     auto id=c->gpr[3];if(id>=capacity || id==localAid)FAIL();
                     if(id<connected){Memory::Write32(c->gpr[4],((1+id%2)<<24)|id);c->gpr[3]=1;}else c->gpr[3]=0;}
                 void matching_suspended(CpuContext* c){c->gpr[3]=suspended;}
+                uint32_t ratingMode=0,ratingCalls=0,taskStarts=0;
+                void rating_data(CpuContext* c){
+                    if(c->gpr[3]!=0x81080000 || c->gpr[4]!=root+{{layout.Symbol("RKNetController.ratingRange.offset")}} || ratingCalls++)FAIL();
+                    if(ratingMode)for(uint32_t i=0;i<20;i++)Memory::Write16(c->gpr[4]+i*2,0x1234+i);
+                    c->gpr[3]=ratingMode;}
+                void start_task(CpuContext* c){if(c->gpr[3]!=task || c->gpr[4]!=0x80653078 || c->gpr[5]!=root || c->gpr[6]!=0 || taskStarts++)FAIL();}
+                template<class F> void split_packets(F&& action){
+                    for(uint32_t p=0;p<capacity;p++)for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
+                        auto row=Memory::Read32(root+start+b*rowStride+p*4);
+                        for(uint32_t section=0;section<8;section++){
+                            auto holder=Memory::Read32(row+section*4);action(holder,Memory::Read32(holder),Memory::Read32(holder+4));
+                        }
+                    }
+                }
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="network controller storage fixture";info.rawCpuInvoker=entry;
                     info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -92,6 +110,7 @@ public class NetworkControllerStorageTests
                     register_entry(0x801a7e0c,mutex_init);register_entry(0x80226744,make_heap);register_entry(0x80241a2c,make_thread);
                     register_entry(0x80229a48,allocate);register_entry(0x80229a5c,allocate);register_entry(0x80229a6c,allocate_buffer);
                     register_entry(0x8065a83c,end_init);register_entry(0x80660694,end_init);register_entry(0x800ccbe0,sdk_init);
+                    register_entry(0x8066f108,rating_data);register_entry(0x80241d5c,start_task);Memory::Write32(0x809bd964,0x81080000);
                     register_entry(0x800d2414,available_aids);register_entry(0x800d20b8,connection_count);register_entry(0x800d21bc,direct_aids);
                     register_entry(0x800d48f4,group_id);register_entry(0x800d20d0,local_aid);register_entry(0x800d2648,host_aid);
                     register_entry(0x800d4a28,user_data);register_entry(0x800d4914,matching_suspended);
@@ -202,6 +221,44 @@ public class NetworkControllerStorageTests
                                 for(uint32_t i=0;i<n;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=0)return 23;
                             }
                         }
+                    }
+                    const auto beforeInit=expected;
+                    for(uint32_t local=1;local<=2;local++)for(ratingMode=0;ratingMode<2;ratingMode++){
+                        expected=beforeInit;ratingCalls=taskStarts=0;
+                        constexpr uint32_t status={{layout.Symbol("RKNetController.status.offset")}},friends=status+{{layout.Symbol("RKNetStatus.friends.offset")}},
+                            sendIndices={{layout.Symbol("RKNetController.sendIndices.offset")}},receiveIndices={{layout.Symbol("RKNetController.receiveIndices.offset")}},
+                            packets={{layout.Symbol("RKNetController.receivedPackets.offset")}},packetBytes={{layout.Symbol("RKNetController.receivedPackets.size")}},
+                            playerAids={{layout.Symbol("RKNetController.playerAids.offset")}},range={{layout.Symbol("RKNetController.ratingRange.offset")}};
+                        std::memset(expected.data()+sendIndices,0x66,capacity*4);std::memset(expected.data()+receiveIndices,0x66,capacity*32);
+                        std::memset(expected.data()+times,0x77,capacity*32);std::memset(expected.data()+friends,0x88,360);
+                        std::memset(expected.data()+packets,0x99,packetBytes);std::memset(expected.data()+playerAids,0x66,capacity);
+                        word(disconnected,0xffffffff);word({{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0xffffffff);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        split_packets([](uint32_t holder,uint32_t buffer,uint32_t n){Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(buffer,n),0x6a,n);});
+                        ctx.gpr[3]=root;ctx.gpr[4]=local;func_80651788(&ctx);
+                        word(status+{{layout.Symbol("RKNetStatus.searchKey.offset")}},root);word(status+{{layout.Symbol("RKNetStatus.vr.offset")}},0);word(status+{{layout.Symbol("RKNetStatus.br.offset")}},0);
+                        std::memset(expected.data()+sendIndices,0,capacity*4);std::memset(expected.data()+receiveIndices,0,capacity*32);
+                        std::memset(expected.data()+times,0,capacity*32);word({{layout.Symbol("RKNetController.currentSub.offset")}},0);
+                        for(uint32_t b=0;b<2;b++){
+                            auto sub={{layout.Symbol("RKNetController.subs.offset")}}+b*{{layout.Symbol("RKNetSub.size")}};
+                            for(uint32_t w=0;w<7;w++)word(sub+w*4,0);word(sub+28,0xffffffff);
+                            expected[sub+32]=local;expected[sub+33]=expected[sub+34]=255;
+                            std::memset(expected.data()+sub+{{layout.Symbol("RKNetSub.users.offset")}},0,capacity*4);expected[sub+{{layout.Symbol("RKNetSub.tail.offset")}}]=0;
+                        }
+                        for(uint32_t f=0;f<30;f++){std::memset(expected.data()+friends+f*12,0,9);expected[friends+f*12+9]=1;}
+                        word(disconnected,0);word({{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0);std::memset(expected.data()+packets,0,packetBytes);
+                        for(uint32_t i=0;i<20;i++){
+                            auto value=ratingMode?0x1234+i:Memory::Read16(0x808bc210+(i%10)*2);expected[range+i*2]=value>>8;expected[range+i*2+1]=value;
+                        }
+                        std::memset(expected.data()+playerAids,255,capacity);
+                        if(ratingCalls!=1 || taskStarts!=1)return 24;
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size)){
+                            for(uint32_t at=0;at<size;at++)if(expected[at]!=Memory::Read8(root+at))std::fprintf(stderr,"Init local %u rating %u offset %u actual %u expected %u\n",local,ratingMode,at,Memory::Read8(root+at),expected[at]);return 25;}
+                        split_packets([](uint32_t holder,uint32_t buffer,uint32_t n){if(Memory::Read32(holder+8))FAIL();for(uint32_t i=0;i<n;i++)if(Memory::Read8(buffer+i))FAIL();});
+                        std::memset(expected.data()+friends,0x88,360);std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        ctx.gpr[3]=root;func_80654AF8(&ctx);
+                        for(uint32_t f=0;f<30;f++){std::memset(expected.data()+friends+f*12,0,9);expected[friends+f*12+9]=1;}
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 26;
                     }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;

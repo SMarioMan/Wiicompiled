@@ -49130,6 +49130,94 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80652874",
+      "ExpectedWord": "0x9BDB25F5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 9
+    },
+    {
+      "Instruction": "0x806528B0",
+      "ExpectedWord": "0x9BDB25F5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 9
+    },
+    {
+      "Instruction": "0x806528B8",
+      "ExpectedWord": "0x9BFB25F5",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 9
+    },
+    {
+      "Instruction": "0x80655D50",
+      "ExpectedWord": "0x987B25F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80655D64",
+      "ExpectedWord": "0x901B25EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80655D6C",
+      "ExpectedWord": "0x981B25F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80655D74",
+      "ExpectedWord": "0x981B25F1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80655D7C",
+      "ExpectedWord": "0x981B25F2",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80655D84",
+      "ExpectedWord": "0x981B25F3",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80655D8C",
+      "ExpectedWord": "0x93DB25EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80655D90",
+      "ExpectedWord": "0x9BDB25F1",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
+      "Addend": 5
     }
   ],
   "GlobalPointers": {

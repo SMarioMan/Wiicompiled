@@ -1154,3 +1154,12 @@ both snapshot and packet-buffer rows, recent/stale timers and invalid IDs.
 Player IDs cover every capacity slot while console IDs stay within the SDK's
 32-bit mask. All five capacities and the consumer audit pass. Other packet
 manager participant loops and packet formats still require migration.
+
+Friend-status refresh and added-back loops now address the fixed thirty friend
+records after the expanded arrays. The native controller fixture checks both
+added-back selections, connected/disconnected states, unavailable friends,
+valid/short status records and the SDK's categorized-error path. All five
+capacities and the consumer audit pass. With the corrected PowerPC `crorc`
+semantics, two instances of the capacity-24 build (runtime IDs 24 and 13) discover
+each other and remain in one lobby for five seconds. The subsequent packet
+exchange still fails in unmigrated send/receive paths; this is not a LAN race pass.

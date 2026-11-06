@@ -1408,7 +1408,26 @@
     {
       "Name": "BattleCoinUpdatePlayer",
       "Alignment": 8,
-      "Size": 48
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "BattleCoinUpdatePlayerHeader"
+        },
+        {
+          "Name": "ids",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "indices",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "BattleCoinUpdatePlayerTail"
+        }
+      ]
     },
     {
       "Name": "BattleCoinUpdateTail",
@@ -1433,6 +1452,16 @@
           "Type": "BattleCoinUpdateTail"
         }
       ]
+    },
+    {
+      "Name": "BattleCoinUpdatePlayerHeader",
+      "Alignment": 1,
+      "Size": 21
+    },
+    {
+      "Name": "BattleCoinUpdatePlayerTail",
+      "Alignment": 1,
+      "Size": 3
     }
   ],
   "References": [
@@ -36504,6 +36533,104 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80871790",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80871828",
+      "ExpectedWord": "0x1C840030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80871890",
+      "ExpectedWord": "0x1C800030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x8087190C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80871A24",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80871F3C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80872014",
+      "ExpectedWord": "0x38950021",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.indices.offset"
+    },
+    {
+      "Instruction": "0x80872084",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x808720D8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80872254",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80872460",
+      "ExpectedWord": "0x1C040030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x808729D8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80872BD0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.size"
+    },
+    {
+      "Instruction": "0x80872BFC",
+      "ExpectedWord": "0x3A580021",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinUpdatePlayer.indices.offset"
     }
   ],
   "GlobalPointers": {

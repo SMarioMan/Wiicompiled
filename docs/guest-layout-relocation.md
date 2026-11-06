@@ -961,3 +961,15 @@ counter, plus all one-to-four-screen effect loops. Model callbacks are fixtures;
 all five capacity cases and the 948-consumer audit pass. The playable retry
 continues to find a separate first-frame fault in coin event processing, so
 this remains an experimental profile.
+
+Each temporary coin-update record also contains two participant byte arrays,
+starting after its 21-byte header. Both now grow with capacity; the second array
+moves from offset 33 to 45, the record grows from 48 to 72 bytes, and the complete
+24-player stack frame grows to 2,992 bytes. Every record-index multiplication and
+both inverse-index array bases use layout symbols. A debugger watch identified
+the original second-array clear overwriting the next record's packet pointer.
+The native test now executes that real clear/index-building region for every
+record and used-list length, checking the complete scratch allocation and guards.
+All five capacities and the consumer audit pass. The playable retry progresses
+past that packet-pointer fault, but still ends coin battle immediately and then
+finds a separate results-side fault; a complete coin round trip remains pending.

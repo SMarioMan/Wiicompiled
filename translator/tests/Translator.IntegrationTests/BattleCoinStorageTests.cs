@@ -32,7 +32,7 @@ public class BattleCoinStorageTests
         {
             // The two reset regions end at test-only BLRs. Neither exit is a
             // referenced instruction; production image files remain untouched.
-            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014})
+            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014,0x80872068})
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(exit,4),4),0x4e800020);
             // Keep the real prologue, scratch initialization and epilogue;
             // skip the rendering/network body after the first complete loop.
@@ -40,7 +40,7 @@ public class BattleCoinStorageTests
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
             const uint modelSeam=0x80874c5c,modelTail=0x80875bc8;
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(modelSeam,4),4),0x48000000|((modelTail-modelSeam)&0x03fffffc));
-            var entries=new uint[]{0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            var entries=new uint[]{0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -57,6 +57,7 @@ public class BattleCoinStorageTests
                 #include <cstring>
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},maxActive=capacity<24?capacity:24,
+                    scratchStride={{layout.Symbol("BattleCoinUpdatePlayer.size")}},scratchIndices={{layout.Symbol("BattleCoinUpdatePlayer.indices.offset")}},
                     frameSize={{layout.Symbol("BattleCoinUpdateFrame.size")}},tailOffset={{layout.Symbol("BattleCoinUpdateFrame.tail.offset")}},
                     size={{layout.Symbol("BattleCoinManager.size")}},stride={{layout.Symbol("BattleCoinEntry.size")}},
                     positionOffset={{layout.Symbol("BattleCoinManager.positions.offset")}},
@@ -152,10 +153,10 @@ public class BattleCoinStorageTests
                         if(ctx.gpr[1]!=stack || ctx.lr!=0x80012340)return 20;
                         for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x87650000+r)return 21;
                         for(uint32_t r=24;r<32;r++)if(ctx.fpr[r].d!=double(r)+.25)return 22;
-                        for(uint32_t p=0;p<capacity;p++)for(uint32_t j=0;j<48;j++){
+                        for(uint32_t p=0;p<capacity;p++)for(uint32_t j=0;j<scratchStride;j++){
                             uint8_t value=0x55;
                             if(p<active){if(j<14 || j==20)value=0;else if(j>=16 && j<20)value=0xff;}
-                            if(Memory::Read8(stack-frameSize+984+p*48+j)!=value)return 23;
+                            if(Memory::Read8(stack-frameSize+984+p*scratchStride+j)!=value)return 23;
                         }
                         for(uint32_t i=0;i<16;i++)if(Memory::Read8(stack-frameSize-16+i)!=0x55)return 24;
                         for(uint32_t i=8;i<32;i++)if(Memory::Read8(stack+i)!=0x55)return 25;
@@ -169,6 +170,23 @@ public class BattleCoinStorageTests
                             ctx.gpr[3]=root;ctx.gpr[5]=active;ctx.gpr[7]=0;ctx.gpr[8]=root+coin*stride;ctx.gpr[9]=coin*stride;
                             func_8086F03C(&ctx);
                             if(!guards() || std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 17;
+                        }
+                        // The scratch records themselves have two participant
+                        // arrays. Run the real inverse-index clear/fill for every
+                        // row and every used-list length, preserving all neighbors.
+                        constexpr uint32_t scratch=0x81500000;
+                        auto scratchSize=capacity*scratchStride;
+                        std::array<uint8_t,32768> scratchExpected{};if(scratchSize>scratchExpected.size())return 29;
+                        for(uint32_t row=0;row<capacity;row++)for(uint32_t used=0;used<=active;used++){
+                            std::memset(Memory::GetPointer(scratch-16,scratchSize+32),0x55,scratchSize+32);
+                            auto record=scratch+row*scratchStride;Memory::Write8(record+20,used);
+                            for(uint32_t i=0;i<used;i++)Memory::Write8(record+21+i,active-1-i);
+                            std::memcpy(scratchExpected.data(),Memory::GetPointer(scratch,scratchSize),scratchSize);
+                            for(uint32_t i=0;i<active;i++)scratchExpected[row*scratchStride+scratchIndices+i]=used;
+                            for(uint32_t i=0;i<used;i++)scratchExpected[row*scratchStride+scratchIndices+active-1-i]=i;
+                            ctx.gpr[15]=root;ctx.gpr[21]=record;ctx.gpr[24]=record+21;func_80872014(&ctx);
+                            if(std::memcmp(scratchExpected.data(),Memory::GetPointer(scratch,scratchSize),scratchSize))return 30;
+                            for(uint32_t i=0;i<16;i++)if(Memory::Read8(scratch-16+i)!=0x55 || Memory::Read8(scratch+scratchSize+i)!=0x55)return 31;
                         }
                         // Real model-update tails exercise every nested coin
                         // record, player effect and independent local effect.

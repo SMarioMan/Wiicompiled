@@ -951,3 +951,13 @@ image. All five capacities preserve saved GPRs/FPRs, LR, stack boundaries, unuse
 records and neighboring record bytes. The 945-consumer audit passes. A playable
 retry gets past the corrupted return and exposes further coin-update consumers;
 coin battle is not yet validated end to end.
+
+The coin manager's per-frame simulation and local-screen effect helpers receive
+its pointer through callers rather than loading its singleton themselves.
+Their field references and nested coin strides are now included in the audit.
+Native coverage exercises the real model-update tail across all hundred coins,
+participant effects, owned-coin counts, change flags and the following update
+counter, plus all one-to-four-screen effect loops. Model callbacks are fixtures;
+all five capacity cases and the 948-consumer audit pass. The playable retry
+continues to find a separate first-frame fault in coin event processing, so
+this remains an experimental profile.

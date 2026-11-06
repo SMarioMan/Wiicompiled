@@ -38,7 +38,9 @@ public class BattleCoinStorageTests
             // skip the rendering/network body after the first complete loop.
             const uint seam=0x808717c4,epilogue=0x80874564;
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
-            var entries=new uint[]{0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            const uint modelSeam=0x80874c5c,modelTail=0x80875bc8;
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(modelSeam,4),4),0x48000000|((modelTail-modelSeam)&0x03fffffc));
+            var entries=new uint[]{0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -70,7 +72,14 @@ public class BattleCoinStorageTests
                     eventFlags={{layout.Symbol("BattleCoinManager.playerEventFlags.offset")}},
                     flags={{layout.Symbol("BattleCoinManager.flags.offset")}},
                     root=0x81010000,racedata=0x81030000,karts=0x81050000,stack=0x81f00000;
-                uint32_t active=0,allocations=0,positions=0;
+                uint32_t active=0,allocations=0,positions=0,calls=0;
+                void model_call(CpuContext* ctx){
+                    auto p=ctx->gpr[3];
+                    if(!(p>=0x81200000 && p<0x8120c800 && (p-0x81200000)%512==0) &&
+                       !(p>=0x81220000 && p<0x81220000+active*512 && (p-0x81220000)%512==0) &&
+                       !(p>=0x81240000 && p<0x81240800 && (p-0x81240000)%512==0))std::abort();
+                    calls++;
+                }
                 void allocate(CpuContext* ctx){if(ctx->gpr[3]!=size || allocations++)std::abort();ctx->gpr[3]=root;}
                 void array_ctor(CpuContext* ctx){
                     if(ctx->gpr[3]!=root+positionOffset || ctx->gpr[6]!=20 || ctx->gpr[7]!=255)std::abort();
@@ -86,6 +95,8 @@ public class BattleCoinStorageTests
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x80020494,array_ctor);register_entry(0x805337fc,course);
+                    register_entry(0x80010000,model_call);register_entry(0x80010004,model_call);register_entry(0x80010008,model_call);
+                    Memory::Write32(0x81400014,0x80010000);Memory::Write32(0x81400018,0x80010004);Memory::Write32(0x8140001c,0x80010008);
                     Memory::Write32(0x809b8f68,racedata);Memory::Write32(0x809bd110,karts);Memory::Write32(0x809b8f70,0x81060000);Memory::Write32(0x8106003c,0);
                     auto settings=racedata+{{layout.Symbol("Racedata.race.offset+Scenario.settings.offset")}};
                     Memory::Write32(settings+8,3);Memory::Write32(settings+16,1);
@@ -159,6 +170,32 @@ public class BattleCoinStorageTests
                             func_8086F03C(&ctx);
                             if(!guards() || std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 17;
                         }
+                        // Real model-update tails exercise every nested coin
+                        // record, player effect and independent local effect.
+                        Memory::Write8(root,100);
+                        for(uint32_t i=0;i<100;i++){
+                            auto model=0x81200000+i*512,states=0x81300000+i*16;
+                            Memory::Write32(root+12+i*stride,model);Memory::Write32(model,0x81400000);
+                            Memory::Write32(model+0x160,states);Memory::Write32(model+0x168,0);Memory::Write32(states,7);
+                            Memory::Write8(root+18+i*stride,i%active);Memory::Write8(root+19+i*stride,i%active);
+                        }
+                        for(uint32_t i=0;i<active;i++){
+                            auto model=0x81220000+i*512;Memory::Write32(model,0x81400000);
+                            Memory::Write32(root+playerEffects+i*4,model);
+                            Memory::Write8(root+{{layout.Symbol("BattleCoinManager.previousStates.offset")}}+i,0);
+                            Memory::Write8(root+{{layout.Symbol("BattleCoinManager.changed.offset")}}+i,1);
+                        }
+                        for(uint32_t i=0;i<local;i++){
+                            auto model=0x81240000+i*512;Memory::Write32(model,0x81400000);
+                            Memory::Write32(root+localEffects+i*4,model);
+                        }
+                        auto tick=root+{{layout.Symbol("BattleCoinManager.events.offset")}}+4;Memory::Write32(tick,123);
+                        calls=0;ctx.gpr[3]=root;func_80874C3C(&ctx);
+                        if(calls!=200+active*2 || Memory::Read32(tick)!=124 || !guards())return 26;
+                        for(uint32_t i=0;i<active;i++)if(Memory::Read8(root+{{layout.Symbol("BattleCoinManager.ownedCounts.offset")}}+i)!=(100/active+(i<100%active)) ||
+                            Memory::Read8(root+{{layout.Symbol("BattleCoinManager.changed.offset")}}+i)!=0)return 27;
+                        calls=0;ctx.gpr[3]=root;func_80875E00(&ctx);
+                        if(calls!=local*2 || !guards())return 28;
                     }
                     // Two real external users obtain coin model pointers from
                     // the nested record stride, independently of player count.

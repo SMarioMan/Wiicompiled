@@ -27426,6 +27426,27 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "BattleBalloonManager.changed.offset"
+    },
+    {
+      "Instruction": "0x8073E908",
+      "ExpectedWord": "0x83C30018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset"
+    },
+    {
+      "Instruction": "0x8073E918",
+      "ExpectedWord": "0x83A30018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset"
+    },
+    {
+      "Instruction": "0x8073ED44",
+      "ExpectedWord": "0x80650018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset"
     }
   ],
   "GlobalPointers": {
@@ -32069,6 +32090,11 @@
       "Entry": "0x80241648",
       "Receiver": null,
       "Name": "EGG::TSystem::InitMemory"
+    },
+    {
+      "Entry": "0x8073ED1C",
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [

@@ -818,3 +818,18 @@ object identity, active/unused flags, timers, registers and guards. All five
 capacity cases and the 904-consumer audit pass. The playable expanded battle
 advances into its countdown, then finds a separate stale AI-roster count reader;
 this update fix does not establish a completed battle.
+
+Battle AI grid setup and its frame-selection helper now read the relocated roster
+count too (`8073E908`, `8073E918`, `8073ED44`). These sites receive a roster from a
+getter or a third argument, beyond the rooted pointer audit's call-boundary
+proofs. Reading the old offset instead treated controller slot six as a count,
+inflating grid allocations and selecting invalid controller pointers. That
+inflation contributed to the earlier memory exhaustion; the root reserve budget
+is a separate capacity policy, not a substitute for these count corrections.
+
+The native roster test now also executes real grid setup, both team-update calls
+and the controller-selection helper. It checks each constructor's counts and
+repeated modulo-based selections against each submitted controller position.
+Grid internals and their final reset are fixtures. Empty-team grids are absent
+in the update fixture; this checks the original null-grid skip, not gameplay
+with an empty team. All five capacity cases and the 905-consumer audit pass.

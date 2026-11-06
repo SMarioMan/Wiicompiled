@@ -1011,3 +1011,14 @@ Reference manifests using this expression require version 18 so older readers
 reject the required migration. Unit cases cover power-of-two boundaries, format
 validation and unchanged original-capacity emission.
 All 868 default tests pass with this extension.
+
+The two coin participant codecs (count minus one and participant ID) now use
+`bits(players)`. Their four-bit fields had encoded 24 participants as eight,
+so only the first eight IDs and misaligned following flags were decoded. Coin
+indices, coordinates and other independent field widths retain their own codecs.
+`CoinCodecCapacityTests` executes the actual width getters and game bit-stream
+writer/reader for every active count and participant ID at five capacities. It
+checks a following marker, aligned/unaligned starts, exact packed bytes and
+memory/register guards. All five cases and the 954-consumer audit pass. The
+playable retry now processes the full participant list and exposes another
+coin-event path failure before completion, so the profile remains incomplete.

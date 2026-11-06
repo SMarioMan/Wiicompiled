@@ -1,5 +1,5 @@
 {
-  "Version": 17,
+  "Version": 18,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -37533,6 +37533,20 @@
       "Operand": "offset",
       "Symbol": "BattleCoinManager.events.offset",
       "Addend": 56
+    },
+    {
+      "Instruction": "0x80871000",
+      "ExpectedWord": "0x38600004",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "bits(players)"
+    },
+    {
+      "Instruction": "0x8086FE7C",
+      "ExpectedWord": "0x38600004",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "bits(players)"
     }
   ],
   "GlobalPointers": {
@@ -42411,6 +42425,16 @@
     {
       "Entry": "0x808765D0",
       "Receiver": "BattleCoinManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80871000",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8086FE7C",
+      "Receiver": null,
       "Name": ""
     }
   ],

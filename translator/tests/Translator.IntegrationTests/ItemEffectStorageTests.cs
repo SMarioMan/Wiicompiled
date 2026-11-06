@@ -31,9 +31,9 @@ public class ItemEffectStorageTests
         try
         {
             var entries=new uint[]{0x807d9614,0x807d976c,0x807d96fc,0x807d9808,0x807d9940,0x807d9ec8,0x807da250,
-                0x807d4f74,0x807d5ee8,0x807d5cc4,0x807d5e60,0x807d5d98,0x807d53f4,0x807d64ec};
+                0x807d4f74,0x807d5ee8,0x807d5cc4,0x807d5e60,0x807d5d98,0x807d53f4,0x807d64ec,0x807d5154};
             var fixtures=new HashSet<uint>{0x80229a48,0x807d9f94,0x807d5220,0x80558978,0x80558960,
-                0x807d5510,0x80552eb4,0x807acf74,0x807adf1c,0x80010004,0x8055304c,0x80552fc0,0x8058a5e0,0x805898dc,0x8058a5bc,0x8058aaf0,0x80809f90,0x80010000};
+                0x807d5510,0x80552eb4,0x807acf74,0x807adf1c,0x80010004,0x8055304c,0x80552fc0,0x8058a5e0,0x805898dc,0x8058a5bc,0x8058aaf0,0x80809f90,0x80010000,0x80010008};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -54,9 +54,10 @@ public class ItemEffectStorageTests
                     powSize={{layout.Symbol("PowManager.size")}},powScreens={{layout.Symbol("PowManager.screens.offset")}},
                     shockwave={{layout.Symbol("PowManager.shockwaveStarted.offset")}},
                     gessoSize={{layout.Symbol("GessoManager.size")}},gessoScreens={{layout.Symbol("GessoManager.screens.offset")}};
-                uint32_t screenCount=0,screenAllocations=0,modelCalls=0,manager=0,managerSize=0,screenSize=0,screenOffset=0;
+                uint32_t screenCount=0,screenAllocations=0,modelCalls=0,manager=0,managerSize=0,screenSize=0,screenOffset=0,resetCalls=0;
                 int32_t immune=-1;
                 void no_op(CpuContext*){}
+                void reset_model(CpuContext* ctx){if(ctx->gpr[3]!=0x81090000 || ctx->gpr[4]!=0)std::abort();resetCalls++;}
                 void model_animation(CpuContext* ctx){ctx->gpr[3]=0x81092000;}
                 void linked_animation(CpuContext* ctx){ctx->gpr[3]=0x81093000;}
                 void valid_animation(CpuContext* ctx){ctx->gpr[3]=1;}
@@ -98,7 +99,7 @@ public class ItemEffectStorageTests
                     register_entry(0x80229a48,allocate);register_entry(0x807d9f94,screen_ctor);register_entry(0x807d5220,screen_ctor);
                     register_entry(0x80558978,model);register_entry(0x80558960,model);register_entry(0x8055304c,no_op);register_entry(0x80552fc0,model_animation);
                     register_entry(0x805898dc,get_kart);register_entry(0x8058a5bc,local);register_entry(0x8058a5e0,hud);
-                    register_entry(0x8058aaf0,immunity);register_entry(0x80809f90,character_size);register_entry(0x80010000,no_op);
+                    register_entry(0x8058aaf0,immunity);register_entry(0x80809f90,character_size);register_entry(0x80010000,no_op);register_entry(0x80010008,reset_model);
                     Memory::Write32(0x8109300c,0x81093100);Memory::Write32(0x81093100,0x81091000);
                     Memory::Write32(0x8109312c,0x81093200);Memory::Write16(0x81093220,60);
                     Memory::Write32(0x81091008,0x80010004);Memory::Write32(0x810910e0,0x80010000);
@@ -133,6 +134,16 @@ public class ItemEffectStorageTests
                             prepare(gesso,gessoSize,gessoScreens,208);ctx.gpr[3]=gesso;
                             if(ctor)func_807D5E60(&ctx);else func_807D5CC4(&ctx);
                             if(screenAllocations!=screenCount || Memory::Read32(gesso)!=screenCount)return 9;
+                            for(uint32_t repeat=0;repeat<2;repeat++){
+                                for(uint32_t i=0;i<n;i++)Memory::Write32(gesso+16+i*4,0x12340000+i);
+                                for(uint32_t slot=0;slot<screenCount;slot++){Memory::Write32(screenBase+slot*256,0x12345678);Memory::Write16(screenBase+slot*256+14,0xffff);}
+                                Memory::Write32(gesso+8,0x12345678);Memory::Write32(0x8109100c,0x80010008);resetCalls=0;
+                                ctx.gpr[3]=gesso;func_807D5154(&ctx);guards();
+                                if(resetCalls!=screenCount || Memory::Read32(gesso+8)!=0)return 19;
+                                for(uint32_t i=0;i<n;i++)if(Memory::Read32(gesso+16+i*4)!=0x12340000+i)return 20;
+                                for(uint32_t slot=0;slot<screenCount;slot++)if(Memory::Read32(screenBase+slot*256)!=3 || Memory::Read16(screenBase+slot*256+14)!=n)return 21;
+                                Memory::Write32(0x8109100c,0x80010000);
+                            }
                             Memory::Write32(0x809bf790,gesso);func_807D5D98(&ctx);guards();
                             ctx.gpr[3]=gesso;func_807D53F4(&ctx);guards();
                             for(uint32_t i=0;i<n;i++)if(Memory::Read32(gesso+16+i*4)!=0)return 10;

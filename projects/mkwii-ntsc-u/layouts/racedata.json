@@ -28376,6 +28376,20 @@
       "Symbol": "TeamResultPage.raceCount.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x807D5174",
+      "ExpectedWord": "0x3BC0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D5184",
+      "ExpectedWord": "0x83BC0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
     }
   ],
   "GlobalPointers": {
@@ -33159,6 +33173,11 @@
       "Entry": "0x8083B354",
       "Receiver": "TeamResultPage",
       "Name": "Pages::TeamVSLeaderboardBase::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x807D5154",
+      "Receiver": "GessoManager",
+      "Name": ""
     }
   ],
   "BoundedAccesses": [

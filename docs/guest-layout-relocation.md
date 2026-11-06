@@ -878,3 +878,12 @@ trip now passes finish, menus and a second advancing race. Balloon battle passes
 its former results failure but still finds a separate blooper reset issue before
 the next battle. The six visible authored rows per team remain a presentation
 window; showing all expanded rows still requires presentation work.
+
+The item-holder blooper reset helper (`807D5154`) now reads the shifted screen
+pointer array and writes the capacity-derived inactive-player sentinel. Its
+receiver arrives through the item-holder dispatch, which had left this helper
+outside the earlier global-load audit. The effect-storage test now executes two
+resets for each of one through four local screens, checking model calls, timer,
+screen state, sentinel, player-group preservation and memory/register guards.
+All five capacity cases and the 933-consumer audit pass. The complete expanded
+balloon round trip is being retried with this separate teardown correction.

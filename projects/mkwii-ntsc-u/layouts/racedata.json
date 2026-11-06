@@ -1,5 +1,5 @@
 {
-  "Version": 18,
+  "Version": 19,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -1807,6 +1807,59 @@
         {
           "Name": "trailingState",
           "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "RKNetRoomHeader",
+      "Size": 8,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetRoomTail",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "lastAid",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "padding",
+          "Type": "InputByte",
+          "Count": 7
+        },
+        {
+          "Name": "lastTime",
+          "Type": "RKNetTime"
+        },
+        {
+          "Name": "state",
+          "Type": "Pointer",
+          "Count": 2
+        }
+      ]
+    },
+    {
+      "Name": "RKNetRoomHandler",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RKNetRoomHeader"
+        },
+        {
+          "Name": "send",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "received",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "RKNetRoomTail"
         }
       ]
     }
@@ -45892,6 +45945,432 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80656774",
+      "ExpectedWord": "0x98030068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656778",
+      "ExpectedWord": "0x90A30074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065677C",
+      "ExpectedWord": "0x90A30070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656780",
+      "ExpectedWord": "0x90A3007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset+RKNetRoomTail.state.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656784",
+      "ExpectedWord": "0x90A30078",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656878",
+      "ExpectedWord": "0x98030068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065687C",
+      "ExpectedWord": "0x90830074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656880",
+      "ExpectedWord": "0x90830070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656884",
+      "ExpectedWord": "0x9083007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset+RKNetRoomTail.state.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656888",
+      "ExpectedWord": "0x90830078",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806568D8",
+      "ExpectedWord": "0x3B9C0038",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656AE4",
+      "ExpectedWord": "0x80630038",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656B68",
+      "ExpectedWord": "0x98030068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656B6C",
+      "ExpectedWord": "0x90830074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656B70",
+      "ExpectedWord": "0x90830070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656B74",
+      "ExpectedWord": "0x9083007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset+RKNetRoomTail.state.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656B78",
+      "ExpectedWord": "0x90830078",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656BF4",
+      "ExpectedWord": "0x80FC0074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656C00",
+      "ExpectedWord": "0x80DC0070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656C28",
+      "ExpectedWord": "0x889C0068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656CD8",
+      "ExpectedWord": "0x9BBC0068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656CDC",
+      "ExpectedWord": "0x93DC0074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656CE0",
+      "ExpectedWord": "0x93FC0070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656D2C",
+      "ExpectedWord": "0x3BA30038",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E40",
+      "ExpectedWord": "0x98030068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastAid.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E44",
+      "ExpectedWord": "0x90830074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E48",
+      "ExpectedWord": "0x90830070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.lastTime.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E4C",
+      "ExpectedWord": "0x9083007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset+RKNetRoomTail.state.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E50",
+      "ExpectedWord": "0x90830078",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset+RKNetRoomTail.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656E84",
+      "ExpectedWord": "0x90830038",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656EA4",
+      "ExpectedWord": "0x90A30038",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656EC4",
+      "ExpectedWord": "0x38630038",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRoomHandler.received.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065661C",
+      "ExpectedWord": "0x38600080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetRoomHandler.size"
+    },
+    {
+      "Instruction": "0x80656698",
+      "ExpectedWord": "0x98030068",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065669C",
+      "ExpectedWord": "0x90830074",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x806566A0",
+      "ExpectedWord": "0x90830070",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x806566A4",
+      "ExpectedWord": "0x9083007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x806566A8",
+      "ExpectedWord": "0x90830078",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRoomHandler.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x806567AC",
+      "ExpectedWord": "0x1CC60058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806567E0",
+      "ExpectedWord": "0x1CC60058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806568F4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656980",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656A00",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656A24",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656A48",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656A6C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656A90",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656AB4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656C64",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80656D48",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806569E8",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
     }
   ],
   "GlobalPointers": {
@@ -45907,7 +46386,8 @@
     "0x809BFF98": "BattleBalloonManager",
     "0x809C014C": "BattleCoinManager",
     "0x809B8F50": "MiiManager",
-    "0x809BD918": "RKNetController"
+    "0x809BD918": "RKNetController",
+    "0x809BD920": "RKNetRoomHandler"
   },
   "ArrayCopies": [
     {
@@ -51541,27 +52021,27 @@
     },
     {
       "Entry": "0x80656704",
-      "Receiver": null,
+      "Receiver": "RKNetRoomHandler",
       "Name": "RKNet::ROOMHandler::Init"
     },
     {
       "Entry": "0x80656890",
-      "Receiver": null,
+      "Receiver": "RKNetRoomHandler",
       "Name": "RKNet::ROOMHandler::Update"
     },
     {
       "Entry": "0x806569E8",
-      "Receiver": null,
+      "Receiver": "RKNetRoomHandler",
       "Name": "RKNet::ROOMHandler::SetAllToSendPackets"
     },
     {
       "Entry": "0x80656BC0",
-      "Receiver": null,
+      "Receiver": "RKNetRoomHandler",
       "Name": "RKNet::ROOMHandler::ExportROOMandUSER"
     },
     {
       "Entry": "0x80656D0C",
-      "Receiver": null,
+      "Receiver": "RKNetRoomHandler",
       "Name": "RKNet::ROOMHandler::ImportNewPackets"
     },
     {
@@ -51808,6 +52288,76 @@
       "Entry": "0x8065169C",
       "Receiver": null,
       "Name": "RKNet::Controller::CreateInstance"
+    },
+    {
+      "Entry": "0x8065680C",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::Reset"
+    },
+    {
+      "Entry": "0x80656ADC",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::GetRecvPacket"
+    },
+    {
+      "Entry": "0x80656AEC",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::SetToSendPacket"
+    },
+    {
+      "Entry": "0x80656AFC",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::__ct"
+    },
+    {
+      "Entry": "0x80656B80",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::__dt"
+    },
+    {
+      "Entry": "0x80656DD8",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::ResetAllPackets"
+    },
+    {
+      "Entry": "0x80656E58",
+      "Receiver": null,
+      "Name": "RKNet::ROOMHandler::InitPacket"
+    },
+    {
+      "Entry": "0x80656E64",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::ClearToSendPacket"
+    },
+    {
+      "Entry": "0x80656E78",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::ClearRecvPacket"
+    },
+    {
+      "Entry": "0x80656E8C",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::SetToSendPacket2"
+    },
+    {
+      "Entry": "0x80656E9C",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::SetRecvPacket"
+    },
+    {
+      "Entry": "0x80656EAC",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::GetToSendPacketPtr"
+    },
+    {
+      "Entry": "0x80656EBC",
+      "Receiver": "RKNetRoomHandler",
+      "Name": "RKNet::ROOMHandler::GetRecvPacketPtr"
+    },
+    {
+      "Entry": "0x80656600",
+      "Receiver": null,
+      "Name": "RKNet::ROOMHandler::CreateInstance"
     }
   ],
   "BoundedAccesses": [
@@ -52906,6 +53456,60 @@
       "IndexBias": 3,
       "GroupWidth": 6,
       "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656A14",
+      "ExpectedWord": "0x90830008",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656A38",
+      "ExpectedWord": "0x9083000C",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656A5C",
+      "ExpectedWord": "0x90830010",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656A80",
+      "ExpectedWord": "0x90830014",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656AA4",
+      "ExpectedWord": "0x90830018",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80656AC8",
+      "ExpectedWord": "0x9083001C",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 0
     }
   ],
   "ArrayFills": [
@@ -53654,6 +54258,245 @@
           "Stride": "RKNetController.receiveDurations.stride",
           "Count": "RKNetController.receiveDurations.count",
           "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80656638",
+      "ExpectedWords": [
+        "0x90830008",
+        "0x90830038",
+        "0x9083000C",
+        "0x9083003C",
+        "0x90830010",
+        "0x90830040",
+        "0x90830014",
+        "0x90830044",
+        "0x90830018",
+        "0x90830048",
+        "0x9083001C",
+        "0x9083004C",
+        "0x90830020",
+        "0x90830050",
+        "0x90830024",
+        "0x90830054",
+        "0x90830028",
+        "0x90830058",
+        "0x9083002C",
+        "0x9083005C",
+        "0x90830030",
+        "0x90830060",
+        "0x90830034",
+        "0x90830064"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRoomHandler.send.offset",
+          "Stride": "RKNetRoomHandler.send.stride",
+          "Count": "RKNetRoomHandler.send.count",
+          "Width": 4
+        },
+        {
+          "Array": "RKNetRoomHandler.received.offset",
+          "Stride": "RKNetRoomHandler.received.stride",
+          "Count": "RKNetRoomHandler.received.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80656714",
+      "ExpectedWords": [
+        "0x90A30038",
+        "0x38E00000",
+        "0x90A3000C",
+        "0x90A3003C",
+        "0x90A30010",
+        "0x90A30040",
+        "0x90A30014",
+        "0x90A30044",
+        "0x90A30018",
+        "0x90A30048",
+        "0x90A3001C",
+        "0x90A3004C",
+        "0x90A30020",
+        "0x90A30050",
+        "0x90A30024",
+        "0x90A30054",
+        "0x90A30028",
+        "0x90A30058",
+        "0x90A3002C",
+        "0x90A3005C",
+        "0x90A30030",
+        "0x90A30060",
+        "0x90A30034",
+        "0x90A30064"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r5",
+      "Arrays": [
+        {
+          "Array": "RKNetRoomHandler.send.offset",
+          "Stride": "RKNetRoomHandler.send.stride",
+          "Count": "RKNetRoomHandler.send.count",
+          "Width": 4,
+          "StartIndex": 1
+        },
+        {
+          "Array": "RKNetRoomHandler.received.offset",
+          "Stride": "RKNetRoomHandler.received.stride",
+          "Count": "RKNetRoomHandler.received.count",
+          "Width": 4
+        }
+      ],
+      "Constants": [
+        {
+          "Register": "r7",
+          "Value": 0
+        }
+      ]
+    },
+    {
+      "Begin": "0x80656818",
+      "ExpectedWords": [
+        "0x90830008",
+        "0x90830038",
+        "0x9083000C",
+        "0x9083003C",
+        "0x90830010",
+        "0x90830040",
+        "0x90830014",
+        "0x90830044",
+        "0x90830018",
+        "0x90830048",
+        "0x9083001C",
+        "0x9083004C",
+        "0x90830020",
+        "0x90830050",
+        "0x90830024",
+        "0x90830054",
+        "0x90830028",
+        "0x90830058",
+        "0x9083002C",
+        "0x9083005C",
+        "0x90830030",
+        "0x90830060",
+        "0x90830034",
+        "0x90830064"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRoomHandler.send.offset",
+          "Stride": "RKNetRoomHandler.send.stride",
+          "Count": "RKNetRoomHandler.send.count",
+          "Width": 4
+        },
+        {
+          "Array": "RKNetRoomHandler.received.offset",
+          "Stride": "RKNetRoomHandler.received.stride",
+          "Count": "RKNetRoomHandler.received.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80656B08",
+      "ExpectedWords": [
+        "0x90830008",
+        "0x90830038",
+        "0x9083000C",
+        "0x9083003C",
+        "0x90830010",
+        "0x90830040",
+        "0x90830014",
+        "0x90830044",
+        "0x90830018",
+        "0x90830048",
+        "0x9083001C",
+        "0x9083004C",
+        "0x90830020",
+        "0x90830050",
+        "0x90830024",
+        "0x90830054",
+        "0x90830028",
+        "0x90830058",
+        "0x9083002C",
+        "0x9083005C",
+        "0x90830030",
+        "0x90830060",
+        "0x90830034",
+        "0x90830064"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRoomHandler.send.offset",
+          "Stride": "RKNetRoomHandler.send.stride",
+          "Count": "RKNetRoomHandler.send.count",
+          "Width": 4
+        },
+        {
+          "Array": "RKNetRoomHandler.received.offset",
+          "Stride": "RKNetRoomHandler.received.stride",
+          "Count": "RKNetRoomHandler.received.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80656DDC",
+      "ExpectedWords": [
+        "0x90830008",
+        "0x380000FF",
+        "0x90830038",
+        "0x9083000C",
+        "0x9083003C",
+        "0x90830010",
+        "0x90830040",
+        "0x90830014",
+        "0x90830044",
+        "0x90830018",
+        "0x90830048",
+        "0x9083001C",
+        "0x9083004C",
+        "0x90830020",
+        "0x90830050",
+        "0x90830024",
+        "0x90830054",
+        "0x90830028",
+        "0x90830058",
+        "0x9083002C",
+        "0x9083005C",
+        "0x90830030",
+        "0x90830060",
+        "0x90830034",
+        "0x90830064"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRoomHandler.send.offset",
+          "Stride": "RKNetRoomHandler.send.stride",
+          "Count": "RKNetRoomHandler.send.count",
+          "Width": 4
+        },
+        {
+          "Array": "RKNetRoomHandler.received.offset",
+          "Stride": "RKNetRoomHandler.received.stride",
+          "Count": "RKNetRoomHandler.received.count",
+          "Width": 4
+        }
+      ],
+      "Constants": [
+        {
+          "Register": "r0",
+          "Value": 255
         }
       ]
     }

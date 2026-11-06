@@ -1088,3 +1088,13 @@ out-of-range starts are rejected. Original-capacity C++ stays unchanged, and
 older manifest versions reject this required rewrite. All 870 default translator
 tests pass. The snapshot-aware network-controller product also passes its
 24-player VS round trip, reaching frame 350 in a second race.
+
+Lobby ROOM packet storage now uses uniform capacity-sized outgoing and received
+arrays. The factory, initialization, resets, packet accessors and following state
+move together. Its six-peer message unroll uses a ceiling count and bounded stores
+for a partial final group, preserving the local peer's slot and all receive data.
+`RoomPacketStorageTests` executes the real lifecycle and message functions for
+every local peer, both snapshot directions and both lobby roles, comparing the
+whole room and controller state. All five capacities (including partial groups
+13 and 100) and the 1,172-consumer audit pass. Full expanded LAN discovery,
+handshakes, race protocol and lobby presentation remain pending.

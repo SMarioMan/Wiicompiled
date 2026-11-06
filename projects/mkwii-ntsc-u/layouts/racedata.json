@@ -27447,6 +27447,83 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "AIBattleTeamRoster.count.offset"
+    },
+    {
+      "Instruction": "0x80537914",
+      "ExpectedWord": "0x806303C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807A1624",
+      "ExpectedWord": "0x886303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80865B70",
+      "ExpectedWord": "0x908303C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80865C64",
+      "ExpectedWord": "0x93E303C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80865D98",
+      "ExpectedWord": "0x900303C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80865DDC",
+      "ExpectedWord": "0x93E303C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8087C528",
+      "ExpectedWord": "0x83A503C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8057DD64",
+      "ExpectedWord": "0x9B8304EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.changed.offset"
+    },
+    {
+      "Instruction": "0x80585B44",
+      "ExpectedWord": "0x98A304EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.changed.offset"
+    },
+    {
+      "Instruction": "0x8087BD50",
+      "ExpectedWord": "0x880304EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.changed.offset"
     }
   ],
   "GlobalPointers": {

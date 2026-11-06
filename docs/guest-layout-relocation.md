@@ -833,3 +833,19 @@ repeated modulo-based selections against each submitted controller position.
 Grid internals and their final reset are fixtures. Empty-team grids are absent
 in the update fixture; this checks the original null-grid skip, not gameplay
 with an empty team. All five capacity cases and the 905-consumer audit pass.
+
+The balloon assignment, removal and transfer paths also relocate the five
+pointers within each player's 24-byte record. Their addresses combine player
+and balloon indices; four stores had retained the original 0x3C8 displacement
+even though their count bytes had moved. A live watchpoint caught assignment
+writing into another balloon's manager entry. Related race/item readers and
+kart/balloon change-flag accesses now use the relocated arrays too.
+
+The storage test now fills each active player's five slots, removes one,
+transfers into both available and full receivers, and clears all remaining
+balloons. It checks ownership, slot identity, unique pointers, unused slots,
+object-table preservation and guards after each operation. Animation readiness
+and rendered balloon actions are fixtures. All five storage capacities pass,
+and the 905-consumer audit preserves original-capacity emission and compiles
+the expanded consumers. A playable 24-player battle has advanced beyond 5,700
+simulation frames; completion and results still need validation.

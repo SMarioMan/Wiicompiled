@@ -343,7 +343,7 @@ extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext* ctx) {
     ctx->gpr[3] = holder;
     ctx->gpr[4] = manager + kLayout.inputGCNControllers;
     ctx->gpr[5] = 0;
-    MKW_GUEST_FUNC(80521554)(ctx);
+    MKW_GUEST_NEXT(80521554)(ctx);
     const uint32_t section = Memory::Read32(MKW_GADDR(809C1E38));
     if (section) {
         Memory::Write32(section + 0x44, holder);

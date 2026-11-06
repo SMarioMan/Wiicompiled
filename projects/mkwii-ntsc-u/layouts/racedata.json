@@ -1,5 +1,5 @@
 {
-  "Version": 12,
+  "Version": 13,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -891,6 +891,72 @@
           "Type": "Pointer",
           "Count": 4,
           "PointerTo": "GessoScreen"
+        }
+      ]
+    },
+    {
+      "Name": "RaceinfoPlayerHeader",
+      "Alignment": 4,
+      "Size": 80
+    },
+    {
+      "Name": "RaceinfoPlayer",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RaceinfoPlayerHeader"
+        },
+        {
+          "Name": "finishedPlayers",
+          "Type": "Score",
+          "PerPlayer": true,
+          "PlayersPerElement": 16
+        },
+        {
+          "Name": "finishOrder",
+          "Type": "InputByte"
+        }
+      ]
+    },
+    {
+      "Name": "RaceinfoPlayerPointers",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "players",
+          "Type": "Pointer",
+          "PointerTo": "RaceinfoPlayer",
+          "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "RaceinfoHeader",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "RaceinfoTail",
+      "Alignment": 4,
+      "Size": 60
+    },
+    {
+      "Name": "Raceinfo",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RaceinfoHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "Pointer",
+          "PointerTo": "RaceinfoPlayerPointers"
+        },
+        {
+          "Name": "tail",
+          "Type": "RaceinfoTail"
         }
       ]
     }
@@ -26374,6 +26440,40 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8052DD48",
+      "ExpectedWord": "0x38600054",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RaceinfoPlayer.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8052F764",
+      "ExpectedWord": "0x3880000D",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8052F77C",
+      "ExpectedWord": "0x989F0052",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceinfoPlayer.finishOrder.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052FD48",
+      "ExpectedWord": "0x98A30052",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RaceinfoPlayer.finishOrder.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -26384,7 +26484,8 @@
     "0x809BE740": "DriverManager",
     "0x809BEE20": "ItemManager",
     "0x809BF798": "PowManager",
-    "0x809BF790": "GessoManager"
+    "0x809BF790": "GessoManager",
+    "0x809B8F70": "Raceinfo"
   },
   "ArrayCopies": [
     {
@@ -26953,12 +27054,12 @@
     },
     {
       "Entry": "0x8052F7A0",
-      "Receiver": null,
+      "Receiver": "RaceinfoPlayer",
       "Name": "RaceinfoPlayer::UpdateRealLocal"
     },
     {
       "Entry": "0x8052FE70",
-      "Receiver": null,
+      "Receiver": "RaceinfoPlayer",
       "Name": "RaceinfoPlayer::EndLap"
     },
     {
@@ -26968,7 +27069,7 @@
     },
     {
       "Entry": "0x805307BC",
-      "Receiver": null,
+      "Receiver": "RaceinfoPlayer",
       "Name": "RaceinfoPlayer::Update"
     },
     {
@@ -26998,7 +27099,7 @@
     },
     {
       "Entry": "0x80531DB0",
-      "Receiver": null,
+      "Receiver": "RaceinfoPlayer",
       "Name": "RaceinfoPlayer::ComputeGPRank"
     },
     {
@@ -30810,6 +30911,51 @@
       "Entry": "0x807DA914",
       "Receiver": "PowManager",
       "Name": "Item::PowMgr::GetPowUserPlayerId"
+    },
+    {
+      "Entry": "0x8052E400",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::__dt"
+    },
+    {
+      "Entry": "0x8052F390",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::__ct"
+    },
+    {
+      "Entry": "0x8052F64C",
+      "Receiver": "RaceinfoPlayer",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8052FCAC",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::EndRace"
+    },
+    {
+      "Entry": "0x80530130",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::Vanish"
+    },
+    {
+      "Entry": "0x80530174",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::Disconnect"
+    },
+    {
+      "Entry": "0x805302B0",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::UpdateCheckPoint"
+    },
+    {
+      "Entry": "0x80530BD0",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::CopyCPUInputs"
+    },
+    {
+      "Entry": "0x80530BE4",
+      "Receiver": "RaceinfoPlayer",
+      "Name": "RaceinfoPlayer::FillTimerWithLapSplits"
     }
   ],
   "BoundedAccesses": [
@@ -32350,6 +32496,38 @@
           "Source": "r3"
         }
       ]
+    },
+    {
+      "Begin": "0x8052F778",
+      "ExpectedWords": [
+        "0xB0BF0050"
+      ],
+      "BaseRegister": "r31",
+      "ValueRegister": "r5",
+      "Arrays": [
+        {
+          "Array": "RaceinfoPlayer.finishedPlayers.offset",
+          "Stride": "RaceinfoPlayer.finishedPlayers.stride",
+          "Count": "RaceinfoPlayer.finishedPlayers.count",
+          "Width": 2
+        }
+      ]
+    },
+    {
+      "Begin": "0x8052FCD4",
+      "ExpectedWords": [
+        "0xB0030050"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RaceinfoPlayer.finishedPlayers.offset",
+          "Stride": "RaceinfoPlayer.finishedPlayers.stride",
+          "Count": "RaceinfoPlayer.finishedPlayers.count",
+          "Width": 2
+        }
+      ]
     }
   ],
   "ResampledCursors": [
@@ -32505,6 +32683,24 @@
       "Register": "r3",
       "Count": "players",
       "SourceCount": 12
+    }
+  ],
+  "BitsetStores": [
+    {
+      "Begin": "0x8052FD04",
+      "ExpectedWords": [
+        "0xA0E30050",
+        "0x7D400030",
+        "0x7CE00378",
+        "0xB0030050"
+      ],
+      "Base": "r3",
+      "Index": "r12",
+      "Unit": "r10",
+      "Shift": "r0",
+      "Loaded": "r7",
+      "Offset": "RaceinfoPlayer.finishedPlayers.offset",
+      "Count": "RaceinfoPlayer.finishedPlayers.count"
     }
   ]
 }

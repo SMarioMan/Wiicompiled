@@ -673,3 +673,20 @@ the audited participant index to select a u16 word and bit, preserving the
 legacy low word while retaining higher IDs. The caller must establish an index
 in `0..players-1` and a unit register containing one. Word storage must be
 initialized for its entire declared count before insertion.
+
+The USA `RaceinfoPlayer` migration uses the grouped bitset for the snapshot of
+already-finished/disconnected participants taken by `EndRace`. Its allocation
+grows from 0x54 bytes at capacity 12 to 0x58 at 24; both reset and finish entry
+clear every mask word, and the finish-order byte follows the entire array. The
+initial finish-order sentinel is capacity plus one. The existing low-word reader
+keeps its original representation; higher participant bits remain in subsequent
+words instead of being truncated by the original halfword store.
+
+`RaceinfoFinishMaskTests` executes the real reset and finish routines at
+capacities 12, 13, 24, 48 and 100, covering every active count and participant
+with no finished racers, all finished, alternating finish/disconnect flags, and
+only IDs 16 and above disconnected. It verifies every mask word, repeated resets,
+finish order, timer copying, status, memory guards and preserved registers. RNG
+and finish-notification boundaries are fixtures. All five cases and the 872
+consumer proof/compilation audit pass; this is separate from validation of
+expanded network packet formats.

@@ -1519,6 +1519,96 @@
       "Name": "BattleCoinEventTail",
       "Size": 16,
       "Alignment": 4
+    },
+    {
+      "Name": "MiiManagerHeader",
+      "Alignment": 4,
+      "Size": 56
+    },
+    {
+      "Name": "MiiMiddleDB",
+      "Alignment": 4,
+      "Size": 24
+    },
+    {
+      "Name": "MiiManagerTail",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "subs",
+          "Type": "MiiAuxiliary",
+          "Count": 2
+        },
+        {
+          "Name": "flags",
+          "Type": "InputByte",
+          "Count": 8
+        },
+        {
+          "Name": "status",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "heap",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "officialIndices",
+          "Type": "InputByte",
+          "Count": 100
+        },
+        {
+          "Name": "officialCount",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "extraState",
+          "Type": "MiiState"
+        },
+        {
+          "Name": "random",
+          "Type": "MiiState"
+        }
+      ]
+    },
+    {
+      "Name": "MiiManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "MiiManagerHeader"
+        },
+        {
+          "Name": "playerBuffers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "sharedDatabases",
+          "Type": "MiiMiddleDB",
+          "Count": 6
+        },
+        {
+          "Name": "playerDatabases",
+          "Type": "MiiMiddleDB",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "MiiManagerTail"
+        }
+      ]
+    },
+    {
+      "Name": "MiiAuxiliary",
+      "Size": 36,
+      "Alignment": 4
+    },
+    {
+      "Name": "MiiState",
+      "Size": 24,
+      "Alignment": 4
     }
   ],
   "References": [
@@ -37569,6 +37659,1377 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "bits(players)"
+    },
+    {
+      "Instruction": "0x80516724",
+      "ExpectedWord": "0x386302F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805173F4",
+      "ExpectedWord": "0x80040300",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805173F8",
+      "ExpectedWord": "0x80640304",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805173FC",
+      "ExpectedWord": "0x906402FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80517400",
+      "ExpectedWord": "0x900402F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805220B4",
+      "ExpectedWord": "0x380300F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.playerDatabases.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805220F8",
+      "ExpectedWord": "0x38630068",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522144",
+      "ExpectedWord": "0x38630098",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522174",
+      "ExpectedWord": "0x380300E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522184",
+      "ExpectedWord": "0x387D00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052218C",
+      "ExpectedWord": "0x387D00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052227C",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522284",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805222A4",
+      "ExpectedWord": "0x88030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805223B8",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805223C0",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805223E0",
+      "ExpectedWord": "0x88030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805224E0",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805224E8",
+      "ExpectedWord": "0x387F00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522510",
+      "ExpectedWord": "0x88030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052284C",
+      "ExpectedWord": "0x387E0218",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.subs.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522874",
+      "ExpectedWord": "0x9BFE0263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522878",
+      "ExpectedWord": "0x387E02F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052287C",
+      "ExpectedWord": "0x9BFE0264",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522880",
+      "ExpectedWord": "0x9BFE0265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522884",
+      "ExpectedWord": "0x901E0268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052288C",
+      "ExpectedWord": "0x9BFE02E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522894",
+      "ExpectedWord": "0x93FE02D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522898",
+      "ExpectedWord": "0x9BFE02E9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052289C",
+      "ExpectedWord": "0x93FE02DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805228A0",
+      "ExpectedWord": "0x9BFE02EA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 18,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805228A4",
+      "ExpectedWord": "0x93FE02E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805228A8",
+      "ExpectedWord": "0x9BFE02EB",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 19,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805228AC",
+      "ExpectedWord": "0x93FE02E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805229F4",
+      "ExpectedWord": "0x901D0268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522A08",
+      "ExpectedWord": "0x901D0268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522A14",
+      "ExpectedWord": "0x901D0268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522A18",
+      "ExpectedWord": "0x3B3D0068",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522AB0",
+      "ExpectedWord": "0x3BFD0098",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522B50",
+      "ExpectedWord": "0x387D00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522B64",
+      "ExpectedWord": "0x3B3D00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.playerDatabases.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522BCC",
+      "ExpectedWord": "0x3B1D0218",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.subs.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522C68",
+      "ExpectedWord": "0x93DD026C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.heap.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522C70",
+      "ExpectedWord": "0x9B9D0263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522C78",
+      "ExpectedWord": "0x881D0263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522CAC",
+      "ExpectedWord": "0x9B9D0264",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522CCC",
+      "ExpectedWord": "0x901D0268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D08",
+      "ExpectedWord": "0x88030263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D20",
+      "ExpectedWord": "0x8063026C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.heap.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D38",
+      "ExpectedWord": "0x807E026C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.heap.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D58",
+      "ExpectedWord": "0x807E026C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.heap.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D6C",
+      "ExpectedWord": "0x807E026C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.heap.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D84",
+      "ExpectedWord": "0x387E02F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522D94",
+      "ExpectedWord": "0x387E0218",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.subs.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522E48",
+      "ExpectedWord": "0x988302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522F88",
+      "ExpectedWord": "0x881F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522F94",
+      "ExpectedWord": "0x887F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522F9C",
+      "ExpectedWord": "0x981F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522FE8",
+      "ExpectedWord": "0x881F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522FF4",
+      "ExpectedWord": "0x887F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80522FFC",
+      "ExpectedWord": "0x981F02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80523038",
+      "ExpectedWord": "0x88030263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80523048",
+      "ExpectedWord": "0x3BA30098",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80523074",
+      "ExpectedWord": "0x9BFB0264",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805230A0",
+      "ExpectedWord": "0x386300E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805230D8",
+      "ExpectedWord": "0x386300E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805230E4",
+      "ExpectedWord": "0x387D00E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.sharedDatabases.offset+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride+MiiManager.sharedDatabases.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805231C4",
+      "ExpectedWord": "0x88060263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80523284",
+      "ExpectedWord": "0x80630268",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.status.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805232A8",
+      "ExpectedWord": "0x88040263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805233A8",
+      "ExpectedWord": "0x88030263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805236CC",
+      "ExpectedWord": "0x88030263",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80524380",
+      "ExpectedWord": "0x3BDC02F0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.random.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805246CC",
+      "ExpectedWord": "0x881C02D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80822C7C",
+      "ExpectedWord": "0x880302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B4A4",
+      "ExpectedWord": "0x880502D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B74C",
+      "ExpectedWord": "0x88C302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B7C0",
+      "ExpectedWord": "0x880302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B800",
+      "ExpectedWord": "0x88C302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B818",
+      "ExpectedWord": "0x88C302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082B8EC",
+      "ExpectedWord": "0x98030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BA40",
+      "ExpectedWord": "0x880302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BD08",
+      "ExpectedWord": "0x98030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BD54",
+      "ExpectedWord": "0x88A402D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BD6C",
+      "ExpectedWord": "0x88A402E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BDF8",
+      "ExpectedWord": "0x88C302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BE10",
+      "ExpectedWord": "0x88C302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BEFC",
+      "ExpectedWord": "0x88C302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BF14",
+      "ExpectedWord": "0x88C302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BFC4",
+      "ExpectedWord": "0x880302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082BFDC",
+      "ExpectedWord": "0x880302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C04C",
+      "ExpectedWord": "0x88C302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C064",
+      "ExpectedWord": "0x88C302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C188",
+      "ExpectedWord": "0x880302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C19C",
+      "ExpectedWord": "0x880302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C384",
+      "ExpectedWord": "0x886302D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8082C39C",
+      "ExpectedWord": "0x886302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8084DAFC",
+      "ExpectedWord": "0x98060265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8084DD00",
+      "ExpectedWord": "0x98030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8084E274",
+      "ExpectedWord": "0x98070265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8084E3E4",
+      "ExpectedWord": "0x98030265",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride+MiiManagerTail.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805227A4",
+      "ExpectedWord": "0x38600308",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MiiManager.size"
+    },
+    {
+      "Instruction": "0x80522BB0",
+      "ExpectedWord": "0x2C17000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80522A98",
+      "ExpectedWord": "0x98640260",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522C04",
+      "ExpectedWord": "0x9079021C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.subs.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80522C50",
+      "ExpectedWord": "0xB3990238",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.subs.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x80522E60",
+      "ExpectedWord": "0x98850270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522E6C",
+      "ExpectedWord": "0x98850271",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80522E70",
+      "ExpectedWord": "0x98850272",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80522E74",
+      "ExpectedWord": "0x98850273",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80522E78",
+      "ExpectedWord": "0x98850274",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80522E7C",
+      "ExpectedWord": "0x98850275",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80522E80",
+      "ExpectedWord": "0x98850276",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80522E84",
+      "ExpectedWord": "0x98850277",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80522E94",
+      "ExpectedWord": "0x98850270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522E98",
+      "ExpectedWord": "0x98850271",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80522E9C",
+      "ExpectedWord": "0x98850272",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80522EA0",
+      "ExpectedWord": "0x98850273",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80522EA4",
+      "ExpectedWord": "0x98850274",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80522EA8",
+      "ExpectedWord": "0x98850275",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80522EAC",
+      "ExpectedWord": "0x98850276",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80522EB0",
+      "ExpectedWord": "0x98850277",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80522EC0",
+      "ExpectedWord": "0x98850270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522EC4",
+      "ExpectedWord": "0x98850271",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80522EC8",
+      "ExpectedWord": "0x98850272",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80522ECC",
+      "ExpectedWord": "0x98850273",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80522ED0",
+      "ExpectedWord": "0x98850274",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80522ED4",
+      "ExpectedWord": "0x98850275",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80522ED8",
+      "ExpectedWord": "0x98850276",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80522EDC",
+      "ExpectedWord": "0x98850277",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80522EE8",
+      "ExpectedWord": "0x98850270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522EEC",
+      "ExpectedWord": "0x98850271",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80522EF0",
+      "ExpectedWord": "0x98850272",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80522EF4",
+      "ExpectedWord": "0x98850273",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 3
+    },
+    {
+      "Instruction": "0x80522EF8",
+      "ExpectedWord": "0x98850274",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80522EFC",
+      "ExpectedWord": "0x98850275",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 5
+    },
+    {
+      "Instruction": "0x80522F00",
+      "ExpectedWord": "0x98850276",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 6
+    },
+    {
+      "Instruction": "0x80522F04",
+      "ExpectedWord": "0x98850277",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 7
+    },
+    {
+      "Instruction": "0x80522F28",
+      "ExpectedWord": "0x98E60270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522F38",
+      "ExpectedWord": "0x98E50270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522F44",
+      "ExpectedWord": "0x98E40270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522F48",
+      "ExpectedWord": "0x98E30270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522F90",
+      "ExpectedWord": "0x9BC30270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80522FF0",
+      "ExpectedWord": "0x9BC30270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80523924",
+      "ExpectedWord": "0x88030270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80523F10",
+      "ExpectedWord": "0x88030260",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80523F28",
+      "ExpectedWord": "0x88030260",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80523FB0",
+      "ExpectedWord": "0x89040260",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.flags.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80524458",
+      "ExpectedWord": "0x88830270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x805244F0",
+      "ExpectedWord": "0x88140270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x805245C8",
+      "ExpectedWord": "0x88170270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80524624",
+      "ExpectedWord": "0x88C50270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8052466C",
+      "ExpectedWord": "0x88940270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x805246B4",
+      "ExpectedWord": "0x88740270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.officialIndices.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x805250F4",
+      "ExpectedWord": "0x988302E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80525100",
+      "ExpectedWord": "0x900302D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80525140",
+      "ExpectedWord": "0x800302D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8052517C",
+      "ExpectedWord": "0x90A402D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8052519C",
+      "ExpectedWord": "0x90A402D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MiiManager.tail.offset+MiiManagerTail.extraState.offset",
+      "Addend": 0
     }
   ],
   "GlobalPointers": {
@@ -37582,7 +39043,8 @@
     "0x809BF790": "GessoManager",
     "0x809B8F70": "Raceinfo",
     "0x809BFF98": "BattleBalloonManager",
-    "0x809C014C": "BattleCoinManager"
+    "0x809C014C": "BattleCoinManager",
+    "0x809B8F50": "MiiManager"
   },
   "ArrayCopies": [
     {
@@ -37911,12 +39373,12 @@
     },
     {
       "Entry": "0x80523304",
-      "Receiver": null,
+      "Receiver": "MiiManager",
       "Name": "MiiManager::CreatePlayerMiiFromOfficial"
     },
     {
       "Entry": "0x80524348",
-      "Receiver": null,
+      "Receiver": "MiiManager",
       "Name": "MiiManager::CreateMii(CreationParams)"
     },
     {
@@ -42458,6 +43920,236 @@
       "Entry": "0x8086FE7C",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x8051733C",
+      "Receiver": null,
+      "Name": "GameScene::reinit"
+    },
+    {
+      "Entry": "0x80521FEC",
+      "Receiver": null,
+      "Name": "Mii::GetRFLArgs"
+    },
+    {
+      "Entry": "0x805221C8",
+      "Receiver": null,
+      "Name": "Mii::CreateScnRfl"
+    },
+    {
+      "Entry": "0x80522340",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80522480",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8052280C",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::__ct"
+    },
+    {
+      "Entry": "0x80522920",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::Init"
+    },
+    {
+      "Entry": "0x80522CE4",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::__dt"
+    },
+    {
+      "Entry": "0x80522E24",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CountOfficialMiis"
+    },
+    {
+      "Entry": "0x80523024",
+      "Receiver": "MiiManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x805230A0",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::GetMiddleDB3"
+    },
+    {
+      "Entry": "0x805230A8",
+      "Receiver": "MiiManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80523118",
+      "Receiver": null,
+      "Name": "Mii::ComputeRFLStoreData"
+    },
+    {
+      "Entry": "0x80523178",
+      "Receiver": null,
+      "Name": "Mii::IsMiiId"
+    },
+    {
+      "Entry": "0x80523190",
+      "Receiver": null,
+      "Name": "Mii::GetMiiId"
+    },
+    {
+      "Entry": "0x8052326C",
+      "Receiver": null,
+      "Name": "MiiManager::GetStatus"
+    },
+    {
+      "Entry": "0x8052328C",
+      "Receiver": null,
+      "Name": "MiiManager::IsOfficialOrDefaultMii"
+    },
+    {
+      "Entry": "0x80523698",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateStoreMii(RFLCreateID)"
+    },
+    {
+      "Entry": "0x805238EC",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateOfficialMii(RFLIdx)"
+    },
+    {
+      "Entry": "0x80523A10",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateOfficialMii(RFLCreateID)"
+    },
+    {
+      "Entry": "0x80523B10",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateDefaultMii(RFLIdx)"
+    },
+    {
+      "Entry": "0x80523BF4",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateDefaultMii(RFLCreateID)"
+    },
+    {
+      "Entry": "0x80523CF8",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateOfficialMii(IdxArray)"
+    },
+    {
+      "Entry": "0x80523E1C",
+      "Receiver": null,
+      "Name": "MiiManager::AllowMiiDisplay"
+    },
+    {
+      "Entry": "0x80523E3C",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateMiddleDBMii"
+    },
+    {
+      "Entry": "0x80524124",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateRandomMii"
+    },
+    {
+      "Entry": "0x80524A34",
+      "Receiver": "MiiManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80524BC0",
+      "Receiver": null,
+      "Name": "Mii::__dt"
+    },
+    {
+      "Entry": "0x80524C00",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateMiddleDB2Mii"
+    },
+    {
+      "Entry": "0x80524EBC",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateMii(RFLStoreData)"
+    },
+    {
+      "Entry": "0x80524FAC",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreateControllerMii"
+    },
+    {
+      "Entry": "0x805250BC",
+      "Receiver": "MiiManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8052511C",
+      "Receiver": "MiiManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x805251CC",
+      "Receiver": "MiiManager",
+      "Name": "MiiManager::CreatePlayerMiiFromMiddleDB"
+    },
+    {
+      "Entry": "0x8082B358",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::CreateControl"
+    },
+    {
+      "Entry": "0x8082B690",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnActivate"
+    },
+    {
+      "Entry": "0x8082B914",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnButtonClick"
+    },
+    {
+      "Entry": "0x8082BCFC",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnDeactivate"
+    },
+    {
+      "Entry": "0x8082BD10",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnRightArrowPress"
+    },
+    {
+      "Entry": "0x8082BE68",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnLeftArrowPress"
+    },
+    {
+      "Entry": "0x8082BF6C",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::OnTabButtonClick"
+    },
+    {
+      "Entry": "0x8082C0BC",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::SetMiiIcons"
+    },
+    {
+      "Entry": "0x8082C35C",
+      "Receiver": null,
+      "Name": "Pages::MiiSelect::GetCurTabMiiCount"
+    },
+    {
+      "Entry": "0x8084D9D8",
+      "Receiver": null,
+      "Name": "MenuDriverModel::SetPlayerCharacter"
+    },
+    {
+      "Entry": "0x8084E20C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80522788",
+      "Receiver": null,
+      "Name": "MiiManager::CreateInstance"
     }
   ],
   "BoundedAccesses": [

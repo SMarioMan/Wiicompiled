@@ -1041,3 +1041,18 @@ complete the remaining presentation, Mii and LAN migrations. Time-trial CPU
 benchmarking still attempts to save an uninitialized ghost and reaches the
 corrupt-save dialog, including with original twelve-player capacity and the
 course's authored three laps; this is separate from coin storage and packet fixes.
+
+The Mii manager now allocates its avatar buffers and middle-database records as
+uniform capacity-sized arrays. Its six shared databases and following manager
+state move together; official-avatar lists retain their authored 100 entries,
+and controller state retains four local channels. The allocation size, participant
+initialization bound, indexed official-avatar accesses and auxiliary state accesses
+are declared layout references, including the unrolled official-list clear.
+`MiiManagerStorageTests` runs the actual manager factory/constructor, the Init
+participant allocation loop, complete official-avatar enumeration and controller
+state transitions at capacities 12, 13, 24, 48 and 100. SDK fixtures check the
+allocation arguments and database pointers. Whole-manager comparisons check
+adjacent fields, guards and preserved registers. All five cases and the consumer
+audit pass; the audit covers 1,000 entries including the separately added factory.
+The playable product is being rebuilt for regression testing. This change alone
+does not complete Mii presentation or the LAN participant migration.

@@ -56,6 +56,41 @@ public class GuestLayoutArrayFillTests
     }
 
     [Fact]
+    public void PartialInterleavedFillPreservesTheSlotWrittenBeforeAControlFlowEffect()
+    {
+        // The first array's slot zero was written before a comparison outside
+        // this span; clear the second array and the remaining first-array slots.
+        var words = new uint[] { Words[1], Words[2], Words[3] };
+        var fill = Fill(words) with { Arrays = new[] { Fill().Arrays[0] with { StartIndex = 1 }, Fill().Arrays[1] } };
+        var image = Image(words);
+        var baseline = new FunctionTranslator(image).Translate(Start).CxxCode;
+        Assert.Equal(baseline, new FunctionTranslator(image,layoutRelocations:Layout(2,fill)).Translate(Start).CxxCode);
+        var stores = new FunctionTranslator(image,layoutRelocations:Layout(3,fill)).Discover(Start,TranslationOptions.Default)
+            .LinearIr.Blocks.SelectMany(block=>block.Instructions).OfType<IrStore>().ToArray();
+        Assert.Equal(new[] {20,12,24,16,28},stores.Select(store=>store.Address.Offset));
+        foreach(var start in new[] {-1,2,3})
+            Assert.Throws<InvalidDataException>(()=>Layout(3,fill with {Arrays=new[] {fill.Arrays[0] with {StartIndex=start},fill.Arrays[1]}}));
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:Layout(3,Fill(words))));
+    }
+
+    [Fact]
+    public void PartialFillsRequireVersionNineteen()
+    {
+        var path=Path.GetTempFileName();
+        try
+        {
+            foreach(var version in new[] {18,19,20}){
+                File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
+                    References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Skip(1).Select(word=>$"0x{word:X8}"),
+                        BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0] with {StartIndex=1},Fill().Arrays[1]}}}}));
+                if(version==19)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
+            }
+        }
+        finally{File.Delete(path);}
+    }
+
+    [Fact]
     public void DeclaredInterleavedAddressSetupMovesWithItsArrayAndRejectsAliasing()
     {
         var words=new uint[] {Words[0],0x38a30010,Words[1],Words[2],Words[3]}; // addi r5,r3,16
@@ -201,12 +236,12 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {14,15,16,17,18,19})
+            foreach(var version in new[] {14,15,16,17,18,19,20})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0],Fill().Arrays[1] with {ValueRegister="r4"}}}}}));
-                if(version is 15 or 16 or 17 or 18)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 15 or 16 or 17 or 18 or 19)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

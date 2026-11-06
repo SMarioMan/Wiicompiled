@@ -72,10 +72,10 @@ public class GuestLayoutAuthoredCountIndexTests
     {
         var path=Path.GetTempFileName();
         try{
-            foreach(var version in new[]{16,17,18,19}){
+            foreach(var version in new[]{16,17,18,19,20}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     AuthoredCountIndices=new[]{new{Instruction="0x80001000",ExpectedWord="0x381cfffe",Input="r28",Destination="r0",FirstCount=2,LastCount=12}}}));
-                if(version is 17 or 18)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 17 or 18 or 19)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));}
         }finally{File.Delete(path);}
     }

@@ -7,7 +7,7 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null);
+public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null, int StartIndex = 0);
 public sealed record GuestFillConstant(string Register, uint Value);
 public sealed record GuestFillAddress(string Register, string Array);
 public sealed record GuestFillCopy(string Register, string Source);
@@ -61,11 +61,11 @@ public sealed partial class GuestLayoutRelocations
                 {
                     var begin = layout.Symbol(array.Array); var stride = layout.Symbol(array.Stride);
                     var count = layout.Symbol(array.Count);
-                    if (begin < 0 || count <= 0 ||
+                    if (begin < 0 || count <= 0 || array.StartIndex < 0 || array.StartIndex >= count ||
                         (IsFpr(array.ValueRegister ?? fill.ValueRegister) ? array.Width is not (4 or 8) : array.Width is not (1 or 2 or 4)) ||
                         stride < array.Width || stride % array.Width != 0 || begin % array.Width != 0)
                         throw new InvalidDataException("Guest array-fill requires aligned scalar array fields.");
-                    for (var index=0;index<count;index++)
+                    for (var index=array.StartIndex;index<count;index++)
                     {
                         var offset=checked(begin+stride*index);
                         intervals.Add((offset,checked(offset+array.Width)));
@@ -127,7 +127,7 @@ public sealed partial class GuestLayoutRelocations
     {
         for (var index = 0; index < layout.Symbol(fill.Arrays[0].Count); index++)
             foreach (var array in fill.Arrays)
-                yield return new IrStore(new(fill.BaseRegister, checked(layout.Symbol(array.Array) + index * layout.Symbol(array.Stride))),
+                if (index >= array.StartIndex) yield return new IrStore(new(fill.BaseRegister, checked(layout.Symbol(array.Array) + index * layout.Symbol(array.Stride))),
                     IrValue.Register(array.ValueRegister ?? fill.ValueRegister), array.Width);
     }
 

@@ -1079,3 +1079,12 @@ both packet-size reader rows for every peer and local-aid connection predicates.
 All five capacity cases and the consumer audit pass. The preceding storage build
 also passes a complete 24-player VS round trip, reaching frame 335 of a second
 race after results and menus. Actual expanded LAN interoperability is pending.
+
+Layout format 19 adds an optional `StartIndex` to individual array-fill streams.
+This preserves a slot initialized before a comparison while expanding the
+remaining interleaved stores after that comparison. The original instruction
+sequence must still exactly match the declared stores and setup; negative or
+out-of-range starts are rejected. Original-capacity C++ stays unchanged, and
+older manifest versions reject this required rewrite. All 870 default translator
+tests pass. The snapshot-aware network-controller product also passes its
+24-player VS round trip, reaching frame 350 in a second race.

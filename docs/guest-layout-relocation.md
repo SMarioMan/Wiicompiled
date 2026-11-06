@@ -608,6 +608,14 @@ initialization, update paths and destruction at capacities 12, 13, 24, 48 and
 including slot 12, every object-holder call, player loops, moved counters,
 allocation sizes and memory/register boundaries. Object, network and subsystem
 work is supplied by fixtures; the original dummy-object methods execute.
-The real 24-player VS round-trip driver passes with item use enabled. This does
+The real one-lap 24-player VS round-trip driver passes with item use enabled. This does
 not establish correctness of every item effect, battle mode, results layout or
 network packet at the expanded capacity.
+
+Item completion callbacks also use the relocated holder array. Their short
+branch entry can reach a body outside the entry's adjacent MAP address range;
+auditing decoded control flow is necessary to include that field access.
+Native tests exercise the real callback thunk for all fifteen item types at
+all five capacities. A longer three-lap 24-player run passes that callback path
+but still exposes the original POW manager's affected-player storage; that
+separate layout remains to be migrated.

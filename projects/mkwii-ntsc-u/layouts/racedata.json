@@ -25972,6 +25972,15 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "ItemManager.currentObjects.offset"
+    },
+    {
+      "Instruction": "0x8079DF50",
+      "ExpectedWord": "0x38630048",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ItemManager.holders.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -30319,6 +30328,11 @@
     },
     {
       "Entry": "0x807916C4",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8079A904",
       "Receiver": null,
       "Name": ""
     }

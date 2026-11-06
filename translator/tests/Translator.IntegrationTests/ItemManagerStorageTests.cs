@@ -31,12 +31,12 @@ public class ItemManagerStorageTests
         try
         {
             var entries=new uint[]{0x800202d4,0x80020494,0x8002058c,0x8078ccbc,0x8079012c,0x807902cc,
-                0x807948b0,0x8079a60c,0x80790664,0x80790788,0x80790844,0x80790994,0x807909ec,0x80790a44,0x80790ac0,0x807916c4};
+                0x807948b0,0x8079a60c,0x8079a904,0x80790664,0x80790788,0x80790844,0x80790994,0x807909ec,0x80790a44,0x80790ac0,0x807916c4};
             var fixtures=new HashSet<uint>{0x80229a48,0x80229a6c,0x8021a050,0x8021a0a4,0x807ae080,0x80787acc,0x807abd1c,
                 0x807a9bac,0x807968a8,0x80791898,0x807d5cc4,0x807d9614,0x807abdb4,0x80791b5c,0x807d5d60,0x807d96c4,
                 0x807d5d98,0x807d96fc,0x807acf8c,0x807ae8e0,0x807d6070,0x807d9d4c,0x80792d88,0x80792ec4,
                 0x8078ccc0,0x8078e540,0x8078e6d4,0x8078d464,0x8078db24,0x8078e4a0,0x8078cd88,0x80790e44,
-                0x8078e91c,0x807904d0,0x8078da3c,0x8078f83c};
+                0x8078e91c,0x807904d0,0x8078da3c,0x8078f83c,0x8078cf5c};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -51,13 +51,13 @@ public class ItemManagerStorageTests
                 #include <cstdio>
                 #include <cstring>
                 {{declarations}}
-                constexpr uint32_t n={{players}},root=0x81010000,records=0x81100000,stack=0x81f00000,
+                constexpr uint32_t n={{players}},root=0x81010000,records=0x81100000,stack=0x81f00000,object=0x81200000,
                     size={{layout.Symbol("ItemManager.size")}},online={{layout.Symbol("ItemManager.otherLocalOnlinePlayers.offset")}},
                     holders={{layout.Symbol("ItemManager.holders.offset")}},dummy={{layout.Symbol("ItemManager.dummy.offset")}},
                     total={{layout.Symbol("ItemManager.totalItemCountMinus30.offset")}},
                     localA=n>13?12:n-2,localB=n-1;
                 uint32_t allocations=0,initialized=0,constructed=0,playerInit=0,playerUpdates=0,holderUpdates=0,modelUpdates=0,
-                    hidden=0,destructed=0,cleaned=0,resetPlayers=0;
+                    hidden=0,destructed=0,cleaned=0,resetPlayers=0,finishCallbacks=0;
                 bool network=false;
                 void no_op(CpuContext*){}
                 void allocate(CpuContext* ctx){auto expected=allocations==0?size:n*584+16;
@@ -80,6 +80,8 @@ public class ItemManagerStorageTests
                 void player_update(CpuContext* ctx){if(playerId(ctx->gpr[3])!=playerUpdates++%n)std::abort();}
                 void player_reset(CpuContext* ctx){if(playerId(ctx->gpr[3])!=resetPlayers++ || ctx->gpr[4]!=1)std::abort();}
                 void manager_init_direct(CpuContext* ctx){if(ctx->gpr[3]!=root)std::abort();}
+                void object_finished(CpuContext* ctx){
+                    if(ctx->gpr[4]!=object || holderId(ctx->gpr[3])!=Memory::Read32(object+4) || holderId(ctx->gpr[3])!=finishCallbacks++)std::abort();}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="item manager storage fixture";
                     info.rawCpuInvoker=entry;info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -100,10 +102,10 @@ public class ItemManagerStorageTests
                     register_entry(0x8078ccc0,holder_init);register_entry(0x8078e540,player_ctor);register_entry(0x8078e6d4,player_init);
                     register_entry(0x8078d464,holder_update);register_entry(0x8078db24,model_update);register_entry(0x8078e4a0,holder_count);
                     register_entry(0x8078cd88,holder_hide);register_entry(0x80790e44,manager_init_direct);register_entry(0x8078e91c,player_update);
-                    register_entry(0x807904d0,holder_destroy);register_entry(0x8078da3c,holder_cleanup);register_entry(0x8078f83c,player_reset);
+                    register_entry(0x8078cf5c,object_finished);register_entry(0x807904d0,holder_destroy);register_entry(0x8078da3c,holder_cleanup);register_entry(0x8078f83c,player_reset);
                     for(uint32_t flag=0;flag<2;flag++){
                         network=flag;allocations=initialized=constructed=playerInit=playerUpdates=holderUpdates=modelUpdates=hidden=destructed=0;
-                        cleaned=resetPlayers=0;
+                        cleaned=resetPlayers=finishCallbacks=0;
                         std::memset(Memory::GetPointer(root,size),0x7e,size);
                         for(uint32_t i=0;i<16;i++){Memory::Write8(root-16+i,0x55);Memory::Write8(root+size+i,0x55);Memory::Write8(records+n*584+i,0x55);}
                         Memory::Write32(0x809bee20,0);Memory::Write8(0x809bf0b0,n);Memory::Write8(0x809bf0b1,flag);Memory::Write8(0x809bf0b4,0);
@@ -116,6 +118,9 @@ public class ItemManagerStorageTests
                             Memory::Read32(root+dummy+0x74)!=0 || Memory::Read32(root+dummy+0x78)!=0 || Memory::Read32(root+dummy+0x7c)!=64)return 15;
                         if(Memory::Read32(root+0x14)!=records || Memory::Read32(root+total)!=0 || !holder_storage() || !guards())return 5;
                         for(uint32_t i=0;i<n;i++)if(Memory::Read32(root+online+i*4)!=(flag && i==localA?records+localB*584:flag && i==localB?records+localA*584:0))return 6;
+                        // The member-function thunk branches to a body outside its MAP span.
+                        for(uint32_t id=0;id<15;id++){Memory::Write32(object+4,id);ctx.gpr[3]=object;func_8079A904(&ctx);}
+                        if(finishCallbacks!=15 || !holder_storage())return 16;
                         ctx.gpr[3]=root;func_80790788(&ctx);if(hidden!=15 || !holder_storage())return 7;
                         ctx.gpr[3]=root;func_80790844(&ctx);
                         if(holderUpdates!=15 || modelUpdates!=15 || playerUpdates!=n || Memory::Read32(root+total)!=static_cast<uint32_t>(-15))return 8;

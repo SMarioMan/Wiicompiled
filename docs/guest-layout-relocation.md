@@ -772,3 +772,18 @@ expanded structures the scene's larger MEM2 budget without changing the original
 12-player code. The 892-consumer audit and a real 24-player VS finish/menu/second
 race round trip pass with this route. It does not fix battle setup corruption;
 that failure was traced separately to the battle AI's six-entry team rosters.
+
+A subsequent hardware watchpoint found a separate overwrite in battle AI setup
+(`8073DFC8`): each team's controller roster still allocated six pointers and a
+count word, while a full expanded battle wrote twelve pointers per team. Both
+rosters now use `ceil(players/2)` entries, with their trailing counts relocated
+consistently. Allocation, zero initialization, opponent counts and active-team
+readers use the same layout. No extension slots are appended to the stock six.
+
+`BattleAiRosterTests` runs the real roster setup, opponent-count reader and
+active-controller counter at capacities 12, 13, 24, 48 and 100. Every legal pair
+of team sizes is covered, including empty teams and odd fields, with allocation,
+identity, unused-slot, register and memory guards. All five cases and the
+903-consumer audit pass. The playable 24-player retry no longer corrupts the
+heap at this point, but exhausts the scene's 33.4 MiB MEM2 heap later during
+model setup. Expanded battle is still incomplete.

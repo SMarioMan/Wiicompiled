@@ -1,5 +1,5 @@
 {
-  "Version": 14,
+  "Version": 15,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -196,7 +196,8 @@
         },
         {
           "Name": "battle",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PointerTo": "AIBattleManager"
         },
         {
           "Name": "unknown",
@@ -1027,6 +1028,48 @@
           "Name": "changed",
           "Type": "InputByte",
           "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "AIBattleHeader",
+      "Alignment": 4,
+      "Size": 192
+    },
+    {
+      "Name": "AIBattleManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "AIBattleHeader"
+        },
+        {
+          "Name": "rosters",
+          "Type": "Pointer",
+          "Count": 2,
+          "PointerTo": "AIBattleTeamRoster"
+        },
+        {
+          "Name": "state",
+          "Type": "Pointer",
+          "Count": 2
+        }
+      ]
+    },
+    {
+      "Name": "AIBattleTeamRoster",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "controllers",
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 2
+        },
+        {
+          "Name": "count",
+          "Type": "Pointer"
         }
       ]
     }
@@ -27282,6 +27325,79 @@
       "Symbol": "BattleBalloonManager.players.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8073DFE8",
+      "ExpectedWord": "0x3860001C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIBattleTeamRoster.size"
+    },
+    {
+      "Instruction": "0x8073E024",
+      "ExpectedWord": "0x3860001C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIBattleTeamRoster.size"
+    },
+    {
+      "Instruction": "0x8073E000",
+      "ExpectedWord": "0x93430018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset"
+    },
+    {
+      "Instruction": "0x8073E034",
+      "ExpectedWord": "0x93230018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset"
+    },
+    {
+      "Instruction": "0x8073DD88",
+      "ExpectedWord": "0x80A30018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073DD9C",
+      "ExpectedWord": "0x80A30018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073DE30",
+      "ExpectedWord": "0x83A50018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073DE70",
+      "ExpectedWord": "0x83830018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8073DF14",
+      "ExpectedWord": "0x83A30018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTeamRoster.count.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -29703,22 +29819,22 @@
     },
     {
       "Entry": "0x8073D7F0",
-      "Receiver": null,
+      "Receiver": "AIBattleManager",
       "Name": ""
     },
     {
       "Entry": "0x8073E0F0",
-      "Receiver": null,
+      "Receiver": "AIBattleManager",
       "Name": ""
     },
     {
       "Entry": "0x8073E8C4",
-      "Receiver": null,
+      "Receiver": "AIBattleManager",
       "Name": ""
     },
     {
       "Entry": "0x8073E9F8",
-      "Receiver": null,
+      "Receiver": "AIBattleManager",
       "Name": ""
     },
     {
@@ -31865,6 +31981,61 @@
       "Entry": "0x805166E4",
       "Receiver": null,
       "Name": "GameScene::enter"
+    },
+    {
+      "Entry": "0x8073DB54",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DB94",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DC40",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DD0C",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DD60",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DDA8",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DDB8",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DE08",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DEEC",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DF5C",
+      "Receiver": "AIBattleManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073DFC8",
+      "Receiver": "AIBattleManager",
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -33469,6 +33640,48 @@
         {
           "Register": "r3",
           "Value": 2157707264
+        }
+      ]
+    },
+    {
+      "Begin": "0x8073E008",
+      "ExpectedWords": [
+        "0x90030000",
+        "0x90030004",
+        "0x90030008",
+        "0x9003000C",
+        "0x90030010",
+        "0x90030014"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIBattleTeamRoster.controllers.offset",
+          "Stride": "AIBattleTeamRoster.controllers.stride",
+          "Count": "AIBattleTeamRoster.controllers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x8073E03C",
+      "ExpectedWords": [
+        "0x90030000",
+        "0x90030004",
+        "0x90030008",
+        "0x9003000C",
+        "0x90030010",
+        "0x90030014"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIBattleTeamRoster.controllers.offset",
+          "Stride": "AIBattleTeamRoster.controllers.stride",
+          "Count": "AIBattleTeamRoster.controllers.count",
+          "Width": 4
         }
       ]
     }

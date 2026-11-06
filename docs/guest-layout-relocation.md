@@ -1121,3 +1121,13 @@ fixture checks whole-cache contents, per-peer resets for the first 24 active IDs
 and both local-player getters across all storage slots. All five capacities and
 the 1,183-consumer audit pass. This is cache storage work; race-header wire
 serialization, selection/team encoding and full LAN interoperability are pending.
+
+The first live two-instance LAN run at capacity 24 exposed the controller's
+packet-clear routine still reading old row bases and advancing by the old row
+size. Both row bases, the peer bound and the row increment now use layout
+symbols. The native network fixture runs the real clear over every peer and
+section in both rows, checking zeroed payloads/lengths, unchanged full packets,
+whole-controller contents and allocation guards. All five capacities and the
+consumer audit pass. The race-header cache build separately passes a complete
+24-player offline round trip, reaching frame 339 of a second race. Live LAN is
+being retried; expanded interoperability remains unverified.

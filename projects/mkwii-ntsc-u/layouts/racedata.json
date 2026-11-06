@@ -48824,6 +48824,34 @@
       "Operand": "offset",
       "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
       "Addend": 1
+    },
+    {
+      "Instruction": "0x80652ADC",
+      "ExpectedWord": "0x835B00F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80652B0C",
+      "ExpectedWord": "0x835B0150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset"
+    },
+    {
+      "Instruction": "0x80652B44",
+      "ExpectedWord": "0x2818000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80652B50",
+      "ExpectedWord": "0x3B9C0030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
     }
   ],
   "GlobalPointers": {

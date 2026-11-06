@@ -30,7 +30,7 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
             var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -178,6 +178,31 @@ public class NetworkControllerStorageTests
                             ctx.gpr[3]=root;func_80652A78(&ctx);
                             if(ctx.gpr[3]!=(present && connections>1))return 19;
                         }
+                    for(uint32_t p=0;p<capacity;p++){
+                        auto fullHolder=Memory::Read32(root+full+p*4);
+                        std::memset(Memory::GetPointer(Memory::Read32(fullHolder),736),0x7b,736);
+                        for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
+                            auto row=Memory::Read32(root+start+b*rowStride+p*4);
+                            for(uint32_t section=0;section<8;section++){
+                                auto holder=Memory::Read32(row+section*4),n=Memory::Read32(holder+4);
+                                Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(Memory::Read32(holder),n),0x6a,n);
+                            }
+                        }
+                    }
+                    ctx.gpr[3]=root;func_80652AB8(&ctx);
+                    if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 20;
+                    for(uint32_t p=0;p<capacity;p++){
+                        auto fullHolder=Memory::Read32(root+full+p*4);
+                        for(uint32_t i=0;i<736;i++)if(Memory::Read8(Memory::Read32(fullHolder)+i)!=0x7b)return 21;
+                        for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
+                            auto row=Memory::Read32(root+start+b*rowStride+p*4);
+                            for(uint32_t section=0;section<8;section++){
+                                auto holder=Memory::Read32(row+section*4),n=Memory::Read32(holder+4);
+                                if(Memory::Read32(holder+8)!=0)return 22;
+                                for(uint32_t i=0;i<n;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=0)return 23;
+                            }
+                        }
+                    }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 13;

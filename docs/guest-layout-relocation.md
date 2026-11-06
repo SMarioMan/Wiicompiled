@@ -1145,3 +1145,12 @@ player counts, then the real friend reset. Whole-controller/packet comparisons,
 register and allocation guards pass at capacities 12, 13, 24, 48 and 100; the
 1,183-consumer proof/original-emission/expanded-compilation audit also passes.
 These checks verify initialization, not expanded LAN gameplay.
+
+The packet manager now allocates and resets one uniform capacity-sized RH1 timer
+array. Its timer reader validates the expanded player range and follows the
+moved player-to-console map and receive-row stride. The native fixture executes
+both construction paths, repeated singleton creation, offline/online resets,
+both snapshot and packet-buffer rows, recent/stale timers and invalid IDs.
+Player IDs cover every capacity slot while console IDs stay within the SDK's
+32-bit mask. All five capacities and the consumer audit pass. Other packet
+manager participant loops and packet formats still require migration.

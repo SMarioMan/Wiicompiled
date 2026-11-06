@@ -1972,6 +1972,26 @@
           "Count": 2
         }
       ]
+    },
+    {
+      "Name": "RKNetPacketMgrHeader",
+      "Size": 408,
+      "Alignment": 8
+    },
+    {
+      "Name": "RKNetPacketMgr",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RKNetPacketMgrHeader"
+        },
+        {
+          "Name": "playerRH1Timers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        }
+      ]
     }
   ],
   "References": [
@@ -49082,6 +49102,34 @@
       "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset+RKNetFriend.status.offset",
       "Addend": 4,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8064EDA0",
+      "ExpectedWord": "0x386001C8",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetPacketMgr.size"
+    },
+    {
+      "Instruction": "0x80650030",
+      "ExpectedWord": "0x2C04000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8065003C",
+      "ExpectedWord": "0x88C42920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset"
+    },
+    {
+      "Instruction": "0x80650084",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
     }
   ],
   "GlobalPointers": {
@@ -49099,7 +49147,8 @@
     "0x809B8F50": "MiiManager",
     "0x809BD918": "RKNetController",
     "0x809BD920": "RKNetRoomHandler",
-    "0x809BD940": "RKNetRH1Handler"
+    "0x809BD940": "RKNetRH1Handler",
+    "0x809BD790": "RKNetPacketMgr"
   },
   "ArrayCopies": [
     {
@@ -50563,32 +50612,32 @@
     },
     {
       "Entry": "0x8064EE50",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::Reset"
     },
     {
       "Entry": "0x8064F2A0",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::Update"
     },
     {
       "Entry": "0x80650020",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::GetPlayerRH1Timer"
     },
     {
       "Entry": "0x80650880",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::CreateRH1AndExportRH1andUSERandRacedata"
     },
     {
       "Entry": "0x80650CDC",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::CreateAndExportRH1andUSER"
     },
     {
       "Entry": "0x80651018",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ProcessReceived"
     },
     {
@@ -54373,67 +54422,67 @@
     },
     {
       "Entry": "0x8064F4D8",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ExportRacedata"
     },
     {
       "Entry": "0x8064F634",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::GetRacedata"
     },
     {
       "Entry": "0x8064F780",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ExportRH2"
     },
     {
       "Entry": "0x8064F830",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::GetRH2"
     },
     {
       "Entry": "0x8064F88C",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ClearSentRacedata"
     },
     {
       "Entry": "0x8064F8F0",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ClearSentRH2"
     },
     {
       "Entry": "0x8064FA9C",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::UpdateAsSpectator"
     },
     {
       "Entry": "0x8064FBB0",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::EveryoneIsConnected"
     },
     {
       "Entry": "0x8064FCC8",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::UpdateAsRacer"
     },
     {
       "Entry": "0x806500E0",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::GetPlayerLagFrames"
     },
     {
       "Entry": "0x80650154",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::GetMaxRH1Timer"
     },
     {
       "Entry": "0x80650398",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::IsPlayerConnected"
     },
     {
       "Entry": "0x806504FC",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::UpdateRaceinfoConnectionStatus"
     },
     {
@@ -54443,12 +54492,12 @@
     },
     {
       "Entry": "0x80650678",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::ProcessLagFrames"
     },
     {
       "Entry": "0x806512C4",
-      "Receiver": null,
+      "Receiver": "RKNetPacketMgr",
       "Name": "RKNet::PacketMgr::UpdateAidsBitfield"
     },
     {
@@ -55125,6 +55174,66 @@
       "Entry": "0x8065C1DC",
       "Receiver": "RKNetRH1Handler",
       "Name": "RKNet::RH1Handler::GetAidsBelongingToPlayer"
+    },
+    {
+      "Entry": "0x8064F954",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::ProcessPlayerDC"
+    },
+    {
+      "Entry": "0x8064F96C",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::__ct"
+    },
+    {
+      "Entry": "0x8064FA44",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::__dt"
+    },
+    {
+      "Entry": "0x80650294",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::SetITEMItem"
+    },
+    {
+      "Entry": "0x806502AC",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::IsITEMItemNew"
+    },
+    {
+      "Entry": "0x806502B8",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::GetITEMStoredItem"
+    },
+    {
+      "Entry": "0x806502C4",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::AddEVENTEntry"
+    },
+    {
+      "Entry": "0x806502D0",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::HasFreeEVENTEntries"
+    },
+    {
+      "Entry": "0x80650388",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::GetEVENTFreeDataSpace"
+    },
+    {
+      "Entry": "0x80650420",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::IsPlayerLocal"
+    },
+    {
+      "Entry": "0x80650490",
+      "Receiver": "RKNetPacketMgr",
+      "Name": "RKNet::PacketMgr::GetHudSlotId"
+    },
+    {
+      "Entry": "0x8064ED80",
+      "Receiver": null,
+      "Name": "RKNet::PacketMgr::CreateInstance"
     }
   ],
   "BoundedAccesses": [
@@ -57990,6 +58099,33 @@
           "Count": "RKNetController.playerAids.count",
           "Width": 1,
           "StartIndex": 2
+        }
+      ]
+    },
+    {
+      "Begin": "0x8064EEDC",
+      "ExpectedWords": [
+        "0x93DF0198",
+        "0x93DF019C",
+        "0x93DF01A0",
+        "0x93DF01A4",
+        "0x93DF01A8",
+        "0x93DF01AC",
+        "0x93DF01B0",
+        "0x93DF01B4",
+        "0x93DF01B8",
+        "0x93DF01BC",
+        "0x93DF01C0",
+        "0x93DF01C4"
+      ],
+      "BaseRegister": "r31",
+      "ValueRegister": "r30",
+      "Arrays": [
+        {
+          "Array": "RKNetPacketMgr.playerRH1Timers.offset",
+          "Stride": "RKNetPacketMgr.playerRH1Timers.stride",
+          "Count": "RKNetPacketMgr.playerRH1Timers.count",
+          "Width": 4
         }
       ]
     }

@@ -939,3 +939,15 @@ screens and offline/online eligibility cases. Five capacities (12, 13, 24, 48
 and 100) and the expanded consumer audit pass. Larger storage capacities use
 at most 24 active participants in these tests; they do not establish wider
 protocol support. A full playable coin-battle round trip is still being retried.
+
+The coin-update temporary array also grows uniformly. Its 48-byte participant
+records previously occupied twelve slots in a 1,840-byte guest stack frame;
+twenty-four initializations reached the saved-register block and caller frame.
+The frame, following scalar scratch values, GPR/FPR save areas, paired-single
+accesses and caller-LR slot now move together (2,416 bytes at capacity 24).
+The native coin test keeps the actual prologue, record-initialization loop and
+epilogue while branching around the simulation/rendering body in its private
+image. All five capacities preserve saved GPRs/FPRs, LR, stack boundaries, unused
+records and neighboring record bytes. The 945-consumer audit passes. A playable
+retry gets past the corrupted return and exposes further coin-update consumers;
+coin battle is not yet validated end to end.

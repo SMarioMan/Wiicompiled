@@ -34,7 +34,11 @@ public class BattleCoinStorageTests
             // referenced instruction; production image files remain untouched.
             foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014})
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(exit,4),4),0x4e800020);
-            var entries=new uint[]{0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            // Keep the real prologue, scratch initialization and epilogue;
+            // skip the rendering/network body after the first complete loop.
+            const uint seam=0x808717c4,epilogue=0x80874564;
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
+            var entries=new uint[]{0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -51,6 +55,7 @@ public class BattleCoinStorageTests
                 #include <cstring>
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},maxActive=capacity<24?capacity:24,
+                    frameSize={{layout.Symbol("BattleCoinUpdateFrame.size")}},tailOffset={{layout.Symbol("BattleCoinUpdateFrame.tail.offset")}},
                     size={{layout.Symbol("BattleCoinManager.size")}},stride={{layout.Symbol("BattleCoinEntry.size")}},
                     positionOffset={{layout.Symbol("BattleCoinManager.positions.offset")}},
                     activeOffset={{layout.Symbol("BattleCoinManager.active.offset")}},
@@ -127,6 +132,22 @@ public class BattleCoinStorageTests
                         for(uint32_t p=0;p<active;p++){word(eventWords+p*4,eligible?0:4);expected[eventStates+p]=1;expected[eventFlags+p]=0;}
                         ctx.gpr[24]=root;func_8086F470(&ctx);
                         if(!guards() || std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 16;
+                        // The actual update's expanded temporary records must
+                        // not reach its saved GPR/FPR block or caller's frame.
+                        std::memset(Memory::GetPointer(stack-frameSize-16,frameSize+48),0x55,frameSize+48);
+                        for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x87650000+r;
+                        for(uint32_t r=24;r<32;r++)ctx.fpr[r].d=double(r)+.25;
+                        ctx.gpr[3]=root;ctx.lr=0x80012340;func_80871710(&ctx);
+                        if(ctx.gpr[1]!=stack || ctx.lr!=0x80012340)return 20;
+                        for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x87650000+r)return 21;
+                        for(uint32_t r=24;r<32;r++)if(ctx.fpr[r].d!=double(r)+.25)return 22;
+                        for(uint32_t p=0;p<capacity;p++)for(uint32_t j=0;j<48;j++){
+                            uint8_t value=0x55;
+                            if(p<active){if(j<14 || j==20)value=0;else if(j>=16 && j<20)value=0xff;}
+                            if(Memory::Read8(stack-frameSize+984+p*48+j)!=value)return 23;
+                        }
+                        for(uint32_t i=0;i<16;i++)if(Memory::Read8(stack-frameSize-16+i)!=0x55)return 24;
+                        for(uint32_t i=8;i<32;i++)if(Memory::Read8(stack+i)!=0x55)return 25;
                         // Initialize each coin's participant flags using the real
                         // eight-at-a-time loop and scalar tail. Adjacent coins and
                         // unused capacity slots must retain their sentinels.

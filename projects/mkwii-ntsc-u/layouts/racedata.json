@@ -980,6 +980,55 @@
           "PerPlayer": true
         }
       ]
+    },
+    {
+      "Name": "BattleBalloonHeader",
+      "Alignment": 4,
+      "Size": 4
+    },
+    {
+      "Name": "BattleBalloonEntry",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "BattleBalloonPlayer",
+      "Alignment": 4,
+      "Size": 24
+    },
+    {
+      "Name": "BattleBalloonManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "BattleBalloonHeader"
+        },
+        {
+          "Name": "objects",
+          "Type": "BattleBalloonEntry",
+          "Count": 10,
+          "PerPlayer": true
+        },
+        {
+          "Name": "players",
+          "Type": "BattleBalloonPlayer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tick",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "duration",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "changed",
+          "Type": "InputByte",
+          "PerPlayer": true
+        }
+      ]
     }
   ],
   "References": [
@@ -26560,6 +26609,679 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "ObjectPoolCapacity.size/4"
+    },
+    {
+      "Instruction": "0x808653E8",
+      "ExpectedWord": "0x386004F8",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "BattleBalloonManager.size"
+    },
+    {
+      "Instruction": "0x80533C6C",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80533D10",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80533DDC",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80533E90",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80533F3C",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534008",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805340B8",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534100",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534154",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805341D8",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534220",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534274",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534308",
+      "ExpectedWord": "0x890703C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80537290",
+      "ExpectedWord": "0x890803C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80537900",
+      "ExpectedWord": "0x886603C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805380D0",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053818C",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538258",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538318",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805383DC",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805384A8",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538564",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805385C0",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538614",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805386B4",
+      "ExpectedWord": "0x890703C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538764",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805387C0",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538814",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805388A0",
+      "ExpectedWord": "0x890803C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8057328C",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654B4",
+      "ExpectedWord": "0x98A403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654B8",
+      "ExpectedWord": "0x90A403C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654BC",
+      "ExpectedWord": "0x90A403CC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654C0",
+      "ExpectedWord": "0x90A403D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654C4",
+      "ExpectedWord": "0x90A403D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808654C8",
+      "ExpectedWord": "0x90A403D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655E0",
+      "ExpectedWord": "0x98A403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655E4",
+      "ExpectedWord": "0x90A403C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655E8",
+      "ExpectedWord": "0x90A403CC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655EC",
+      "ExpectedWord": "0x90A403D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655F0",
+      "ExpectedWord": "0x90A403D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808655F4",
+      "ExpectedWord": "0x90A403D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086569C",
+      "ExpectedWord": "0x909F04E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.duration.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808656C8",
+      "ExpectedWord": "0x901F04E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.duration.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808656D4",
+      "ExpectedWord": "0x901F04E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.duration.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808656DC",
+      "ExpectedWord": "0x901F04E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865718",
+      "ExpectedWord": "0x808304E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086571C",
+      "ExpectedWord": "0x800304E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.duration.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808657C4",
+      "ExpectedWord": "0x890303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808658CC",
+      "ExpectedWord": "0x807F04E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808658D4",
+      "ExpectedWord": "0x901F04E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808659F4",
+      "ExpectedWord": "0x808304E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865A00",
+      "ExpectedWord": "0x888403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865B28",
+      "ExpectedWord": "0x88DE03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865B58",
+      "ExpectedWord": "0x881E03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865B60",
+      "ExpectedWord": "0x881E03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865B74",
+      "ExpectedWord": "0x887E03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865B7C",
+      "ExpectedWord": "0x981E03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865BCC",
+      "ExpectedWord": "0x888403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865BD0",
+      "ExpectedWord": "0x800304E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865BFC",
+      "ExpectedWord": "0x887D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865C68",
+      "ExpectedWord": "0x887D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865C70",
+      "ExpectedWord": "0x981D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865CDC",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865CEC",
+      "ExpectedWord": "0x800304E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.tick.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865CF8",
+      "ExpectedWord": "0x880403C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865D24",
+      "ExpectedWord": "0x887D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865D5C",
+      "ExpectedWord": "0x8AFC03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865D9C",
+      "ExpectedWord": "0x887C03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865DA4",
+      "ExpectedWord": "0x981C03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865DE0",
+      "ExpectedWord": "0x887D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80865DE8",
+      "ExpectedWord": "0x981D03C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087B83C",
+      "ExpectedWord": "0x88C603C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087C6EC",
+      "ExpectedWord": "0x880303C4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.players.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -26571,7 +27293,8 @@
     "0x809BEE20": "ItemManager",
     "0x809BF798": "PowManager",
     "0x809BF790": "GessoManager",
-    "0x809B8F70": "Raceinfo"
+    "0x809B8F70": "Raceinfo",
+    "0x809BFF98": "BattleBalloonManager"
   },
   "ArrayCopies": [
     {
@@ -30550,12 +31273,12 @@
     },
     {
       "Entry": "0x808655A8",
-      "Receiver": null,
+      "Receiver": "BattleBalloonManager",
       "Name": ""
     },
     {
       "Entry": "0x808656FC",
-      "Receiver": null,
+      "Receiver": "BattleBalloonManager",
       "Name": ""
     },
     {
@@ -31042,6 +31765,101 @@
       "Entry": "0x80530BE4",
       "Receiver": "RaceinfoPlayer",
       "Name": "RaceinfoPlayer::FillTimerWithLapSplits"
+    },
+    {
+      "Entry": "0x80533C28",
+      "Receiver": null,
+      "Name": "GMDataBalloonBattle::OnItemCollision"
+    },
+    {
+      "Entry": "0x80533E4C",
+      "Receiver": null,
+      "Name": "GMDataBalloonBattle::OnKartCollision"
+    },
+    {
+      "Entry": "0x80534078",
+      "Receiver": null,
+      "Name": "GMDataBalloonBattle::OnOOBCollision"
+    },
+    {
+      "Entry": "0x80534198",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x805342B8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80538080",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x805382C8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80538518",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80538658",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80538718",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80538858",
+      "Receiver": null,
+      "Name": "GMDataOnlineBalloonBattle::vf_0x28"
+    },
+    {
+      "Entry": "0x80865454",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80865568",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80865818",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x808659C4",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80865BA0",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80865CAC",
+      "Receiver": "BattleBalloonManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8087B788",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8087BC64",
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -32612,6 +33430,40 @@
           "Stride": "RaceinfoPlayer.finishedPlayers.stride",
           "Count": "RaceinfoPlayer.finishedPlayers.count",
           "Width": 2
+        }
+      ]
+    },
+    {
+      "Begin": "0x80865654",
+      "ExpectedWords": [
+        "0x989F04EC",
+        "0x3C60809C",
+        "0x989F04ED",
+        "0x989F04EE",
+        "0x989F04EF",
+        "0x989F04F0",
+        "0x989F04F1",
+        "0x989F04F2",
+        "0x989F04F3",
+        "0x989F04F4",
+        "0x989F04F5",
+        "0x989F04F6",
+        "0x989F04F7"
+      ],
+      "BaseRegister": "r31",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "BattleBalloonManager.changed.offset",
+          "Stride": "BattleBalloonManager.changed.stride",
+          "Count": "BattleBalloonManager.changed.count",
+          "Width": 1
+        }
+      ],
+      "Constants": [
+        {
+          "Register": "r3",
+          "Value": 2157707264
         }
       ]
     }

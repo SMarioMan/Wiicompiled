@@ -730,3 +730,22 @@ are fixtures. All five cases and the consumer proof audit pass. A real expanded
 battle still exposes another setup overwrite after this change; these pool
 checks therefore do not establish complete expanded battle support. The
 original-capacity twelve-player Delfino Pier battle completed its round trip.
+
+A hardware watchpoint then identified the remaining setup overwrite in the
+battle-balloon manager's constructor (`80865454`). Its original allocation
+contains 120 eight-byte balloon entries, twelve 24-byte player records, two
+words of timer state, and twelve change flags. The loop creates ten balloon
+objects per active player, so 24 players require 240 entries. The manifest now
+relocates all these arrays and their following fields together, including the
+manager allocation, reset fill, collision consumers and online update consumers.
+At capacity 24 the manager grows from 0x4F8 to 0x9E4 bytes.
+
+`BattleBalloonStorageTests` executes the real factory, constructor, reset and
+destroy paths for every active count from 1 through 24 (or the storage capacity
+when smaller), with repeated resets, entry identity checks and memory/register
+guards. Allocations and rendered balloon objects are fixtures. Five storage
+capacities (12, 13, 24, 48 and 100) and the 891-consumer proof audit pass. The
+larger storage cases still use at most 24 active participants: the original
+manager and balloon-object byte counters require a separate width migration
+before supporting more than 25 active players. Those cases are storage-layout
+checks, not claims of playable 48/100-player battles.

@@ -40,7 +40,7 @@ public class BattleCoinStorageTests
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
             const uint modelSeam=0x80874c5c,modelTail=0x80875bc8;
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(modelSeam,4),4),0x48000000|((modelTail-modelSeam)&0x03fffffc));
-            var entries=new uint[]{0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            var entries=new uint[]{0x80534f3c,0x808764f8,0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -58,7 +58,7 @@ public class BattleCoinStorageTests
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},maxActive=capacity<24?capacity:24,
                     scratchStride={{layout.Symbol("BattleCoinUpdatePlayer.size")}},scratchIndices={{layout.Symbol("BattleCoinUpdatePlayer.indices.offset")}},
-                    frameSize={{layout.Symbol("BattleCoinUpdateFrame.size")}},tailOffset={{layout.Symbol("BattleCoinUpdateFrame.tail.offset")}},
+                    scratchOffset={{layout.Symbol("BattleCoinUpdateFrame.players.offset")}},frameSize={{layout.Symbol("BattleCoinUpdateFrame.size")}},tailOffset={{layout.Symbol("BattleCoinUpdateFrame.tail.offset")}},
                     size={{layout.Symbol("BattleCoinManager.size")}},stride={{layout.Symbol("BattleCoinEntry.size")}},
                     positionOffset={{layout.Symbol("BattleCoinManager.positions.offset")}},
                     activeOffset={{layout.Symbol("BattleCoinManager.active.offset")}},
@@ -156,7 +156,7 @@ public class BattleCoinStorageTests
                         for(uint32_t p=0;p<capacity;p++)for(uint32_t j=0;j<scratchStride;j++){
                             uint8_t value=0x55;
                             if(p<active){if(j<14 || j==20)value=0;else if(j>=16 && j<20)value=0xff;}
-                            if(Memory::Read8(stack-frameSize+984+p*scratchStride+j)!=value)return 23;
+                            if(Memory::Read8(stack-frameSize+scratchOffset+p*scratchStride+j)!=value)return 23;
                         }
                         for(uint32_t i=0;i<16;i++)if(Memory::Read8(stack-frameSize-16+i)!=0x55)return 24;
                         for(uint32_t i=8;i<32;i++)if(Memory::Read8(stack+i)!=0x55)return 25;
@@ -194,7 +194,7 @@ public class BattleCoinStorageTests
                         for(uint32_t i=0;i<100;i++){
                             auto model=0x81200000+i*512,states=0x81300000+i*16;
                             Memory::Write32(root+12+i*stride,model);Memory::Write32(model,0x81400000);
-                            Memory::Write32(model+0x160,states);Memory::Write32(model+0x168,0);Memory::Write32(states,7);
+                            Memory::Write32(model+0x160,states);Memory::Write32(model+0x164,0);Memory::Write32(model+0x168,0);Memory::Write8(model+365,1);Memory::Write32(states,7);
                             Memory::Write8(root+18+i*stride,i%active);Memory::Write8(root+19+i*stride,i%active);
                         }
                         for(uint32_t i=0;i<active;i++){
@@ -214,6 +214,21 @@ public class BattleCoinStorageTests
                             Memory::Read8(root+{{layout.Symbol("BattleCoinManager.changed.offset")}}+i)!=0)return 27;
                         calls=0;ctx.gpr[3]=root;func_80875E00(&ctx);
                         if(calls!=local*2 || !guards())return 28;
+                        // Completion must scan every active player before it
+                        // checks all coin animations. Unused capacity is excluded.
+                        for(uint32_t done=0;done<=active;done++){
+                            for(uint32_t i=0;i<capacity;i++){
+                                Memory::Write8(root+{{layout.Symbol("BattleCoinManager.playerStates.offset")}}+i,i<done && i%2?1:0);
+                                Memory::Write8(root+{{layout.Symbol("BattleCoinManager.playerEventFlags.offset")}}+i,i<done && i%2?1:0);
+                                Memory::Write8(root+{{layout.Symbol("BattleCoinManager.previousStates.offset")}}+i,i<done && i%2==0?1:0);
+                            }
+                            ctx.gpr[3]=root;func_80534F3C(&ctx);if(ctx.gpr[3]!=(done==active) || !guards())return 32;
+                        }
+                        auto lastModel=0x81200000+99*512,lastState=0x81300000+99*16;
+                        Memory::Write32(lastState,2);ctx.gpr[3]=root;func_80534F3C(&ctx);if(ctx.gpr[3])return 33;
+                        Memory::Write32(lastState,7);Memory::Write8(lastModel+365,0);
+                        ctx.gpr[3]=root;func_80534F3C(&ctx);if(ctx.gpr[3])return 34;
+                        Memory::Write8(lastModel+365,1);ctx.gpr[3]=root;func_80534F3C(&ctx);if(ctx.gpr[3]!=1)return 35;
                     }
                     // Two real external users obtain coin model pointers from
                     // the nested record stride, independently of player count.

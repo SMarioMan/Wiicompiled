@@ -973,3 +973,18 @@ record and used-list length, checking the complete scratch allocation and guards
 All five capacities and the consumer audit pass. The playable retry progresses
 past that packet-pointer fault, but still ends coin battle immediately and then
 finds a separate results-side fault; a complete coin round trip remains pending.
+
+The coin completion predicate and collision/event helpers now use their shifted
+participant state, flags, effect arrays and nested coin strides. Its real
+`GMDataCoinBattle::CanRaceEnd` path is tested with every used participant count,
+with each participant finishing in turn, and with the final coin's animation
+still pending. Unused capacity cannot prevent completion or end a match early.
+
+The update frame also contains a participant byte array and pointer array before
+its main temporary records. They now grow uniformly too; the intervening scalar
+scratch values and three course-coin buffers move with them. At capacity 24 the
+record array starts at 1,048 instead of 984 and the complete frame is 3,056 bytes.
+Five native capacity cases and the 952-consumer audit pass. The first playable
+retry reached the real battle timer with all 24 racers and no guest fault, but
+remained in the completion phase; the retry with the additional scratch-array
+migration is running. A complete coin-battle round trip is not yet established.

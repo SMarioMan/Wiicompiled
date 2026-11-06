@@ -1111,3 +1111,13 @@ unchanged-stride analysis could not prove. The 1,172-consumer audit and all five
 native network-storage cases pass. The lobby product also passes its full
 24-player offline round trip, reaching frame 341 in a second race. These checks
 do not establish completed 24-player LAN interoperability.
+
+Race-header cache records now carry a capacity-sized player-to-console map, so
+both the record stride and following engine/star-rank fields move together. The
+uniform record array rounds storage to the constructor's two-record group;
+an odd capacity has one padding record, without admitting an extra participant.
+Factory/full resets initialize every stored record and every map slot. The native
+fixture checks whole-cache contents, per-peer resets for the first 24 active IDs,
+and both local-player getters across all storage slots. All five capacities and
+the 1,183-consumer audit pass. This is cache storage work; race-header wire
+serialization, selection/team encoding and full LAN interoperability are pending.

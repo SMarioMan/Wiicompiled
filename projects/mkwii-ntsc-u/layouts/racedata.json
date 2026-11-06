@@ -45661,6 +45661,237 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.splitReceived.offset"
+    },
+    {
+      "Instruction": "0x80654978",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80654A20",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806549D8",
+      "ExpectedWord": "0x281C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80654A9C",
+      "ExpectedWord": "0x281A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80654ABC",
+      "ExpectedWord": "0x981F0053",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetSub.tail.offset"
+    },
+    {
+      "Instruction": "0x80652618",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80652A84",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653290",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653304",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653344",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653648",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806536A8",
+      "ExpectedWord": "0x1C040058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806536D4",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653800",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653834",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653868",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x8065389C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x806538D8",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653908",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653958",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80653A5C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653C48",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80654BE0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80654C54",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80654CA0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806550E0",
+      "ExpectedWord": "0x1CE30058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80655168",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x8065522C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806553F0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x806556AC",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x806556DC",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x80655A00",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetSub.size"
+    },
+    {
+      "Instruction": "0x80653C54",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
     }
   ],
   "GlobalPointers": {

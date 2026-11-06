@@ -30,8 +30,8 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x806548b4,0x80005f84,0x80006038};
-            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -70,6 +70,17 @@ public class NetworkControllerStorageTests
                 void make_thread(CpuContext* c){if(threadCalls++)FAIL();c->gpr[3]=task;}
                 void end_init(CpuContext*){ends++;}
                 void sdk_init(CpuContext* c){if(c->gpr[3]!=1 || c->gpr[5]!=0x524d434a || c->gpr[6]!=0x80654078 || c->gpr[7]!=0x80654104)FAIL();c->gpr[3]=0;}
+                uint32_t connected=0,localAid=0,suspended=0;
+                void available_aids(CpuContext* c){c->gpr[3]=connected?1:0;}
+                void connection_count(CpuContext* c){c->gpr[3]=connected;}
+                void direct_aids(CpuContext* c){c->gpr[3]=0x10203040;}
+                void group_id(CpuContext* c){c->gpr[3]=0x12345678;}
+                void local_aid(CpuContext* c){c->gpr[3]=localAid;}
+                void host_aid(CpuContext* c){c->gpr[3]=0;}
+                void user_data(CpuContext* c){
+                    auto id=c->gpr[3];if(id>=capacity || id==localAid)FAIL();
+                    if(id<connected){Memory::Write32(c->gpr[4],((1+id%2)<<24)|id);c->gpr[3]=1;}else c->gpr[3]=0;}
+                void matching_suspended(CpuContext* c){c->gpr[3]=suspended;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="network controller storage fixture";info.rawCpuInvoker=entry;
                     info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -81,6 +92,10 @@ public class NetworkControllerStorageTests
                     register_entry(0x801a7e0c,mutex_init);register_entry(0x80226744,make_heap);register_entry(0x80241a2c,make_thread);
                     register_entry(0x80229a48,allocate);register_entry(0x80229a5c,allocate);register_entry(0x80229a6c,allocate_buffer);
                     register_entry(0x8065a83c,end_init);register_entry(0x80660694,end_init);register_entry(0x800ccbe0,sdk_init);
+                    register_entry(0x800d2414,available_aids);register_entry(0x800d20b8,connection_count);register_entry(0x800d21bc,direct_aids);
+                    register_entry(0x800d48f4,group_id);register_entry(0x800d20d0,local_aid);register_entry(0x800d2648,host_aid);
+                    register_entry(0x800d4a28,user_data);register_entry(0x800d4914,matching_suspended);
+                    Memory::Write32(0x809bd958,0x81070000);Memory::Write8(0x81070000,0);
                     std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);Memory::Write32(0x809bd918,0);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
@@ -118,6 +133,51 @@ public class NetworkControllerStorageTests
                         expected[sub+{{layout.Symbol("RKNetSub.tail.offset")}}]=0;
                     }
                     if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 16;
+                    const auto initialized=expected;
+                    for(uint32_t current=0;current<2;current++)for(uint32_t online=0;online<2;online++)for(suspended=0;suspended<2;suspended++){
+                        expected=initialized;connected=online?(capacity<24?capacity:24):0;localAid=connected?connected-1:0;
+                        word({{layout.Symbol("RKNetController.currentSub.offset")}},current);
+                        for(uint32_t b=0;b<2;b++){
+                            auto sub={{layout.Symbol("RKNetController.subs.offset")}}+b*{{layout.Symbol("RKNetSub.size")}};
+                            expected[sub+32]=2;expected[sub+33]=localAid;
+                            std::memset(expected.data()+sub+{{layout.Symbol("RKNetSub.users.offset")}},0x66,capacity*4);
+                        }
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        ctx.gpr[3]=root;func_80654958(&ctx);
+                        word({{layout.Symbol("RKNetController.currentSub.offset")}},current^1);
+                        auto sub={{layout.Symbol("RKNetController.subs.offset")}}+current*{{layout.Symbol("RKNetSub.size")}};
+                        word(sub+16,online?1:0);
+                        if(online){
+                            word(sub+8,connected);word(sub+20,0x10203040);word(sub+24,0x12345678);expected[sub+33]=localAid;expected[sub+34]=0;
+                            uint32_t total=2;
+                            for(uint32_t id=0;id<capacity;id++)if(id!=localAid){
+                                auto count=id<connected?1+id%2:0;total+=count;
+                                word(sub+{{layout.Symbol("RKNetSub.users.offset")}}+id*4,count?(count<<24)|id:0);
+                            }
+                            word(sub+12,total);
+                        }else{
+                            word(sub+8,0);word(sub+12,0);word(sub+20,0);word(sub+24,0);expected[sub+33]=expected[sub+34]=255;
+                            std::memset(expected.data()+sub+{{layout.Symbol("RKNetSub.users.offset")}},0,capacity*4);
+                        }
+                        expected[sub+{{layout.Symbol("RKNetSub.tail.offset")}}]=suspended;
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 17;
+                    }
+                    for(uint32_t p=0;p<capacity;p++)for(uint32_t b=0;b<2;b++){
+                        auto at={{layout.Symbol("RKNetController.sendIndices.offset")}}+p*4;word(at,b);Memory::Write32(root+at,b);
+                        auto row=Memory::Read32(root+send+b*rowStride+p*4);uint32_t total=0;
+                        for(uint32_t section=0;section<8;section++){
+                            auto n=p+b+section+1;total+=n;Memory::Write32(Memory::Read32(row+section*4)+8,n);
+                        }
+                        ctx.gpr[3]=root;ctx.gpr[4]=p;func_80653C3C(&ctx);if(ctx.gpr[3]!=total)return 18;
+                    }
+                    for(uint32_t current=0;current<2;current++)for(uint32_t aid=0;aid<(capacity<32?capacity:32);aid++)
+                        for(uint32_t connections=0;connections<3;connections++)for(uint32_t present=0;present<2;present++){
+                            auto sub={{layout.Symbol("RKNetController.subs.offset")}}+current*{{layout.Symbol("RKNetSub.size")}};
+                            word({{layout.Symbol("RKNetController.currentSub.offset")}},current);word(sub+8,connections);word(sub+16,present?(1u<<aid):0);expected[sub+33]=aid;
+                            std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                            ctx.gpr[3]=root;func_80652A78(&ctx);
+                            if(ctx.gpr[3]!=(present && connections>1))return 19;
+                        }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 13;

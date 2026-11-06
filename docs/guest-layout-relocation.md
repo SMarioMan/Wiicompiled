@@ -1069,3 +1069,13 @@ declared array fills; indexed packet writes and row strides are explicit refs.
 All five storage capacities and the 1,158-consumer audit pass. This verifies
 storage construction; connection updates, protocol fields and LAN interoperability
 still need migration and testing, and the profile remains incomplete.
+
+Connection snapshot updates now use the expanded snapshot stride and initialize
+or copy every peer's user data. Matching status follows the moved peer array.
+Network-controller snapshot indexing and double-buffer row indexing derive from
+the declared type sizes. The native storage fixture also runs the real snapshot
+update in both directions, with disconnected/connected SDK results, then checks
+both packet-size reader rows for every peer and local-aid connection predicates.
+All five capacity cases and the consumer audit pass. The preceding storage build
+also passes a complete 24-player VS round trip, reaching frame 335 of a second
+race after results and menus. Actual expanded LAN interoperability is pending.

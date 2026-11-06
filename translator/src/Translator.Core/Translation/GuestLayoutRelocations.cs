@@ -223,6 +223,7 @@ public sealed partial class GuestLayoutRelocations
             result[site.Node] = (site.Operand, result[site.Node]) switch
             {
                 ("value", IrAssign node) => node with { Value = Replace(node.Value) },
+                ("left", IrBinary node) => node with { Left = Replace(node.Left) },
                 ("right", IrBinary node) => node with { Right = Replace(node.Right) },
                 ("right", IrSetCrField node) => node with { Right = Replace(node.Right) },
                 ("offset", IrLoad node) => node with { Address = node.Address with { Offset = ReplaceOffset(node.Address.Offset) } },

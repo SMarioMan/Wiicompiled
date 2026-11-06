@@ -230,6 +230,29 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void RemainingCapacitySubtractionRelocatesItsLeftOperandAndCarryTogether()
+    {
+        const uint pc=0x80001000;
+        var types=new[] {new GuestLayoutType("Word",4,4)};
+        var image=TranslatorCppTestHarness.CreateImage((pc,0x20720006),(pc+4,0x4e800020));
+        GuestLayoutRelocations Plan(int players)=>new(types,12,players,new[] {
+            new GuestLayoutReference(pc,0x20720006,0,"left","ceil(players/2)"),
+            new GuestLayoutReference(pc,0x20720006,1,"argument:0","ceil(players/2)")});
+        Assert.Equal(new FunctionTranslator(image).Translate(pc).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:Plan(12)).Translate(pc).CxxCode);
+        foreach(var players in new[] {13,24,48,100})
+        {
+            var discovery=new FunctionTranslator(image,layoutRelocations:Plan(players)).Discover(pc);
+            var nodes=discovery.LinearIr.Blocks.SelectMany(block=>block.Instructions).ToArray();
+            Assert.Equal((players+1)/2,Assert.Single(nodes.OfType<IrBinary>()).Left.Constant);
+            Assert.Equal((players+1)/2,Assert.Single(nodes.OfType<IrCall>()).Arguments[0].Constant);
+        }
+        var wrong=new GuestLayoutRelocations(types,12,24,new[] {
+            new GuestLayoutReference(pc,0x20720006,0,"left","players")});
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:wrong));
+    }
+
+    [Fact]
     public void UnrolledLoopCountRequiresAnExactCapacityMultiple()
     {
         Assert.Equal(3, new GuestLayouts(RaceTypes(), 12).Symbol("players/4"));

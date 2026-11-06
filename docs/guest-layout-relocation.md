@@ -849,3 +849,9 @@ and rendered balloon actions are fixtures. All five storage capacities pass,
 and the 905-consumer audit preserves original-capacity emission and compiles
 the expanded consumers. A playable 24-player battle has advanced beyond 5,700
 simulation frames; completion and results still need validation.
+
+Checked scalar references also support a binary instruction's constant `left`
+operand. This covers remaining-capacity expressions such as `capacity - used`;
+when the original instruction sets carry, its helper argument must be relocated
+as a separate checked operand too. Tests preserve original emission, check both
+operands at expanded capacities, and reject a mismatching original constant.

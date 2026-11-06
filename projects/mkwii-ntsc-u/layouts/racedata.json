@@ -1,5 +1,5 @@
 {
-  "Version": 15,
+  "Version": 16,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -1072,6 +1072,11 @@
           "Type": "Pointer"
         }
       ]
+    },
+    {
+      "Name": "NdevDebugReserveUnits",
+      "Alignment": 1,
+      "Size": 23322624
     }
   ],
   "References": [
@@ -27398,6 +27403,22 @@
       "Symbol": "AIBattleTeamRoster.count.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x80241724",
+      "ExpectedWord": "0x3C1AFC4B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "floor(NdevDebugReserveUnits.size/players)",
+      "Scale": -32
+    },
+    {
+      "Instruction": "0x80241728",
+      "ExpectedWord": "0x3F6003B5",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "floor(NdevDebugReserveUnits.size/players)",
+      "Scale": 32
     }
   ],
   "GlobalPointers": {
@@ -32036,6 +32057,11 @@
       "Entry": "0x8073DFC8",
       "Receiver": "AIBattleManager",
       "Name": ""
+    },
+    {
+      "Entry": "0x80241648",
+      "Receiver": null,
+      "Name": "EGG::TSystem::InitMemory"
     }
   ],
   "BoundedAccesses": [

@@ -793,3 +793,19 @@ layout symbol such as `players` as a quotient's divisor. Existing plain quotient
 still require exact division; `ceil` still rounds partial groups up. This allows
 capacity-dependent resource budgets to state their rounding explicitly. Invalid,
 zero and negative divisors fail, and relocation arithmetic remains checked.
+
+The USA root-heap initializer now budgets the NDEV debug reserve as
+`32 * floor(NdevDebugReserveUnits.size / players)`. The constant's units encode
+the original reserve times twelve in 32-byte units: twelve-player output keeps
+its original 62,193,664-byte reserve, while capacity 24 reserves 31,096,832 bytes
+and gives the rest to the normal MEM2 root. The original branch for a retail-size
+arena still creates no debug heap. This redistributes mapped RAM; it does not
+claim additional guest address space.
+
+`RootHeapBudgetTests` executes the real root initializer for both retail-size
+and expanded arenas at capacities 12, 13, 24, 48 and 100. It checks aligned heap
+ranges, exact coverage, separate ownership, system-heap creation, registers and
+memory guards. All five cases and the 904-consumer audit pass. The playable
+24-player battle now completes model setup and reports all 24 participants at
+stage zero. It then exposes a separate balloon-manager update overwrite, so a
+complete expanded battle round trip has not yet passed.

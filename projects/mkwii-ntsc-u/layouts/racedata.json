@@ -1,5 +1,5 @@
 {
-  "Version": 13,
+  "Version": 14,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -31860,6 +31860,11 @@
       "Entry": "0x8087BC64",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x805166E4",
+      "Receiver": null,
+      "Name": "GameScene::enter"
     }
   ],
   "BoundedAccesses": [
@@ -33639,6 +33644,26 @@
       "Loaded": "r7",
       "Offset": "RaceinfoPlayer.finishedPlayers.offset",
       "Count": "RaceinfoPlayer.finishedPlayers.count"
+    }
+  ],
+  "HeapRoutes": [
+    {
+      "Begin": "0x80516A64",
+      "ExpectedWords": [
+        "0x809F0C8C",
+        "0x38C00000",
+        "0x801F0C88",
+        "0x901F0C94",
+        "0x909F0C98"
+      ],
+      "Scene": "r31",
+      "PrimaryRegister": "r0",
+      "SecondaryRegister": "r4",
+      "ZeroRegister": "r6",
+      "PrimaryHeap": 3208,
+      "SecondaryHeap": 3212,
+      "PrimarySlot": 3220,
+      "SecondarySlot": 3224
     }
   ]
 }

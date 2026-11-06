@@ -764,3 +764,11 @@ The fill's register remains the default. This verifies mixed record initializers
 such as zero scores and invalid-player sentinels in one unrolled span. Every
 original store must match its declared source and order. Address setup, constants
 and receiver copies cannot overwrite any of the fill's source registers.
+
+The expanded USA profile routes `GameScene::enter`'s default structure allocation
+slot to the scene's existing MEM2 heap. The MEM1/MEM2 ownership fields remain
+separate, and scene exit destroys each original backing heap once. This gives
+expanded structures the scene's larger MEM2 budget without changing the original
+12-player code. The 892-consumer audit and a real 24-player VS finish/menu/second
+race round trip pass with this route. It does not fix battle setup corruption;
+that failure was traced separately to the battle AI's six-entry team rosters.

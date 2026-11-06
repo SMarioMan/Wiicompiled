@@ -758,3 +758,9 @@ all original register effects. Original-capacity code is unchanged. Partial
 spans, interior entries, mismatching effects and overlapping relocations fail.
 The caller must audit that heap destruction uses the separate ownership fields;
 redirecting allocation slots does not transfer ownership or create another heap.
+
+Format version 15 permits an optional `ValueRegister` on each `GuestFillArray`.
+The fill's register remains the default. This verifies mixed record initializers
+such as zero scores and invalid-player sentinels in one unrolled span. Every
+original store must match its declared source and order. Address setup, constants
+and receiver copies cannot overwrite any of the fill's source registers.

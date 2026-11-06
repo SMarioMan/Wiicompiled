@@ -172,6 +172,47 @@ public class GuestLayoutArrayFillTests
         finally{File.Delete(path);}
     }
 
+    [Theory]
+    [InlineData(3)] [InlineData(24)]
+    public void DistinctArraySourcesPreserveMixedRecordInitializersWithoutSetupAliasing(int players)
+    {
+        var words=new uint[] {0x90030008,0x90830010,0x9003000c,0x90830014};
+        var original=Fill(words);var fill=original with {Arrays=new[] {original.Arrays[0],original.Arrays[1] with {ValueRegister="r4"}}};
+        var image=Image(words);
+        Assert.Equal(new FunctionTranslator(image).Translate(Start,TranslationOptions.Default).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:Layout(2,fill)).Translate(Start,TranslationOptions.Default).CxxCode);
+        var stores=new FunctionTranslator(image,layoutRelocations:Layout(players,fill)).Discover(Start,TranslationOptions.Default)
+            .LinearIr.Blocks.SelectMany(block=>block.Instructions).OfType<IrStore>().ToArray();
+        Assert.Equal(players*2,stores.Length);
+        for(var i=0;i<players;i++){
+            Assert.Equal("r0",stores[i*2].Source.RegisterName);Assert.Equal(8+i*4,stores[i*2].Address.Offset);
+            Assert.Equal("r4",stores[i*2+1].Source.RegisterName);Assert.Equal(8+players*4+i*4,stores[i*2+1].Address.Offset);
+        }
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(image,layoutRelocations:Layout(players,original)));
+        Assert.Throws<InvalidDataException>(()=>Layout(players,fill with {Addresses=new[] {new GuestFillAddress("r4","Object.first.offset")}}));
+        Assert.Throws<InvalidDataException>(()=>Layout(players,fill with {Constants=new[] {new GuestFillConstant("r4",0)}}));
+        Assert.Throws<InvalidDataException>(()=>Layout(players,fill with {Copies=new[] {new GuestFillCopy("r4","r3")}}));
+        Assert.Throws<InvalidDataException>(()=>Layout(players,fill with {Arrays=new[] {original.Arrays[0],original.Arrays[1] with {ValueRegister="pc"}}}));
+    }
+
+    [Fact]
+    public void PerArraySourcesRequireVersionFifteen()
+    {
+        var path=Path.GetTempFileName();
+        try
+        {
+            foreach(var version in new[] {14,15,16})
+            {
+                File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
+                    References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
+                        BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0],Fill().Arrays[1] with {ValueRegister="r4"}}}}}));
+                if(version==15)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
+            }
+        }
+        finally{File.Delete(path);}
+    }
+
     [Fact]
     public void ExtraEffectsWrongSourceOrderAndMismatchingWordsAreRejected()
     {

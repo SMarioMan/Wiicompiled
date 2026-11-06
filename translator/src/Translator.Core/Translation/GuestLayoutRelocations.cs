@@ -240,7 +240,7 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
@@ -276,6 +276,8 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Grouped player storage and bitset stores require layout format version 13.");
         if (file.Version < 14 && file.HeapRoutes is { Length: > 0 })
             throw new InvalidDataException("Heap routes require layout format version 14.");
+        if (file.Version < 15 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.ValueRegister is not null)) == true)
+            throw new InvalidDataException("Per-array fill sources require layout format version 15.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,

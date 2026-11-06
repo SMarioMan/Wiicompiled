@@ -7,7 +7,7 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-public sealed record GuestFillArray(string Array, string Stride, string Count, int Width);
+public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null);
 public sealed record GuestFillConstant(string Register, uint Value);
 public sealed record GuestFillAddress(string Register, string Array);
 public sealed record GuestFillCopy(string Register, string Source);
@@ -32,23 +32,26 @@ public sealed partial class GuestLayoutRelocations
             if (fill.Begin % 4 != 0 || fill.ExpectedWords.Count == 0 || fill.Arrays.Count == 0 ||
                 !IsGpr(fill.BaseRegister) || fill.BaseRegister == "r0" || !(IsGpr(fill.ValueRegister) || IsFpr(fill.ValueRegister)))
                 throw new InvalidDataException("Invalid guest array-fill definition.");
+            var values = fill.Arrays.Select(array => array.ValueRegister ?? fill.ValueRegister).Append(fill.ValueRegister).ToHashSet();
+            if (values.Any(register => !(IsGpr(register) || IsFpr(register))))
+                throw new InvalidDataException("Invalid guest fill value register.");
             var addresses = fill.Addresses ?? Array.Empty<GuestFillAddress>();
             if (addresses.Select(address => address.Register).Distinct().Count() != addresses.Count ||
                 addresses.Any(address => !IsGpr(address.Register) || address.Register == fill.BaseRegister ||
-                    address.Register == fill.ValueRegister ||
+                    values.Contains(address.Register) ||
                     !(address.Register == "r0" || int.Parse(address.Register.AsSpan(1)) is >= 3 and <= 12) ||
                     !fill.Arrays.Any(array => array.Array == address.Array)))
                 throw new InvalidDataException("Guest fill address setup must use distinct volatile registers and declared arrays.");
             var constants=fill.Constants ?? Array.Empty<GuestFillConstant>();
             if(constants.Select(item=>item.Register).Distinct().Count()!=constants.Count ||
-                constants.Any(item=>!IsGpr(item.Register) || item.Register==fill.BaseRegister || item.Register==fill.ValueRegister ||
+                constants.Any(item=>!IsGpr(item.Register) || item.Register==fill.BaseRegister || values.Contains(item.Register) ||
                     !(item.Register=="r0" || int.Parse(item.Register.AsSpan(1)) is >=3 and <=12) ||
                     addresses.Any(address=>address.Register==item.Register)))
                 throw new InvalidDataException("Guest fill constants require distinct volatile registers independent of the stores.");
             var copies = fill.Copies ?? Array.Empty<GuestFillCopy>();
             if (copies.Select(copy => copy.Register).Distinct().Count() != copies.Count ||
                 copies.Any(copy => !IsGpr(copy.Register) || copy.Register is "r1" or "r2" ||
-                    copy.Register == fill.BaseRegister || copy.Register == fill.ValueRegister || copy.Source != fill.BaseRegister ||
+                    copy.Register == fill.BaseRegister || values.Contains(copy.Register) || copy.Source != fill.BaseRegister ||
                     addresses.Any(address => address.Register == copy.Register) || constants.Any(item => item.Register == copy.Register)))
                 throw new InvalidDataException("Guest fill copies must preserve the unchanged base in distinct registers independent of stores and setup.");
             foreach (var layout in new[] { _original, _expanded })
@@ -59,7 +62,7 @@ public sealed partial class GuestLayoutRelocations
                     var begin = layout.Symbol(array.Array); var stride = layout.Symbol(array.Stride);
                     var count = layout.Symbol(array.Count);
                     if (begin < 0 || count <= 0 ||
-                        (IsFpr(fill.ValueRegister) ? array.Width is not (4 or 8) : array.Width is not (1 or 2 or 4)) ||
+                        (IsFpr(array.ValueRegister ?? fill.ValueRegister) ? array.Width is not (4 or 8) : array.Width is not (1 or 2 or 4)) ||
                         stride < array.Width || stride % array.Width != 0 || begin % array.Width != 0)
                         throw new InvalidDataException("Guest array-fill requires aligned scalar array fields.");
                     for (var index=0;index<count;index++)
@@ -125,7 +128,7 @@ public sealed partial class GuestLayoutRelocations
         for (var index = 0; index < layout.Symbol(fill.Arrays[0].Count); index++)
             foreach (var array in fill.Arrays)
                 yield return new IrStore(new(fill.BaseRegister, checked(layout.Symbol(array.Array) + index * layout.Symbol(array.Stride))),
-                    IrValue.Register(fill.ValueRegister), array.Width);
+                    IrValue.Register(array.ValueRegister ?? fill.ValueRegister), array.Width);
     }
 
     private static IEnumerable<IrBinary> FillAddresses(GuestArrayFill fill, GuestLayouts layout) =>

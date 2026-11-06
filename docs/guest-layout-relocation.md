@@ -809,3 +809,12 @@ memory guards. All five cases and the 904-consumer audit pass. The playable
 24-player battle now completes model setup and reports all 24 participants at
 stage zero. It then exposes a separate balloon-manager update overwrite, so a
 complete expanded battle round trip has not yet passed.
+
+The balloon manager's per-frame change-flag clear now uses the relocated flag
+array too. Its indexed byte store retained the original 0x4EC displacement and
+could overwrite balloon pointers on the next frame. The native storage test now
+runs three real update/model passes for every tested active count, checking
+object identity, active/unused flags, timers, registers and guards. All five
+capacity cases and the 904-consumer audit pass. The playable expanded battle
+advances into its countdown, then finds a separate stale AI-roster count reader;
+this update fix does not establish a completed battle.

@@ -30,8 +30,8 @@ public class BattleBalloonStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-battle-balloons-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8086538c,0x80865454,0x808655a8,0x80865414};
-            var fixtures=new HashSet<uint>{0x80229a48,0x8087a59c,0x80010000,0x80010004,0x80229a90};
+            var entries=new uint[]{0x8086538c,0x80865454,0x808655a8,0x80865414,0x80865818};
+            var fixtures=new HashSet<uint>{0x80229a48,0x8087a59c,0x80010000,0x80010004,0x80010008,0x8001000c,0x80229a90};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -51,7 +51,7 @@ public class BattleBalloonStorageTests
                     tick={{layout.Symbol("BattleBalloonManager.tick.offset")}},duration={{layout.Symbol("BattleBalloonManager.duration.offset")}},
                     changed={{layout.Symbol("BattleBalloonManager.changed.offset")}},
                     root=0x81010000,racedata=0x81020000,karts=0x81030000,vtable=0x81040000,objects=0x81100000,stack=0x81f00000;
-                uint32_t active=0,allocations=0,constructed=0,started=0,initialized=0,freed=0;
+                uint32_t active=0,allocations=0,constructed=0,started=0,initialized=0,freed=0,updated=0,models=0;
                 void allocate(CpuContext* ctx){
                     auto expected=allocations?484:size;if(ctx->gpr[3]!=expected || allocations>active*10)std::abort();
                     ctx->gpr[3]=allocations?objects+(allocations-1)*512:root;allocations++;}
@@ -61,6 +61,8 @@ public class BattleBalloonStorageTests
                     Memory::Write32(ctx->gpr[3],vtable);}
                 void start(CpuContext* ctx){if(id(ctx->gpr[3])!=started++)std::abort();}
                 void init(CpuContext* ctx){if(id(ctx->gpr[3])!=initialized++%(active*10))std::abort();}
+                void update(CpuContext* ctx){if(id(ctx->gpr[3])!=updated++%(active*10))std::abort();}
+                void model(CpuContext* ctx){if(id(ctx->gpr[3])!=models++%(active*10))std::abort();}
                 void free(CpuContext* ctx){if(ctx->gpr[3]!=root)std::abort();freed++;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="battle balloon storage fixture";
@@ -73,7 +75,9 @@ public class BattleBalloonStorageTests
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x8087a59c,object_ctor);register_entry(0x80229a90,free);
                     register_entry(0x80010000,start);register_entry(0x80010004,init);
+                    register_entry(0x80010008,update);register_entry(0x8001000c,model);
                     Memory::Write32(vtable+32,0x80010000);Memory::Write32(vtable+12,0x80010004);
+                    Memory::Write32(vtable+24,0x80010008);Memory::Write32(vtable+28,0x8001000c);
                     Memory::Write32(0x809b8f68,racedata);Memory::Write32(0x809bd110,karts);
                     Memory::Write32(racedata+{{layout.Symbol("Racedata.race.offset+Scenario.settings.offset")}}+8,3);
                     Memory::Write32(racedata+{{layout.Symbol("Racedata.race.offset+Scenario.settings.offset")}}+12,0);
@@ -101,6 +105,15 @@ public class BattleBalloonStorageTests
                                 Memory::Read8(root+8+i*8)!=i/(active*5) || Memory::Read8(root+9+i*8)!=active || Memory::Read8(root+10+i*8)!=5)return 9;
                             if(Memory::Read32(root+tick)!=0 || Memory::Read32(root+duration)!=120)return 10;
                             for(uint32_t i=0;i<capacity;i++)if(Memory::Read8(root+changed+i)!=0)return 11;
+                        }
+                        updated=models=0;
+                        for(uint32_t repeat=0;repeat<3;repeat++){
+                            for(uint32_t i=0;i<capacity;i++)Memory::Write8(root+changed+i,1);
+                            ctx.gpr[3]=root;func_80865818(&ctx);
+                            if(updated!=(repeat+1)*active*10 || models!=updated || !guards())return 15;
+                            if(Memory::Read32(root+tick)!=repeat+1 || Memory::Read32(root+duration)!=120)return 16;
+                            for(uint32_t i=0;i<capacity;i++)if(Memory::Read8(root+changed+i)!=(i<active?0:1))return 17;
+                            for(uint32_t i=0;i<active*10;i++)if(Memory::Read32(root+4+i*8)!=objects+i*512)return 18;
                         }
                         Memory::Write32(0x809bff98,root);func_80865414(&ctx);if(freed!=1 || Memory::Read32(0x809bff98)!=0 || !guards())return 12;
                     }

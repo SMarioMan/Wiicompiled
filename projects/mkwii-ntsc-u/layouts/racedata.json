@@ -27419,6 +27419,13 @@
       "Operand": "value",
       "Symbol": "floor(NdevDebugReserveUnits.size/players)",
       "Scale": 32
+    },
+    {
+      "Instruction": "0x808658B8",
+      "ExpectedWord": "0x988304EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleBalloonManager.changed.offset"
     }
   ],
   "GlobalPointers": {

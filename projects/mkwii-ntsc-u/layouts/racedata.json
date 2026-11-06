@@ -49218,6 +49218,125 @@
       "Operand": "offset",
       "Symbol": "RKNetController.status.offset+RKNetStatus.friends.offset",
       "Addend": 5
+    },
+    {
+      "Instruction": "0x806536DC",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x806537F8",
+      "ExpectedWord": "0x801A276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x80653808",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x8065382C",
+      "ExpectedWord": "0x801A276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x8065383C",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80653860",
+      "ExpectedWord": "0x801A276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x80653870",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80653894",
+      "ExpectedWord": "0x801A276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x806538A4",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x806538C4",
+      "ExpectedWord": "0x8078276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x806538E0",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80653900",
+      "ExpectedWord": "0x8018276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x80653910",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x80653924",
+      "ExpectedWord": "0x835801B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.fullSend.offset"
+    },
+    {
+      "Instruction": "0x80653950",
+      "ExpectedWord": "0x8018276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset"
+    },
+    {
+      "Instruction": "0x80653960",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x8065398C",
+      "ExpectedWord": "0x2817000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {

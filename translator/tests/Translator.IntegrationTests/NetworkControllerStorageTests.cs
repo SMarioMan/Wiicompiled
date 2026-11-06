@@ -34,7 +34,7 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
             var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -302,6 +302,57 @@ public class NetworkControllerStorageTests
                         }
                         if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 29;
                     }
+                    // Packet exchange uses the SDK's 32-bit console mask.
+                    // Larger capacities above still exercise storage, not an
+                    // unsupported expansion of that SDK connection protocol.
+                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t buffer=0;buffer<2;buffer++)
+                        for(uint32_t local : {0u,capacity-1}){
+                            constexpr uint32_t currentSub={{layout.Symbol("RKNetController.currentSub.offset")}},
+                                subs={{layout.Symbol("RKNetController.subs.offset")}},stride={{layout.Symbol("RKNetSub.size")}},
+                                indices={{layout.Symbol("RKNetController.sendIndices.offset")}};
+                            auto sub=subs+current*stride;word(currentSub,current);word(sub+8,capacity);
+                            word(sub+16,capacity==32?0xffffffffu:(1u<<capacity)-1);expected[sub+33]=local;
+                            for(uint32_t p=0;p<capacity;p++)word(indices+p*4,buffer);
+                            std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                            for(uint32_t p=0;p<capacity;p++){
+                                auto fullHolder=Memory::Read32(root+full+p*4);Memory::Write32(fullHolder+8,0);
+                                std::memset(Memory::GetPointer(Memory::Read32(fullHolder),736),0x7b,736);
+                                for(uint32_t row=0;row<2;row++){
+                                    auto split=Memory::Read32(root+send+row*rowStride+p*4);
+                                    for(uint32_t section=0;section<8;section++){
+                                        auto holder=Memory::Read32(split+section*4),n=section?1+(p+section)%7:16;
+                                        Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(Memory::Read32(holder),Memory::Read32(holder+4)),0x30+section+p%8,Memory::Read32(holder+4));
+                                    }
+                                }
+                            }
+                            ctx.gpr[3]=root;func_80653628(&ctx);
+                            for(uint32_t p=0;p<capacity;p++){
+                                bool selected=p!=local;if(selected)word(indices+p*4,1-buffer);
+                                auto fullHolder=Memory::Read32(root+full+p*4),payload=Memory::Read32(fullHolder);uint32_t total=16;
+                                for(uint32_t section=1;section<8;section++)total+=1+(p+section)%7;
+                                if(Memory::Read32(fullHolder+8)!=(selected?total:0))return 30;
+                                uint32_t offset=16;
+                                for(uint32_t i=0;i<736;i++){
+                                    uint8_t value=selected?0:0x7b;
+                                    if(selected && i>=8 && i<16)value=i==8?16:1+(p+i-8)%7;
+                                    if(selected && i>=16 && i<total){uint32_t at=16;for(uint32_t section=1;section<8;section++){
+                                        auto end=at+1+(p+section)%7;if(i>=at && i<end)value=0x30+section+p%8;at=end;}
+                                    }
+                                    if(Memory::Read8(payload+i)!=value)return 31;
+                                }
+                                for(uint32_t row=0;row<2;row++){
+                                    auto split=Memory::Read32(root+send+row*rowStride+p*4);
+                                    for(uint32_t section=0;section<8;section++){
+                                        auto holder=Memory::Read32(split+section*4),n=section?1+(p+section)%7:16;
+                                        bool cleared=selected && row==buffer;
+                                        if(Memory::Read32(holder+8)!=(cleared?0:n))return 32;
+                                        for(uint32_t i=0;i<Memory::Read32(holder+4);i++)
+                                            if(Memory::Read8(Memory::Read32(holder)+i)!=(cleared?0:0x30+section+p%8))return 33;
+                                    }
+                                }
+                            }
+                            if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 34;
+                        }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 13;

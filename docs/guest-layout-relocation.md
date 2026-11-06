@@ -1163,3 +1163,11 @@ capacities and the consumer audit pass. With the corrected PowerPC `crorc`
 semantics, two instances of the capacity-24 build (runtime IDs 24 and 13) discover
 each other and remain in one lobby for five seconds. The subsequent packet
 exchange still fails in unmigrated send/receive paths; this is not a LAN race pass.
+
+The split-send combiner now follows the moved row bases, per-peer buffer indices
+and full packet holders throughout its nested loops, with a symbolic peer bound.
+The native fixture checks both snapshots and buffer rows, first/last local peers,
+packet-header lengths, concatenated section payloads, buffer toggles and clearing
+only the consumed sections. This packet-path check runs within the SDK's 32-peer
+mask limit; larger capacity cases continue to check storage. The five native
+cases and consumer audit pass. Receiving and full LAN races are still pending.

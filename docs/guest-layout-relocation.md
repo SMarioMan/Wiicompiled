@@ -1057,3 +1057,15 @@ audit pass; the audit covers 999 entries including the separately added factory.
 The rebuilt product passes a full 24-player VS round trip: all racers finish,
 menus complete and a second race reaches stage two at frame 357. This change
 alone does not complete Mii presentation or the LAN participant migration.
+
+The network controller's storage now follows participant capacity: both connection
+snapshots, both rows of outgoing/incoming split-packet pointers, full packet
+holders, receive buffers, timestamps, buffer indices and player-to-console IDs.
+`NetworkControllerStorageTests` executes the real factory and constructor with
+SDK allocation fixtures, checking every peer's distinct packet graph and payload
+clear, the whole controller, allocation guards and preserved registers. It also
+executes both connection-snapshot initializations. Unrolled timestamp clears use
+declared array fills; indexed packet writes and row strides are explicit refs.
+All five storage capacities and the 1,158-consumer audit pass. This verifies
+storage construction; connection updates, protocol fields and LAN interoperability
+still need migration and testing, and the profile remains incomplete.

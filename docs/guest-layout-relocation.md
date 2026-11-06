@@ -1022,3 +1022,12 @@ checks a following marker, aligned/unaligned starts, exact packed bytes and
 memory/register guards. All five cases and the 954-consumer audit pass. The
 playable retry now processes the full participant list and exposes another
 coin-event path failure before completion, so the profile remains incomplete.
+
+Coin reset's cached packet-segment boundaries use the same participant width as
+the codecs. The count field, eight-ID unroll and scalar ID tail previously added
+fixed four-bit widths, leaving later segments inside the expanded ID list.
+`BattleCoinStorageTests` now executes the actual boundary-calculation region for
+several coin counts and offline/online eligibility configurations, checking the
+whole manager and every cached start/length. All five capacities and the
+954-consumer audit pass. The playable retry has advanced beyond 7,000 frames
+with the full participant format; completion is still being checked.

@@ -32,7 +32,7 @@ public class BattleCoinStorageTests
         {
             // The two reset regions end at test-only BLRs. Neither exit is a
             // referenced instruction; production image files remain untouched.
-            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014,0x80872068,0x80876328})
+            foreach(var exit in new uint[]{0x8086f4e8,0x8086f0dc,0x8086e014,0x80872068,0x80876328,0x8086f6e4})
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(exit,4),4),0x4e800020);
             // Keep the real prologue, scratch initialization and epilogue;
             // skip the rendering/network body after the first complete loop.
@@ -40,7 +40,7 @@ public class BattleCoinStorageTests
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(seam,4),4),0x48000000|((epilogue-seam)&0x03fffffc));
             const uint modelSeam=0x80874c5c,modelTail=0x80875bc8;
             System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(modelSeam,4),4),0x48000000|((modelTail-modelSeam)&0x03fffffc));
-            var entries=new uint[]{0x808762fc,0x80534f3c,0x808764f8,0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
+            var entries=new uint[]{0x8086f560,0x808762fc,0x80534f3c,0x808764f8,0x80872014,0x80874c3c,0x80875e00,0x80020a38,0x80020a84,0x80871710,0x80020a0c,0x80020a58,0x8086e684,0x8086e778,0x8086f470,0x8086f03c,0x80726b6c,0x8086dff0};
             var fixtures=new HashSet<uint>{0x80020494,0x805337fc,0x80229a48};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -233,6 +233,23 @@ public class BattleCoinStorageTests
                             func_808762FC(&ctx);
                             if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size) || !guards())return 36;
                         }
+                        // The reset precomputes segment boundaries as well as
+                        // packing fields dynamically. Check its actual unrolled
+                        // and scalar paths against the codecs' capacity width.
+                        auto headerEligible=Memory::Read8(root+eligibleCount),exponent=Memory::Read8(root+{{layout.Symbol("BattleCoinManager.events.offset")}}+24);
+                        if(!exponent)return 37;
+                        for(uint32_t coinCount:{0u,1u,7u,8u,71u,100u}){
+                            Memory::Write8(root,coinCount);std::memcpy(expected.data(),Memory::GetPointer(root,size),size);
+                            auto groups=(coinCount+exponent-1)/exponent,baseBits=Memory::Read8(root+flags+1)?35u:67u;
+                            auto full=baseBits+{{layout.Symbol("bits(players)")}}*(headerEligible+1)+headerEligible+3+groups*8;
+                            constexpr uint32_t eventHeader={{layout.Symbol("BattleCoinManager.events.offset")}};
+                            word(eventHeader+16,0);expected[eventHeader+25]=groups;
+                            word(eventHeader+20,baseBits);word(eventHeader+28,baseBits);word(eventHeader+32,full-baseBits);
+                            word({{layout.Symbol("BattleCoinManager.packetCursor.offset")}},full);word({{layout.Symbol("BattleCoinManager.packetPosition.offset")}},0);
+                            ctx.gpr[24]=root;func_8086F560(&ctx);
+                            if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size) || !guards())return 38;
+                        }
+                        Memory::Write8(root,100);
                         // Completion must scan every active player before it
                         // checks all coin animations. Unused capacity is excluded.
                         for(uint32_t done=0;done<=active;done++){

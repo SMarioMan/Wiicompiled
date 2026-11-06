@@ -37547,6 +37547,28 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "bits(players)"
+    },
+    {
+      "Instruction": "0x8086F5C4",
+      "ExpectedWord": "0x38C60004",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "bits(players)"
+    },
+    {
+      "Instruction": "0x8086F5F8",
+      "ExpectedWord": "0x38C60020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "bits(players)",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x8086F604",
+      "ExpectedWord": "0x38C60004",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "bits(players)"
     }
   ],
   "GlobalPointers": {

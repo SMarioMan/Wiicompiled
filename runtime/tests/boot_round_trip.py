@@ -10,6 +10,9 @@ import tempfile
 import time
 
 PROGRESS = re.compile(r"\[race-progress\] (.*)")
+FIELDS = re.compile(r"([a-z_]+)=(\d+)")
+REQUIRED = {"stage", "frames", "players", "capacity", "observed", "min_player_frames",
+            "course", "mode", "finished", "min_lap", "max_lap"}
 
 
 def write_pad(path, buttons=0):
@@ -37,17 +40,25 @@ def run(args):
             restarted = False
             previous_buttons = 0
             try:
-                with args.log.open() as reader:
+                with args.log.open(encoding="utf-8", errors="replace") as reader:
+                    pending = ""
                     while time.monotonic() - started < args.timeout:
-                        for line in reader:
+                        pending += reader.read()
+                        if "\n" in pending:
+                            complete, pending = pending.rsplit("\n", 1)
+                            lines = complete.split("\n")
+                        else:
+                            lines = []
+                        for line in lines:
                             if any(marker in line for marker in (
                                 "FATAL", "scheduler could not switch away", "WARNING unmapped guest touch")):
                                 raise RuntimeError(f"Guest fault: {line.strip()}")
                             match = PROGRESS.search(line)
                             if not match:
                                 continue
-                            progress = dict((key, int(value)) for key, value in
-                                            (item.split("=", 1) for item in match[1].split()))
+                            progress = {key: int(value) for key, value in FIELDS.findall(match[1])}
+                            if not REQUIRED.issubset(progress):
+                                continue
                             if progress["players"] != args.players or progress["observed"] != args.players:
                                 raise RuntimeError(f"Incomplete field: {line.strip()}")
                             if progress["stage"] == 4 and progress["finished"] == args.players:

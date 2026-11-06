@@ -67,12 +67,12 @@ public class GuestLayoutNormalizedRankTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {11,12,13,14,15,16,17})
+            foreach(var version in new[] {11,12,13,14,15,16,17,18})
             {
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,
                     References=Array.Empty<object>(),NormalizedRanks=new[] {new {Instruction="0x80001000",ExpectedWord="0x3863ffff",
                         Register="r3",Count="players",SourceCount=12}}}));
-                if(version is 12 or 13 or 14 or 15 or 16) Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 12 or 13 or 14 or 15 or 16 or 17) Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

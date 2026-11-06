@@ -887,3 +887,17 @@ resets for each of one through four local screens, checking model calls, timer,
 screen state, sentinel, player-group preservation and memory/register guards.
 All five capacity cases and the 933-consumer audit pass. The complete expanded
 balloon round trip is being retried with this separate teardown correction.
+
+Format version 17 adds checked `AuthoredCountIndices` for fixed resource-rule
+axes. A site must be the exact original `input - firstCount` index conversion.
+Expanded profiles bound that lookup to the declared authored count range; they
+preserve every in-range rule and use the terminal rule above the table's range.
+The actual participant count and participant storage remain unchanged. Original
+capacity emits its original code. Scratch values are native locals, and the
+rewrite preserves other guest registers, CR and XER. Overlaps, wrong instruction
+effects, protected registers and invalid bounds fail validation.
+
+The count-index unit cases check complete expanded input ranges and unsigned
+boundary values. Six generated-native cases cover five capacities and an aliased
+source/destination, checking every guest register and the condition/carry/link
+state. All six cases and the 866 default tests pass.

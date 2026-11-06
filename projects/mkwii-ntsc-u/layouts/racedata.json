@@ -46371,6 +46371,1770 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x8061DF80",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E0A0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064EF68",
+      "ExpectedWord": "0x1CA00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064EFB8",
+      "ExpectedWord": "0x1CA00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F028",
+      "ExpectedWord": "0x1CA00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F078",
+      "ExpectedWord": "0x1CA00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F0F4",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F14C",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F1DC",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F24C",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F390",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F398",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F414",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065005C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806508D0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065090C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650C0C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650C74",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650D28",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651058",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065122C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065819C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658A9C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659B70",
+      "ExpectedWord": "0x1D440058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659DE0",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659EC8",
+      "ExpectedWord": "0x1CA50058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659EF4",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659F3C",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659F94",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065D2EC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805C5C6C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E4FC8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E4FDC",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E5200",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E5454",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E5490",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E5498",
+      "ExpectedWord": "0x8803008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E54FC",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806124D0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612508",
+      "ExpectedWord": "0x1CE30058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806125BC",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612620",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612D68",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612E9C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80613124",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061AB18",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B160",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B190",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B23C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B244",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B3A0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061B3A8",
+      "ExpectedWord": "0x8805008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061BB50",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061BB58",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C0CC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C0E0",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C150",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C1C8",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D08C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D0C4",
+      "ExpectedWord": "0x1CA00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D1E8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E3AC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E634",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E68C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E810",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80628AB8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80629054",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A570",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A760",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A89C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A908",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AACC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AB40",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AC7C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AC84",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEEC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B044",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B3B8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B554",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B590",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B744",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B8A8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062CE20",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D260",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D368",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D3D4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D9C0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062DD34",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062DE98",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062DEDC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062DF08",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062E01C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062E024",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062E130",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062E168",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806389D0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E160",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E1E8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F520",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F7BC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FAC8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FAD0",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FB4C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FC04",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FC80",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FD88",
+      "ExpectedWord": "0x1C050058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FE0C",
+      "ExpectedWord": "0x1C050058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FEA8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FEB0",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FF04",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FF0C",
+      "ExpectedWord": "0x8803008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FF38",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FF40",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FFD4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806500F4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065016C",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806503EC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650564",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650614",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806506A0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806506E0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065078C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806512E8",
+      "ExpectedWord": "0x1CA50058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651460",
+      "ExpectedWord": "0x1C060058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806514E4",
+      "ExpectedWord": "0x1C060058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065158C",
+      "ExpectedWord": "0x1C060058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651610",
+      "ExpectedWord": "0x1C060058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065765C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657724",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657888",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657CB4",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658418",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806585A4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806585F4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658644",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658694",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806586DC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658794",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806588F4",
+      "ExpectedWord": "0x1C040058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658E50",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658E70",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658EC0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658EE0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658F34",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658F54",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659084",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659178",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806592C0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659398",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659478",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806594FC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065951C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806595B4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659610",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806596C0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806596DC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065982C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659848",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659978",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A128",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A160",
+      "ExpectedWord": "0x1CC00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A1A4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A1DC",
+      "ExpectedWord": "0x1CC00058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A3E8",
+      "ExpectedWord": "0x1D480058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A48C",
+      "ExpectedWord": "0x1D480058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A500",
+      "ExpectedWord": "0x1D480058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A600",
+      "ExpectedWord": "0x1D480058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A6B8",
+      "ExpectedWord": "0x1CE70058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A720",
+      "ExpectedWord": "0x1D270058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A790",
+      "ExpectedWord": "0x1D270058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A800",
+      "ExpectedWord": "0x1CE70058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B4D8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B4F8",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B500",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B51C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B53C",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B580",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B740",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B748",
+      "ExpectedWord": "0x8804008B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetSub.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065B8A4",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065C478",
+      "ExpectedWord": "0x1CA50058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065C7AC",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065C88C",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065CA28",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065E924",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065E968",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EA00",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065ECD8",
+      "ExpectedWord": "0x1C800058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065F58C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8066033C",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660818",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660BC8",
+      "ExpectedWord": "0x1C840058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660C60",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E14",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80842720",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80842794",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {

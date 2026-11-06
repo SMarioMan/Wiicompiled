@@ -1098,3 +1098,16 @@ every local peer, both snapshot directions and both lobby roles, comparing the
 whole room and controller state. All five capacities (including partial groups
 13 and 100) and the 1,172-consumer audit pass. Full expanded LAN discovery,
 handshakes, race protocol and lobby presentation remain pending.
+
+The pointer audit now proposes a changed literal index multiply together with
+its typed array-field accesses. It retains the scale's instruction identity
+through aliases and control-flow merges; shifts and register-held changing
+multipliers remain unresolved. A multiply shared by different record types is
+rejected when their layouts require separate index expressions. Unit checks
+cover field/stride agreement, original emission and that shared-index conflict.
+All 873 default tests pass. Applying the broader audit adds 196 snapshot stride
+and following-field references in menus and network handlers that the earlier
+unchanged-stride analysis could not prove. The 1,172-consumer audit and all five
+native network-storage cases pass. The lobby product also passes its full
+24-player offline round trip, reaching frame 341 in a second race. These checks
+do not establish completed 24-player LAN interoperability.

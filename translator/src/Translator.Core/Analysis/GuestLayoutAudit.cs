@@ -16,11 +16,13 @@ public sealed record GuestLayoutAuditResult(IReadOnlyList<GuestLayoutCandidate> 
 /// <summary>
 /// Finds review candidates from declared receiver/global pointer types. It never applies patches.
 /// Facts cross control-flow edges only when every reachable predecessor agrees.
-/// Unknown operations discard affected facts; scaled indices require a declared, unchanged array stride.
+/// Unknown operations discard affected facts; changing index scales require a literal multiply and a declared array field.
 /// </summary>
 public sealed class GuestLayoutAudit
 {
-    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0, int Rotation = 0);
+    private sealed record ScaleOrigin(uint Instruction, uint Word, int Node, string Operand);
+    private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0, int Rotation = 0,
+        ScaleOrigin? Scale = null);
     private readonly Dictionary<string, GuestLayoutType> _definitions;
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -50,6 +52,7 @@ public sealed class GuestLayoutAudit
         var words = function.Instructions.ToDictionary(i => i.Address, i => i.Word);
         var candidates = new List<GuestLayoutCandidate>();
         var unresolved = 0;
+        var scaleUses = new Dictionary<ScaleOrigin,(string Element, int Before, int After)>();
         var nodes = function.LinearIr.Blocks.SelectMany(b => b.Instructions).ToArray();
         var invariantReceiver = !nodes.Any(i => Defines(i) == "r3" ||
             i is IrIndirectCall or IrUndefined || i is IrCall call && (CallWrites(call) & 8) != 0);
@@ -91,7 +94,7 @@ public sealed class GuestLayoutAudit
         foreach (var block in function.LinearIr.Blocks)
             RunBlock(block, inputs.GetValueOrDefault(block.Label) ?? Seeds(
                 block.Label.Equals(function.LinearIr.EntryLabel, StringComparison.OrdinalIgnoreCase), invariant: true), collect: true);
-        return new GuestLayoutAuditResult(candidates, unresolved,
+        return new GuestLayoutAuditResult(candidates.Distinct().ToArray(), unresolved,
             "Review candidates only. No patches were applied; bounds, interior pointers and unknown control flow need separate audit.");
 
         Dictionary<string, Fact> Seeds(bool entry, bool invariant)
@@ -146,7 +149,23 @@ public sealed class GuestLayoutAudit
                 // An interior pointer can also be an array cursor. Rebasing a
                 // cursor's final stride would skip the new elements; require review.
                 if (basis.Offset != 0) { unresolved++; return; }
-                var path = basis.IndexStride == 0 || IsIndexedArrayField(type, offset, basis.IndexStride)
+                var indexed = basis.IndexStride == 0 ? null : IndexedArray(type,offset,basis.IndexStride);
+                if (indexed is { } array && basis.Scale is { } scale)
+                {
+                    var beforeStride = _original.Symbol(array.Symbol);
+                    var afterStride = _expanded.Symbol(array.Symbol);
+                    // One multiply shared by different record types may need two
+                    // independent native index expressions after relocation.
+                    if (scaleUses.TryGetValue(scale,out var previous) && previous.Element != array.Element &&
+                        (previous.After != previous.Before || afterStride != beforeStride))
+                        throw new InvalidDataException($"Shared guest index scale needs separate expressions at 0x{scale.Instruction:X8}.");
+                    scaleUses[scale]=(array.Element,beforeStride,afterStride);
+                    if (afterStride != beforeStride)
+                        candidates.Add(new GuestLayoutCandidate(new(scale.Instruction,scale.Word,scale.Node,scale.Operand,array.Symbol),
+                            beforeStride,afterStride,type,basis.IndexStride));
+                }
+                var path = basis.IndexStride == 0 || indexed is { } field &&
+                    (basis.Scale is not null || _expanded.Symbol(field.Symbol) == basis.IndexStride)
                     ? Locate(type, offset) : null;
                 if (path is null) { unresolved++; return; }
                 if (checked(_original.Symbol(path.Value.Symbol) + path.Value.Addend) != offset)
@@ -183,10 +202,12 @@ public sealed class GuestLayoutAudit
                             if (constant is { } value) result = new Fact(Constant: value);
                         }
                         else if (binary.Op == "mul" &&
-                            (left?.Constant is { } scaleLeft && right is null && binary.Right.RegisterName is not null && IsArrayStride(scaleLeft) ||
-                             right?.Constant is { } scaleRight && left is null && binary.Left.RegisterName is not null && IsArrayStride(scaleRight)))
+                            (left?.Constant is { } scaleLeft && right is null && binary.Right.RegisterName is not null && IsArrayStride(scaleLeft,allowChanging:true) ||
+                             right?.Constant is { } scaleRight && left is null && binary.Left.RegisterName is not null && IsArrayStride(scaleRight,allowChanging:true)))
                         {
-                            result = new Fact(IndexStride: checked((int)(left?.Constant ?? right!.Constant!.Value)));
+                            var origin = binary.Right.Constant is not null ? new ScaleOrigin(pc,words[pc],index,"right") :
+                                binary.Left.Constant is not null ? new ScaleOrigin(pc,words[pc],index,"left") : null;
+                            result = new Fact(IndexStride: checked((int)(left?.Constant ?? right!.Constant!.Value)),Scale:origin);
                         }
                         else if (binary.Op is "shl" or "rotl" && left is null && binary.Left.RegisterName is not null &&
                             right?.Constant is > 0 and < 31 && IsArrayStride(1u << (int)right.Constant.Value))
@@ -200,7 +221,7 @@ public sealed class GuestLayoutAudit
                             var pointer = left?.Type is not null ? left : right?.Type is not null ? right : null;
                             var scaled = pointer == left ? right : left;
                             if (pointer is { Offset: 0, IndexStride: 0 } && scaled is { Type: null, Constant: null, IndexStride: > 0 })
-                                result = pointer with { IndexStride = scaled.IndexStride };
+                                result = pointer with { IndexStride = scaled.IndexStride, Scale = scaled.Scale };
                             else if (collect && pointer is not null) unresolved++;
                         }
                         else if (collect && (left?.Type is not null || right?.Type is not null)) unresolved++;
@@ -216,7 +237,8 @@ public sealed class GuestLayoutAudit
                             if (address?.Constant is { } location) _globals.TryGetValue(location, out pointedType);
                             var basis = facts.GetValueOrDefault(load.Address.Base);
                             if (pointedType is null && basis is { Type: not null, Offset: 0 } &&
-                                (basis.IndexStride == 0 || IsIndexedArrayField(basis.Type, load.Address.Offset, basis.IndexStride)))
+                                (basis.IndexStride == 0 || IsIndexedArrayField(basis.Type, load.Address.Offset, basis.IndexStride) ||
+                                    basis.Scale is not null && IndexedArray(basis.Type,load.Address.Offset,basis.IndexStride) is not null))
                                 pointedType = PointerAt(basis.Type, load.Address.Offset);
                         }
                         Set(load.Destination, pointedType is null ? null : new Fact(Type: pointedType));
@@ -263,25 +285,28 @@ public sealed class GuestLayoutAudit
         return nested is { } child ? ($"{prefix}+{child.Symbol}", child.Addend) : (prefix, inner);
     }
 
-    // Only infer an index scale when a declared array keeps that stride.
-    private bool IsArrayStride(uint scale) => scale <= int.MaxValue && _definitions.Values.Any(type =>
+    // A changed scale is proposed only after its use identifies the array.
+    private bool IsArrayStride(uint scale, bool allowChanging = false) => scale <= int.MaxValue && _definitions.Values.Any(type =>
         type.Fields is not null && type.Fields.Any(field => (field.PerPlayer || _original.Types[type.Name].Fields[field.Name].Count > 1) &&
             _original.Types[type.Name].Fields[field.Name].Stride == scale &&
-            _expanded.Types[type.Name].Fields[field.Name].Stride == scale));
+            (allowChanging || _expanded.Types[type.Name].Fields[field.Name].Stride == scale)));
 
-    private bool IsIndexedArrayField(string type, int offset, int stride)
+    private bool IsIndexedArrayField(string type,int offset,int stride) =>
+        IndexedArray(type,offset,stride) is { } array && _expanded.Symbol(array.Symbol)==stride;
+
+    private (string Symbol,string Element)? IndexedArray(string type,int offset,int stride)
     {
         var shape = _original.Types[type];
-        if (offset < 0 || offset >= shape.Size) return false;
+        if (offset < 0 || offset >= shape.Size) return null;
         foreach (var field in shape.Fields)
         {
             if (offset < field.Value.Offset || offset >= field.Value.Offset + field.Value.Size) continue;
             var definition = _definitions[type].Fields!.Single(f => f.Name == field.Key);
-            if ((definition.PerPlayer || field.Value.Count > 1) && field.Value.Stride == stride &&
-                _expanded.Types[type].Fields[field.Key].Stride == stride) return true;
-            return IsIndexedArrayField(definition.Type, (offset - field.Value.Offset) % field.Value.Stride, stride);
+            if ((definition.PerPlayer || field.Value.Count > 1) && field.Value.Stride == stride)
+                return ($"{type}.{field.Key}.stride",definition.Type);
+            return IndexedArray(definition.Type,(offset-field.Value.Offset)%field.Value.Stride,stride);
         }
-        return false;
+        return null;
     }
 
     private string? PointerAt(string type, int offset)

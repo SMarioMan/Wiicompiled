@@ -84,6 +84,53 @@ public class GuestLayoutAuditTests
         Assert.Empty(audit.Analyze(Discover(0x1ca400f0, 0x48000021, 0x7ca32a14, 0x80c50c20, 0x4e800020), "Racedata").Candidates);
     }
 
+    private static GuestLayoutType[] ChangingRecordTypes() => new[] {
+        new GuestLayoutType("Byte",1,1),new GuestLayoutType("Word",4,4),new GuestLayoutType("Header",4,8),
+        new GuestLayoutType("Entry",4,Fields:new[] {new GuestLayoutField("players","Byte",PerPlayer:true),new GuestLayoutField("tail","Word")}),
+        new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("header","Header"),new GuestLayoutField("entries","Entry",PerPlayer:true)})};
+
+    [Fact]
+    public void ChangingRecordStrideAndFollowingFieldAreProvedTogether()
+    {
+        var types=ChangingRecordTypes();
+        var words=new uint[] {0x1ca40008,0x7ca32a14,0x80c5000c,0x80e5000c,0x4e800020};
+        var report=new GuestLayoutAudit(types,2,5).Analyze(Discover(words),"Owner");
+        Assert.Equal(3,report.Candidates.Count); // The multiply is deduplicated.
+        var scale=Assert.Single(report.Candidates.Where(c=>c.Reference.Instruction==Start));
+        Assert.Equal("Owner.entries.stride",scale.Reference.Symbol);Assert.Equal(8,scale.Before);Assert.Equal(12,scale.After);
+        Assert.All(report.Candidates.Where(c=>c.Reference.Instruction!=Start),c=>{Assert.Equal(12,c.Before);Assert.Equal(16,c.After);});
+        var image=TranslatorCppTestHarness.CreateImage(words.Select((word,index)=>(Start+(uint)index*4,word)).ToArray());
+        var references=report.Candidates.Select(c=>c.Reference).ToArray();
+        Assert.Equal(new FunctionTranslator(image).Translate(Start).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,2,references)).Translate(Start).CxxCode);
+        var nodes=new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,5,references))
+            .Discover(Start,TranslationOptions.Default).LinearIr.Blocks.SelectMany(b=>b.Instructions).ToArray();
+        Assert.Contains(nodes,n=>n is IrBinary {Op:"mul",Right.Constant:12});
+        Assert.All(nodes.OfType<IrLoad>(),load=>Assert.Equal(16,load.Address.Offset));
+    }
+
+    [Fact]
+    public void ChangingStridesRequireAnUnambiguousLiteralMultiplyAtADeclaredArray()
+    {
+        var audit=new GuestLayoutAudit(ChangingRecordTypes(),2,5);
+        // Rotated/scaled shifts and a register-held multiplier need separate review.
+        Assert.Empty(audit.Analyze(Discover(0x54851838,0x7ca32a14,0x80c5000c,0x4e800020),"Owner").Candidates);
+        Assert.Empty(audit.Analyze(Discover(0x38e00008,0x7ca439d6,0x7ca32a14,0x80c5000c,0x4e800020),"Owner").Candidates);
+        // Matching arithmetic does not turn a header into an array.
+        Assert.Empty(audit.Analyze(Discover(0x1ca40008,0x7ca32a14,0x80c50004,0x4e800020),"Owner").Candidates);
+    }
+
+    [Fact]
+    public void ASharedMultiplyCannotSilentlyChangeTwoDifferentRecordTypes()
+    {
+        var types=ChangingRecordTypes().Where(t=>t.Name!="Owner").Concat(new[] {
+            new GuestLayoutType("Fixed",4,8),new GuestLayoutType("Owner",4,Fields:new[] {
+                new GuestLayoutField("growing","Entry",PerPlayer:true),new GuestLayoutField("fixedRecords","Fixed",2)})}).ToArray();
+        var error=Assert.Throws<InvalidDataException>(()=>new GuestLayoutAudit(types,2,5)
+            .Analyze(Discover(0x1ca40008,0x7ca32a14,0x80c50004,0x80e50014,0x4e800020),"Owner"));
+        Assert.Contains("Shared guest index scale",error.Message);
+    }
+
     [Fact]
     public void DeclaredReceiverFindsAFieldButDoesNotGuessOtherTwelves()
     {

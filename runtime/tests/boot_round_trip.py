@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Drive a portable VS race through finish, menu confirmation and a second race."""
+"""Drive a portable race/battle through finish, menus and a second simulation."""
 import argparse
 import json
 import os
@@ -26,13 +26,20 @@ def run(args):
     executable = product / ("WiiCompiled.exe" if os.name == "nt" else "WiiCompiled")
     if not executable.is_file() or not (product / "portable.txt").is_file():
         raise ValueError("Expected a portable base product with WiiCompiled and portable.txt")
+    battle = args.mode in {"balloon", "coin"}
+    expected_mode = 3 if battle else {"grand-prix": 0, "time-trial": 2}.get(args.mode, 1)
+    command = [str(executable), "--headless", "--race-cpu-menu-input",
+               f"--race-players={args.players}", f"--race-mode={args.mode}"]
+    if not battle:
+        command.append(f"--race-laps={args.laps}")
+    if args.course is not None:
+        command.append(f"--race={args.course}")
     args.log.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="race-round-trip-", dir=product / "UserData") as directory:
         pad = Path(directory) / "pad.bin"
         write_pad(pad)
         with args.log.open("w") as log:
-            process = subprocess.Popen([str(executable), "--headless", "--race-cpu-menu-input",
-                f"--race-players={args.players}", f"--race-laps={args.laps}"], cwd=product,
+            process = subprocess.Popen(command, cwd=product,
                 env=dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad)),
                 stdout=log, stderr=subprocess.STDOUT)
             started = time.monotonic()
@@ -61,14 +68,16 @@ def run(args):
                                 continue
                             if progress["players"] != args.players or progress["observed"] != args.players:
                                 raise RuntimeError(f"Incomplete field: {line.strip()}")
+                            if progress["mode"] != expected_mode:
+                                raise RuntimeError(f"Wrong game mode: {line.strip()}")
                             if progress["stage"] == 4 and progress["finished"] == args.players:
-                                if progress["min_lap"] < args.laps:
+                                if not battle and progress["min_lap"] < args.laps:
                                     raise RuntimeError("Race ended before every racer reached the final lap")
                                 finished = True
                             elif finished and progress["stage"] == 0:
                                 restarted = True
                             elif restarted and progress["stage"] == 2 and progress["frames"] >= 300:
-                                print(json.dumps(dict(result="passed", players=args.players, laps=args.laps,
+                                print(json.dumps(dict(result="passed", players=args.players, laps=None if battle else args.laps, mode=args.mode,
                                     check="finish, menus, second race advancing", progress=progress)), flush=True)
                                 return 0
                         if process.poll() is not None:
@@ -93,6 +102,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--product", type=Path, required=True)
     parser.add_argument("--players", type=int, required=True, choices=range(1, 256), metavar="N")
+    parser.add_argument("--mode", choices=("vs", "team-vs", "grand-prix", "balloon", "coin", "time-trial"), default="vs")
+    parser.add_argument("--course", type=lambda value: int(value, 0), choices=range(0x2a), metavar="ID")
     parser.add_argument("--laps", type=int, default=1, choices=range(1, 10))
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--timeout", type=float, default=300)

@@ -5,6 +5,7 @@
 #include <optional>
 
 // `--race[=<course id>]`: boot straight into a 1P VS race instead of the title screen.
+// `--race-mode=vs|team-vs|grand-prix|balloon|coin|time-trial`: select the mode.
 // `--race-cpu`: the same, with the local racer driven by the CPU.
 // `--race-cpu-menu-input`: retain a real controller for menu confirmation.
 // `--race-players=N` and `--race-laps=N`: select the field and race length.

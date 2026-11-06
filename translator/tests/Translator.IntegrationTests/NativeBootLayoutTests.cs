@@ -44,7 +44,7 @@ public class NativeBootLayoutTests
                 extern "C" void RealControllerHolder_SetController_80521554(CpuContext*);
                 extern "C" void Raceinfo_CreateInstance_80532084(CpuContext*);
                 unsigned updateCalls=0,holderCalls=0,bootCalls=0;
-                bool hasLicense=true,rejectBoot=false;
+                bool hasLicense=true,rejectBoot=false,customLap=true;
                 uint32_t expectedController=0;
                 constexpr uint32_t inputManager=0x80090000,sectionManager=0x800a0000;
                 void original_holders(CpuContext* ctx){if(ctx->gpr[3]!=inputManager)std::abort();ctx->gpr[3]=0x31415926;}
@@ -57,7 +57,7 @@ public class NativeBootLayoutTests
 
                 void create_raceinfo(CpuContext* ctx){const auto& l=MkwGuestLayout::kLayout;
                     auto data=Memory::Read32(0x809bd728);
-                    if(Memory::Read8(data+l.racedataRace+l.scenarioSettings+0x25)!=1 || Memory::Read32(data+l.racedataRace+l.scenarioSettings+0x28)!=0x104)std::abort();ctx->gpr[3]=0x80050000;}
+                    if(Memory::Read8(data+l.racedataRace+l.scenarioSettings+0x25)!=(customLap?1:3) || Memory::Read32(data+l.racedataRace+l.scenarioSettings+0x28)!=(customLap?0x104:0x100))std::abort();ctx->gpr[3]=0x80050000;}
                 void original_update(CpuContext* ctx) {++updateCalls;Memory::Write32(ctx->gpr[3]+0x20,180);ctx->gpr[3]=0x31415926;}
 
                 void license_exists(CpuContext* ctx){if(ctx->gpr[3]!=0x800d0000 || ctx->gpr[4]!=0)std::abort();ctx->gpr[3]=hasLicense;}
@@ -80,9 +80,15 @@ public class NativeBootLayoutTests
                     for (uint32_t i=0;i<16;i++) {
                         Memory::Write8(data-16+i, 0x55); Memory::Write8(data+l.racedataSize+i, 0x55);
                     }
+                    const std::string mode=argc>2?argv[2]:"vs";
+                    const bool battle=mode=="balloon" || mode=="coin",teams=battle || mode=="team-vs",tt=mode=="time-trial";
+                    const uint32_t active=tt?1:{{activePlayers}},modeId=battle?3:tt?2:mode=="grand-prix"?0:1;
+                    const uint32_t section=battle?0x28:tt?0x1f:mode=="team-vs"?0x24:mode=="grand-prix"?0x1e:0x20;
+                    customLap=!battle;
+                    if(!BootRace::ParseArgument("--race-mode="+mode))return 24;
                     if (!BootRace::ParseArgument("--race-cpu")) return 2;
-                    if(!BootRace::ParseArgument("--race-players={{activePlayers}}") || !BootRace::ParseArgument("--race-laps=1"))return 18;
-                    for(const char* bad:{"--race-players=0","--race-players={{players+1}}","--race-laps=0","--race-laps=10","--race-laps=1x"}){
+                    if(!BootRace::ParseArgument("--race-players="+std::to_string(active)) || (customLap && !BootRace::ParseArgument("--race-laps=1")))return 18;
+                    for(const char* bad:{"--race-players=0","--race-players={{players+1}}","--race-laps=0","--race-laps=10","--race-laps=1x","--race-mode=unknown"}){
                         bool rejected=false;try{BootRace::ParseArgument(bad);}catch(const std::invalid_argument&){rejected=true;}
                         if(!rejected)return 19;
                     }
@@ -92,19 +98,29 @@ public class NativeBootLayoutTests
                     register_entry(0x80544d10,license_exists);register_entry(0x805b9344,original_boot);
                     hasLicense=argc==1 || std::strcmp(argv[1],"missing-license");
                     rejectBoot=argc>1 && !std::strcmp(argv[1],"rejected-args");
-                    ArgumentParser_Parse_805b9344(&ctx);
+                    const bool badCourse=argc>1 && !std::strcmp(argv[1],"bad-course"),
+                        badCount=argc>1 && !std::strcmp(argv[1],"bad-tt-count"),
+                        badLaps=argc>1 && !std::strcmp(argv[1],"bad-battle-laps");
+                    if(badCourse)BootRace::ParseArgument("--race=0x29");
+                    if(badCount)BootRace::ParseArgument("--race-players=2");
+                    if(badLaps)BootRace::ParseArgument("--race-laps=1");
+                    try{ArgumentParser_Parse_805b9344(&ctx);}
+                    catch(const std::invalid_argument&){return (badCourse || badCount || badLaps) && ctx.gpr[1]==0x80080000 &&
+                        Memory::Read32(0x800c0098)==0x800e0000 ? 0 : 25;}
+                    if(badCourse || badCount || badLaps)return 26;
                     if(ctx.gpr[1]!=0x80080000 || Memory::Read32(0x800c0098)!=0x800e0000)return 21;
                     if(!hasLicense || rejectBoot)return ctx.gpr[3]==0x3f && bootCalls==(rejectBoot?1:0) ? 0 : 22;
                     if(bootCalls!=1)return 23;
-                    if(ctx.gpr[3]!=0x20) return 3;
+                    if(ctx.gpr[3]!=section) return 3;
                     const uint32_t menu=data+l.racedataMenu, settings=menu+l.scenarioSettings;
                     for(uint32_t i=0;i<l.playerCapacity;i++) {
                         const uint32_t p=menu+l.scenarioPlayers+i*l.playerStride;
-                        if(Memory::Read32(p+0x10)!=(i>={{activePlayers}}?5:i==0?0:1) || Memory::Read32(p+8)>2 ||
-                           Memory::Read32(p+0xc)>0x16 || Memory::Read8(p)!=0x7e) return 4;
+                        if(Memory::Read32(p+0x10)!=(i>=active?5:i==0?0:1) || Memory::Read32(p+8)>2 ||
+                           Memory::Read32(p+0xc)>0x16 || Memory::Read8(p)!=0x7e || Memory::Read32(p+0xcc)!=(teams?i%2:2)) return 4;
                     }
-                    if(Memory::Read32(settings)!=8 || Memory::Read32(settings+8)!=1 ||
-                       Memory::Read32(settings+0x14)!=2 || Memory::Read32(settings+0x18)!=0 || Memory::Read8(settings+0x25)!=1) return 5;
+                    if(Memory::Read32(settings)!=(battle?0x20:8) || Memory::Read32(settings+8)!=modeId ||
+                       Memory::Read32(settings+0x10)!=(mode=="coin"?1:0) || Memory::Read32(settings+0x28)!=(teams?2:0) ||
+                       Memory::Read32(settings+0x14)!=2 || Memory::Read32(settings+0x18)!=0 || Memory::Read8(settings+0x25)!=(customLap?1:3)) return 5;
                     for(uint32_t a=data+l.racedataRace;a<menu;a++) if(Memory::Read8(a)!=0x7e) return 6;
                     for(uint32_t a=menu+l.scenarioMission;a<data+l.racedataSize;a++)
                         if(Memory::Read8(a)!=0x7e) return 7;
@@ -178,6 +194,24 @@ public class NativeBootLayoutTests
                 if(!fallbackFinished)fallback.Kill(entireProcessTree:true);
                 Assert.True(fallbackFinished,$"{variant} boot timed out");
                 Assert.True(fallback.ExitCode==0,fallbackOutput.GetAwaiter().GetResult());
+            }
+            foreach(var mode in new[]{"vs","team-vs","grand-prix","balloon","coin","time-trial"})
+            {
+                var start=new ProcessStartInfo(exe){RedirectStandardError=true,UseShellExecute=false};
+                start.ArgumentList.Add("present-license");start.ArgumentList.Add(mode);
+                using var modeRun=Process.Start(start)!;var modeOutput=modeRun.StandardError.ReadToEndAsync();
+                var modeFinished=modeRun.WaitForExit(5000);if(!modeFinished)modeRun.Kill(entireProcessTree:true);
+                Assert.True(modeFinished,$"{mode} setup timed out");
+                Assert.True(modeRun.ExitCode==0,$"{mode} setup returned {modeRun.ExitCode}: {modeOutput.GetAwaiter().GetResult()}");
+            }
+            foreach(var invalid in new[]{("bad-course","vs"),("bad-tt-count","time-trial"),("bad-battle-laps","balloon")})
+            {
+                var start=new ProcessStartInfo(exe){RedirectStandardError=true,UseShellExecute=false};
+                start.ArgumentList.Add(invalid.Item1);start.ArgumentList.Add(invalid.Item2);
+                using var invalidRun=Process.Start(start)!;var invalidOutput=invalidRun.StandardError.ReadToEndAsync();
+                var invalidFinished=invalidRun.WaitForExit(5000);if(!invalidFinished)invalidRun.Kill(entireProcessTree:true);
+                Assert.True(invalidFinished,$"{invalid.Item1} check timed out");
+                Assert.True(invalidRun.ExitCode==0,$"{invalid.Item1} returned {invalidRun.ExitCode}: {invalidOutput.GetAwaiter().GetResult()}");
             }
         }
         finally { Directory.Delete(temp, recursive:true); }

@@ -690,3 +690,26 @@ finish order, timer copying, status, memory guards and preserved registers. RNG
 and finish-notification boundaries are fixtures. All five cases and the 872
 consumer proof/compilation audit pass; this is separate from validation of
 expanded network packet formats.
+
+Direct boot also accepts `--race-mode=vs|team-vs|grand-prix|balloon|coin|time-trial`.
+Race modes default to Luigi Circuit; battles default to Delfino Pier. An explicit
+`--race=ID` must select a course of the matching kind. Team VS and battles assign
+alternating red/blue teams and set the original team flag. Time trial defaults
+to one active racer and rejects other counts; its original single-player role
+is preserved. `--race-laps` is rejected for battle modes.
+
+The round-trip driver accepts the same modes, for example:
+
+```sh
+python3 runtime/tests/boot_round_trip.py --product /path/to/product \
+  --mode team-vs --players 24 --laps 1 --timeout 300 --log /tmp/team-vs.log
+python3 runtime/tests/boot_round_trip.py --product /path/to/product \
+  --mode balloon --players 24 --timeout 600 --log /tmp/balloon.log
+```
+
+It verifies the simulated mode as well as the active field; battles do not use
+lap progress as a finish condition. Native boot checks cover all six mode
+setups and invalid mode/course/count/lap combinations. These controls enable
+mode-specific regression work; they do not certify those modes. In particular,
+the first expanded balloon-battle run stopped during object-manager creation,
+so expanded battle support remains incomplete.

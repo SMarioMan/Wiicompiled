@@ -22,6 +22,7 @@ namespace {
 constexpr std::string_view kOption = "--race";
 constexpr uint32_t kLuigiCircuit = 0x08;
 constexpr uint32_t kLastRaceCourse = 0x1F;
+constexpr uint32_t kFirstBattleCourse = 0x20, kLastBattleCourse = 0x29;
 
 // Racedata (menu scenario, copied into the race scenario by Racedata::InitRace)
 const auto& kLayout = MkwGuestLayout::kLayout;
@@ -35,7 +36,7 @@ constexpr uint32_t kFirstGcnControllerId = 0x124;
 constexpr uint32_t kSectionP1Vs = 0x20;
 
 enum : uint32_t { kPlayerRealLocal = 0, kPlayerCpu = 1, kPlayerNone = 5 };
-enum : uint32_t { kGameModeVs = 1, kCc150 = 2, kCpuHard = 2, kItemsBalanced = 0 };
+enum : uint32_t { kCc150 = 2, kCpuHard = 2, kItemsBalanced = 0 };
 
 struct Racer {
     uint32_t character;
@@ -58,7 +59,18 @@ constexpr std::array<Racer, 12> kRacers{{
     {0x16, 0x02}, // Funky Kong
 }};
 
+enum class Mode { Vs, TeamVs, GrandPrix, Balloon, Coin, TimeTrial };
+Mode g_mode = Mode::Vs;
+bool g_explicitCourse = false;
 std::optional<uint32_t> g_course;
+bool Battle() { return g_mode == Mode::Balloon || g_mode == Mode::Coin; }
+bool Teams() { return g_mode == Mode::TeamVs || Battle(); }
+uint32_t DefaultCourse() { return Battle() ? kFirstBattleCourse : kLuigiCircuit; }
+uint32_t ModeId() { return Battle() ? 3 : g_mode == Mode::GrandPrix ? 0 : g_mode == Mode::TimeTrial ? 2 : 1; }
+uint32_t Section() { return Battle() ? 0x28 : g_mode == Mode::TeamVs ? 0x24 : g_mode == Mode::GrandPrix ? 0x1e : g_mode == Mode::TimeTrial ? 0x1f : kSectionP1Vs; }
+const char* ModeName() { return Battle() ? (g_mode == Mode::Coin ? "coin battle" : "balloon battle") :
+    g_mode == Mode::TeamVs ? "team VS" : g_mode == Mode::GrandPrix ? "grand prix" : g_mode == Mode::TimeTrial ? "time trial" : "VS"; }
+
 bool g_cpuDriven = false;
 bool g_cpuMenuInput = false;
 std::optional<uint32_t> g_players;
@@ -72,8 +84,8 @@ uint32_t ParseCourse(std::string_view text) {
     }
     uint32_t course = 0;
     const auto [end, ec] = std::from_chars(text.data(), text.data() + text.size(), course, base);
-    if (text.empty() || ec != std::errc{} || end != text.data() + text.size() || course > kLastRaceCourse) {
-        throw std::invalid_argument("--race expects a race course id from 0 to 0x1F");
+    if (text.empty() || ec != std::errc{} || end != text.data() + text.size() || course > kLastBattleCourse) {
+        throw std::invalid_argument("--race expects a race course id from 0 to 0x29");
     }
     return course;
 }
@@ -119,24 +131,33 @@ void SetUpMenuScenario(uint32_t course) {
     if (racedata == 0) {
         throw std::runtime_error("--race: Racedata does not exist yet at SectionMgr::Init");
     }
+    if ((Battle() && course < kFirstBattleCourse) || (!Battle() && course > kLastRaceCourse))
+        throw std::invalid_argument("--race course must match the selected race or battle mode");
+    const uint32_t active = g_players.value_or(g_mode == Mode::TimeTrial ? 1u : kLayout.playerCapacity);
+    if (g_mode == Mode::TimeTrial && active != 1)
+        throw std::invalid_argument("Direct time-trial boot requires one active player");
+    if (Battle() && g_laps) throw std::invalid_argument("--race-laps applies to racing modes");
     const uint32_t scenario = racedata + kLayout.racedataMenu;
     for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
         const uint32_t player = scenario + kLayout.scenarioPlayers + i * kLayout.playerStride;
         Memory::Write32(player + kPlayerKartOffset, kRacers[i % kRacers.size()].kart);
         Memory::Write32(player + kPlayerCharacterOffset, kRacers[i % kRacers.size()].character);
-        Memory::Write32(player + kPlayerTypeOffset, i >= g_players.value_or(kLayout.playerCapacity)
+        Memory::Write32(player + kPlayerTypeOffset, i >= active
             ? kPlayerNone : i == 0 ? kPlayerRealLocal : kPlayerCpu);
+        Memory::Write32(player + 0xCC, Teams() ? i % 2 : 2);
     }
     const uint32_t settings = scenario + kLayout.scenarioSettings;
     Memory::Write32(settings + 0x00, course);
-    Memory::Write32(settings + 0x04, kCc150);
-    Memory::Write32(settings + 0x08, kGameModeVs);
+    Memory::Write32(settings + 0x04, Battle() ? 0 : kCc150);
+    Memory::Write32(settings + 0x08, ModeId());
     Memory::Write32(settings + 0x0C, 0);
+    Memory::Write32(settings + 0x10, g_mode == Mode::Coin ? 1 : 0);
+    Memory::Write32(settings + 0x20, 0);
     Memory::Write32(settings + 0x14, kCpuHard);
     Memory::Write32(settings + 0x18, kItemsBalanced);
     Memory::Write8(settings + 0x24, 0);
     Memory::Write8(settings + 0x25, static_cast<uint8_t>(g_laps.value_or(3)));
-    Memory::Write32(settings + 0x28, 0);
+    Memory::Write32(settings + 0x28, Teams() ? 2 : 0);
 }
 
 } // namespace
@@ -144,6 +165,18 @@ void SetUpMenuScenario(uint32_t course) {
 namespace BootRace {
 
 bool ParseArgument(std::string_view arg) {
+    if (arg.starts_with("--race-mode=")) {
+        const auto value = arg.substr(12);
+        if (value == "vs") g_mode = Mode::Vs;
+        else if (value == "team-vs") g_mode = Mode::TeamVs;
+        else if (value == "grand-prix") g_mode = Mode::GrandPrix;
+        else if (value == "balloon") g_mode = Mode::Balloon;
+        else if (value == "coin") g_mode = Mode::Coin;
+        else if (value == "time-trial") g_mode = Mode::TimeTrial;
+        else throw std::invalid_argument("--race-mode expects vs, team-vs, grand-prix, balloon, coin, or time-trial");
+        if (!g_explicitCourse) g_course = DefaultCourse();
+        return true;
+    }
     for (const auto option : {std::string_view("--race-players="), std::string_view("--race-laps=")}) {
         if (!arg.starts_with(option)) continue;
         const auto text = arg.substr(option.size());
@@ -154,14 +187,14 @@ bool ParseArgument(std::string_view arg) {
             throw std::invalid_argument(std::string(option) + " expects an integer from 1 to " + std::to_string(maximum));
         if (option == "--race-laps=") g_laps = value;
         else g_players = value;
-        if (!g_course) g_course = kLuigiCircuit;
+        if (!g_course) g_course = DefaultCourse();
         return true;
     }
     if (arg == "--race-cpu" || arg == "--race-cpu-menu-input") {
         g_cpuDriven = true;
         g_cpuMenuInput = arg == "--race-cpu-menu-input" || g_cpuMenuInput;
         if (!g_course) {
-            g_course = kLuigiCircuit;
+            g_course = DefaultCourse();
         }
         return true;
     }
@@ -170,9 +203,10 @@ bool ParseArgument(std::string_view arg) {
     }
     const std::string_view rest = arg.substr(kOption.size());
     if (rest.empty()) {
-        g_course = kLuigiCircuit;
+        g_course = DefaultCourse();
     } else if (rest.front() == '=') {
         g_course = ParseCourse(rest.substr(1));
+        g_explicitCourse = true;
     } else {
         return false;
     }
@@ -244,8 +278,8 @@ extern "C" void ArgumentParser_Parse_805b9344(CpuContext* ctx) {
         MKW_GUEST_FUNC(8061B490)(ctx);
     }
 
-    RT_LOGF("boot-race", "booting into 1P VS on course 0x%02X%s\n", *g_course, g_cpuDriven ? " (CPU driven)" : "");
-    ctx->gpr[3] = kSectionP1Vs;
+    RT_LOGF("boot-race", "booting into 1P %s on course 0x%02X%s\n", ModeName(), *g_course, g_cpuDriven ? " (CPU driven)" : "");
+    ctx->gpr[3] = Section();
 }
 REGISTER_NATIVE_FUNCTION_AS(0x805B9344, ArgumentParser_Parse_805b9344, "ArgumentParser_Parse_805b9344");
 

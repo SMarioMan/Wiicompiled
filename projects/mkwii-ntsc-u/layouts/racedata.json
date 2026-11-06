@@ -1,5 +1,5 @@
 {
-  "Version": 16,
+  "Version": 17,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -35057,6 +35057,56 @@
       "SecondaryHeap": 3212,
       "PrimarySlot": 3220,
       "SecondarySlot": 3224
+    }
+  ],
+  "AuthoredCountIndices": [
+    {
+      "Instruction": "0x8086E85C",
+      "ExpectedWord": "0x381CFFFE",
+      "Input": "r28",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8086E890",
+      "ExpectedWord": "0x381CFFFE",
+      "Input": "r28",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8086E8C4",
+      "ExpectedWord": "0x381CFFFE",
+      "Input": "r28",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8086E8F8",
+      "ExpectedWord": "0x381CFFFE",
+      "Input": "r28",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8052DBE4",
+      "ExpectedWord": "0x381FFFFE",
+      "Input": "r31",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8052DC20",
+      "ExpectedWord": "0x381FFFFE",
+      "Input": "r31",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
     }
   ]
 }

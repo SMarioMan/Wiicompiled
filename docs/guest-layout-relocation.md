@@ -901,3 +901,21 @@ The count-index unit cases check complete expanded input ranges and unsigned
 boundary values. Six generated-native cases cover five capacities and an aliased
 source/destination, checking every guest register and the condition/carry/link
 state. All six cases and the 866 default tests pass.
+
+The USA profile applies authored count indices to the four coin-manager KMG
+parameter lookups and both battle-duration table branches. KMG's parameter
+matrices contain ten arena rows and eleven columns for two through twelve
+entrants. Expanded matches use the twelve-entrant rule above that axis, retaining
+their actual racer count. `BattleRuleCountTests` executes the real duration reader
+for every arena row, both battle types and every supported active count at five
+capacities. Course-index conversion and table contents are fixtures; distinct
+column values expose accidental reads into the next arena. All five cases and
+the 933-consumer audit pass. Coin battle still exposes a separate initialization
+failure after these lookup corrections.
+
+Full playable checks on the preceding expanded profile now pass 24-player
+Grand Prix and balloon battle through finish, menus and a second advancing
+simulation, alongside the team-VS result-storage round trip. Grand Prix advances
+to its next course; balloon battle advances from Delfino Pier to Block Plaza.
+Time trial finishes with its normal single racer but its direct-boot automation
+then requests the Wii Menu, so its round-trip check remains unresolved.

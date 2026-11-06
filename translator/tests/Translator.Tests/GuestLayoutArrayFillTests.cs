@@ -201,12 +201,12 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {14,15,16})
+            foreach(var version in new[] {14,15,16,17})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0],Fill().Arrays[1] with {ValueRegister="r4"}}}}}));
-                if(version==15)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 15 or 16)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

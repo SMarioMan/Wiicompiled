@@ -92,12 +92,12 @@ public class GuestLayoutBitsetTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {12,13,14,15,16})
+            foreach(var version in new[] {12,13,14,15,16,17})
             {
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     BitsetStores=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         Base="r3",Index="r12",Unit="r10",Shift="r0",Loaded="r7",Offset="Record.finished.offset",Count="Record.finished.count"}}}));
-                if(version is 13 or 14 or 15)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 13 or 14 or 15 or 16)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

@@ -74,13 +74,13 @@ public class GuestLayoutHeapRouteTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[]{13,14,15,16})
+            foreach(var version in new[]{13,14,15,16,17})
             {
                 var site=Site();
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     HeapRoutes=new[]{new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),site.Scene,
                         site.PrimaryRegister,site.SecondaryRegister,site.ZeroRegister,site.PrimaryHeap,site.SecondaryHeap,site.PrimarySlot,site.SecondarySlot}}}));
-                if(version is 14 or 15)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 14 or 15 or 16)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

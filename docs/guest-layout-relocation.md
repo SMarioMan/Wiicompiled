@@ -787,3 +787,9 @@ identity, unused-slot, register and memory guards. All five cases and the
 903-consumer audit pass. The playable 24-player retry no longer corrupts the
 heap at this point, but exhausts the scene's 33.4 MiB MEM2 heap later during
 model setup. Expanded battle is still incomplete.
+
+Format version 16 adds explicit `floor(numerator/divisor)` symbols and permits a
+layout symbol such as `players` as a quotient's divisor. Existing plain quotients
+still require exact division; `ceil` still rounds partial groups up. This allows
+capacity-dependent resource budgets to state their rounding explicitly. Invalid,
+zero and negative divisors fail, and relocation arithmetic remains checked.

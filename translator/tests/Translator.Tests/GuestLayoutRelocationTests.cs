@@ -187,6 +187,49 @@ public class GuestLayoutRelocationTests
     }
 
     [Fact]
+    public void FloorBudgetsDivideByCapacityAndKeepExplicitRounding()
+    {
+        var types = new[] { new GuestLayoutType("Budget", 1, 23_322_624) };
+        foreach (var players in new[] { 12, 13, 24, 48, 100 })
+        {
+            var layout = new GuestLayouts(types, players);
+            Assert.Equal(23_322_624 / players, layout.Symbol("floor(Budget.size/players)"));
+            Assert.Equal((23_322_624L + players - 1) / players, layout.Symbol("ceil(Budget.size/players)"));
+        }
+        var odd = new GuestLayouts(types, 100);
+        Assert.Throws<InvalidDataException>(() => odd.Symbol("Budget.size/players"));
+        foreach (var expression in new[] { "floor(players)", "floor(players/0)", "floor(players/-1)",
+            "floor(players/unknown)", "floor(players/4", "floor(players/2/2)" })
+            Assert.Throws<InvalidDataException>(() => odd.Symbol(expression));
+    }
+
+    [Fact]
+    public void FloorBudgetRelocationsRequireTheirFormatAndPreserveOriginalEmission()
+    {
+        const uint pc = 0x80001000;
+        var types = new[] { new GuestLayoutType("Budget", 1, 23_322_624) };
+        var image = TranslatorCppTestHarness.CreateImage((pc, 0x3f6003b5), (pc+4, 0x4e800020));
+        var references = new[] { new { Instruction="0x80001000", ExpectedWord="0x3f6003b5", Node=0, Operand="value", Symbol="floor(Budget.size/players)", Scale=32 } };
+        var path = Path.GetTempFileName();
+        try
+        {
+            foreach (var version in new[] { 15, 16 })
+            {
+                File.WriteAllText(path, JsonSerializer.Serialize(new { Version=version, OriginalPlayers=12, Types=types, References=references }));
+                if (version == 15) Assert.Throws<InvalidDataException>(() => GuestLayoutRelocations.Read(path, 24));
+                else
+                {
+                    var baseline = new FunctionTranslator(image).Translate(pc).CxxCode;
+                    Assert.Equal(baseline, new FunctionTranslator(image, layoutRelocations:GuestLayoutRelocations.Read(path, 12)).Translate(pc).CxxCode);
+                    var expanded = new FunctionTranslator(image, layoutRelocations:GuestLayoutRelocations.Read(path, 24)).Translate(pc).CxxCode;
+                    Assert.Contains("31096832", expanded);
+                }
+            }
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
     public void UnrolledLoopCountRequiresAnExactCapacityMultiple()
     {
         Assert.Equal(3, new GuestLayouts(RaceTypes(), 12).Symbol("players/4"));

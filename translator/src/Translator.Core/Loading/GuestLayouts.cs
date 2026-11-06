@@ -71,16 +71,20 @@ public sealed class GuestLayouts
     {
         if (name.Contains('+'))
             return name.Split('+').Aggregate(0, (sum, term) => checked(sum + Symbol(term.Trim())));
-        if (name.Contains('/') || name.StartsWith("ceil(", StringComparison.Ordinal))
+        if (name.Contains('/') || name.StartsWith("ceil(", StringComparison.Ordinal) || name.StartsWith("floor(", StringComparison.Ordinal))
         {
             var ceiling = name.StartsWith("ceil(", StringComparison.Ordinal);
-            if (ceiling && !name.EndsWith(')')) throw new InvalidDataException($"Invalid guest ceiling expression: {name}.");
-            var quotient = (ceiling ? name[5..^1] : name).Split('/');
-            if (quotient.Length != 2 || !int.TryParse(quotient[1], out var divisor) || divisor <= 0)
+            var floor = name.StartsWith("floor(", StringComparison.Ordinal);
+            if ((ceiling || floor) && !name.EndsWith(')')) throw new InvalidDataException($"Invalid guest quotient expression: {name}.");
+            var quotient = (ceiling ? name[5..^1] : floor ? name[6..^1] : name).Split('/');
+            if (quotient.Length != 2)
                 throw new InvalidDataException($"Invalid guest layout divisor: {name}.");
+            var denominator = quotient[1].Trim();
+            var divisor = int.TryParse(denominator, out var literal) ? literal : Symbol(denominator);
+            if (divisor <= 0) throw new InvalidDataException($"Invalid guest layout divisor: {name}.");
             var dividend = Symbol(quotient[0].Trim());
             if (ceiling) return checked((int)(((long)dividend+divisor-1)/divisor));
-            if (dividend % divisor != 0)
+            if (!floor && dividend % divisor != 0)
                 throw new InvalidDataException($"Guest layout expression requires an exact quotient: {name} ({dividend}/{divisor}).");
             return dividend / divisor;
         }

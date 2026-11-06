@@ -652,3 +652,24 @@ and preserved registers. Graphics/audio boundaries and allocations are fixtures.
 The original first-position loop behavior is preserved, including its first
 rank iteration when the item user is leading. These focused checks do not
 establish complete expanded race, battle, results-menu or LAN support.
+
+With the POW/blooper migration, a private USA Luigi Circuit run with 24 active
+participants and three laps passed `boot_round_trip.py`: the finished scene
+reported all 24 participants finished, menu confirmation left the scene, and a
+second race reached stage 2/frame 304 with all 24 participants advancing. This
+supersedes the earlier item-callback and POW failures for that particular run.
+It does not verify every results row, other race modes, or an expanded LAN room.
+
+Format version 13 adds `PlayersPerElement` for grouped player storage. A
+`PerPlayer` field with `PlayersPerElement: 16` allocates `ceil(players/16)`
+elements in one contiguous array; following fields move after that complete
+array. This models participant bitsets without a separate extension allocation.
+The default is one element per player and grouping requires `PerPlayer`.
+
+Version 13 `BitsetStores` verify the complete original u16 load/shift/or/store
+span and reject partial discovery, interior entries and overlapping rewrites.
+The original load/shift/or register effects remain intact. Expanded stores use
+the audited participant index to select a u16 word and bit, preserving the
+legacy low word while retaining higher IDs. The caller must establish an index
+in `0..players-1` and a unit register containing one. Word storage must be
+initialized for its entire declared count before insertion.

@@ -36,7 +36,8 @@ public sealed partial class GuestLayoutRelocations
         IEnumerable<GuestTraversalMarker>? traversalMarkers = null,
         IEnumerable<GuestCapacityTable>? capacityTables = null,
         IEnumerable<GuestGridTable>? gridTables = null,
-        IEnumerable<GuestNormalizedRank>? normalizedRanks = null)
+        IEnumerable<GuestNormalizedRank>? normalizedRanks = null,
+        IEnumerable<GuestBitsetStore>? bitsetStores = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -71,6 +72,8 @@ public sealed partial class GuestLayoutRelocations
         ValidateGridDefinitions(sites);
         _normalizedRanks = (normalizedRanks ?? Array.Empty<GuestNormalizedRank>()).ToArray();
         ValidateNormalizedRankDefinitions(sites);
+        _bitsetStores = (bitsetStores ?? Array.Empty<GuestBitsetStore>()).ToArray();
+        ValidateBitsetDefinitions(sites);
     }
 
     public void ValidateImage(ProgramImage image)
@@ -82,6 +85,7 @@ public sealed partial class GuestLayoutRelocations
         ValidateCapacityTables(image);
         ValidateGridTables(image);
         ValidateNormalizedRanks(image);
+        ValidateBitsets(image);
         ValidateRankTables(image);
         ValidateBoundedAccesses(image);
         foreach (var (address, sites) in _references)
@@ -113,6 +117,8 @@ public sealed partial class GuestLayoutRelocations
         GridTables = _gridTables.Select(table => new {
             Address = $"0x{table.Address:X8}", ExpectedHex = Convert.ToHexString(table.ExpectedValues), table.AdvanceRows,
             Policy = "repeat terminal lateral pattern; advance terminal row pattern", table.Lookups }),
+        BitsetStores = _bitsetStores.Select(site => new { Begin=$"0x{site.Begin:X8}",
+            ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"), site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count }),
         NormalizedRanks = _normalizedRanks.Select(site => new {
             Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
             site.Register, site.Count, site.SourceCount, TargetCount = _expanded.Symbol(site.Count),
@@ -153,6 +159,8 @@ public sealed partial class GuestLayoutRelocations
 
     public IReadOnlyList<IrInstruction> Apply(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
+        var bitsetReplacement = ApplyBitsetStore(origin, instructions);
+        if (bitsetReplacement is not null) return bitsetReplacement;
         var normalizedRankReplacement = ApplyNormalizedRank(origin, instructions);
         if (normalizedRankReplacement is not null) return normalizedRankReplacement;
         var gridReplacement = ApplyGridLookup(origin, instructions);
@@ -223,7 +231,7 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13)) throw new InvalidDataException("Unsupported guest layout format.");
         if (file.Version == 1 && file.ArrayCopies is { Length: > 0 })
             throw new InvalidDataException("Guest array-copy rewrites require layout format version 2.");
         if (file.Version < 3 && file.RankTables is { Length: > 0 })
@@ -254,6 +262,9 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Normalized rank indices require layout format version 12.");
         if (file.Version < 12 && file.ArrayFills?.Any(fill => fill.Copies is { Length: > 0 }) == true)
             throw new InvalidDataException("Array-fill register copies require layout format version 12.");
+        if (file.Version < 13 && (file.BitsetStores is { Length: > 0 } ||
+            file.Types.Any(type => type.Fields?.Any(field => field.PlayersPerElement != 1) == true)))
+            throw new InvalidDataException("Grouped player storage and bitset stores require layout format version 13.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
                 r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
@@ -278,7 +289,9 @@ public sealed partial class GuestLayoutRelocations
             file.GridTables?.Select(table => new GuestGridTable(Hex(table.Address), Convert.FromHexString(table.ExpectedHex), table.AdvanceRows,
                 table.Lookups.Select(site => new GuestGridLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
                     site.Base, site.Index, site.Destination, site.CountOffset, site.Position)).ToArray())),
-            file.NormalizedRanks?.Select(site => new GuestNormalizedRank(Hex(site.Instruction), Hex(site.ExpectedWord), site.Register, site.Count, site.SourceCount)))
+            file.NormalizedRanks?.Select(site => new GuestNormalizedRank(Hex(site.Instruction), Hex(site.ExpectedWord), site.Register, site.Count, site.SourceCount)),
+            file.BitsetStores?.Select(site => new GuestBitsetStore(Hex(site.Begin), site.ExpectedWords.Select(Hex).ToArray(),
+                site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -286,7 +299,8 @@ public sealed partial class GuestLayoutRelocations
         ? value.AsSpan(2) : value.AsSpan(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
     private sealed record LayoutFile(int Version, int OriginalPlayers, GuestLayoutType[] Types,
         ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null,
-        BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null, TraversalMarkerFile[]? TraversalMarkers = null, CapacityTableFile[]? CapacityTables = null, GridTableFile[]? GridTables = null, NormalizedRankFile[]? NormalizedRanks = null);
+        BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null, TraversalMarkerFile[]? TraversalMarkers = null, CapacityTableFile[]? CapacityTables = null, GridTableFile[]? GridTables = null, NormalizedRankFile[]? NormalizedRanks = null, BitsetStoreFile[]? BitsetStores = null);
+    private sealed record BitsetStoreFile(string Begin, string[] ExpectedWords, string Base, string Index, string Unit, string Shift, string Loaded, string Offset, string Count);
     private sealed record NormalizedRankFile(string Instruction, string ExpectedWord, string Register, string Count, int SourceCount);
     private sealed record GridTableFile(string Address, string ExpectedHex, bool AdvanceRows, GridLookupFile[] Lookups);
     private sealed record GridLookupFile(string Instruction, string ExpectedWord, string Base, string Index, string Destination, string CountOffset, string? Position = null);

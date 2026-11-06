@@ -125,6 +125,7 @@ public sealed partial class GuestLayoutRelocations
     {
         ValidateFillControlFlow(instructions, blocks);
         ValidateMarkerControlFlow(instructions, blocks);
+        ValidateBitsetControlFlow(instructions, blocks);
         foreach (var copy in _arrayCopies)
         {
             var end = CopyEnd(copy);

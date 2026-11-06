@@ -1203,6 +1203,202 @@
           "Type": "Pointer"
         }
       ]
+    },
+    {
+      "Name": "BattleCoinEvents",
+      "Size": 8756,
+      "Alignment": 4
+    },
+    {
+      "Name": "BattleCoinConfig",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "BattleCoinEntryHeader",
+      "Alignment": 1,
+      "Size": 15
+    },
+    {
+      "Name": "BattleCoinEntry",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "BattleCoinEntryHeader"
+        },
+        {
+          "Name": "playerFlags",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "InputByte"
+        }
+      ]
+    },
+    {
+      "Name": "BattleCoinPosition",
+      "Alignment": 4,
+      "Size": 20
+    },
+    {
+      "Name": "BattleCoinManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "BattleCoinConfig"
+        },
+        {
+          "Name": "coins",
+          "Type": "BattleCoinEntry",
+          "Count": 100
+        },
+        {
+          "Name": "positionCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "positions",
+          "Type": "BattleCoinPosition",
+          "Count": 255
+        },
+        {
+          "Name": "active",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "eligibleCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "eligibleIds",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "eligibleIndices",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "rankIds",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "ownedCounts",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "playerWords",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "playerStates",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "previousStates",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "changed",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "playerEffects",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "localCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "localEffects",
+          "Type": "Pointer",
+          "Count": 4
+        },
+        {
+          "Name": "packet",
+          "Type": "InputByte",
+          "Count": 255
+        },
+        {
+          "Name": "packetSize",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "packetCapacity",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "playerScores",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "events",
+          "Type": "BattleCoinEvents"
+        },
+        {
+          "Name": "playerEventWords",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "playerEventStates",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "state",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "playerEventFlags",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "pending",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "packetCursor",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "packetPosition",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "mode",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "flags",
+          "Type": "InputByte",
+          "Count": 4
+        },
+        {
+          "Name": "effect",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "timers",
+          "Type": "Pointer",
+          "PerPlayer": true
+        }
+      ]
     }
   ],
   "References": [
@@ -28390,6 +28586,5242 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x80538924",
+      "ExpectedWord": "0x38861FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538934",
+      "ExpectedWord": "0x80A620B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetSize.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E73C",
+      "ExpectedWord": "0x387F0B00",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E7AC",
+      "ExpectedWord": "0x38630B00",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E7C8",
+      "ExpectedWord": "0x981D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E7D4",
+      "ExpectedWord": "0x981D1FA4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E7E0",
+      "ExpectedWord": "0x909D4378",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.mode.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E848",
+      "ExpectedWord": "0x8B9D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E86C",
+      "ExpectedWord": "0x8B9D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E8A0",
+      "ExpectedWord": "0x8B9D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E8D4",
+      "ExpectedWord": "0x8B9D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E9B8",
+      "ExpectedWord": "0x987D437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E9C8",
+      "ExpectedWord": "0x881D437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E9D0",
+      "ExpectedWord": "0x989D4360",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E9E8",
+      "ExpectedWord": "0x907D20F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086E9F4",
+      "ExpectedWord": "0x981D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA00",
+      "ExpectedWord": "0x881D437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA2C",
+      "ExpectedWord": "0x889D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA3C",
+      "ExpectedWord": "0x981D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA44",
+      "ExpectedWord": "0x881D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA54",
+      "ExpectedWord": "0x881D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA64",
+      "ExpectedWord": "0x981D437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA70",
+      "ExpectedWord": "0x889D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EA80",
+      "ExpectedWord": "0x881D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EAB0",
+      "ExpectedWord": "0x88BD1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EAC4",
+      "ExpectedWord": "0x881D437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EAF0",
+      "ExpectedWord": "0x981D437F",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EAFC",
+      "ExpectedWord": "0x981D2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB08",
+      "ExpectedWord": "0x887D1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB0C",
+      "ExpectedWord": "0x889D2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB1C",
+      "ExpectedWord": "0x981D2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB30",
+      "ExpectedWord": "0x981D2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB34",
+      "ExpectedWord": "0x881D437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB50",
+      "ExpectedWord": "0x907D20BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCapacity.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB5C",
+      "ExpectedWord": "0x989D0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EB60",
+      "ExpectedWord": "0x989D437C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EC60",
+      "ExpectedWord": "0x90831F74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EC64",
+      "ExpectedWord": "0x881D1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EC8C",
+      "ExpectedWord": "0x90831FA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EC90",
+      "ExpectedWord": "0x881D1FA4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EDF4",
+      "ExpectedWord": "0x80034378",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.mode.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EE54",
+      "ExpectedWord": "0x80034378",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.mode.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF04",
+      "ExpectedWord": "0x88030AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF38",
+      "ExpectedWord": "0xD0470B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF40",
+      "ExpectedWord": "0xD0270B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF44",
+      "ExpectedWord": "0xD0070B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF48",
+      "ExpectedWord": "0x91070B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF4C",
+      "ExpectedWord": "0x98C70B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF50",
+      "ExpectedWord": "0x98A70B11",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF54",
+      "ExpectedWord": "0x88A30AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EF64",
+      "ExpectedWord": "0x98A30AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086EFAC",
+      "ExpectedWord": "0x98E50B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F014",
+      "ExpectedWord": "0x88831EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F01C",
+      "ExpectedWord": "0x88831EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F030",
+      "ExpectedWord": "0x88A31EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F0D8",
+      "ExpectedWord": "0x8803437C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F1A4",
+      "ExpectedWord": "0x90641F74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F1BC",
+      "ExpectedWord": "0x881F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F23C",
+      "ExpectedWord": "0x90641FA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F254",
+      "ExpectedWord": "0x881F1FA4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F26C",
+      "ExpectedWord": "0x981F437C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F2A8",
+      "ExpectedWord": "0x8803437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F2FC",
+      "ExpectedWord": "0x88980AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F358",
+      "ExpectedWord": "0x9B230B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F360",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F38C",
+      "ExpectedWord": "0x9B230B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F39C",
+      "ExpectedWord": "0x9B230B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F464",
+      "ExpectedWord": "0x98D820F9",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 9,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F474",
+      "ExpectedWord": "0x98F820F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F480",
+      "ExpectedWord": "0x90F820FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F488",
+      "ExpectedWord": "0x90F84314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F490",
+      "ExpectedWord": "0x90F84318",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8744,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F498",
+      "ExpectedWord": "0x90F8431C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8748,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F49C",
+      "ExpectedWord": "0x90F84320",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8752,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F4A4",
+      "ExpectedWord": "0x88D8437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F4CC",
+      "ExpectedWord": "0x90034324",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F4D8",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F4EC",
+      "ExpectedWord": "0x9818436D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.pending.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F508",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F550",
+      "ExpectedWord": "0x88981EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F560",
+      "ExpectedWord": "0x88982108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F56C",
+      "ExpectedWord": "0x88B8437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F574",
+      "ExpectedWord": "0x90D82100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F584",
+      "ExpectedWord": "0x98182109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 25,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F5AC",
+      "ExpectedWord": "0x88981EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F5B4",
+      "ExpectedWord": "0x80182100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F5BC",
+      "ExpectedWord": "0x90D8210C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F5C8",
+      "ExpectedWord": "0x90182104",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F66C",
+      "ExpectedWord": "0x88982109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 25,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F6C8",
+      "ExpectedWord": "0x8018210C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F6D0",
+      "ExpectedWord": "0x90D84370",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCursor.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F6DC",
+      "ExpectedWord": "0x90182110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F6E0",
+      "ExpectedWord": "0x90984374",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetPosition.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F6F4",
+      "ExpectedWord": "0x801820BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCapacity.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F704",
+      "ExpectedWord": "0x901820B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetSize.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F754",
+      "ExpectedWord": "0x80631F74",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F774",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F794",
+      "ExpectedWord": "0x80631FA8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localEffects.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F7B4",
+      "ExpectedWord": "0x88181FA4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.localCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F7E4",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F810",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F83C",
+      "ExpectedWord": "0x90184380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F870",
+      "ExpectedWord": "0x90184380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F87C",
+      "ExpectedWord": "0x90184380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F884",
+      "ExpectedWord": "0x93B820F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8B0",
+      "ExpectedWord": "0x8818437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8C0",
+      "ExpectedWord": "0x88180AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8D4",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8E0",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8EC",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F8F4",
+      "ExpectedWord": "0x801820F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F904",
+      "ExpectedWord": "0x88781EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9A8",
+      "ExpectedWord": "0x9BF8210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9BC",
+      "ExpectedWord": "0x9BE40B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9C0",
+      "ExpectedWord": "0x80040B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9CC",
+      "ExpectedWord": "0x80640B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9D4",
+      "ExpectedWord": "0x80040B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9EC",
+      "ExpectedWord": "0x80040B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086F9F8",
+      "ExpectedWord": "0x80984380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA0C",
+      "ExpectedWord": "0x80640B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA14",
+      "ExpectedWord": "0x80040B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA2C",
+      "ExpectedWord": "0x80040B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA38",
+      "ExpectedWord": "0x80984380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA4C",
+      "ExpectedWord": "0x80640B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA54",
+      "ExpectedWord": "0x80040B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA68",
+      "ExpectedWord": "0x80040B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA74",
+      "ExpectedWord": "0x80984380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA80",
+      "ExpectedWord": "0x80640B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA88",
+      "ExpectedWord": "0x80040B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FA9C",
+      "ExpectedWord": "0x80040B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FAA8",
+      "ExpectedWord": "0x80984380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FAB0",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FABC",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FAC4",
+      "ExpectedWord": "0x80184380",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.effect.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FAD4",
+      "ExpectedWord": "0x88781EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FB78",
+      "ExpectedWord": "0x9BF8210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FB94",
+      "ExpectedWord": "0x9818210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FB9C",
+      "ExpectedWord": "0x9818436D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.pending.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FBBC",
+      "ExpectedWord": "0x90831F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FBC0",
+      "ExpectedWord": "0x88181EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FBE8",
+      "ExpectedWord": "0x908320C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FBEC",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FC10",
+      "ExpectedWord": "0x88981EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FCA4",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FCC0",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FD40",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FD50",
+      "ExpectedWord": "0x8818437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FD84",
+      "ExpectedWord": "0x90834384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.timers.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FD88",
+      "ExpectedWord": "0x88181EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FFB0",
+      "ExpectedWord": "0x8803437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FFC8",
+      "ExpectedWord": "0x8803437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FFCC",
+      "ExpectedWord": "0x83432100",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8086FFEC",
+      "ExpectedWord": "0x800320F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870018",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870040",
+      "ExpectedWord": "0x800320F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087006C",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870090",
+      "ExpectedWord": "0x881C20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808700BC",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808700C8",
+      "ExpectedWord": "0x881C437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808700EC",
+      "ExpectedWord": "0x801C20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870118",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087013C",
+      "ExpectedWord": "0x801C20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870168",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870174",
+      "ExpectedWord": "0x881C210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870178",
+      "ExpectedWord": "0x907C2104",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870180",
+      "ExpectedWord": "0x835C210C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808701A0",
+      "ExpectedWord": "0x889C1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808701D0",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808701DC",
+      "ExpectedWord": "0x889C1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870234",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870248",
+      "ExpectedWord": "0x889C1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808702E4",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808702F8",
+      "ExpectedWord": "0x881C1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870320",
+      "ExpectedWord": "0x889C2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870350",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087035C",
+      "ExpectedWord": "0x88DC2109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 25,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870378",
+      "ExpectedWord": "0x891C2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087038C",
+      "ExpectedWord": "0x881C2108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870390",
+      "ExpectedWord": "0x895C1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808703B8",
+      "ExpectedWord": "0x881C1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870408",
+      "ExpectedWord": "0x881C2109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 25,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870460",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870474",
+      "ExpectedWord": "0x881C2109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 25,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870484",
+      "ExpectedWord": "0x807C210C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087048C",
+      "ExpectedWord": "0x981C210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870494",
+      "ExpectedWord": "0x901C2110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870498",
+      "ExpectedWord": "0x881C436D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.pending.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087049C",
+      "ExpectedWord": "0x83DC4370",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCursor.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808704A8",
+      "ExpectedWord": "0x881C1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808704D8",
+      "ExpectedWord": "0x80034324",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870504",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870518",
+      "ExpectedWord": "0x881C1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870528",
+      "ExpectedWord": "0x809C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870530",
+      "ExpectedWord": "0x801C4318",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8744,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870574",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870598",
+      "ExpectedWord": "0x801C431C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8748,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808705C4",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808705D0",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870614",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870620",
+      "ExpectedWord": "0x881C437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870630",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870674",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870688",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808706CC",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808706DC",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870734",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870740",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087076C",
+      "ExpectedWord": "0x809C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808707B0",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808707D0",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808707FC",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087081C",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087083C",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870864",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870870",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808708A0",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808708C0",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808708E8",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870940",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087099C",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808709A8",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808709D4",
+      "ExpectedWord": "0x809C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870A18",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870A38",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870A84",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870AE0",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870AEC",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870B34",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870B40",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870B98",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870BF4",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870C50",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870C5C",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870CA8",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870CC0",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870D00",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870D0C",
+      "ExpectedWord": "0x881C0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870D1C",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870D68",
+      "ExpectedWord": "0x38BC1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870D7C",
+      "ExpectedWord": "0x801C4314",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8740,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870DB4",
+      "ExpectedWord": "0x389C1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E08",
+      "ExpectedWord": "0x389C1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E24",
+      "ExpectedWord": "0x389C1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E38",
+      "ExpectedWord": "0x807C4370",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCursor.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E40",
+      "ExpectedWord": "0x981C436D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.pending.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E48",
+      "ExpectedWord": "0x901C4374",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetPosition.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E4C",
+      "ExpectedWord": "0x809C2104",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E50",
+      "ExpectedWord": "0x801C2110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E54",
+      "ExpectedWord": "0x807C4374",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetPosition.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80870E70",
+      "ExpectedWord": "0x901C20B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetSize.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808717B4",
+      "ExpectedWord": "0x88031EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808717E4",
+      "ExpectedWord": "0x88031EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871814",
+      "ExpectedWord": "0x880F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871830",
+      "ExpectedWord": "0x386F1FB8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinManager.packet.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871834",
+      "ExpectedWord": "0x800F20B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetSize.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871894",
+      "ExpectedWord": "0x800F20BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packetCapacity.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808718D8",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871920",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808719C8",
+      "ExpectedWord": "0x800320C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808719DC",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871A70",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B00",
+      "ExpectedWord": "0x886F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B10",
+      "ExpectedWord": "0x980F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B24",
+      "ExpectedWord": "0x886F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B40",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B54",
+      "ExpectedWord": "0x9AC30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B60",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B6C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B74",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871B84",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C28",
+      "ExpectedWord": "0x9AAF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C40",
+      "ExpectedWord": "0x886F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C48",
+      "ExpectedWord": "0x980F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C4C",
+      "ExpectedWord": "0x880F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C58",
+      "ExpectedWord": "0x92EF20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C5C",
+      "ExpectedWord": "0x880F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C68",
+      "ExpectedWord": "0x800F20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C80",
+      "ExpectedWord": "0x886F20F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871C98",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871CB8",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871CC8",
+      "ExpectedWord": "0x800F20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871CD8",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871CE8",
+      "ExpectedWord": "0x80E30B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D08",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D10",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D28",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D44",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D4C",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D64",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D80",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D88",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871D9C",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871DB0",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871DB8",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871DD0",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871DEC",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871DF4",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871E0C",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871E1C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871E28",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871E3C",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871EE0",
+      "ExpectedWord": "0x9AAF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871EF8",
+      "ExpectedWord": "0x926F20FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80871F00",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872030",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808720A8",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808721B4",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087221C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808723A4",
+      "ExpectedWord": "0x88CF1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087242C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872448",
+      "ExpectedWord": "0x88AF1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087251C",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087257C",
+      "ExpectedWord": "0x880F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808725D0",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872654",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872688",
+      "ExpectedWord": "0x886F437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726A0",
+      "ExpectedWord": "0x806320C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726CC",
+      "ExpectedWord": "0x886F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726E0",
+      "ExpectedWord": "0x808F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726E8",
+      "ExpectedWord": "0x80651F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726F8",
+      "ExpectedWord": "0x90851F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808726FC",
+      "ExpectedWord": "0x806F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872708",
+      "ExpectedWord": "0x90851F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872714",
+      "ExpectedWord": "0x886F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872728",
+      "ExpectedWord": "0x9AE30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872734",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872748",
+      "ExpectedWord": "0x880F437E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087275C",
+      "ExpectedWord": "0x800320C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087279C",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808727AC",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872880",
+      "ExpectedWord": "0x9A8F210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872890",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728A0",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728B4",
+      "ExpectedWord": "0x9AE30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728C0",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728CC",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728D4",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808728E4",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872988",
+      "ExpectedWord": "0x9A8F210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872A20",
+      "ExpectedWord": "0x80A620C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872A24",
+      "ExpectedWord": "0x80664384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.timers.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872A34",
+      "ExpectedWord": "0x90A64384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.timers.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872A44",
+      "ExpectedWord": "0x908320C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerScores.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872A58",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872C58",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872C78",
+      "ExpectedWord": "0x80AF431C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 8748,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872CC0",
+      "ExpectedWord": "0x880F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872D8C",
+      "ExpectedWord": "0x80044324",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80872DD8",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808730A0",
+      "ExpectedWord": "0x888F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808730BC",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087314C",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873168",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808731B0",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808731BC",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808731D0",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873274",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873280",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873294",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808732A0",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808732AC",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808732C0",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873364",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873478",
+      "ExpectedWord": "0x880F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087349C",
+      "ExpectedWord": "0x808F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808734A8",
+      "ExpectedWord": "0x80651F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808734BC",
+      "ExpectedWord": "0x90051F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808734C8",
+      "ExpectedWord": "0x90851F20",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808734E4",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873504",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873508",
+      "ExpectedWord": "0x880F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087351C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873528",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873530",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873540",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808735F0",
+      "ExpectedWord": "0x80CF20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873614",
+      "ExpectedWord": "0x880F1EED",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087362C",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087363C",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808736E0",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808737C8",
+      "ExpectedWord": "0x88CF1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087384C",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873860",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808738A4",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808738B0",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808738B8",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808738C8",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087396C",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873970",
+      "ExpectedWord": "0x888F437D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.flags.offset+BattleCoinManager.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873980",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808739BC",
+      "ExpectedWord": "0x9BE30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808739C0",
+      "ExpectedWord": "0x80AF20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808739C4",
+      "ExpectedWord": "0x80C30B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808739E0",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808739E8",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A00",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A1C",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A24",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A3C",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A58",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A60",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A74",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A88",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873A90",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873AA8",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873AB8",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873AC4",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873AD8",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873B7C",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873B88",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873B9C",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873BA8",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873BB4",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873BC8",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873C6C",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873CB4",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873CD8",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873CE8",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873CF4",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873D08",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873DAC",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873E48",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873E88",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873E94",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873E9C",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873EA8",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873EB0",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80873F54",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874000",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087404C",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874104",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874118",
+      "ExpectedWord": "0x9BA30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087411C",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874130",
+      "ExpectedWord": "0x9BE30B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087413C",
+      "ExpectedWord": "0x80030B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874148",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874150",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087416C",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874188",
+      "ExpectedWord": "0x81230B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874190",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808741AC",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808741C8",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808741D0",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808741E8",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808741FC",
+      "ExpectedWord": "0x81030B00",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874204",
+      "ExpectedWord": "0x80030B04",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087421C",
+      "ExpectedWord": "0x80030B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positions.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087422C",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874238",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087424C",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808742F0",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x808743D0",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087443C",
+      "ExpectedWord": "0x808F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874444",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874450",
+      "ExpectedWord": "0x880F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874458",
+      "ExpectedWord": "0x800F20F4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874464",
+      "ExpectedWord": "0x880F0AFC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.positionCount.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8087446C",
+      "ExpectedWord": "0x888F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874510",
+      "ExpectedWord": "0x9BEF210A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 26,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874534",
+      "ExpectedWord": "0x92A34324",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventWords.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874544",
+      "ExpectedWord": "0x9BEF436D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.pending.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80874554",
+      "ExpectedWord": "0x886F1EEC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.active.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80534D2C",
+      "ExpectedWord": "0x88061F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x80534F90",
+      "ExpectedWord": "0x88A51F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x805389A0",
+      "ExpectedWord": "0x88051F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x8057DD90",
+      "ExpectedWord": "0x98A31F68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.changed.offset"
+    },
+    {
+      "Instruction": "0x80585B70",
+      "ExpectedWord": "0x98A31F68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.changed.offset"
+    },
+    {
+      "Instruction": "0x807AEB04",
+      "ExpectedWord": "0x88A51F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x807AEB24",
+      "ExpectedWord": "0x88631F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x8086E6E8",
+      "ExpectedWord": "0x386043B4",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "BattleCoinManager.size"
+    },
+    {
+      "Instruction": "0x8086EA38",
+      "ExpectedWord": "0x98C31EEE",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIds.offset"
+    },
+    {
+      "Instruction": "0x8086EA7C",
+      "ExpectedWord": "0x98831EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x8086EAA0",
+      "ExpectedWord": "0x88031EEE",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIds.offset"
+    },
+    {
+      "Instruction": "0x8086EAA8",
+      "ExpectedWord": "0x98831EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x8086EB70",
+      "ExpectedWord": "0x1C60001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EB80",
+      "ExpectedWord": "0x9085000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset"
+    },
+    {
+      "Instruction": "0x8086EB84",
+      "ExpectedWord": "0x1C60001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EB8C",
+      "ExpectedWord": "0x90850028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EB94",
+      "ExpectedWord": "0x90850044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EB98",
+      "ExpectedWord": "0x90850060",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EB9C",
+      "ExpectedWord": "0x9085007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBA0",
+      "ExpectedWord": "0x90850098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBA4",
+      "ExpectedWord": "0x908500B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBA8",
+      "ExpectedWord": "0x908500D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBB0",
+      "ExpectedWord": "0x1C60001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBB8",
+      "ExpectedWord": "0x9085000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset"
+    },
+    {
+      "Instruction": "0x8086EBC0",
+      "ExpectedWord": "0x90850028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBC4",
+      "ExpectedWord": "0x90850044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBC8",
+      "ExpectedWord": "0x90850060",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBCC",
+      "ExpectedWord": "0x9085007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBD0",
+      "ExpectedWord": "0x90850098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBD4",
+      "ExpectedWord": "0x908500B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBD8",
+      "ExpectedWord": "0x908500D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBE0",
+      "ExpectedWord": "0x1C60001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBE8",
+      "ExpectedWord": "0x9085000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset"
+    },
+    {
+      "Instruction": "0x8086EBEC",
+      "ExpectedWord": "0x90850028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBF0",
+      "ExpectedWord": "0x90850044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBF4",
+      "ExpectedWord": "0x90850060",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBF8",
+      "ExpectedWord": "0x9085007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EBFC",
+      "ExpectedWord": "0x90850098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC00",
+      "ExpectedWord": "0x908500B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC04",
+      "ExpectedWord": "0x908500D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC0C",
+      "ExpectedWord": "0x9085000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset"
+    },
+    {
+      "Instruction": "0x8086EC10",
+      "ExpectedWord": "0x90850028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC14",
+      "ExpectedWord": "0x90850044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC18",
+      "ExpectedWord": "0x90850060",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC1C",
+      "ExpectedWord": "0x9085007C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC20",
+      "ExpectedWord": "0x90850098",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC24",
+      "ExpectedWord": "0x908500B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC28",
+      "ExpectedWord": "0x908500D0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC30",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC40",
+      "ExpectedWord": "0x9083000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset"
+    },
+    {
+      "Instruction": "0x8086EC44",
+      "ExpectedWord": "0x90830028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC48",
+      "ExpectedWord": "0x90830044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EC4C",
+      "ExpectedWord": "0x90830060",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.coins.offset+BattleCoinEntry.size+BattleCoinEntry.size+BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EF7C",
+      "ExpectedWord": "0x1CA5001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EFA4",
+      "ExpectedWord": "0x1D05001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086EFFC",
+      "ExpectedWord": "0x1D26001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F114",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F2DC",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F318",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F36C",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F3D8",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F428",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F494",
+      "ExpectedWord": "0x90E32114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8086F4D0",
+      "ExpectedWord": "0x98864354",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventStates.offset"
+    },
+    {
+      "Instruction": "0x8086F4D4",
+      "ExpectedWord": "0x98E64361",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventFlags.offset"
+    },
+    {
+      "Instruction": "0x8086F500",
+      "ExpectedWord": "0x98831F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8086F53C",
+      "ExpectedWord": "0x88031F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8086F540",
+      "ExpectedWord": "0x88851F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8086F548",
+      "ExpectedWord": "0x98051F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8086F54C",
+      "ExpectedWord": "0x98831F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8086F6F0",
+      "ExpectedWord": "0x98831FB8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.packet.offset"
+    },
+    {
+      "Instruction": "0x8086F714",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086F7E0",
+      "ExpectedWord": "0x98831F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x8086F80C",
+      "ExpectedWord": "0x98831F5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.previousStates.offset"
+    },
+    {
+      "Instruction": "0x8086F89C",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086FC14",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086FCA0",
+      "ExpectedWord": "0x98831F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x8086FCC4",
+      "ExpectedWord": "0x1C63001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086FD04",
+      "ExpectedWord": "0x88641F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x8086FD0C",
+      "ExpectedWord": "0x98041F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x8086FD3C",
+      "ExpectedWord": "0x98831F68",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.changed.offset"
+    },
+    {
+      "Instruction": "0x80870208",
+      "ExpectedWord": "0x88031EEE",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIds.offset"
+    },
+    {
+      "Instruction": "0x80870280",
+      "ExpectedWord": "0x88A31EEE",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIds.offset"
+    },
+    {
+      "Instruction": "0x80870288",
+      "ExpectedWord": "0x88031F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808703B4",
+      "ExpectedWord": "0x1C63001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x808703D0",
+      "ExpectedWord": "0x8B431EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x808705EC",
+      "ExpectedWord": "0x80042114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8087064C",
+      "ExpectedWord": "0x80042118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 40
+    },
+    {
+      "Instruction": "0x808706A4",
+      "ExpectedWord": "0x80042118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 40
+    },
+    {
+      "Instruction": "0x808706E8",
+      "ExpectedWord": "0x80042114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 36
+    },
+    {
+      "Instruction": "0x8087070C",
+      "ExpectedWord": "0x88042134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 68
+    },
+    {
+      "Instruction": "0x80870754",
+      "ExpectedWord": "0x8B232134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 68
+    },
+    {
+      "Instruction": "0x80870788",
+      "ExpectedWord": "0x88042135",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 69
+    },
+    {
+      "Instruction": "0x80870910",
+      "ExpectedWord": "0x8883212C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 60
+    },
+    {
+      "Instruction": "0x80870974",
+      "ExpectedWord": "0x88042124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x808709BC",
+      "ExpectedWord": "0x8B232124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x808709F0",
+      "ExpectedWord": "0x88042125",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 53
+    },
+    {
+      "Instruction": "0x80870A5C",
+      "ExpectedWord": "0x8804211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80870AB8",
+      "ExpectedWord": "0x8804211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80870B0C",
+      "ExpectedWord": "0x8804211D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 45
+    },
+    {
+      "Instruction": "0x80870B68",
+      "ExpectedWord": "0x8884211E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 46
+    },
+    {
+      "Instruction": "0x80870BC8",
+      "ExpectedWord": "0x8804211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80870C24",
+      "ExpectedWord": "0x8804211C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 44
+    },
+    {
+      "Instruction": "0x80870C78",
+      "ExpectedWord": "0x8B24211E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 46
+    },
+    {
+      "Instruction": "0x80870CD8",
+      "ExpectedWord": "0x8B24211D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 45
+    },
+    {
+      "Instruction": "0x80870D40",
+      "ExpectedWord": "0x80042120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.events.offset",
+      "Addend": 48
+    },
+    {
+      "Instruction": "0x808717D4",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8087181C",
+      "ExpectedWord": "0x88701EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x808718C4",
+      "ExpectedWord": "0x88101F5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.previousStates.offset"
+    },
+    {
+      "Instruction": "0x80871B28",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80871C84",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80872184",
+      "ExpectedWord": "0x88651F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x8087219C",
+      "ExpectedWord": "0x9A851F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808721EC",
+      "ExpectedWord": "0x88041F5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.previousStates.offset"
+    },
+    {
+      "Instruction": "0x80872214",
+      "ExpectedWord": "0x9A041F5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.previousStates.offset"
+    },
+    {
+      "Instruction": "0x808723A0",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x808723C4",
+      "ExpectedWord": "0x88041F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808723D4",
+      "ExpectedWord": "0x88041F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808723F0",
+      "ExpectedWord": "0x88871F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808723F4",
+      "ExpectedWord": "0x88061F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x80872400",
+      "ExpectedWord": "0x88871F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x80872404",
+      "ExpectedWord": "0x88061F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x8087244C",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80872498",
+      "ExpectedWord": "0x88031F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808724A8",
+      "ExpectedWord": "0x88031F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808724C4",
+      "ExpectedWord": "0x88661F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808724C8",
+      "ExpectedWord": "0x88051F50",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerStates.offset"
+    },
+    {
+      "Instruction": "0x808724D4",
+      "ExpectedWord": "0x88661F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x808724D8",
+      "ExpectedWord": "0x88051F06",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.rankIds.offset"
+    },
+    {
+      "Instruction": "0x80872520",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80872580",
+      "ExpectedWord": "0x88841EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x808726D0",
+      "ExpectedWord": "0x88841EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x80872C80",
+      "ExpectedWord": "0x88031EEE",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIds.offset"
+    },
+    {
+      "Instruction": "0x80872CAC",
+      "ExpectedWord": "0x9BE34354",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventStates.offset"
+    },
+    {
+      "Instruction": "0x80872D30",
+      "ExpectedWord": "0x98834361",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.playerEventFlags.offset"
+    },
+    {
+      "Instruction": "0x808730B8",
+      "ExpectedWord": "0x1C74001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x808730D8",
+      "ExpectedWord": "0x1C14001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80873148",
+      "ExpectedWord": "0x1C74001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80873484",
+      "ExpectedWord": "0x8A441EFA",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.eligibleIndices.offset"
+    },
+    {
+      "Instruction": "0x808734E8",
+      "ExpectedWord": "0x1C63001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x808737C0",
+      "ExpectedWord": "0x1C13001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80873CB8",
+      "ExpectedWord": "0x1C84001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80873E44",
+      "ExpectedWord": "0x1C13001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80874088",
+      "ExpectedWord": "0x88051F5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.previousStates.offset"
+    },
+    {
+      "Instruction": "0x808740A4",
+      "ExpectedWord": "0x1C13001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x808743BC",
+      "ExpectedWord": "0x1C13001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x80883BA0",
+      "ExpectedWord": "0x88041F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x80884890",
+      "ExpectedWord": "0x88E31F12",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattleCoinManager.ownedCounts.offset"
+    },
+    {
+      "Instruction": "0x80726B84",
+      "ExpectedWord": "0x1C03001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8073F2BC",
+      "ExpectedWord": "0x1C00001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
+    },
+    {
+      "Instruction": "0x8086E000",
+      "ExpectedWord": "0x1C03001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattleCoinEntry.size"
     }
   ],
   "GlobalPointers": {
@@ -28402,7 +33834,8 @@
     "0x809BF798": "PowManager",
     "0x809BF790": "GessoManager",
     "0x809B8F70": "Raceinfo",
-    "0x809BFF98": "BattleBalloonManager"
+    "0x809BFF98": "BattleBalloonManager",
+    "0x809C014C": "BattleCoinManager"
   },
   "ArrayCopies": [
     {
@@ -32411,22 +37844,22 @@
     },
     {
       "Entry": "0x8086E778",
-      "Receiver": null,
+      "Receiver": "BattleCoinManager",
       "Name": ""
     },
     {
       "Entry": "0x8086ED74",
-      "Receiver": null,
+      "Receiver": "BattleCoinManager",
       "Name": ""
     },
     {
       "Entry": "0x8086F28C",
-      "Receiver": null,
+      "Receiver": "BattleCoinManager",
       "Name": ""
     },
     {
       "Entry": "0x80871710",
-      "Receiver": null,
+      "Receiver": "BattleCoinManager",
       "Name": ""
     },
     {
@@ -33177,6 +38610,66 @@
     {
       "Entry": "0x807D5154",
       "Receiver": "GessoManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x805388E0",
+      "Receiver": null,
+      "Name": "GMDataOnlineCoinBattle::Update"
+    },
+    {
+      "Entry": "0x8086FF9C",
+      "Receiver": "BattleCoinManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8086E714",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80534CDC",
+      "Receiver": null,
+      "Name": "GMDataCoinBattle::Update"
+    },
+    {
+      "Entry": "0x80534F48",
+      "Receiver": null,
+      "Name": "GMDataCoinBattle::OnItemCollision"
+    },
+    {
+      "Entry": "0x8057DB10",
+      "Receiver": null,
+      "Name": "Kart::Movement::DoRespawn"
+    },
+    {
+      "Entry": "0x805858B8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80883B5C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80884740",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80726B6C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8073F26C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8086D9C0",
+      "Receiver": null,
       "Name": ""
     }
   ],

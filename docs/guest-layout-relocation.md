@@ -919,3 +919,23 @@ simulation, alongside the team-VS result-storage round trip. Grand Prix advances
 to its next course; balloon battle advances from Delfino Pier to Block Plaza.
 Time trial finishes with its normal single racer but its direct-boot automation
 then requests the Wii Menu, so its round-trip check remains unresolved.
+
+The coin manager now has uniform participant arrays for eligibility, rankings,
+owned-coin counts, effect pointers, event state and timers. Its hundred coin
+records each contain a participant flag array too; those nested records grow
+from 28 to 40 bytes at capacity 24. The following 255 course-position records,
+local-screen pointers, packet state and event storage move with the arrays.
+The allocation grows from 17,332 to 18,880 bytes. Independent course-position,
+coin and screen limits retain their original roles.
+
+Checked references cover the manager's construction, setup, reset and update,
+its renderer's coin-pointer lookup, and external AI/item readers. The constructor's
+unrolled pointer clears use the nested record stride. `BattleCoinStorageTests`
+executes the real factory/constructor with allocation and position-construction
+fixtures, isolates the real event-reset and per-coin flag loops with test-only
+returns, and executes two external lookup paths. It checks all hundred records,
+neighboring bytes, unused capacity, register/heap guards, one through four local
+screens and offline/online eligibility cases. Five capacities (12, 13, 24, 48
+and 100) and the expanded consumer audit pass. Larger storage capacities use
+at most 24 active participants in these tests; they do not establish wider
+protocol support. A full playable coin-battle round trip is still being retried.

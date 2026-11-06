@@ -1,5 +1,5 @@
 {
-  "Version": 11,
+  "Version": 12,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -821,6 +821,76 @@
         {
           "Name": "totalItemCountMinus30",
           "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "PowHeader",
+      "Alignment": 1,
+      "Size": 9
+    },
+    {
+      "Name": "PowScreen",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "PowManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "PowHeader"
+        },
+        {
+          "Name": "affected",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "shockwaveStarted",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "screens",
+          "Type": "Pointer",
+          "Count": 4,
+          "PointerTo": "PowScreen"
+        }
+      ]
+    },
+    {
+      "Name": "GessoHeader",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "GessoScreen",
+      "Alignment": 4,
+      "Size": 208
+    },
+    {
+      "Name": "GessoManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "GessoHeader"
+        },
+        {
+          "Name": "positionGroups",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "flags",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "screens",
+          "Type": "Pointer",
+          "Count": 4,
+          "PointerTo": "GessoScreen"
         }
       ]
     }
@@ -25981,6 +26051,329 @@
       "Symbol": "ItemManager.holders.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x807D4FB4",
+      "ExpectedWord": "0x9B780040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D5F28",
+      "ExpectedWord": "0x9B830040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D6224",
+      "ExpectedWord": "0x881F0040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D6250",
+      "ExpectedWord": "0x981F0040",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.flags.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D677C",
+      "ExpectedWord": "0x82E30044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D9928",
+      "ExpectedWord": "0x98030015",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.shockwaveStarted.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D99E8",
+      "ExpectedWord": "0x83030018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D9A6C",
+      "ExpectedWord": "0x83030018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D9AB4",
+      "ExpectedWord": "0x83030018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D9E34",
+      "ExpectedWord": "0x881F0015",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.shockwaveStarted.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D9EB0",
+      "ExpectedWord": "0x981F0015",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.shockwaveStarted.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x807D961C",
+      "ExpectedWord": "0x38600028",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "PowManager.size"
+    },
+    {
+      "Instruction": "0x807D5CCC",
+      "ExpectedWord": "0x38600054",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "GessoManager.size"
+    },
+    {
+      "Instruction": "0x807D9684",
+      "ExpectedWord": "0x907D0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D972C",
+      "ExpectedWord": "0x809C0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D97CC",
+      "ExpectedWord": "0x907F0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D9E18",
+      "ExpectedWord": "0x807E0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D9EF8",
+      "ExpectedWord": "0x83BC0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807DA27C",
+      "ExpectedWord": "0x809D0018",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "PowManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D5D24",
+      "ExpectedWord": "0x907D0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D5DD4",
+      "ExpectedWord": "0x83DC0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D5EB0",
+      "ExpectedWord": "0x907F0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D5F60",
+      "ExpectedWord": "0x827B0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D6280",
+      "ExpectedWord": "0x82980044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D67CC",
+      "ExpectedWord": "0x82F60044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D542C",
+      "ExpectedWord": "0x83DD0044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D9648",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D9710",
+      "ExpectedWord": "0x3BC0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D977C",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D9EE0",
+      "ExpectedWord": "0x3BE0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D9F70",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807DA264",
+      "ExpectedWord": "0x3BC0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807DA2BC",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807DA634",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D5DA4",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D5F40",
+      "ExpectedWord": "0x3BA0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D53FC",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807DA460",
+      "ExpectedWord": "0x2C04000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D6214",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D6288",
+      "ExpectedWord": "0x2817000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D67D4",
+      "ExpectedWord": "0x2800000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x807D4FF4",
+      "ExpectedWord": "0x82390044",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "GessoManager.screens.offset"
+    },
+    {
+      "Instruction": "0x807D4FD4",
+      "ExpectedWord": "0x3B80000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {
@@ -25989,7 +26382,9 @@
     "0x809B8F4C": "InputManager",
     "0x809BFDC0": "RaceHUD",
     "0x809BE740": "DriverManager",
-    "0x809BEE20": "ItemManager"
+    "0x809BEE20": "ItemManager",
+    "0x809BF798": "PowManager",
+    "0x809BF790": "GessoManager"
   },
   "ArrayCopies": [
     {
@@ -30335,6 +30730,86 @@
       "Entry": "0x8079A904",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x807D4F74",
+      "Receiver": null,
+      "Name": "Item::Player::UseBlooper"
+    },
+    {
+      "Entry": "0x807D53F4",
+      "Receiver": "GessoManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807D5E60",
+      "Receiver": "GessoManager",
+      "Name": "Item::GessoMgr::__ct"
+    },
+    {
+      "Entry": "0x807D5EE8",
+      "Receiver": "GessoManager",
+      "Name": "Item::GessoMgr::DeployBlooper"
+    },
+    {
+      "Entry": "0x807D6070",
+      "Receiver": "GessoManager",
+      "Name": "Item::GessoMgr::Update"
+    },
+    {
+      "Entry": "0x807D64EC",
+      "Receiver": "GessoManager",
+      "Name": "Item::GessoMgr::ApplyBlooper"
+    },
+    {
+      "Entry": "0x807D976C",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::__ct"
+    },
+    {
+      "Entry": "0x807D9808",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::DeployPow"
+    },
+    {
+      "Entry": "0x807D9940",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::AnimateModel"
+    },
+    {
+      "Entry": "0x807D9B10",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::CreateShockwave"
+    },
+    {
+      "Entry": "0x807D9D4C",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::Update"
+    },
+    {
+      "Entry": "0x807D9EC8",
+      "Receiver": "PowManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807DA250",
+      "Receiver": "PowManager",
+      "Name": ""
+    },
+    {
+      "Entry": "0x807DA8E4",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::IsPowActive"
+    },
+    {
+      "Entry": "0x807DA900",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::GetFramesUntilPOWSmash"
+    },
+    {
+      "Entry": "0x807DA914",
+      "Receiver": "PowManager",
+      "Name": "Item::PowMgr::GetPowUserPlayerId"
     }
   ],
   "BoundedAccesses": [
@@ -31780,6 +32255,101 @@
           "Width": 4
         }
       ]
+    },
+    {
+      "Begin": "0x807D5E1C",
+      "ExpectedWords": [
+        "0x901B0010",
+        "0x901B0014",
+        "0x901B0018",
+        "0x901B001C",
+        "0x901B0020",
+        "0x901B0024",
+        "0x901B0028",
+        "0x901B002C",
+        "0x901B0030",
+        "0x901B0034",
+        "0x901B0038",
+        "0x901B003C"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "GessoManager.positionGroups.offset",
+          "Stride": "GessoManager.positionGroups.stride",
+          "Count": "GessoManager.positionGroups.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x807D5474",
+      "ExpectedWords": [
+        "0x901B0010",
+        "0x901B0014",
+        "0x901B0018",
+        "0x901B001C",
+        "0x901B0020",
+        "0x901B0024",
+        "0x901B0028",
+        "0x901B002C",
+        "0x901B0030",
+        "0x901B0034",
+        "0x901B0038",
+        "0x901B003C"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "GessoManager.positionGroups.offset",
+          "Stride": "GessoManager.positionGroups.stride",
+          "Count": "GessoManager.positionGroups.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x807D6504",
+      "ExpectedWords": [
+        "0x90030010",
+        "0x3C80809C",
+        "0x7C781B78",
+        "0x90030014",
+        "0x90030018",
+        "0x9003001C",
+        "0x90030020",
+        "0x90030024",
+        "0x90030028",
+        "0x9003002C",
+        "0x90030030",
+        "0x90030034",
+        "0x90030038",
+        "0x9003003C"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "GessoManager.positionGroups.offset",
+          "Stride": "GessoManager.positionGroups.stride",
+          "Count": "GessoManager.positionGroups.count",
+          "Width": 4
+        }
+      ],
+      "Constants": [
+        {
+          "Register": "r4",
+          "Value": 2157707264
+        }
+      ],
+      "Copies": [
+        {
+          "Register": "r24",
+          "Source": "r3"
+        }
+      ]
     }
   ],
   "ResampledCursors": [
@@ -31926,6 +32496,15 @@
           "Position": "r26"
         }
       ]
+    }
+  ],
+  "NormalizedRanks": [
+    {
+      "Instruction": "0x807D66EC",
+      "ExpectedWord": "0x3863FFFF",
+      "Register": "r3",
+      "Count": "players",
+      "SourceCount": 12
     }
   ]
 }

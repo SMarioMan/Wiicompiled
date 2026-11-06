@@ -634,3 +634,21 @@ address setup, constants, or stack registers. Expanded fills preserve that base
 in the declared register after filling the uniform arrays. This handles original
 constructors that save their receiver between unrolled stores without accepting
 unproven instructions in the rewritten span.
+
+The USA POW and blooper managers now use one capacity-sized affected-player or
+severity array. Their four local-screen pointers remain a separate screen role;
+allocation sizes, pointer offsets, the trailing POW shockwave flag, and invalid
+player IDs move with the layout. The migration includes duplicate reset bodies
+and the blooper deploy body in `Item::Player::UseBlooper`, whose cursor-based
+screen load is not proven automatically by the pointer audit. Blooper's three
+rank severity bands resample the original twelve-rank axis; the number of
+severity bands and local screens does not grow with player capacity.
+
+`ItemEffectStorageTests` executes the original translated allocation, constructor,
+reset, deploy and effect-selection code at capacities 12, 13, 24, 48 and 100,
+with one through four screens and every possible item user. It checks both
+blooper deploy copies, team targeting, immunity, screen pointers, memory guards
+and preserved registers. Graphics/audio boundaries and allocations are fixtures.
+The original first-position loop behavior is preserved, including its first
+rank iteration when the item user is leading. These focused checks do not
+establish complete expanded race, battle, results-menu or LAN support.

@@ -49337,6 +49337,48 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x806556A0",
+      "ExpectedWord": "0x801F279C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.receiveIndices.offset"
+    },
+    {
+      "Instruction": "0x806556B4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset"
+    },
+    {
+      "Instruction": "0x806556D0",
+      "ExpectedWord": "0x801F279C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.receiveIndices.offset"
+    },
+    {
+      "Instruction": "0x806556E8",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset"
+    },
+    {
+      "Instruction": "0x80655700",
+      "ExpectedWord": "0x801F279C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.receiveIndices.offset"
+    },
+    {
+      "Instruction": "0x8065570C",
+      "ExpectedWord": "0x901F279C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.receiveIndices.offset"
     }
   ],
   "GlobalPointers": {

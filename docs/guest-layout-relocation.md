@@ -1171,3 +1171,10 @@ packet-header lengths, concatenated section payloads, buffer toggles and clearin
 only the consumed sections. This packet-path check runs within the SDK's 32-peer
 mask limit; larger capacity cases continue to check storage. The five native
 cases and consumer audit pass. Receiving and full LAN races are still pending.
+
+The receive path now follows the moved per-peer section indices and split-packet
+rows. Its native check submits valid and rejected CRCs for every storage slot,
+both buffer directions, zero/nonzero sections and initial/subsequent timestamps.
+It compares section contents, lengths, toggles, timestamp deltas, the whole
+controller and allocation/register guards. All five capacities and the consumer
+audit pass. Wire payload formats still require their separate participant migration.

@@ -1187,3 +1187,13 @@ Pointee identity survives the proved indexed load. Tests cover both index orders
 original-capacity emission, expanded expressions and rejected ambiguous cases.
 All 876 default translator tests pass. This only broadens review candidates;
 applying and validating the newly found game references is a separate step.
+
+Applying the nested-index audit adds 84 network row/field references across packet
+handlers. It also corrects four RH1 import/default-export multipliers: these index
+controller packet rows, rather than the independently expanded RH1 cache records.
+The controller send scan now uses capacity bounds. Native checks cover successful
+and rejected sends to every supported console slot, CRC arguments, timestamps and
+payload clearing. The real USER exporter and packet-holder copy are checked for
+every storage slot, both rows and enabled/disabled state. All five network fixture
+capacities and the 1,195-consumer audit pass. This still does not complete the
+expanded USER/SELECT/RH1 payload layouts or establish a 24-peer LAN race.

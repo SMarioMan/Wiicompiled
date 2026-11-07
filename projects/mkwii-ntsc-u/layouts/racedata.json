@@ -47915,7 +47915,7 @@
       "ExpectedWord": "0x1C840030",
       "Node": 0,
       "Operand": "right",
-      "Symbol": "RKNetRH1Data.size",
+      "Symbol": "RKNetController.splitReceived.stride",
       "Addend": 0
     },
     {
@@ -47923,7 +47923,7 @@
       "ExpectedWord": "0x1CA50030",
       "Node": 0,
       "Operand": "right",
-      "Symbol": "RKNetRH1Data.size",
+      "Symbol": "RKNetController.splitReceived.stride",
       "Addend": 0
     },
     {
@@ -47931,7 +47931,7 @@
       "ExpectedWord": "0x1C000030",
       "Node": 0,
       "Operand": "right",
-      "Symbol": "RKNetRH1Data.size",
+      "Symbol": "RKNetController.splitSend.stride",
       "Addend": 0
     },
     {
@@ -47939,7 +47939,7 @@
       "ExpectedWord": "0x1C000030",
       "Node": 0,
       "Operand": "right",
-      "Symbol": "RKNetRH1Data.size",
+      "Symbol": "RKNetController.splitSend.stride",
       "Addend": 0
     },
     {
@@ -49379,6 +49379,776 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.receiveIndices.offset"
+    },
+    {
+      "Instruction": "0x80653A44",
+      "ExpectedWord": "0x2800000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80653B40",
+      "ExpectedWord": "0x281E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80650C4C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650C54",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650C78",
+      "ExpectedWord": "0x1CA30030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650C88",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650FC0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650FC8",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651088",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651094",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A920",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F760",
+      "ExpectedWord": "0x1C840030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F76C",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F7F0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F7F8",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F870",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F87C",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F8B8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F8C0",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F91C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F924",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FDB8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FDC4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FE3C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FE48",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065012C",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650138",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650198",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806501A4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806501EC",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806501F8",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650240",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065024C",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065071C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650728",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806507C8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806507D4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651318",
+      "ExpectedWord": "0x1CA50030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651324",
+      "ExpectedWord": "0x80A50150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065137C",
+      "ExpectedWord": "0x1CC60030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651384",
+      "ExpectedWord": "0x80A50150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651490",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065149C",
+      "ExpectedWord": "0x80840150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651514",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651520",
+      "ExpectedWord": "0x80840150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806515BC",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806515C8",
+      "ExpectedWord": "0x80840150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651640",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065164C",
+      "ExpectedWord": "0x80840150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656924",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656930",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656CC0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656CCC",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656D78",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656D84",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657694",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065769C",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657754",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657760",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658464",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658470",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658FA4",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80658FB0",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806590F0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806590FC",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806591AC",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806591B4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659300",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80659308",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065A7EC",
+      "ExpectedWord": "0x1CE70058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065C8C8",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065C910",
+      "ExpectedWord": "0x80840150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065CB0C",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065CBC4",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065E990",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065E998",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EA34",
+      "ExpectedWord": "0x1C630030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EA3C",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A00",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A0C",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A90",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A9C",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660AB8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660AC4",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E44",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E50",
+      "ExpectedWord": "0x80630150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {

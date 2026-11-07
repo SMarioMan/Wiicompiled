@@ -34,8 +34,8 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
-            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0,0x801d1c00,0x801aacbc};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0,0x801d1c00,0x801aacbc,0x800e85b4};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -91,12 +91,16 @@ public class NetworkControllerStorageTests
                     if(ratingMode)for(uint32_t i=0;i<20;i++)Memory::Write16(c->gpr[4]+i*2,0x1234+i);
                     c->gpr[3]=ratingMode;}
                 void start_task(CpuContext* c){if(c->gpr[3]!=task || c->gpr[4]!=0x80653078 || c->gpr[5]!=root || c->gpr[6]!=0 || taskStarts++)FAIL();}
-                uint32_t crcCalls=0,timeCalls=0,packetSize=0;
+                uint32_t crcCalls=0,timeCalls=0,packetSize=0,sendAddress=0,sendAid=0,sendResult=0,sendCalls=0;
+                bool sending=false;
                 constexpr uint32_t incomingPacket=0x810d0000;
                 void packet_crc(CpuContext* c){
-                    if(c->gpr[3]!=incomingPacket || c->gpr[4]!=packetSize || Memory::Read32(incomingPacket+4))FAIL();
+                    if(c->gpr[3]!=(sending?sendAddress:incomingPacket) || c->gpr[4]!=packetSize || Memory::Read32(c->gpr[3]+4))FAIL();
                     crcCalls++;c->gpr[3]=0x12345678;}
                 void packet_time(CpuContext* c){timeCalls++;c->gpr[3]=0;c->gpr[4]=2000;}
+                void send_packet(CpuContext* c){
+                    if(c->gpr[3]!=sendAid || c->gpr[4]!=sendAddress || c->gpr[5]!=packetSize || sendCalls++ || Memory::Read32(sendAddress+4)!=0x12345678)FAIL();
+                    if(Memory::Read32(sendAddress)!=0x52414345)FAIL();c->gpr[3]=sendResult;}
                 constexpr uint32_t friendMgr=0x81090000;
                 uint32_t friendChecks=0,statusReads=0,lastError=0;
                 void friend_profile(CpuContext* c){
@@ -137,7 +141,7 @@ public class NetworkControllerStorageTests
                     register_entry(0x800ec3f8,friend_profile);register_entry(0x800ccac4,last_error);
                     register_entry(0x8065ae04,friend_available);register_entry(0x800ce0f0,friend_status);
                     Memory::Write32(0x809bd938,friendMgr);
-                    register_entry(0x801d1c00,packet_crc);register_entry(0x801aacbc,packet_time);
+                    register_entry(0x801d1c00,packet_crc);register_entry(0x801aacbc,packet_time);register_entry(0x800e85b4,send_packet);
                     Memory::Write32(0x809bd958,0x81070000);Memory::Write8(0x81070000,0);
                     std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);Memory::Write32(0x809bd918,0);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
@@ -400,6 +404,39 @@ public class NetworkControllerStorageTests
                                 }
                             }
                         }
+                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(sendAid=0;sendAid<capacity;sendAid++)for(sendResult=0;sendResult<2;sendResult++){
+                        constexpr uint32_t currentSub={{layout.Symbol("RKNetController.currentSub.offset")}},
+                            subs={{layout.Symbol("RKNetController.subs.offset")}},stride={{layout.Symbol("RKNetSub.size")}};
+                        auto sub=subs+current*stride;word(currentSub,current);word(sub+16,1u<<sendAid);expected[sub+33]=(sendAid+1)%capacity;
+                        expected[lastAid]=255;word(times+sendAid*8,0);word(times+sendAid*8+4,0);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        for(uint32_t p=0;p<capacity;p++)Memory::Write32(Memory::Read32(root+full+p*4)+8,0);
+                        auto holder=Memory::Read32(root+full+sendAid*4);sendAddress=Memory::Read32(holder);packetSize=16;
+                        std::memset(Memory::GetPointer(sendAddress,736),0x6a,736);Memory::Write32(sendAddress,0x52414345);Memory::Write32(sendAddress+4,0);Memory::Write32(holder+8,packetSize);
+                        sending=true;crcCalls=timeCalls=sendCalls=0;ctx.gpr[3]=root;func_806539A8(&ctx);sending=false;
+                        if(crcCalls!=1 || sendCalls!=1 || timeCalls!=sendResult)return 39;
+                        if(sendResult){expected[lastAid]=sendAid;word(times+sendAid*8,0);word(times+sendAid*8+4,2000);}
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size) || Memory::Read32(holder+8))return 40;
+                        for(uint32_t i=0;i<736;i++)if(Memory::Read8(sendAddress+i))return 41;
+                    }
+                    constexpr uint32_t userHandler=0x810e0000;
+                    for(uint32_t i=0;i<192;i++)Memory::Write8(userHandler+8+i,0x20+i%64);
+                    for(uint32_t aid=0;aid<capacity;aid++)for(uint32_t buffer=0;buffer<2;buffer++)for(uint32_t enabled=0;enabled<2;enabled++){
+                        word({{layout.Symbol("RKNetController.sendIndices.offset")}}+aid*4,buffer);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);Memory::Write8(userHandler,enabled);
+                        for(uint32_t row=0;row<2;row++){
+                            auto split=Memory::Read32(root+send+row*rowStride+aid*4),holder=Memory::Read32(split+20);
+                            if(Memory::Read32(holder+4)!=192)return 42;
+                            Memory::Write32(holder+8,0);std::memset(Memory::GetPointer(Memory::Read32(holder),192),0x6a,192);
+                        }
+                        ctx.gpr[3]=userHandler;ctx.gpr[4]=aid;func_806609D8(&ctx);
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 43;
+                        for(uint32_t row=0;row<2;row++){
+                            auto split=Memory::Read32(root+send+row*rowStride+aid*4),holder=Memory::Read32(split+20);bool copied=enabled && row==buffer;
+                            if(Memory::Read32(holder+8)!=(copied?192:0))return 44;
+                            for(uint32_t i=0;i<192;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=(copied?0x20+i%64:0x6a))return 45;
+                        }
+                    }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 13;

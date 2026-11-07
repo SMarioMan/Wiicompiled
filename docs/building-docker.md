@@ -1,6 +1,6 @@
 # Container builds
 
-Validation status: all 915 translator unit tests pass. Complete base and optional LAN
+Validation status: all 922 translator unit tests pass. Complete base and optional LAN
 container workflows were tested with the USA RMCE01 RVZ, including Windows x64
 cross-compilation inside Linux Docker. Both LAN exports contain the required
 release artifacts and matching module source provenance; the Windows import audit

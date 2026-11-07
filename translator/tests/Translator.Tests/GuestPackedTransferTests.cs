@@ -24,8 +24,8 @@ public class GuestPackedTransferTests
         uint Value(IrValue value)=>value.RegisterName is {} register?registers[register]:unchecked((uint)value.Constant!.Value);
         uint Address(IrAddress address)=>registers[address.Base]+unchecked((uint)address.Offset);
         foreach(var node in nodes)switch(node){
-            case IrLoad load:Assert.Equal(4,load.SizeBytes);registers[load.Destination]=memory[Address(load.Address)];break;
-            case IrStore store:Assert.Equal(4,store.SizeBytes);memory[Address(store.Address)]=Value(store.Source);break;
+            case IrLoad load:Assert.Contains(load.SizeBytes,new[] {1,2,4});registers[load.Destination]=memory[Address(load.Address)];break;
+            case IrStore store:Assert.Contains(store.SizeBytes,new[] {1,2,4});memory[Address(store.Address)]=Value(store.Source)&(store.SizeBytes==1?0xffu:store.SizeBytes==2?0xffffu:0xffffffffu);break;
             case IrBinary binary:
                 var a=Value(binary.Left);var b=Value(binary.Right);
                 registers[binary.Destination]=binary.Op switch {"add"=>unchecked(a+b),"sub"=>unchecked(a-b),"mul"=>unchecked(a*b),"divu"=>a/b,"or"=>a|b,"shl"=>a<<(int)b,"ppc_slw"=>(b&63)>=32?0:a<<(int)(b&31),
@@ -98,7 +98,7 @@ public class GuestPackedTransferTests
             File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 BitsetStores=new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=words.Select(word=>$"0x{word:X8}"),site.Base,site.Index,site.Unit,
                     site.Shift,site.Loaded,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer,site.ShiftInput}}}));
-            if(version is 22 or 23 or 24 or 25)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 22 or 23 or 24 or 25 or 26)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }
 
@@ -146,11 +146,54 @@ public class GuestPackedTransferTests
     {
         var words=new uint[]{0x80e30050,0x7d406030,0x38c00000,0x398c0001,0x7ce00378,0x90030050};
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[] {22,23,24,25,26})foreach(var store in new[] {false,true}){
+        try{foreach(var version in new[] {22,23,24,25,26,27})foreach(var store in new[] {false,true}){
             File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 BitsetStores=store?new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=words.Select(word=>$"0x{word:X8}"),Base="r3",Index="r12",Unit="r10",Shift="r0",Loaded="r7",Offset="Record.teams.offset",Count="Record.teams.count",WordBits=24,WordBytes=4,BitsPerPlayer=2,ShiftInput="r12",IndexBias=-1,AllowScalarAuxiliaries=true}}:null,
                 ArrayTransfers=store?null:new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=new[] {"0x80040008","0x901f0050"},SourceBase="r4",SourceOffset="Frame.teams.offset",DestinationBase="r31",DestinationOffset="Record.teams.offset",Value="r0",Stride="Word.size",Count="Record.teams.count",AllowObjectSource=true}}}));
-            if(version is 23 or 24 or 25)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 23 or 24 or 25 or 26)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+        }}finally{File.Delete(path);}
+    }
+
+    [Theory]
+    [InlineData(12,1)] [InlineData(13,1)] [InlineData(24,1)] [InlineData(48,1)] [InlineData(100,1)]
+    [InlineData(24,2)] [InlineData(24,4)]
+    public void UnrolledArrayTransfersGrowUniformlyAndRetainTheFinalOriginalLoad(int players,int width)
+    {
+        var types=new[] {Types[0],new GuestLayoutType("SourceHeader",4,8),new GuestLayoutType("Element",width,width),
+            new GuestLayoutType("Source",4,Fields:new[] {new GuestLayoutField("header","SourceHeader"),new GuestLayoutField("items","Element",PerPlayer:true)}),
+            new GuestLayoutType("Target",4,Fields:new[] {new GuestLayoutField("header","Header"),new GuestLayoutField("items","Element",PerPlayer:true)})};
+        var load=width==1?0x88040000u:width==2?0xa0040000u:0x80040000u;
+        var store=width==1?0x981f0000u:width==2?0xb01f0000u:0x901f0000u;
+        var words=Enumerable.Range(0,12).SelectMany(i=>new[] {load|(uint)(8+i*width),store|(uint)(80+i*width)}).ToArray();
+        var site=new GuestArrayTransfer(Start,words,"r4","Source.items.offset","r31","Target.items.offset","r0","Element.size","Source.items.count",width,true,12);
+        var image=Image(words);var plan=new GuestLayoutRelocations(types,12,players,Array.Empty<GuestLayoutReference>(),arrayTransfers:new[] {site});
+        var translator=new FunctionTranslator(image,layoutRelocations:plan);
+        if(players==12)Assert.Equal(new FunctionTranslator(image).Translate(Start,TranslationOptions.Default).CxxCode,translator.Translate(Start,TranslationOptions.Default).CxxCode);
+        var sourceBase=0x1000u;var destinationBase=players==12?0x2000u:sourceBase+8+(uint)width-80;
+        var memory=new Dictionary<uint,uint>();
+        for(var i=-1;i<=players+1;i++){
+            memory[sourceBase+unchecked((uint)(8+i*width))]=0x55;
+            memory[destinationBase+unchecked((uint)(80+i*width))]=0x66;
+        }
+        for(var i=0;i<players;i++)memory[sourceBase+8+(uint)(i*width)]=(uint)i+1;
+        var before=new Dictionary<uint,uint>(memory);var expected=new Dictionary<uint,uint>(memory);
+        for(var i=0;i<players;i++)expected[destinationBase+80+(uint)(i*width)]=before[sourceBase+8+(uint)(i*width)];
+        var registers=new Dictionary<string,uint>{{"r4",sourceBase},{"r31",destinationBase},{"r0",0}};
+        Execute(translator.Discover(Start,TranslationOptions.Default).LinearIr.Blocks.SelectMany(block=>block.Instructions),registers,memory);
+        Assert.Equal(expected.OrderBy(pair=>pair.Key),memory.OrderBy(pair=>pair.Key));
+        Assert.Equal(12u,registers["r0"]);Assert.Equal(sourceBase,registers["r4"]);Assert.Equal(destinationBase,registers["r31"]);
+        Assert.NotEmpty(translator.Translate(Start,TranslationOptions.Default).CxxCode);
+        Assert.Throws<InvalidDataException>(()=>new GuestLayoutRelocations(types,12,players,Array.Empty<GuestLayoutReference>(),arrayTransfers:new[] {site with {OriginalElements=13}}));
+        var wrong=words.ToArray();wrong[3]^=1;
+        Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(Image(wrong),layoutRelocations:new GuestLayoutRelocations(types,12,players,
+            Array.Empty<GuestLayoutReference>(),arrayTransfers:new[] {site with {ExpectedWords=wrong}})));
+        Assert.Throws<InvalidDataException>(()=>translator.Discover(Start+4,TranslationOptions.Default));
+        var path=Path.GetTempFileName();
+        try{foreach(var version in new[] {25,26,27}){
+            File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types=types,References=Array.Empty<object>(),
+                ArrayTransfers=new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=words.Select(word=>$"0x{word:X8}"),site.SourceBase,site.SourceOffset,
+                    site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource,site.OriginalElements}}}));
+            if(version==26)Assert.Equal(players,GuestLayoutRelocations.Read(path,players).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,players));
         }}finally{File.Delete(path);}
     }
 
@@ -179,11 +222,11 @@ public class GuestPackedTransferTests
     public void PackedLoadsAndArrayTransfersRequireFormatTwentyTwo()
     {
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[] {21,22,23,24,25,26})foreach(var load in new[] {false,true}){
+        try{foreach(var version in new[] {21,22,23,24,25,26,27})foreach(var load in new[] {false,true}){
             File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 BitsetLoads=load?new[] {new {Instruction=$"0x{Start:X8}",ExpectedWord="0x80830050",Node=0,Base="r3",Index="r0",Destination="r4",Offset="Record.teams.offset",Count="Record.teams.count",WordBits=24,WordBytes=4,BitsPerPlayer=2}}:null,
                 ArrayTransfers=load?null:new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=CopyWords.Select(word=>$"0x{word:X8}"),SourceBase="r1",SourceOffset="Frame.teams.offset",DestinationBase="r31",DestinationOffset="Record.teams.offset",Value="r0",Stride="Word.size",Count="Record.teams.count",Width=4}}}));
-            if(version is 22 or 23 or 24 or 25)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 22 or 23 or 24 or 25 or 26)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }
 }

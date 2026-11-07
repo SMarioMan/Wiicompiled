@@ -1345,3 +1345,13 @@ A stride of five and scale of six retain that counter's register effects while
 bounding a partial final group. A supplied base still requires a positive stride.
 Tests check emitted normalization, the zero-origin argument, stock/aligned
 emission, invalid pairs, and version gating. All 915 unit tests pass.
+
+Layout format 26 extends checked array transfers to byte elements and verified
+unrolled copies. `OriginalElements` must match the original layout count and the
+span must contain exactly the corresponding alternating loads and stores.
+Expanded transfers snapshot all source elements, preserve the final original
+load's register value, and write the full new count. Rewrites and interior
+entries inside a multi-element span are rejected. Tests cover 12, 13, 24, 48,
+and 100, byte/halfword/word elements, overlap, guards, invalid spans, and format
+gating. All 922 unit tests pass. The optimized native test also exercises an
+expanded 24-byte overlapping copy, along with pointer chains and word transfers.

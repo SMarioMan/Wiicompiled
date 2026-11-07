@@ -105,10 +105,10 @@ public class GuestBoundedAccessTests
             types,12,players,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {site})).Translate(pc).CxxCode);
         Assert.Throws<InvalidDataException>(()=>new GuestLayoutRelocations(types,12,13,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {site with {IndexBase="r7",IndexStride=null}}));
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[] {24,25,26}){
+        try{foreach(var version in new[] {24,25,26,27}){
             File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types=types,References=Array.Empty<object>(),
                 BoundedAccesses=new[] {new {Instruction=$"0x{pc:X8}",ExpectedWord="0x88640000",site.Node,site.Index,site.IndexBias,site.GroupWidth,site.IndexStride,site.IndexScale}}}));
-            if(version==25)Assert.Equal(13,GuestLayoutRelocations.Read(path,13).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,13));
+            if(version is 25 or 26)Assert.Equal(13,GuestLayoutRelocations.Read(path,13).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,13));
         }}finally{File.Delete(path);}
     }
 
@@ -117,13 +117,13 @@ public class GuestBoundedAccessTests
     {
         var path=Path.GetTempFileName();
         try {
-            foreach(var version in new[] {19,20,21,22,23,24,25,26})foreach(var always in new[] {false,true}){
+            foreach(var version in new[] {19,20,21,22,23,24,25,26,27})foreach(var always in new[] {false,true}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     BoundedAccesses=new[] {new {Instruction="0x80001000",ExpectedWord="0x90830000",Node=0,
                         Index="r6",IndexBias=-2,GroupWidth=2,IndexScale=always?1:2,AlwaysWhenResized=always}}
                 }));
-                if(version is not (20 or 21 or 22 or 23 or 24 or 25))Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+                if(version is not (20 or 21 or 22 or 23 or 24 or 25 or 26))Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
                 else Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
             }
         }finally{File.Delete(path);}

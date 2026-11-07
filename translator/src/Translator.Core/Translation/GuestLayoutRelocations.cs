@@ -138,7 +138,7 @@ public sealed partial class GuestLayoutRelocations
         BitsetLoads = _bitsetLoads.Select(site => new {Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",
             site.Node,site.Base,site.Index,site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer}),
         ArrayTransfers = _arrayTransfers.Select(site => new {Begin=$"0x{site.Begin:X8}",ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"),
-            site.SourceBase,site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource}),
+            site.SourceBase,site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource,site.OriginalElements}),
         BitsetStores = _bitsetStores.Select(site => new { Begin=$"0x{site.Begin:X8}",
             ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"), site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count, site.WordBits, site.WordBytes, site.BitsPerPlayer, site.ShiftInput, site.IndexBias, site.AllowScalarAuxiliaries }),
         AuthoredCountIndices = _authoredCountIndices.Select(site => new {
@@ -267,7 +267,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 26 && file.ArrayTransfers?.Any(site => site.OriginalElements != 1 || site.Width == 1) == true)
+            throw new InvalidDataException("Unrolled and byte array transfers require layout format version 26.");
         if (file.Version < 25 && file.BoundedAccesses?.Any(site => site.IndexBase is null && site.IndexStride is not null) == true)
             throw new InvalidDataException("Zero-based stride-normalized bounds require layout format version 25.");
         if (file.Version < 24 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.LinkToNext)) == true)
@@ -362,7 +364,7 @@ public sealed partial class GuestLayoutRelocations
             file.BitsetLoads?.Select(site => new GuestBitsetLoad(Hex(site.Instruction),Hex(site.ExpectedWord),site.Node,site.Base,site.Index,
                 site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer)),
             file.ArrayTransfers?.Select(site => new GuestArrayTransfer(Hex(site.Begin),site.ExpectedWords.Select(Hex).ToArray(),site.SourceBase,
-                site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource)))
+                site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource,site.OriginalElements)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -375,7 +377,7 @@ public sealed partial class GuestLayoutRelocations
     private sealed record BitsetLoadFile(string Instruction,string ExpectedWord,int Node,string Base,string Index,string Destination,
         string Offset,string Count,int WordBits=16,int WordBytes=2,int BitsPerPlayer=1);
     private sealed record ArrayTransferFile(string Begin,string[] ExpectedWords,string SourceBase,string SourceOffset,string DestinationBase,
-        string DestinationOffset,string Value,string Stride,string Count,int Width=4,bool AllowObjectSource=false);
+        string DestinationOffset,string Value,string Stride,string Count,int Width=4,bool AllowObjectSource=false,int OriginalElements=1);
     private sealed record AuthoredCountIndexFile(string Instruction,string ExpectedWord,string Input,string Destination,int FirstCount,int LastCount);
     private sealed record HeapRouteFile(string Begin,string[] ExpectedWords,string Scene,string PrimaryRegister,string SecondaryRegister,
         string ZeroRegister,int PrimaryHeap,int SecondaryHeap,int PrimarySlot,int SecondarySlot);

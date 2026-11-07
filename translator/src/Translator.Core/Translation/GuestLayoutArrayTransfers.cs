@@ -7,11 +7,11 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-// Expand a proven scalar copy into an array transfer. Safe
+// Expand a proven scalar or unrolled copy into an array transfer. Safe
 // address setup between the load and store retains its original register effects.
 public sealed record GuestArrayTransfer(uint Begin, IReadOnlyList<uint> ExpectedWords,
     string SourceBase, string SourceOffset, string DestinationBase, string DestinationOffset,
-    string Value, string Stride, string Count, int Width = 4, bool AllowObjectSource = false);
+    string Value, string Stride, string Count, int Width = 4, bool AllowObjectSource = false, int OriginalElements = 1);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -23,10 +23,11 @@ public sealed partial class GuestLayoutRelocations
         foreach (var site in _arrayTransfers)
         {
             var registers = new[] { site.SourceBase, site.DestinationBase, site.Value };
-            if (site.Begin % 4 != 0 || site.ExpectedWords.Count is < 2 or > 16 || (!site.AllowObjectSource && site.SourceBase != "r1") || site.SourceBase is "r0" or "r2" ||
+            if (site.Begin % 4 != 0 || site.ExpectedWords.Count < 2 || site.OriginalElements is <1 or >512 ||
+                (site.OriginalElements==1 ? site.ExpectedWords.Count>16 : site.ExpectedWords.Count!=2*site.OriginalElements) || (!site.AllowObjectSource && site.SourceBase != "r1") || site.SourceBase is "r0" or "r2" ||
                 registers.Any(register => !IsGpr(register)) || registers.Distinct().Count() != 3 ||
-                site.DestinationBase is "r0" or "r2" || site.Width is not (2 or 4) ||
-                _original.Symbol(site.Count) != 1 || _expanded.Symbol(site.Count) < 1 || Players < OriginalPlayers ||
+                site.DestinationBase is "r0" or "r2" || site.Width is not (1 or 2 or 4) ||
+                _original.Symbol(site.Count) != site.OriginalElements || _expanded.Symbol(site.Count) < site.OriginalElements || Players < OriginalPlayers ||
                 new[] { _original, _expanded }.Any(layout => layout.Symbol(site.Stride) < site.Width ||
                     layout.Symbol(site.SourceOffset) < 0 || layout.Symbol(site.DestinationOffset) < 0))
                 throw new InvalidDataException("Invalid scalar-to-array transfer.");
@@ -34,7 +35,7 @@ public sealed partial class GuestLayoutRelocations
             bool Inside(uint pc) => site.Begin <= pc && pc < end;
             bool Overlap(uint begin, uint otherEnd) => begin < end && otherEnd > site.Begin;
             // Middle address operands can have their own checked layout references.
-            if (references.Any(reference => reference.Instruction == site.Begin || reference.Instruction == end - 4) ||
+            if (references.Any(reference => site.OriginalElements>1 ? Inside(reference.Instruction) : reference.Instruction == site.Begin || reference.Instruction == end - 4) ||
                 _arrayTransfers.Count(other => Overlap(other.Begin, TransferEnd(other))) != 1 ||
                 _arrayCopies.Any(copy => Overlap(copy.Begin, CopyEnd(copy))) ||
                 _arrayFills.Any(fill => Overlap(fill.Begin, FillEnd(fill))) ||
@@ -62,7 +63,12 @@ public sealed partial class GuestLayoutRelocations
                 var nodes = new PpcLifter().Lift(new[] { PpcDecoder.Decode(pc, word) })[0].Ir;
                 if (word != site.ExpectedWords[index] || nodes.Count != 1)
                     throw new InvalidDataException($"Array-transfer instruction mismatch at 0x{pc:X8}.");
-                var valid = index == 0
+                var elementOffset=checked((index/2)*_original.Symbol(site.Stride));
+                var valid = site.OriginalElements>1
+                    ? index%2==0
+                        ? nodes[0] == new IrLoad(site.Value,new(site.SourceBase,checked(_original.Symbol(site.SourceOffset)+elementOffset)),site.Width)
+                        : nodes[0] == new IrStore(new(site.DestinationBase,checked(_original.Symbol(site.DestinationOffset)+elementOffset)),IrValue.Register(site.Value),site.Width)
+                    : index == 0
                     ? nodes[0] == new IrLoad(site.Value, new(site.SourceBase, _original.Symbol(site.SourceOffset)), site.Width)
                     : index == site.ExpectedWords.Count - 1
                         ? nodes[0] == new IrStore(new(site.DestinationBase, _original.Symbol(site.DestinationOffset)), IrValue.Register(site.Value), site.Width)
@@ -82,23 +88,26 @@ public sealed partial class GuestLayoutRelocations
         if (instruction.Word != site.ExpectedWords[(int)(instruction.Address - site.Begin) / 4])
             throw new InvalidDataException("Array-transfer instruction mismatch.");
         if (Players == OriginalPlayers) return null;
-        if (instruction.Address == site.Begin)
-            return new IrInstruction[] { new IrLoad(site.Value, new(site.SourceBase, _expanded.Symbol(site.SourceOffset)), site.Width) };
-        if (instruction.Address != TransferEnd(site) - 4) return null;
-        var result = new List<IrInstruction>();
-        for (var index = 0; index < _expanded.Symbol(site.Count); index++)
-        {
-            var value = $"addr_layout_transfer_{site.Begin:X8}_{index}_loc";
-            var offset = checked(index * _expanded.Symbol(site.Stride));
-            result.Add(new IrLoad(value, new(site.SourceBase, checked(_expanded.Symbol(site.SourceOffset) + offset)), site.Width));
+        var first=instruction.Address==site.Begin;var last=instruction.Address==TransferEnd(site)-4;
+        if(site.OriginalElements==1 && first)
+            return new IrInstruction[] {new IrLoad(site.Value,new(site.SourceBase,_expanded.Symbol(site.SourceOffset)),site.Width)};
+        if(site.OriginalElements>1 && !first && !last)return Array.Empty<IrInstruction>();
+        if(site.OriginalElements==1 && !last)return null;
+        var result=new List<IrInstruction>();
+        string Value(int index)=>$"addr_layout_transfer_{site.Begin:X8}_{index}_loc";
+        if(site.OriginalElements==1 || first){
+            for(var index=0;index<_expanded.Symbol(site.Count);index++){
+                var offset=checked(index*_expanded.Symbol(site.Stride));
+                result.Add(new IrLoad(Value(index),new(site.SourceBase,checked(_expanded.Symbol(site.SourceOffset)+offset)),site.Width));
+            }
+            if(site.OriginalElements>1)
+                result.Add(new IrAssign(site.Value,IrValue.Register(Value(site.OriginalElements-1))));
         }
-        // Snapshot all words first so overlapping source/destination regions
-        // retain transfer semantics instead of repeatedly reading our own writes.
-        for (var index = 0; index < _expanded.Symbol(site.Count); index++)
-        {
-            var value = $"addr_layout_transfer_{site.Begin:X8}_{index}_loc";
-            var offset = checked(index * _expanded.Symbol(site.Stride));
-            result.Add(new IrStore(new(site.DestinationBase, checked(_expanded.Symbol(site.DestinationOffset) + offset)), IrValue.Register(value), site.Width));
+        // Snapshot all elements before stores, retaining the original final
+        // scalar load's register value even when the array grows.
+        if(last)for(var index=0;index<_expanded.Symbol(site.Count);index++){
+            var offset=checked(index*_expanded.Symbol(site.Stride));
+            result.Add(new IrStore(new(site.DestinationBase,checked(_expanded.Symbol(site.DestinationOffset)+offset)),IrValue.Register(Value(index)),site.Width));
         }
         return result;
     }

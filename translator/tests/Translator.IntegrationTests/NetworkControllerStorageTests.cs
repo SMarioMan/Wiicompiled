@@ -34,7 +34,7 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652468,0x80652480,0x8065543c,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
             var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0,0x801d1c00,0x801aacbc,0x800e85b4};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -435,6 +435,32 @@ public class NetworkControllerStorageTests
                             auto split=Memory::Read32(root+send+row*rowStride+aid*4),holder=Memory::Read32(split+20);bool copied=enabled && row==buffer;
                             if(Memory::Read32(holder+8)!=(copied?192:0))return 44;
                             for(uint32_t i=0;i<192;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=(copied?0x20+i%64:0x6a))return 45;
+                        }
+                    }
+                    constexpr uint32_t roomState={{layout.Symbol("RKNetController.room.offset")}}+4;
+                    for(uint32_t request : {2u,3u})for(uint32_t state=0;state<5;state++){
+                        word(roomState,state);std::memcpy(Memory::GetPointer(root,size),expected.data(),size);ctx.gpr[3]=root;
+                        if(request==2)func_80652468(&ctx);else func_80652480(&ctx);
+                        if(state!=1)word(roomState,request);
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 46;
+                    }
+                    for(uint32_t aid=0;aid<capacity;aid++)for(uint32_t buffer=0;buffer<2;buffer++){
+                        word({{layout.Symbol("RKNetController.sendIndices.offset")}}+aid*4,buffer);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        for(uint32_t row=0;row<2;row++){
+                            auto split=Memory::Read32(root+send+row*rowStride+aid*4);
+                            for(uint32_t section=0;section<8;section++)Memory::Write32(Memory::Read32(split+section*4)+8,section?1+(aid+section)%7:0);
+                            auto header=Memory::Read32(split);std::memset(Memory::GetPointer(Memory::Read32(header),16),0x6a,16);
+                        }
+                        ctx.gpr[3]=root;ctx.gpr[4]=aid;func_8065543C(&ctx);
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 47;
+                        for(uint32_t row=0;row<2;row++){
+                            auto split=Memory::Read32(root+send+row*rowStride+aid*4),header=Memory::Read32(split);bool selected=row==1-buffer;
+                            if(Memory::Read32(header+8)!=(selected?16:0))return 48;
+                            for(uint32_t i=0;i<16;i++){
+                                uint8_t value=!selected?0x6a:i<8?0:i==8?16:1+(aid+i-8)%7;
+                                if(Memory::Read8(Memory::Read32(header)+i)!=value)return 49;
+                            }
                         }
                     }
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)

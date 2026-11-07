@@ -1197,3 +1197,12 @@ payload clearing. The real USER exporter and packet-holder copy are checked for
 every storage slot, both rows and enabled/disabled state. All five network fixture
 capacities and the 1,195-consumer audit pass. This still does not complete the
 expanded USER/SELECT/RH1 payload layouts or establish a 24-peer LAN race.
+
+Seven unnamed controller entries now have reviewed receiver types. Their 26
+proved references include the matchmaking-state requests, join setup, status
+request and standalone packet-header writer. Native checks cover both state
+requests (including the protected state) and header generation for every storage
+slot and both rows. All five capacities and the 1,202-consumer audit pass.
+The two-instance run now completes room startup and course voting, reaching race
+scene initialization. That transition exposed remaining byte-map accesses in
+race setup; the live LAN race check still has not passed.

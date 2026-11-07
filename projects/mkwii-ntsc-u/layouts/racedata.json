@@ -50149,6 +50149,240 @@
       "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x806521F8",
+      "ExpectedWord": "0x901D00E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652204",
+      "ExpectedWord": "0x901D00E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065224C",
+      "ExpectedWord": "0x93DD00AC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetController.subs.stride+RKNetSub.header.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652254",
+      "ExpectedWord": "0x9BFD00B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset+RKNetController.subs.stride+RKNetSub.header.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652468",
+      "ExpectedWord": "0x800300EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652478",
+      "ExpectedWord": "0x900300EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652480",
+      "ExpectedWord": "0x800300EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80652490",
+      "ExpectedWord": "0x900300EC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.room.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806524D0",
+      "ExpectedWord": "0x981D2757",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset+RKNetStatus.flags.offset+RKNetStatus.flags.stride+RKNetStatus.flags.stride+RKNetStatus.flags.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806551C4",
+      "ExpectedWord": "0x8003291C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.currentSub.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806551D0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655498",
+      "ExpectedWord": "0x8007276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806554A0",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806554A8",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806554CC",
+      "ExpectedWord": "0x8007276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806554D4",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806554DC",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655500",
+      "ExpectedWord": "0x8007276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655508",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655510",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655534",
+      "ExpectedWord": "0x8007276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065553C",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655544",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065556C",
+      "ExpectedWord": "0x8003276C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.sendIndices.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655578",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655584",
+      "ExpectedWord": "0x806300F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -56253,6 +56487,41 @@
       "Entry": "0x8064ED80",
       "Receiver": null,
       "Name": "RKNet::PacketMgr::CreateInstance"
+    },
+    {
+      "Entry": "0x8065214C",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80652468",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80652480",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80652498",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x806529E8",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80655194",
+      "Receiver": "RKNetController",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8065543C",
+      "Receiver": "RKNetController",
+      "Name": ""
     }
   ],
   "BoundedAccesses": [

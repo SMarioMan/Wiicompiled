@@ -1269,3 +1269,14 @@ buffer guards, repeated-prepare behavior and preserved registers. RFL initializa
 is an explicit SDK fixture in these tests: the original SDK rejects capacities
 of 32 and above, so the larger storage tests do not establish online support.
 All five capacities and the 1,283-function consumer audit pass.
+
+SELECT handler received-packet caches and receive/delay/state arrays now use the
+configured capacity. Factory and standalone constructor flags move after these
+arrays, and both constructor paths clear every controller SELECT timestamp.
+Initialization, reset, update/import, and rotating peer-send scans follow capacity;
+the six-peer timer unroll has bounded stores for a partial final group. Native
+tests cover complete constructor/init/reset memory and character, kart, vote,
+player-data and star-rank getters for every peer and both local slots. Capacities
+12, 13, 24, 48, and 100 and the 1,300-function consumer audit pass. The SELECT
+wire packet is still the original 56-byte format: its 12-entry player map and
+packed team field have not yet been expanded by this cache migration.

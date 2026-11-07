@@ -27,12 +27,12 @@ public sealed partial class GuestLayoutRelocations
         {
             if (site.Instruction % 4 != 0 || site.Node < 0 || !Gpr(site.Index) ||
                 site.GroupWidth <= 0 || site.IndexScale <= 0 || OriginalPlayers % site.GroupWidth != 0 || !seen.Add(site.Instruction) ||
-                (site.IndexBase is null) != (site.IndexStride is null) || site.IndexBase is not null && !Gpr(site.IndexBase) ||
+                (site.IndexBase is not null && site.IndexStride is null) || site.IndexBase is not null && !Gpr(site.IndexBase) ||
                 _arrayCopies.Any(copy => site.Instruction >= copy.Begin && site.Instruction < CopyEnd(copy)) ||
                 _rankTables.Any(table => table.Lookups.Any(lookup => lookup.Instruction == site.Instruction)))
                 throw new InvalidDataException("Invalid or overlapping bounded guest access.");
             if (site.IndexStride is { } stride && (_original.Symbol(stride) <= 0 || _expanded.Symbol(stride) <= 0))
-                throw new InvalidDataException("Bounded pointer indices require a positive element stride.");
+                throw new InvalidDataException("Bounded indices require a positive normalization stride.");
         }
     }
 

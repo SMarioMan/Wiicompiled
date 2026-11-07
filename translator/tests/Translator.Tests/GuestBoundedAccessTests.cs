@@ -90,17 +90,40 @@ public class GuestBoundedAccessTests
     }
 
     [Fact]
+    public void ZeroBasedCountersCanNormalizeAnIndependentUnrollStep()
+    {
+        const uint pc=0x80001000;var types=new[] {Types[0],new GuestLayoutType("CounterStep",1,5)};
+        var image=TranslatorCppTestHarness.CreateImage((pc,0x88640000),(pc+4,0x4e800020));
+        var site=new GuestBoundedAccess(pc,0x88640000,0,"r6",1,6,IndexStride:"CounterStep.size",IndexScale:6);
+        var plan=new GuestLayoutRelocations(types,12,13,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {site});
+        var result=new FunctionTranslator(image,layoutRelocations:plan).Translate(pc);
+        Assert.Contains("relative % 5u",result.CxxCode);Assert.Contains("int64_t(relative/5u)*6+(1)",result.CxxCode);
+        var call=Assert.Single(result.LinearIr.Blocks.SelectMany(block=>block.Instructions).OfType<IrCall>(),call=>call.Target=="layout_bound_80001000");
+        Assert.Equal(0,call.Arguments[3].Constant);
+        var original=new FunctionTranslator(image).Translate(pc).CxxCode;
+        foreach(var players in new[] {12,24})Assert.Equal(original,new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(
+            types,12,players,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {site})).Translate(pc).CxxCode);
+        Assert.Throws<InvalidDataException>(()=>new GuestLayoutRelocations(types,12,13,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {site with {IndexBase="r7",IndexStride=null}}));
+        var path=Path.GetTempFileName();
+        try{foreach(var version in new[] {24,25,26}){
+            File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types=types,References=Array.Empty<object>(),
+                BoundedAccesses=new[] {new {Instruction=$"0x{pc:X8}",ExpectedWord="0x88640000",site.Node,site.Index,site.IndexBias,site.GroupWidth,site.IndexStride,site.IndexScale}}}));
+            if(version==25)Assert.Equal(13,GuestLayoutRelocations.Read(path,13).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,13));
+        }}finally{File.Delete(path);}
+    }
+
+    [Fact]
     public void ResizedCounterBoundsRequireVersionTwenty()
     {
         var path=Path.GetTempFileName();
         try {
-            foreach(var version in new[] {19,20,21,22,23,24,25})foreach(var always in new[] {false,true}){
+            foreach(var version in new[] {19,20,21,22,23,24,25,26})foreach(var always in new[] {false,true}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     BoundedAccesses=new[] {new {Instruction="0x80001000",ExpectedWord="0x90830000",Node=0,
                         Index="r6",IndexBias=-2,GroupWidth=2,IndexScale=always?1:2,AlwaysWhenResized=always}}
                 }));
-                if(version is not (20 or 21 or 22 or 23 or 24))Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+                if(version is not (20 or 21 or 22 or 23 or 24 or 25))Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
                 else Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
             }
         }finally{File.Delete(path);}

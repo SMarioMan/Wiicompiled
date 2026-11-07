@@ -1337,3 +1337,11 @@ terminal values and check payloads, guards, register effects, and stock emission
 All 914 unit tests pass. The optimized native test covers both the pointer-chain
 extension and overlapping object transfers. The game rating-sort stack and its
 callers still require their corresponding layout migration.
+
+Layout format 25 permits `IndexStride` without `IndexBase` in bounded accesses;
+the normalization origin is then zero. This handles the original player-map
+comparison unroll, which compares six bytes but advances its counter by five.
+A stride of five and scale of six retain that counter's register effects while
+bounding a partial final group. A supplied base still requires a positive stride.
+Tests check emitted normalization, the zero-origin argument, stock/aligned
+emission, invalid pairs, and version gating. All 915 unit tests pass.

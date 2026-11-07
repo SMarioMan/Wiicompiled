@@ -267,7 +267,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 25 && file.BoundedAccesses?.Any(site => site.IndexBase is null && site.IndexStride is not null) == true)
+            throw new InvalidDataException("Zero-based stride-normalized bounds require layout format version 25.");
         if (file.Version < 24 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.LinkToNext)) == true)
             throw new InvalidDataException("Pointer-chain fill extensions require layout format version 24.");
         if (file.Version < 23 && (file.BitsetStores?.Any(site => site.IndexBias != 0 || site.AllowScalarAuxiliaries) == true ||

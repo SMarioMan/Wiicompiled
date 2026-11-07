@@ -54,10 +54,10 @@ public class GuestPointerChainTests
             Assert.Throws<InvalidDataException>(()=>Plan(24,Fill(bad)));
         Assert.Throws<InvalidDataException>(()=>new FunctionTranslator(Image(Word^0x200000),layoutRelocations:Plan(24)));
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[] {23,24,25}){
+        try{foreach(var version in new[] {23,24,25,26}){
             File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 ArrayFills=new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=new[] {$"0x{Word:X8}"},BaseRegister="r1",ValueRegister="r6",Arrays=Fill().Arrays}}}));
-            if(version==24)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 24 or 25)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }
 }

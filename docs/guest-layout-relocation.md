@@ -1280,3 +1280,14 @@ player-data and star-rank getters for every peer and both local slots. Capacitie
 12, 13, 24, 48, and 100 and the 1,300-function consumer audit pass. The SELECT
 wire packet is still the original 56-byte format: its 12-entry player map and
 packed team field have not yet been expanded by this cache migration.
+
+Layout format 21 generalizes bitset stores with `WordBits`, `WordBytes`, and
+`BitsPerPlayer` (defaults 16, 2, and 1). For packed teams, a four-byte word can
+reserve its upper eight bits while holding two team bits for each of twelve
+consoles; later consoles select later words. Checked spans can retain independent
+counter increments between the load, shift, OR, and store. The pass rejects
+increments of any register used by the bit operation. Tests cover every bit at
+12, 13, 24, 48, and 100, preservation of reserved bits and counters, unchanged
+stock emission, invalid shapes, and version gating. All 884 unit tests pass.
+The public game manifest remains format 20 until the packed-team consumers and
+packet layouts have been migrated together.

@@ -94,13 +94,13 @@ public class GuestBoundedAccessTests
     {
         var path=Path.GetTempFileName();
         try {
-            foreach(var version in new[] {19,20,21})foreach(var always in new[] {false,true}){
+            foreach(var version in new[] {19,20,21,22})foreach(var always in new[] {false,true}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new {
                     Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     BoundedAccesses=new[] {new {Instruction="0x80001000",ExpectedWord="0x90830000",Node=0,
                         Index="r6",IndexBias=-2,GroupWidth=2,IndexScale=always?1:2,AlwaysWhenResized=always}}
                 }));
-                if(version!=20)Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+                if(version is not (20 or 21))Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
                 else Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
             }
         }finally{File.Delete(path);}

@@ -79,11 +79,11 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {18,19,20,21,22,23,24}){
+            foreach(var version in new[] {18,19,20,21,22,23,24,25}){
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Skip(1).Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0] with {StartIndex=1},Fill().Arrays[1]}}}}));
-                if(version is 19 or 20 or 21 or 22 or 23)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 19 or 20 or 21 or 22 or 23 or 24)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }
@@ -236,12 +236,12 @@ public class GuestLayoutArrayFillTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {14,15,16,17,18,19,20,21,22,23,24})
+            foreach(var version in new[] {14,15,16,17,18,19,20,21,22,23,24,25})
             {
                 File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new {Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         BaseRegister="r3",ValueRegister="r0",Arrays=new[] {Fill().Arrays[0],Fill().Arrays[1] with {ValueRegister="r4"}}}}}));
-                if(version is 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
         }

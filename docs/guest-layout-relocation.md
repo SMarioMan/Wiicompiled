@@ -1326,3 +1326,14 @@ as the stack. Transfers snapshot all source words before storing, preserving
 copy behavior for overlapping regions. All 908 unit tests pass; an optimized
 native C++ integration test also verifies overlapping transfers and guard words.
 These framework changes precede the game packet and team-algorithm migration.
+
+Layout format 24 adds `LinkToNext` to partial array fills. It replaces only the
+original terminal pointer store: added elements point to the next element, and
+the new terminal retains the original scalar value. This grows a uniform node
+pool without replacing its existing prefix or changing node payloads. Definitions
+must start at the original last element and use a four-byte integer pointer.
+Tests walk every node at capacities 12, 13, 24, 48, and 100 with zero and nonzero
+terminal values and check payloads, guards, register effects, and stock emission.
+All 914 unit tests pass. The optimized native test covers both the pointer-chain
+extension and overlapping object transfers. The game rating-sort stack and its
+callers still require their corresponding layout migration.

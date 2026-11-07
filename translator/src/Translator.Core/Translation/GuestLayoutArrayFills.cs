@@ -7,7 +7,7 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null, int StartIndex = 0);
+public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null, int StartIndex = 0, bool LinkToNext = false);
 public sealed record GuestFillConstant(string Register, uint Value);
 public sealed record GuestFillAddress(string Register, string Array);
 public sealed record GuestFillCopy(string Register, string Source);
@@ -54,6 +54,9 @@ public sealed partial class GuestLayoutRelocations
                     copy.Register == fill.BaseRegister || values.Contains(copy.Register) || copy.Source != fill.BaseRegister ||
                     addresses.Any(address => address.Register == copy.Register) || constants.Any(item => item.Register == copy.Register)))
                 throw new InvalidDataException("Guest fill copies must preserve the unchanged base in distinct registers independent of stores and setup.");
+            if(fill.Arrays.Any(array => array.LinkToNext && (array.Width != 4 ||
+                IsFpr(array.ValueRegister ?? fill.ValueRegister) || array.StartIndex != _original.Symbol(array.Count)-1)))
+                throw new InvalidDataException("Pointer-chain extension must replace only the original terminal pointer store.");
             foreach (var layout in new[] { _original, _expanded })
             {
                 var intervals = new List<(int Begin, int End)>();
@@ -94,7 +97,7 @@ public sealed partial class GuestLayoutRelocations
     {
         foreach (var fill in _arrayFills)
         {
-            var expected = FillStores(fill, _original).ToArray();
+            var expected = FillStores(fill, _original).Cast<IrStore>().ToArray();
             var observed = new List<IrStore>();
             var observedAddresses = new List<IrBinary>();
             var observedConstants = new List<IrAssign>();
@@ -123,12 +126,21 @@ public sealed partial class GuestLayoutRelocations
         }
     }
 
-    private static IEnumerable<IrStore> FillStores(GuestArrayFill fill, GuestLayouts layout)
+    private static IEnumerable<IrInstruction> FillStores(GuestArrayFill fill, GuestLayouts layout)
     {
-        for (var index = 0; index < layout.Symbol(fill.Arrays[0].Count); index++)
-            foreach (var array in fill.Arrays)
-                if (index >= array.StartIndex) yield return new IrStore(new(fill.BaseRegister, checked(layout.Symbol(array.Array) + index * layout.Symbol(array.Stride))),
-                    IrValue.Register(array.ValueRegister ?? fill.ValueRegister), array.Width);
+        var count=layout.Symbol(fill.Arrays[0].Count);
+        for (var index = 0; index < count; index++)
+            for(var arrayIndex=0;arrayIndex<fill.Arrays.Count;arrayIndex++){
+                var array=fill.Arrays[arrayIndex];if(index<array.StartIndex)continue;
+                var offset=layout.Symbol(array.Array);var stride=layout.Symbol(array.Stride);
+                var value=IrValue.Register(array.ValueRegister ?? fill.ValueRegister);
+                if(array.LinkToNext && index+1<count){
+                    var next=$"addr_layout_fill_next_{fill.Begin:X8}_{arrayIndex}_{index}_loc";
+                    yield return new IrBinary(next,IrValue.Register(fill.BaseRegister),IrValue.Imm(checked(offset+(index+1)*stride)),"add");
+                    value=IrValue.Register(next);
+                }
+                yield return new IrStore(new(fill.BaseRegister,checked(offset+index*stride)),value,array.Width);
+            }
     }
 
     private static IEnumerable<IrBinary> FillAddresses(GuestArrayFill fill, GuestLayouts layout) =>

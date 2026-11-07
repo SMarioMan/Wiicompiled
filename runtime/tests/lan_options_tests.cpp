@@ -1,6 +1,7 @@
 #include "lan_options.h"
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 void Check(bool value) { if (!value) { std::cerr << "LAN option contract failed\n"; std::exit(1); } }
 template<class F> void Invalid(F action) {
@@ -23,6 +24,22 @@ int main() {
     Invalid([&] { join.Parse("--lan-peers=13"); });
     Invalid([&] { join.Parse("--lan-id=2junk"); });
     Invalid([&] { join.Parse("--lan-id=-1"); });
+    for (uint32_t capacity : {12u, 13u, 24u, 32u}) {
+        Options expanded{capacity};
+        Check(expanded.instances == capacity && expanded.capacity == capacity);
+        Check(expanded.Parse("--lan-id=" + std::to_string(capacity)));
+        Check(expanded.Parse("--lan-peers=" + std::to_string(capacity)));
+        expanded.Validate();
+        Invalid([&] { expanded.Parse("--lan-id=" + std::to_string(capacity+1)); });
+        Invalid([&] { expanded.Parse("--lan-peers=" + std::to_string(capacity+1)); });
+        for (uint32_t i=0;i<capacity;i++)Check(expanded.Parse("--lan-peer=192.168.1.20"));
+        Invalid([&] { expanded.Parse("--lan-peer=192.168.1.20"); });
+        expanded.Validate();
+    }
+    Invalid([] { Options invalid{0}; });
+    Invalid([] { Options invalid{256}; });
+    Options future{100}; // Storage-only base builds still construct their options.
+    Invalid([&] { future.Validate(); });
     Options remote;
     Check(remote.Parse("--lan-bind=192.168.1.10"));
     remote.Validate(); // multicast discovery does not require a peer list

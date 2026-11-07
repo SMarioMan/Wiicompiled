@@ -7,7 +7,7 @@
 struct mkw_net_state {
 	uint8_t _unk0[0x28 - 0x0];
 	int connection_state;
-	uint8_t _unk2c[0x29c8 - 0x2c];
+
 };
 
 extern struct mkw_net_state *mkw_net_state;
@@ -63,8 +63,8 @@ struct dwc_gamedata /* size 0x10f8 */ {
 		uint8_t _unk17[0x28 - 0x17];
 		uint32_t players_at_console_little_endian; /* +0x28 */
 		uint8_t _unk2c[0x30 - 0x2c];
-	} peers[12]; /* +0x38 */
-	uint8_t _unk278[0x6d0 - 0x278];
+	} peers[32]; /* +0x38; SDK node storage already supports 32 AIDs. */
+    uint8_t _unk638[0x6d0 - (0x38 + 32 * 0x30)];
 	uint16_t public_port; /* +0x6d0 probably? */
 	uint8_t _unk6d2[0x6d4 - 0x6d2];
 	uint32_t public_ip; /* +0x6d4 probably? */
@@ -92,6 +92,11 @@ struct dwc_gamedata /* size 0x10f8 */ {
 	uint32_t players_at_console_little_endian; /* +0x8a8 */
 	uint8_t _unk8ac[0x10f8 - 0x8ac];
 };
+
+/* These are SDK storage limits, independent of the game's participant arrays. */
+typedef char mkw_dwc_peer_offset_check[__builtin_offsetof(struct dwc_gamedata, peers) == 0x38 ? 1 : -1];
+typedef char mkw_dwc_port_offset_check[__builtin_offsetof(struct dwc_gamedata, public_port) == 0x6d0 ? 1 : -1];
+typedef char mkw_dwc_size_check[sizeof(struct dwc_gamedata) == 0x10f8 ? 1 : -1];
 
 struct dwc_gamedata2 /* size 0x1458 */ {
 	struct gt2_socket *socket;

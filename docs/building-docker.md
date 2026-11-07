@@ -1,6 +1,6 @@
 # Container builds
 
-Validation status: all 764 translator tests pass. Complete base and optional LAN
+Validation status: all 879 translator unit tests pass. Complete base and optional LAN
 container workflows were tested with the USA RMCE01 RVZ, including Windows x64
 cross-compilation inside Linux Docker. Both LAN exports contain the required
 release artifacts and matching module source provenance; the Windows import audit
@@ -116,6 +116,8 @@ does not establish native Windows runtime behavior.
 Build a single LAN variant with `--build-arg PRODUCT=lan` when building either
 Dockerfile, or select it when running a builder with `WIICOMPILED_PRODUCT=lan`.
 It currently requires the clean USA game and retains twelve-player capacity.
+Its discovery protocol is version 2; peers must use matching WiiCompiled LAN
+builds with the same capacity.
 Every copy of the resulting executable can create or join a room through the
 normal LAN/Nintendo WFC menus. Instance identities and startup automation are
 runtime options; no host/client builds are needed.

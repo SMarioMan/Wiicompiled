@@ -8,8 +8,12 @@
 namespace LanRuntime {
 enum class Automation : uint32_t { Manual, Host, Join };
 struct Options {
+    const uint32_t capacity;
+    explicit Options(uint32_t maximum = 12) : capacity(maximum), instances(maximum) {
+        if (!maximum || maximum > 255) throw std::invalid_argument("Invalid LAN build capacity");
+    }
     uint32_t instance = 1;
-    uint32_t instances = 12;
+    uint32_t instances;
     Automation automation = Automation::Manual;
     uint32_t bindAddress = 0;
     bool localOnly = false;
@@ -19,7 +23,7 @@ struct Options {
         uint32_t result = 0;
         const auto [end, error] = std::from_chars(value.data(), value.data()+value.size(), result);
         if (value.empty() || error != std::errc{} || end != value.data()+value.size() || !result || result > maximum)
-            throw std::invalid_argument("LAN IDs/counts must be between 1 and 12");
+            throw std::invalid_argument("LAN IDs/counts must fit this build's capacity");
         return result;
     }
     static uint32_t Address(std::string_view value) {
@@ -46,16 +50,19 @@ struct Options {
                 throw std::invalid_argument("Choose only one LAN automation role");
             automation = selected;
         } else if (argument == "--lan-local") localOnly = true;
-        else if (argument.starts_with("--lan-id=")) instance = Number(argument.substr(9), 12);
-        else if (argument.starts_with("--lan-peers=")) instances = Number(argument.substr(12), 12);
+        else if (argument.starts_with("--lan-id=")) instance = Number(argument.substr(9), capacity);
+        else if (argument.starts_with("--lan-peers=")) instances = Number(argument.substr(12), capacity);
         else if (argument.starts_with("--lan-bind=")) bindAddress = Address(argument.substr(11));
         else if (argument.starts_with("--lan-peer=")) {
-            if (peers.size() == 12) throw std::invalid_argument("The current LAN layout supports twelve peers");
+            if (peers.size() >= capacity) throw std::invalid_argument("LAN discovery peers exceed this build's capacity");
             peers.push_back(Address(argument.substr(11)));
         } else return false;
         return true;
     }
     void Validate() const {
+        if (capacity > 32) throw std::invalid_argument("The current LAN protocol supports at most 32 capacity slots");
+        if (!instance || !instances || instance > capacity || instances > capacity || peers.size() > capacity)
+            throw std::invalid_argument("LAN settings exceed this build's capacity");
         if (instance > instances) throw std::invalid_argument("--lan-id must not exceed --lan-peers");
         if (bindAddress && localOnly)
             throw std::invalid_argument("Choose --lan-local or --lan-bind, not both");

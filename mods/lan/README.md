@@ -4,7 +4,7 @@ This directory contains the LAN v0.9 module adapted for native translation,
 including the supplied `build_lan.py` script's per-instance loopback networking,
 boot/menu hooks, fake PIDs and client joining. It is under development;
 **two-instance room joining and online VS race progression are verified on
-Linux; 24-player support is not implemented**.
+Linux; 24-player networking remains incomplete**.
 
 The original archive is `https://www.chadsoft.co.uk/downloads/LAN_MKW_v0.9.zip`,
 SHA-256 `2a8d76844e79b23b147ea97f134386d313401e0535c2f52da9ab41822369095e`.
@@ -26,6 +26,27 @@ startup fills that data record after copying the module image, before guest
 hooks run. Runtime configuration changes data, never PowerPC instructions.
 There are no compiled host/client roles or instance IDs. Current capacity is
 twelve players; 24-player layouts remain unfinished.
+
+Runtime configuration version 2 checks the module's capacity, controller address
+and race telemetry offsets against the linked native guest layout. Discovery
+protocol 2 advertises capacity and ignores incompatible peers. Use matching
+WiiCompiled LAN builds on every peer; the original Wii LAN v0.9 discovery format
+is not compatible with this version.
+
+For development against an explicitly resolved guest layout, pass its translator
+context when compiling the module:
+
+```sh
+python3 mods/lan/build.py --toolchain /path/to/toolchain \
+  --guest-layout-context /path/to/functions/guest_layout_context.json \
+  --experimental-guest-layouts --out build/lan-experimental
+```
+
+The experimental flag is required while the guest migration is incomplete.
+Controller assembly uses the resolved full-width offset. Source C uses the same
+capacity and race offsets. This prepares the ABI boundary; it does not establish
+24-player lobby, protocol or race support. The current protocol has a 32-slot
+SDK ceiling; larger offline storage tests do not establish larger LAN support.
 
 Validated on Linux with the Null renderer: two local instances and two separate
 network namespaces discover and race without explicit peers; four simultaneous
@@ -154,7 +175,9 @@ python3 mods/lan/tests/local_pair.py \
 The test requires identical executable hashes in all directories. It passes
 `--lan-local`, runtime IDs and automation flags; use `--host-id=2 --client-id=1`
 to reverse the roles with the same executable. Repeat `--client` for additional
-independent portable directories (currently up to twelve total instances).
+independent portable directories (the default product currently supports twelve
+slots). The test driver accepts `--capacity N` for an experimental matched build
+and validates runtime IDs against that capacity.
 Optional repeated `--client-id` values follow the client directory order;
 otherwise the test assigns distinct IDs automatically. Run local processes in
 the same network namespace. Discovery uses multicast, with no peer list supplied.
@@ -188,3 +211,11 @@ unless the environment variable is set. For example, `01 00 00 00` presses A,
 `00 00 50 00` moves the stick right, and `00 00 00 00` releases it.
 `--diagnostics` on the module builder additionally logs unique original BMG
 message IDs to help identify menu prompts.
+
+The [two-peer capacity-24 trace](tests/results/two-peer-capacity24.json) records a
+Linux test of the uniform experimental layout with ABI 2. Runtime IDs 24 and 13
+used the same executable, discovered each other over multicast, entered one
+lobby, selected course 8, and advanced together in racing stage 2 with exactly
+two racers. This verifies the expanded module/native boundary and removal of
+unused CPU slots; it does not demonstrate 24 active racers. The five Python
+layout/ELF checks and native capacity-option tests also pass.

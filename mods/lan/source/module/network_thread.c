@@ -21,7 +21,7 @@
 #define BROADCAST_INTERVAL 60
 #define BROADCAST_TIMEOUT (BROADCAST_INTERVAL * 5)
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
-#define BROADCAST_TRACK_MAX 30
+#define BROADCAST_TRACK_MAX 32
 
 #define STATUS_MAGIC 0xbb49cc4d
 #define STATUS_SIZE_MAX 512
@@ -147,6 +147,8 @@ static bool initialise(void) {
 
 struct broadcast_packet {
 	uint32_t magic;
+	uint16_t protocol;
+	uint16_t capacity;
 	uint32_t pid;
 	uint8_t mii[MII_SIZE];
 	uint16_t communication_port;
@@ -210,7 +212,7 @@ static void update_game_state(struct dwc_gamedata *gamedata) {
 }
 
 /* USA globals verified against the pinned game's CreateInstance routines.
- * Separate telemetry keeps the original room-status packet compatible. */
+ * Telemetry is independent of the versioned lobby discovery record. */
 extern const uint8_t *MKWRaceInfo;
 extern const uint8_t *MKWRaceData;
 
@@ -223,6 +225,7 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 
 	struct broadcast_packet packet = {
 		.magic = BROADCAST_MAGIC,
+        .protocol = 2, .capacity = MKW_LAN_CAPACITY,
 		.pid = my_fake_pid,
 		.communication_port = communication_port,
 		.status = game_state,
@@ -275,9 +278,9 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
             0x4d4b5752, MKW_INSTANCE_ID,
             *(const uint32_t *)(MKWRaceInfo + 0x28), /* RaceStage */
             *(const uint32_t *)(MKWRaceInfo + 0x20), /* simulation frame */
-            *(const uint32_t *)(MKWRaceData + 0xB68), /* race course */
-            MKWRaceData[0x24], /* in-race scenario player count */
-            *(const uint32_t *)(MKWRaceData + 0xB70) /* game mode */
+            *(const uint32_t *)(MKWRaceData + MKW_LAN_RACE_COURSE_OFFSET), /* race course */
+            MKWRaceData[MKW_LAN_RACE_PLAYER_COUNT_OFFSET], /* in-race scenario player count */
+            *(const uint32_t *)(MKWRaceData + MKW_LAN_RACE_MODE_OFFSET) /* game mode */
         };
         SOSendTo(fd, race_status, sizeof(race_status), 0, &monitor);
     }
@@ -313,7 +316,7 @@ static int find_peer_by_pid(uint32_t pid) {
 }
 
 static void process_broadcast(const struct broadcast_packet buffer, const so_addr_t raddr) {
-	if (buffer.magic != BROADCAST_MAGIC) return;
+	if (buffer.magic != BROADCAST_MAGIC || buffer.protocol != 2 || buffer.capacity != MKW_LAN_CAPACITY) return;
 	int peer = find_or_alloc_peer(&raddr);
 	if (peer == -1) return;
 	tracked_peers[peer].last_update = timestamp;
@@ -395,7 +398,7 @@ bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status) {
 		.gid = pid,
 		.region = 0xff,
 		.state = (tracked_peers[peer].info.status - 1) & 0x3f,
-		.player_count = 12,
+		.player_count = MKW_LAN_CAPACITY,
 		.race_number = tracked_peers[peer].info.status >> 6
 	};
 	return true;

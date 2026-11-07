@@ -73,6 +73,6 @@ cp "build/lan/Code.pul" "build/lan/"*.json "$output/lan-build/"
 touch "$output/portable.txt"
 mkdir -p "$output/UserData"
 printf '[paths]\ndvd_root = "../DATA"\n' > "$output/UserData/Config.toml"
-printf 'game_id=RMCE01\nlan_runtime_configuration=1\ndol_sha256=%s\nrel_sha256=%s\n' \
+printf 'game_id=RMCE01\nlan_runtime_configuration=2\ndol_sha256=%s\nrel_sha256=%s\n' \
     "$(mkw_sha256 Assets/main.dol)" "$(mkw_sha256 Assets/StaticR.rel)" \
     > "$output/build-inputs.txt"

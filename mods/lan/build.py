@@ -71,11 +71,56 @@ def static_patches():
     return patches
 
 
+def guest_layout(context_path=None, allow_experimental=False):
+    """Resolve the guest ABI once for all C code and assembly in the module."""
+    values = dict(capacity=12, input_gcn=0x3ba0, race_course=0xb68,
+                  race_mode=0xb70, race_player_count=0x24)
+    if context_path is None:
+        return values, None
+    data = context_path.read_bytes()
+    context = json.loads(data)
+    if context.get('Format') != 'guest-layout-build-context-v1':
+        raise ValueError('Unsupported guest layout context')
+    layout = context.get('Layout')
+    if not isinstance(layout, dict) or layout.get('Format') != 'guest-layout-plan-v4':
+        raise ValueError('The context has no resolved guest layout')
+    if (context.get('Experimental') or not layout.get('Complete')) and not allow_experimental:
+        raise ValueError('Incomplete guest layouts require --experimental-guest-layouts')
+    capacity = layout.get('Players')
+    if type(capacity) is not int or not 1 <= capacity <= 32:
+        raise ValueError('The current LAN protocol requires 1 to 32 capacity slots')
+    types = layout['Types']
+    def offset(owner, field):
+        value = types[owner]['Fields'][field]['Offset']
+        if type(value) is not int or not 0 <= value <= 0xffffffff:
+            raise ValueError(f'Invalid guest field offset: {owner}.{field}')
+        return value
+    race = offset('Racedata', 'race')
+    settings = race + offset('Scenario', 'settings')
+    values = dict(capacity=capacity, input_gcn=offset('InputManager', 'gcnControllers'),
+                  race_course=settings, race_mode=settings+8, race_player_count=race+4)
+    if any(value > 0xffffffff for value in values.values()):
+        raise ValueError('Guest layout offsets exceed a 32-bit address')
+    return values, hashlib.sha256(data).hexdigest()
+
+
+def guest_layout_header(values):
+    return ('#pragma once\n/* Generated guest ABI for this LAN module. */\n'
+            f'#define MKW_LAN_CAPACITY {values["capacity"]}\n'
+            f'#define MKW_LAN_INPUT_GCN_HI {values["input_gcn"] >> 16}\n'
+            f'#define MKW_LAN_INPUT_GCN_LO {values["input_gcn"] & 0xffff}\n'
+            f'#define MKW_LAN_RACE_COURSE_OFFSET {values["race_course"]}\n'
+            f'#define MKW_LAN_RACE_MODE_OFFSET {values["race_mode"]}\n'
+            f'#define MKW_LAN_RACE_PLAYER_COUNT_OFFSET {values["race_player_count"]}\n')
+
+
 def build(args):
     output = args.out.resolve()
     output.mkdir(parents=True, exist_ok=True)
     intermediate = output / 'objects'
     intermediate.mkdir(exist_ok=True)
+    layout, layout_hash = guest_layout(args.guest_layout_context, args.experimental_guest_layouts)
+    (intermediate / 'mkw_lan_guest_layout.h').write_text(guest_layout_header(layout))
     tools = args.toolchain.resolve() / 'bin'
     compiler, linker = tools / 'clang', tools / 'ld.lld'
     module = SOURCE / 'module'
@@ -127,7 +172,8 @@ def build(args):
     (output / 'lan_runtime_config.h').write_text(
         '#pragma once\n#include <cstdint>\n'
         f'inline constexpr uint32_t kLanConfigGuestAddress = 0x{config_address:08X}u;\n')
-    provenance = dict(runtime_configuration_version=1, diagnostics=args.diagnostics,
+    provenance = dict(runtime_configuration_version=2, diagnostics=args.diagnostics,
+        guest_layout=layout, guest_layout_context_sha256=layout_hash,
         compiler_sha256=hashlib.sha256(compiler.read_bytes()).hexdigest(),
         source_sha256={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in sorted(SOURCE.rglob('*')) if p.is_file()})
@@ -139,6 +185,8 @@ if __name__ == '__main__':
     parser.add_argument('--toolchain', type=pathlib.Path, required=True)
     parser.add_argument('--dotnet', default='dotnet')
     parser.add_argument('--diagnostics', action='store_true', help='Log unique game message IDs for port debugging')
+    parser.add_argument('--guest-layout-context', type=pathlib.Path, help='Resolved guest_layout_context.json emitted by the translator')
+    parser.add_argument('--experimental-guest-layouts', action='store_true', help='Allow a context whose guest migration is incomplete')
     parser.add_argument('--module-guest-base', default='0x81800000')
     parser.add_argument('--out', type=pathlib.Path, required=True)
     build(parser.parse_args())

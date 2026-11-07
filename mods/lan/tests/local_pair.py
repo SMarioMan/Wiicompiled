@@ -23,11 +23,13 @@ def write_pad(path, buttons=0, x=0, y=0):
 
 def run(args):
     directories = [args.host.resolve()] + [path.resolve() for path in args.client]
-    available = [i for i in range(1, 13) if i != args.host_id]
+    available = [i for i in range(1, args.capacity+1) if i != args.host_id]
     client_ids = args.client_id if args.client_id is not None else available[:len(args.client)]
     ids = [args.host_id] + client_ids
-    if len(ids) != len(directories) or len(ids) > 12:
-        raise ValueError('Supply one client ID per directory, within the current twelve-player capacity')
+    if len(ids) != len(directories) or len(ids) > args.capacity:
+        raise ValueError('Supply one client ID per directory, within the requested build capacity')
+    if any(not 1 <= instance <= args.capacity for instance in ids):
+        raise ValueError('Runtime IDs must fit the requested build capacity')
     if len(set(ids)) != len(ids):
         raise ValueError('Local instances require different runtime IDs')
     if not 0 <= args.startup_gap <= 30:
@@ -68,7 +70,7 @@ def run(args):
                 log = (directory / 'lan-test-game.log').open('w')
                 logs.append(log)
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
-                processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', '--lan-peers=12', role], cwd=directory,
+                processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role], cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
             while time.monotonic() - started < args.timeout:
                 for instance, process in zip(ids, processes):
@@ -81,8 +83,9 @@ def run(args):
                         page = status.get(instance, ({}, 0))[0].get('page')
                         buttons, x = 0, 0
                         if elapsed < 3:
-                            # Start is left of the initially selected Message button.
-                            x = -80 if instance == args.host_id and elapsed < 1.2 else 0
+                            # A short left pulse selects Start without menu auto-repeat
+                            # wrapping back to the initial Message button.
+                            x = -80 if instance == args.host_id and elapsed < 0.2 else 0
                         elif page == 0x42:
                             buttons = 0x100  # accelerate after countdown
                         elif not (instance != args.host_id and page == 0x9d):
@@ -161,8 +164,9 @@ if __name__ == '__main__':
     parser.add_argument('--client', type=Path, action='append', required=True, help='Repeat for additional portable client directories')
     parser.add_argument('--timeout', type=float, default=180)
     parser.add_argument('--startup-gap', type=float, default=0, help='Seconds between process launches')
-    parser.add_argument('--host-id', type=int, choices=range(1, 13), default=1)
-    parser.add_argument('--client-id', type=int, choices=range(1, 13), action='append', help='Optional IDs in client-directory order')
+    parser.add_argument('--capacity', type=int, choices=range(1, 33), default=12, help='Capacity of the matched guest/module build')
+    parser.add_argument('--host-id', type=int, choices=range(1, 33), default=1)
+    parser.add_argument('--client-id', type=int, choices=range(1, 33), action='append', help='Optional IDs in client-directory order')
     parser.add_argument('--race', action='store_true', help='Also navigate menus and require every race simulation to advance')
     options = parser.parse_args()
     try:

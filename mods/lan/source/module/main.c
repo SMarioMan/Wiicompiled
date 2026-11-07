@@ -92,13 +92,17 @@ __asm__(".section .text.MKWSetBootArgs,\"ax\"\n"
    r27 (channel) and r30 (Input::Manager) belong to the original call site.
    Layouts and PAL call site are documented by Pulsar's Input/Section headers;
    USA code addresses use the -0x4474 mapping from versions.txt. */
+#define MKW_LAN_STRING_RAW(value) #value
+#define MKW_LAN_STRING(value) MKW_LAN_STRING_RAW(value)
 extern void MKWSetController(void);
 __asm__(".section .text.MKWSetController,\"ax\"\n"
         ".global MKWSetController\n"
         "MKWSetController:\n"
         "cmpwi 27,0\n"
         "bne 1f\n"
-        "addi 4,30,0x3ba0\n"
+        "lis 4," MKW_LAN_STRING(MKW_LAN_INPUT_GCN_HI) "\n"
+        "ori 4,4," MKW_LAN_STRING(MKW_LAN_INPUT_GCN_LO) "\n"
+        "add 4,30,4\n"
         "lis 5,0x809c\n"
         "lwz 5,-0x2af8(5)\n"
         "stw 3,0x44(5)\n"

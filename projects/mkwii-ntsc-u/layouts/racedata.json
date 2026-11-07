@@ -51309,6 +51309,34 @@
       "Operand": "value",
       "Symbol": "ceil(players/6)",
       "Addend": 0
+    },
+    {
+      "Instruction": "0x80654574",
+      "ExpectedWord": "0x833A00F0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitSend.offset"
+    },
+    {
+      "Instruction": "0x806545A4",
+      "ExpectedWord": "0x833A0150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.splitReceived.offset"
+    },
+    {
+      "Instruction": "0x806545D8",
+      "ExpectedWord": "0x3B5A0030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPointerRow.size"
+    },
+    {
+      "Instruction": "0x806545E4",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)"
     }
   ],
   "GlobalPointers": {

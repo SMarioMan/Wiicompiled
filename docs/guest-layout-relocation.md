@@ -1220,3 +1220,10 @@ The packet-manager fixture checks connected/disconnected lookups and both local-
 paths with local slots at the first and last capacity positions, including absent
 ordinals and invalid IDs. All five capacities and the consumer audit pass. The
 SDK connection/player masks retain their separately documented width limits.
+
+Peer-disconnect cleanup now clears both expanded send/receive rows using the
+current row stride and scans the complete player map with a bounded four-player
+unroll. The native controller fixture checks first/last supported console IDs,
+all four timestamp arrays, full/split payloads and lengths, and preservation of
+other peers' data. All five capacities and the consumer audit pass; participant
+mask behavior beyond the SDK width is still not an expanded online protocol.

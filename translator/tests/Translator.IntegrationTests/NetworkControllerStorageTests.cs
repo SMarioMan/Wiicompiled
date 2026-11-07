@@ -34,7 +34,7 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652468,0x80652480,0x8065543c,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652468,0x80652480,0x8065543c,0x80654508,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
             var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0,0x801d1c00,0x801aacbc,0x800e85b4};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -460,6 +460,36 @@ public class NetworkControllerStorageTests
                             for(uint32_t i=0;i<16;i++){
                                 uint8_t value=!selected?0x6a:i<8?0:i==8?16:1+(aid+i-8)%7;
                                 if(Memory::Read8(Memory::Read32(header)+i)!=value)return 49;
+                            }
+                        }
+                    }
+                    constexpr uint32_t peerLimit=capacity<32?capacity:32,
+                        playerAids={{layout.Symbol("RKNetController.playerAids.offset")}},
+                        disconnectedPlayers={{layout.Symbol("RKNetController.disconnectedPlayers.offset")}};
+                    for(uint32_t aid : {0u,peerLimit-1}){
+                        std::memset(expected.data()+times,0x77,capacity*32);word(disconnected,0);word(disconnectedPlayers,0);
+                        for(uint32_t p=0;p<capacity;p++)expected[playerAids+p]=p%peerLimit;
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        for(uint32_t p=0;p<capacity;p++){
+                            auto holder=Memory::Read32(root+full+p*4);Memory::Write32(holder+8,736);std::memset(Memory::GetPointer(Memory::Read32(holder),736),0x7b,736);
+                        }
+                        split_packets([](uint32_t holder,uint32_t buffer,uint32_t n){Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(buffer,n),0x6a,n);});
+                        ctx.gpr[3]=root;ctx.gpr[4]=aid;func_80654508(&ctx);
+                        for(uint32_t array=0;array<4;array++)std::memset(expected.data()+times+array*capacity*8+aid*8,0,8);
+                        uint32_t playerMask=0;for(uint32_t p=0;p<capacity;p++)if(p%peerLimit==aid && !(p&32))playerMask|=1u<<(p&31);
+                        word(disconnectedPlayers,playerMask);word(disconnected,1u<<aid);
+                        if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 50;
+                        for(uint32_t p=0;p<capacity;p++){
+                            auto holder=Memory::Read32(root+full+p*4);bool cleared=p==aid;
+                            if(Memory::Read32(holder+8)!=(cleared?0:736))return 51;
+                            for(uint32_t i=0;i<736;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=(cleared?0:0x7b))return 52;
+                            for(uint32_t row=0;row<2;row++)for(auto start : {send,receive}){
+                                auto split=Memory::Read32(root+start+row*rowStride+p*4);
+                                for(uint32_t section=0;section<8;section++){
+                                    auto part=Memory::Read32(split+section*4),n=Memory::Read32(part+4);
+                                    if(Memory::Read32(part+8)!=(cleared?0:n))return 53;
+                                    for(uint32_t i=0;i<n;i++)if(Memory::Read8(Memory::Read32(part)+i)!=(cleared?0:0x6a))return 54;
+                                }
                             }
                         }
                     }

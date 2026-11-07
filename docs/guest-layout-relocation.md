@@ -1237,3 +1237,14 @@ fused initialization loops whose overlapping stores extend beyond the declared
 array even for a complete final group. The original 12-player emission remains
 unchanged. Unit tests cover aligned capacity 24, scaled indices, negative bias,
 invalid scales, and format-version gating; all 879 translator unit tests pass.
+
+The section manager now allocates `SectionParams.size`. Its online menu state
+uses uniform capacity-sized friend indices, team pairs, auxiliary player bytes,
+rank messages, and region IDs; the following menu state moves with these arrays.
+The player Mii group receives the configured capacity, while the physical local
+Mii group retains its two slots. The original overlapping reset remains unchanged
+at 12; resized resets initialize each declared array without spilling into the
+next array. Native constructor/reset tests pass at 12, 13, 24, 48, and 100,
+including Mii initialization arguments, guard bytes, and preserved registers.
+The consumer audit passes for all 1,275 declared functions. Race setup and the
+remaining online protocol still need their own capacity migrations.

@@ -1227,3 +1227,13 @@ unroll. The native controller fixture checks first/last supported console IDs,
 all four timestamp arrays, full/split payloads and lengths, and preservation of
 other peers' data. All five capacities and the consumer audit pass; participant
 mask behavior beyond the SDK width is still not an expanded online protocol.
+
+Layout format 20 adds `IndexScale` (positive, default 1) and
+`AlwaysWhenResized` (default false) to bounded accesses. After optional
+base/stride normalization, the logical player index is
+`index * IndexScale + IndexBias`. An always-bounded access checks every resized
+capacity, including capacities divisible by its group width. This supports
+fused initialization loops whose overlapping stores extend beyond the declared
+array even for a complete final group. The original 12-player emission remains
+unchanged. Unit tests cover aligned capacity 24, scaled indices, negative bias,
+invalid scales, and format-version gating; all 879 translator unit tests pass.

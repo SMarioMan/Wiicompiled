@@ -9,13 +9,16 @@ using Translator.Core.Loading;
 namespace Translator.Core.Translation;
 
 public sealed record GuestBoundedAccess(uint Instruction, uint ExpectedWord, int Node, string Index,
-    int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null);
+    int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null,
+    int IndexScale = 1, bool AlwaysWhenResized = false);
 
 public sealed partial class GuestLayoutRelocations
 {
     private readonly GuestBoundedAccess[] _boundedAccesses;
     private readonly ConcurrentDictionary<uint, (bool Write, int Width)> _boundShapes = new();
     private static string BoundHelper(GuestBoundedAccess site) => $"layout_bound_{site.Instruction:X8}";
+    private bool BoundEnabled(GuestBoundedAccess site) => Players != OriginalPlayers &&
+        (site.AlwaysWhenResized || Players % site.GroupWidth != 0);
 
     private void ValidateBoundDefinitions()
     {
@@ -23,7 +26,7 @@ public sealed partial class GuestLayoutRelocations
         foreach (var site in _boundedAccesses)
         {
             if (site.Instruction % 4 != 0 || site.Node < 0 || !Gpr(site.Index) ||
-                site.GroupWidth <= 0 || OriginalPlayers % site.GroupWidth != 0 || !seen.Add(site.Instruction) ||
+                site.GroupWidth <= 0 || site.IndexScale <= 0 || OriginalPlayers % site.GroupWidth != 0 || !seen.Add(site.Instruction) ||
                 (site.IndexBase is null) != (site.IndexStride is null) || site.IndexBase is not null && !Gpr(site.IndexBase) ||
                 _arrayCopies.Any(copy => site.Instruction >= copy.Begin && site.Instruction < CopyEnd(copy)) ||
                 _rankTables.Any(table => table.Lookups.Any(lookup => lookup.Instruction == site.Instruction)))
@@ -69,7 +72,7 @@ public sealed partial class GuestLayoutRelocations
             if (origin.Address != site.Instruction) continue;
             if (origin.Word != site.ExpectedWord) throw BoundMismatch(site);
             _ = BoundShape(site, nodes);
-            if (Players % site.GroupWidth == 0) return nodes;
+            if (!BoundEnabled(site)) return nodes;
             var result = nodes.ToArray();
             var address = result[site.Node] is IrLoad load ? load.Address : ((IrStore)result[site.Node]).Address;
             var arguments = new List<IrValue> { IrValue.Register(address.Base), IrValue.Imm(address.Offset),
@@ -107,7 +110,7 @@ public sealed partial class GuestLayoutRelocations
                 static inline {{type}} {{helper}}(uint32_t base, int32_t offset, uint32_t index, uint32_t root{{extra}}) {
                     const uint32_t relative = index-root;
                     if (relative % {{stride}}u != 0) { {{reject}} }
-                    const int64_t logical = int64_t(relative/{{stride}}u)+({{site.IndexBias}});
+                    const int64_t logical = int64_t(relative/{{stride}}u)*{{site.IndexScale}}+({{site.IndexBias}});
                     if (logical < 0 || logical >= {{Players}}) { {{reject}} }
                     {{operation}}
                 }

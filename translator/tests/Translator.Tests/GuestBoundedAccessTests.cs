@@ -69,4 +69,40 @@ public class GuestBoundedAccessTests
         }
         finally { File.Delete(path); }
     }
+
+    [Fact]
+    public void ScaledLoopCountersCanGuardEvenAnAlignedExpandedCapacity()
+    {
+        const uint pc=0x80001000;
+        var image=TranslatorCppTestHarness.CreateImage((pc,0x90830000),(pc+4,0x4e800020));
+        var bounds=new[] {new GuestBoundedAccess(pc,0x90830000,0,"r6",-2,2,
+            IndexScale:2,AlwaysWhenResized:true)};
+        var original=new FunctionTranslator(image).Translate(pc).CxxCode;
+        var same=new GuestLayoutRelocations(Types,12,12,Array.Empty<GuestLayoutReference>(),boundedAccesses:bounds);
+        Assert.Equal(original,new FunctionTranslator(image,layoutRelocations:same).Translate(pc).CxxCode);
+        var expanded=new GuestLayoutRelocations(Types,12,24,Array.Empty<GuestLayoutReference>(),boundedAccesses:bounds);
+        var code=new FunctionTranslator(image,layoutRelocations:expanded).Translate(pc).CxxCode;
+        Assert.Contains("int64_t(relative/1u)*2+(-2)",code);
+        Assert.Contains("logical >= 24",code);
+        Assert.Contains("layout_bound_80001000",code);
+        foreach(var scale in new[] {0,-1})Assert.Throws<InvalidDataException>(()=>new GuestLayoutRelocations(
+            Types,12,24,Array.Empty<GuestLayoutReference>(),boundedAccesses:new[] {bounds[0] with {IndexScale=scale}}));
+    }
+
+    [Fact]
+    public void ResizedCounterBoundsRequireVersionTwenty()
+    {
+        var path=Path.GetTempFileName();
+        try {
+            foreach(var version in new[] {19,20,21})foreach(var always in new[] {false,true}){
+                File.WriteAllText(path,JsonSerializer.Serialize(new {
+                    Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
+                    BoundedAccesses=new[] {new {Instruction="0x80001000",ExpectedWord="0x90830000",Node=0,
+                        Index="r6",IndexBias=-2,GroupWidth=2,IndexScale=always?1:2,AlwaysWhenResized=always}}
+                }));
+                if(version!=20)Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+                else Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+            }
+        }finally{File.Delete(path);}
+    }
 }

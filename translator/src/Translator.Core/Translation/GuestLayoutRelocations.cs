@@ -114,7 +114,7 @@ public sealed partial class GuestLayoutRelocations
         BoundedAccesses = _boundedAccesses.Select(site => new {
             Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
             site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride,
-            Enabled = Players % site.GroupWidth != 0
+            site.IndexScale, site.AlwaysWhenResized, Enabled = BoundEnabled(site)
         }),
         RankTables = _rankTables.Select(table => new {
             Address = $"0x{table.Address:X8}", OriginalCapacity = OriginalPlayers, Capacity = Players,
@@ -252,7 +252,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 20 && file.BoundedAccesses?.Any(site => site.IndexScale != 1 || site.AlwaysWhenResized) == true)
+            throw new InvalidDataException("Scaled and always-bounded resized accesses require layout format version 20.");
         if (file.Version < 19 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.StartIndex != 0)) == true)
             throw new InvalidDataException("Partial array fills require layout format version 19.");
         if (file.Version < 18 && file.References.Any(reference => reference.Symbol.Contains("bits(", StringComparison.Ordinal)))
@@ -309,7 +311,8 @@ public sealed partial class GuestLayoutRelocations
                 table.Lookups.Select(site => new GuestRankLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
                     site.Node, site.AddressBase, site.AddressOffset, site.Destination, site.Players, site.Position)).ToArray())),
             file.BoundedAccesses?.Select(site => new GuestBoundedAccess(Hex(site.Instruction), Hex(site.ExpectedWord),
-                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride)),
+                site.Node, site.Index, site.IndexBias, site.GroupWidth, site.Fallback, site.IndexBase, site.IndexStride,
+                site.IndexScale, site.AlwaysWhenResized)),
             file.ArrayFills?.Select(fill => new GuestArrayFill(Hex(fill.Begin), fill.ExpectedWords.Select(Hex).ToArray(),
                 fill.BaseRegister, fill.ValueRegister, fill.Arrays, fill.Addresses, fill.Constants, fill.Copies)),
             file.ResampledCursors?.Select(site => new GuestResampledCursor(Hex(site.Instruction),Hex(site.ExpectedWord),
@@ -351,7 +354,8 @@ public sealed partial class GuestLayoutRelocations
         string IndexStride,string SourceStride,string Count,int SourceCount);
     private sealed record ArrayFillFile(string Begin, string[] ExpectedWords, string BaseRegister, string ValueRegister, GuestFillArray[] Arrays, GuestFillAddress[]? Addresses = null, GuestFillConstant[]? Constants = null, GuestFillCopy[]? Copies = null);
     private sealed record BoundAccessFile(string Instruction, string ExpectedWord, int Node, string Index,
-        int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null);
+        int IndexBias, int GroupWidth, uint Fallback = 0, string? IndexBase = null, string? IndexStride = null,
+        int IndexScale = 1, bool AlwaysWhenResized = false);
     private sealed record RankTableFile(string Address, string ExpectedHex, int[] Curve, RankLookupFile[] Lookups);
     private sealed record RankLookupFile(string Instruction, string ExpectedWord, int Node, string AddressBase,
         int AddressOffset, string Destination, string Players, string Position);

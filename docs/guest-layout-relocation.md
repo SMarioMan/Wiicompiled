@@ -1302,3 +1302,16 @@ five capacities. The 1,304-function consumer audit passes. A live
 that IDs 24, 13, 23, and 12 discover one another, share a lobby, select course 8,
 and advance in racing stage 2 with four racers after this fix. This still does
 not validate 24 active participants or the pending larger wire packet format.
+
+Layout format 22 adds packed-word loads and checked stack-to-object array
+transfers, plus an independent `ShiftInput` for packed stores. A packed load
+selects the word containing the audited bit index and normalizes that index for
+the original mask operations. An array transfer verifies the original scalar
+load/store and safe intervening stack-address setup, retains register effects,
+and copies every configured word. Middle address operands can retain separate
+layout references when other stack objects move. Transfers reject interior
+entries, overwritten bases/data, other memory effects, and overlapping rewrite
+sites. Tests cover 12, 13, 24, 48, and 100, every team bit, shifted stack addresses,
+source/destination guards, register effects, invalid spans, and format gating.
+All 897 translator unit tests pass. These primitives do not themselves expand
+the public packet format or establish support for 24 active network players.

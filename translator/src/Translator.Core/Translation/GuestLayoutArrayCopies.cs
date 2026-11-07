@@ -124,6 +124,7 @@ public sealed partial class GuestLayoutRelocations
     public void ValidateCopyControlFlow(IReadOnlyList<PpcInstruction> instructions, IReadOnlyList<BasicBlock> blocks)
     {
         ValidateFillControlFlow(instructions, blocks);
+        ValidateTransferControlFlow(instructions, blocks);
         ValidateMarkerControlFlow(instructions, blocks);
         ValidateBitsetControlFlow(instructions, blocks);
         ValidateHeapRouteControlFlow(instructions, blocks);

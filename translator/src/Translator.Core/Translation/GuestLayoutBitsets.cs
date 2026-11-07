@@ -11,7 +11,7 @@ namespace Translator.Core.Translation;
 // Unit must contain one; Index must remain available after the original shift.
 public sealed record GuestBitsetStore(uint Begin, IReadOnlyList<uint> ExpectedWords,
     string Base, string Index, string Unit, string Shift, string Loaded, string Offset, string Count,
-    int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1);
+    int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1, string? ShiftInput = null);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -25,6 +25,7 @@ public sealed partial class GuestLayoutRelocations
             var registers=new[] {site.Base,site.Index,site.Unit,site.Shift,site.Loaded};
             if(site.Begin%4!=0 || site.ExpectedWords.Count is <4 or >16 || registers.Distinct().Count()!=5 ||
                 registers.Any(register=>!IsGpr(register) || register is "r1" or "r2") ||
+                (site.ShiftInput is not null && site.ShiftInput != site.Shift && site.ShiftInput != site.Index) ||
                 site.WordBytes is not (2 or 4) || site.WordBits<=0 || site.WordBits>site.WordBytes*8 ||
                 site.BitsPerPlayer<=0 || site.BitsPerPlayer>32 || (long)OriginalPlayers*site.BitsPerPlayer>site.WordBits || Players<OriginalPlayers ||
                 _original.Symbol(site.Count)!=1 || _expanded.Symbol(site.Count)!=((long)Players*site.BitsPerPlayer+site.WordBits-1)/site.WordBits ||
@@ -55,7 +56,7 @@ public sealed partial class GuestLayoutRelocations
             var offset=_original.Symbol(site.Offset);
             var expected=new IrInstruction[] {
                 new IrLoad(site.Loaded,new(site.Base,offset),site.WordBytes),
-                new IrBinary(site.Shift,IrValue.Register(site.Unit),IrValue.Register(site.Shift),"ppc_slw"),
+                new IrBinary(site.Shift,IrValue.Register(site.Unit),IrValue.Register(site.ShiftInput ?? site.Shift),"ppc_slw"),
                 new IrBinary(site.Shift,IrValue.Register(site.Loaded),IrValue.Register(site.Shift),"or"),
                 new IrStore(new(site.Base,offset),IrValue.Register(site.Shift),site.WordBytes)};
             var effect=0;

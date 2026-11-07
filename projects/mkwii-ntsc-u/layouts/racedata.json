@@ -50383,6 +50383,932 @@
       "Symbol": "RKNetController.splitSend.offset+RKNetPointerRow.players.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x805E57E0",
+      "ExpectedWord": "0x8AA32920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DE7C",
+      "ExpectedWord": "0x8AA32920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F3F0",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650AB4",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650AD8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650AFC",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650B20",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650B44",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650B68",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650EC4",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650EE8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650F0C",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650F30",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650F54",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650F78",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065112C",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065114C",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065116C",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065118C",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806511AC",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806511CC",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651210",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8085ACF8",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E38C",
+      "ExpectedWord": "0x8B032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F544",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F578",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F5AC",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F5E0",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F650",
+      "ExpectedWord": "0x88A32920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F680",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F6B4",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F6E8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F71C",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064F84C",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FB28",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FC6C",
+      "ExpectedWord": "0x88842920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064FFAC",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806503C8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065053C",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806505F0",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80654608",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80654644",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80654680",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806546BC",
+      "ExpectedWord": "0x88042920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655A30",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655A54",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655A78",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655A9C",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655AC0",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80655AE4",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065770C",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657870",
+      "ExpectedWord": "0x88832920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806578C8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806578FC",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657930",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657964",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EA6C",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EA90",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EAB4",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EAD8",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EAFC",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065EB20",
+      "ExpectedWord": "0x88032920",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805E57D0",
+      "ExpectedWord": "0x2811000B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8061DE6C",
+      "ExpectedWord": "0x2811000B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8064F3E4",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650AA8",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650ACC",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650AF0",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650B14",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650B38",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650B5C",
+      "ExpectedWord": "0x2C07000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650EB8",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650EDC",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650F00",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650F24",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650F48",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650F6C",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80651204",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8085ACE8",
+      "ExpectedWord": "0x2819000B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8061E37C",
+      "ExpectedWord": "0x281B000B",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8064F538",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F56C",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F5A0",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F5D4",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F644",
+      "ExpectedWord": "0x2C04000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F674",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F6A8",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F6DC",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F710",
+      "ExpectedWord": "0x2C06000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064F840",
+      "ExpectedWord": "0x2C04000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064FB1C",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064FC60",
+      "ExpectedWord": "0x2C0A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8064FFA0",
+      "ExpectedWord": "0x2C1F000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806503BC",
+      "ExpectedWord": "0x2C04000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80650530",
+      "ExpectedWord": "0x2C1F000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806505E4",
+      "ExpectedWord": "0x2C1E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806545FC",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80654638",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80654674",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806546B0",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80657700",
+      "ExpectedWord": "0x2C1C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80657864",
+      "ExpectedWord": "0x2C1C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806578BC",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806578F0",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80657924",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80657958",
+      "ExpectedWord": "0x2C05000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806558E4",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80655A1C",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)",
+      "Addend": 0
     }
   ],
   "GlobalPointers": {
@@ -58070,6 +58996,114 @@
       "IndexBias": 3,
       "GroupWidth": 4,
       "Fallback": 0
+    },
+    {
+      "Instruction": "0x80655908",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x80655930",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x80655958",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x80655980",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x806559A8",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x806559D0",
+      "ExpectedWord": "0x80050010",
+      "Node": 0,
+      "Index": "r3",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 4
+    },
+    {
+      "Instruction": "0x80655A30",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
+    },
+    {
+      "Instruction": "0x80655A54",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
+    },
+    {
+      "Instruction": "0x80655A78",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
+    },
+    {
+      "Instruction": "0x80655A9C",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
+    },
+    {
+      "Instruction": "0x80655AC0",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
+    },
+    {
+      "Instruction": "0x80655AE4",
+      "ExpectedWord": "0x88052920",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6,
+      "Fallback": 255
     }
   ],
   "ArrayFills": [

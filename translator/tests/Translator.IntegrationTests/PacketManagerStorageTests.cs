@@ -30,7 +30,7 @@ public class PacketManagerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-packet-manager-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80006038,0x80005f84};
+            var entries=new uint[]{0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84};
             var fixtures=new HashSet<uint>{0x80229a48,0x80656ecc,0x8065cd74,0x80652ab8};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -130,6 +130,35 @@ public class PacketManagerStorageTests
                         Memory::Write32(controller+subs+current*subStride+16,0);
                         ctx.gpr[3]=root;ctx.gpr[4]=capacity-1;func_80650020(&ctx);if(ctx.gpr[3]!=0)return 12;
                         if(!equal())return 13;
+                    }
+                    Memory::Write8(racedata+{{layout.Symbol("Racedata.race.offset")}}+4,capacity);
+                    for(uint32_t current=0;current<2;current++)for(uint32_t p=0;p<capacity;p++)
+                        for(uint32_t present=0;present<2;present++)for(uint32_t disconnected=0;disconnected<2;disconnected++){
+                            const auto aid=p%peerCount,playerBit=(p&32)?0u:1u<<(p&31);
+                            Memory::Write8(controller+aidMap+p,aid);Memory::Write32(controller+currentSub,current);
+                            Memory::Write32(controller+subs+current*subStride+16,present?1u<<aid:0);
+                            Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},disconnected?playerBit:0);
+                            ctx.gpr[3]=root;ctx.gpr[4]=p;func_80650398(&ctx);
+                            if(ctx.gpr[3]!=(present && !(disconnected && playerBit)))return 17;
+                        }
+                    for(uint32_t p : {capacity,capacity+1,0xffffffffu}){
+                        ctx.gpr[3]=root;ctx.gpr[4]=p;func_80650398(&ctx);if(ctx.gpr[3])return 18;
+                    }
+                    for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,peerCount-1}){
+                        Memory::Write32(0x809bd790,0);Memory::Write32(controller+currentSub,current);
+                        Memory::Write32(controller+subs+current*subStride+16,1u<<local);Memory::Write8(controller+subs+current*subStride+33,local);
+                        std::memset(Memory::GetPointer(controller+aidMap,capacity),255,capacity);
+                        Memory::Write8(controller+aidMap,local);Memory::Write8(controller+aidMap+capacity-1,local);
+                        for(uint32_t ordinal=0;ordinal<3;ordinal++){
+                            ctx.gpr[3]=controller;ctx.gpr[4]=ordinal;func_806558D0(&ctx);
+                            if(ctx.gpr[3]!=(ordinal==0?0:ordinal==1?capacity-1:0xffffffffu))return 19;
+                        }
+                    }
+                    Memory::Write32(0x809bd790,root);
+                    for(uint32_t p=0;p<capacity;p++)Memory::Write32(racedata+{{layout.Symbol("Racedata.race.offset+Scenario.players.offset")}}+p*240+16,(p==0 || p==capacity-1)?0:4);
+                    for(uint32_t ordinal=0;ordinal<3;ordinal++){
+                        ctx.gpr[3]=controller;ctx.gpr[4]=ordinal;func_806558D0(&ctx);
+                        if(ctx.gpr[3]!=(ordinal==0?0:ordinal==1?capacity-1:0xffffffffu))return 20;
                     }
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 14;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 15;

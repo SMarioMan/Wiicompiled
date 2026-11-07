@@ -1211,3 +1211,12 @@ Unscaled register indices can now produce review candidates at byte loads/stores
 on a declared byte-array dimension. They cannot prove word accesses, address-only
 arithmetic or pointee identities. Unit checks cover the moved byte array, original
 emission and those rejection cases. All 877 default translator tests pass.
+
+The byte-index audit adds 62 moved player-to-console map reads. Forty signed
+range guards and four unsigned last-index guards now follow capacity; their
+compare/branch/index/load/fallback sequences were reviewed together. Both
+six-player local-ID scans use ceiling counts and bounded final-group reads.
+The packet-manager fixture checks connected/disconnected lookups and both local-ID
+paths with local slots at the first and last capacity positions, including absent
+ordinals and invalid IDs. All five capacities and the consumer audit pass. The
+SDK connection/player masks retain their separately documented width limits.

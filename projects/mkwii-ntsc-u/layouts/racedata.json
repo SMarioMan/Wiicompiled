@@ -53642,6 +53642,92 @@
       "Operand": "offset",
       "Symbol": "OnlineParams.unknown.offset",
       "Addend": 13
+    },
+    {
+      "Instruction": "0x8061DE88",
+      "ExpectedWord": "0x2815000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061DF00",
+      "ExpectedWord": "0x2C00000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061E280",
+      "ExpectedWord": "0x2C11000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061E398",
+      "ExpectedWord": "0x2818000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061E3DC",
+      "ExpectedWord": "0x2C00000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061E478",
+      "ExpectedWord": "0x2C1B000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8061DF0C",
+      "ExpectedWord": "0x8803291F",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8061E3E8",
+      "ExpectedWord": "0x8803291F",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.playerAids.offset",
+      "Addend": -1
+    },
+    {
+      "Instruction": "0x8061E0E4",
+      "ExpectedWord": "0x9083038C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
+    },
+    {
+      "Instruction": "0x8061E0F8",
+      "ExpectedWord": "0x93C3038C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
+    },
+    {
+      "Instruction": "0x8061E184",
+      "ExpectedWord": "0x93C3038C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
+    },
+    {
+      "Instruction": "0x8061E274",
+      "ExpectedWord": "0x93C3038C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
     }
   ],
   "GlobalPointers": {
@@ -63705,6 +63791,23 @@
         {
           "Register": "r4",
           "Value": 255
+        }
+      ]
+    },
+    {
+      "Begin": "0x8061E378",
+      "ExpectedWords": [
+        "0x980302E3"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "SectionParams.online.offset+OnlineParams.friendIndices.offset",
+          "Stride": "OnlineParams.friendIndices.stride",
+          "Count": "OnlineParams.friendIndices.count",
+          "Width": 1,
+          "StartIndex": 11
         }
       ]
     }

@@ -1248,3 +1248,13 @@ next array. Native constructor/reset tests pass at 12, 13, 24, 48, and 100,
 including Mii initialization arguments, guard bytes, and preserved registers.
 The consumer audit passes for all 1,275 declared functions. Race setup and the
 remaining online protocol still need their own capacity migrations.
+
+Online race preparation and friend-list refresh now scan the configured capacity.
+Their console-ID guards and previous-player map reads follow the expanded map;
+four indexed region-ID writes follow the moved menu array. Friend-list clearing
+uses a partial fill from the last original entry through the new capacity.
+A native fixture executes both real functions with all participants absent and
+checks every slot becomes type `NONE`, its Mii is removed, its region is reset,
+and every friend index is cleared. Capacities 12, 13, 24, 48, and 100 pass,
+as does the full consumer audit. Active network participants and packet formats
+require separate live validation.

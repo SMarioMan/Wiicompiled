@@ -30,8 +30,8 @@ public class UserHandlerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-user-handler-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x80660694,0x80660d24,0x80660768,0x80660860,0x800cc0f0,0x80006038,0x80005f84};
-            var fixtures=new HashSet<uint>{0x80229a48,0x80229a6c,0x80660f28,0x800cc110};
+            var entries=new uint[]{0x80660694,0x80660d24,0x80660768,0x80660860,0x800cc0f0,0x80006038,0x80005f84,0x80660b08,0x80660b74,0x80660b84,0x80660ba4,0x80660c3c,0x80660ed4};
+            var fixtures=new HashSet<uint>{0x80229a48,0x80229a6c,0x80660f28,0x800cc110,0x800cc3e0,0x800cc3f0,0x800bc3e0};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -54,7 +54,7 @@ public class UserHandlerStorageTests
                     controllerSize={{layout.Symbol("RKNetController.size")}},currentSub={{layout.Symbol("RKNetController.currentSub.offset")}},
                     subs={{layout.Symbol("RKNetController.subs.offset")}},subStride={{layout.Symbol("RKNetSub.size")}},
                     bufferSize=160*(capacity-1),root=0x81010000,buffer=0x81050000,controller=0x81080000,stack=0x81f00000;
-                uint32_t allocations=0,bufferAllocations=0,prepares=0,rflInitializations=0;
+                uint32_t allocations=0,bufferAllocations=0,prepares=0,rflInitializations=0,toggles=0,asyncResult=0;
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo entryInfo{};entryInfo.address=address;entryInfo.name="USER handler fixture";entryInfo.rawCpuInvoker=entry;
                     entryInfo.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(entryInfo);}
@@ -67,6 +67,8 @@ public class UserHandlerStorageTests
                     // RFL transport itself retains its SDK limit. This fixture verifies
                     // the relocated call arguments and leaves SDK behavior separate.
                 }
+                void toggle(CpuContext* c){if(c->gpr[3]!=root+info)std::abort();toggles++;}
+                void async_status(CpuContext* c){c->gpr[3]=asyncResult;}
                 int main(int argc,char** argv){
                     if(argc!=2)return 1;Memory::Init(32*1024*1024);FILE* input=std::fopen(argv[1],"rb");if(!input)return 2;
                     auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
@@ -74,6 +76,8 @@ public class UserHandlerStorageTests
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x80229a6c,allocate_buffer);
                     register_entry(0x80660f28,prepare_send);register_entry(0x800cc110,initialize_rfl);
+                    register_entry(0x800cc3e0,toggle);register_entry(0x800cc3f0,toggle);register_entry(0x800bc3e0,async_status);
+                    Memory::Write32(0x809b8f88,0x81200000);Memory::Write32(0x81224ffc,0x81300000);
                     Memory::Write32(0x809bd918,controller);std::memset(Memory::GetPointer(controller,controllerSize),0,controllerSize);
                     Memory::Write32(controller+currentSub,1);Memory::Write8(controller+subs+subStride+33,1);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
@@ -105,6 +109,34 @@ public class UserHandlerStorageTests
                         for(uint32_t b=0;b<16;b++)if(Memory::Read8(root-16+b)!=0x55 || Memory::Read8(root+size+b)!=0x55 ||
                             Memory::Read8(buffer-16+b)!=0x55 || Memory::Read8(buffer+bufferSize+b)!=0x55)return 12;
                     }
+                    constexpr uint32_t lastPeer=capacity<32?capacity-1:31,remoteMask=1u|(1u<<lastPeer);
+                    for(uint32_t prepared : {0u,1u})for(uint32_t present : {0u,remoteMask})
+                        for(uint32_t packets : {0u,1u,remoteMask})for(uint32_t avatars : {0u,1u,remoteMask}){
+                            Memory::Write8(root,prepared);Memory::Write32(controller+subs+subStride+16,present|2);
+                            Memory::Write32(root+aidFlags,packets);Memory::Write32(root+miis,avatars);
+                            ctx.gpr[3]=root;func_80660BA4(&ctx);
+                            if(ctx.gpr[3]!=(prepared && present && (packets&present)==present && (avatars&present)==present))return 15;
+                            ctx.gpr[3]=root;func_80660C3C(&ctx);
+                            if(ctx.gpr[3]!=(prepared && present && (avatars&present)==present))return 16;
+                            for(uint32_t peer : {0u,1u,lastPeer}){
+                                ctx.gpr[3]=root;ctx.gpr[4]=peer;func_80660B84(&ctx);
+                                if(ctx.gpr[3]!=bool(packets&(1u<<peer)))return 17;
+                            }
+                        }
+                    for(uint32_t privacy : {0u,32u}){
+                        Memory::Write32(0x8132330c,privacy);Memory::Write32(root+unknown,0);
+                        Memory::Write32(root+miis,remoteMask);Memory::Write32(root+aidFlags,0x12345678);
+                        ctx.gpr[3]=root;func_80660B74(&ctx);if(ctx.gpr[3]!=1)return 18;
+                        ctx.gpr[3]=root;func_80660B08(&ctx);
+                        if(Memory::Read32(root+unknown)!=1 || Memory::Read32(root+aidFlags2)!=remoteMask || toggles!=(privacy?2:1))return 19;
+                        ctx.gpr[3]=root;func_80660B74(&ctx);if(ctx.gpr[3])return 20;
+                        asyncResult=6;ctx.gpr[3]=root;func_80660ED4(&ctx);
+                        if(Memory::Read32(root+unknown)!=1 || Memory::Read32(root+aidFlags)!=0x12345678 || Memory::Read32(root+aidFlags2)!=remoteMask)return 21;
+                        asyncResult=0;ctx.gpr[3]=root;func_80660ED4(&ctx);
+                        if(Memory::Read32(root+unknown) || Memory::Read32(root+aidFlags)!=remoteMask || Memory::Read32(root+aidFlags2))return 22;
+                        ctx.gpr[3]=root;func_80660B74(&ctx);if(ctx.gpr[3]!=1)return 23;
+                    }
+                    for(uint32_t b=0;b<16;b++)if(Memory::Read8(root-16+b)!=0x55 || Memory::Read8(root+size+b)!=0x55)return 24;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 13;
                     if(ctx.gpr[1]!=stack)return 14;
                     return 0;

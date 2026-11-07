@@ -1291,3 +1291,14 @@ increments of any register used by the bit operation. Tests cover every bit at
 stock emission, invalid shapes, and version gating. All 884 unit tests pass.
 The public game manifest remains format 20 until the packed-team consumers and
 packet layouts have been migrated together.
+
+Six unnamed USER helper routines now use the relocated status and RFL fields.
+Their readiness checks previously read the old offsets inside the expanded packet
+cache and prevented the room-start handshake from completing. The native USER
+fixture covers prepared/unprepared state, absent/present peers, packet and Mii
+masks, both privacy branches, and busy/completed asynchronous verification at all
+five capacities. The 1,304-function consumer audit passes. A live
+[four-instance trace](../mods/lan/tests/results/four-peer-capacity24.json) confirms
+that IDs 24, 13, 23, and 12 discover one another, share a lobby, select course 8,
+and advance in racing stage 2 with four racers after this fix. This still does
+not validate 24 active participants or the pending larger wire packet format.

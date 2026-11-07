@@ -219,3 +219,8 @@ lobby, selected course 8, and advanced together in racing stage 2 with exactly
 two racers. This verifies the expanded module/native boundary and removal of
 unused CPU slots; it does not demonstrate 24 active racers. The five Python
 layout/ELF checks and native capacity-option tests also pass.
+
+The [four-peer capacity-24 trace](tests/results/four-peer-capacity24.json) repeats
+the check after the USER and SELECT cache migrations. All four isolated local
+instances share one lobby and advance in the same four-racer online VS race.
+It has the same finish/rendering/item/battle limitations as the two-peer check.

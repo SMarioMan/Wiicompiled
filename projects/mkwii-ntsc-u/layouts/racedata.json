@@ -2112,6 +2112,68 @@
       "Name": "OnlinePlayerBytes",
       "Size": 2,
       "Alignment": 1
+    },
+    {
+      "Name": "RKNetUserHeader",
+      "Size": 8,
+      "Alignment": 8
+    },
+    {
+      "Name": "RKNetUserPacket",
+      "Size": 192,
+      "Alignment": 8
+    },
+    {
+      "Name": "RFLWiFiInformation",
+      "Size": 16,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetUserHandler",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RKNetUserHeader"
+        },
+        {
+          "Name": "send",
+          "Type": "RKNetUserPacket"
+        },
+        {
+          "Name": "received",
+          "Type": "RKNetUserPacket",
+          "PerPlayer": true
+        },
+        {
+          "Name": "rflInfo",
+          "Type": "RFLWiFiInformation"
+        },
+        {
+          "Name": "rflBuffer",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "unknown",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "aidBitflag",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "miisReceived",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "aidBitflag2",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "tail",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -53728,6 +53790,493 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
+    },
+    {
+      "Instruction": "0x805C5CA4",
+      "ExpectedWord": "0x800709E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805C5DEC",
+      "ExpectedWord": "0x38A709C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062907C",
+      "ExpectedWord": "0x800509E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AB78",
+      "ExpectedWord": "0x800309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062CE48",
+      "ExpectedWord": "0x800509E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D3F4",
+      "ExpectedWord": "0x800309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062D524",
+      "ExpectedWord": "0x38A509C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065697C",
+      "ExpectedWord": "0x800309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806583A4",
+      "ExpectedWord": "0x93A309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660738",
+      "ExpectedWord": "0x807F09D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806607D0",
+      "ExpectedWord": "0x387D09C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806607F0",
+      "ExpectedWord": "0x807D09D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660800",
+      "ExpectedWord": "0x809D09D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660808",
+      "ExpectedWord": "0x387D09C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660830",
+      "ExpectedWord": "0x907D09DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.unknown.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660834",
+      "ExpectedWord": "0x907D09E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660838",
+      "ExpectedWord": "0x907D09E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8066083C",
+      "ExpectedWord": "0x907D09E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660888",
+      "ExpectedWord": "0x900309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8066088C",
+      "ExpectedWord": "0x900309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660890",
+      "ExpectedWord": "0x900309E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660940",
+      "ExpectedWord": "0x901D09E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660948",
+      "ExpectedWord": "0x901D09E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8066094C",
+      "ExpectedWord": "0x901D09E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660990",
+      "ExpectedWord": "0x801D09DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.unknown.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806609A8",
+      "ExpectedWord": "0x807D09E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806609B0",
+      "ExpectedWord": "0x907D09E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806609B4",
+      "ExpectedWord": "0x901D09E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806609B8",
+      "ExpectedWord": "0x901D09DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.unknown.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A50",
+      "ExpectedWord": "0x80C309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A58",
+      "ExpectedWord": "0x80A309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A60",
+      "ExpectedWord": "0x800309E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A68",
+      "ExpectedWord": "0x90C309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A74",
+      "ExpectedWord": "0x90A309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660A80",
+      "ExpectedWord": "0x900309E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660D44",
+      "ExpectedWord": "0x900309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660D48",
+      "ExpectedWord": "0x900309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660D4C",
+      "ExpectedWord": "0x900309E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660D64",
+      "ExpectedWord": "0x907F09D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660DA4",
+      "ExpectedWord": "0x806309D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E70",
+      "ExpectedWord": "0x807909E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E80",
+      "ExpectedWord": "0x901909E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E88",
+      "ExpectedWord": "0x387909C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80660E98",
+      "ExpectedWord": "0x389909C8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetUserHandler.rflInfo.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806606B4",
+      "ExpectedWord": "0x386009F0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetUserHandler.size"
+    },
+    {
+      "Instruction": "0x806606D0",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80660D2C",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x806607E4",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8066080C",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x806607C0",
+      "ExpectedWord": "0x281F000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x806608BC",
+      "ExpectedWord": "0x281F000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80660974",
+      "ExpectedWord": "0x281F000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80660EB4",
+      "ExpectedWord": "0x281A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x806606D4",
+      "ExpectedWord": "0x900309E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag.offset"
+    },
+    {
+      "Instruction": "0x806606D8",
+      "ExpectedWord": "0x900309E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.miisReceived.offset"
+    },
+    {
+      "Instruction": "0x806606DC",
+      "ExpectedWord": "0x900309E8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.aidBitflag2.offset"
+    },
+    {
+      "Instruction": "0x806606F4",
+      "ExpectedWord": "0x907F09D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetUserHandler.rflBuffer.offset"
     }
   ],
   "GlobalPointers": {
@@ -53747,7 +54296,8 @@
     "0x809BD920": "RKNetRoomHandler",
     "0x809BD940": "RKNetRH1Handler",
     "0x809BD790": "RKNetPacketMgr",
-    "0x809BD508": "SectionMgr"
+    "0x809BD508": "SectionMgr",
+    "0x809BD958": "RKNetUserHandler"
   },
   "ArrayCopies": [
     {
@@ -59606,17 +60156,17 @@
     },
     {
       "Entry": "0x80660768",
-      "Receiver": null,
+      "Receiver": "RKNetUserHandler",
       "Name": "RKNet::USERHandler::Prepare"
     },
     {
       "Entry": "0x806609D8",
-      "Receiver": null,
+      "Receiver": "RKNetUserHandler",
       "Name": "RKNet::USERHandler::CopySendToPacketHolder"
     },
     {
       "Entry": "0x80660A1C",
-      "Receiver": null,
+      "Receiver": "RKNetUserHandler",
       "Name": "RKNet::USERHandler::ProcessPlayerDisconnect"
     },
     {
@@ -59631,7 +60181,7 @@
     },
     {
       "Entry": "0x80660DD8",
-      "Receiver": null,
+      "Receiver": "RKNetUserHandler",
       "Name": "RKNet::USERHandler::ImportNewPackets"
     },
     {
@@ -60233,6 +60783,46 @@
       "Entry": "0x80838664",
       "Receiver": null,
       "Name": "Pages::RaceMenu::OnButtonClick"
+    },
+    {
+      "Entry": "0x80660714",
+      "Receiver": null,
+      "Name": "RKNet::USERHandler::DestroyInstance"
+    },
+    {
+      "Entry": "0x80660860",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::Reset"
+    },
+    {
+      "Entry": "0x806608DC",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::Update"
+    },
+    {
+      "Entry": "0x80660C9C",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::SetSendVR"
+    },
+    {
+      "Entry": "0x80660CE0",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::SetSendBR"
+    },
+    {
+      "Entry": "0x80660D24",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::__ct"
+    },
+    {
+      "Entry": "0x80660D80",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::__dt"
+    },
+    {
+      "Entry": "0x80660F28",
+      "Receiver": "RKNetUserHandler",
+      "Name": "RKNet::USERHandler::CreateSendPacket"
     }
   ],
   "BoundedAccesses": [

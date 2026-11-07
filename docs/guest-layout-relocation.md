@@ -1258,3 +1258,14 @@ checks every slot becomes type `NONE`, its Mii is removed, its region is reset,
 and every friend index is cleared. Capacities 12, 13, 24, 48, and 100 pass,
 as does the full consumer audit. Active network participants and packet formats
 require separate live validation.
+
+The USER handler now allocates one uniform 192-byte received packet per configured
+participant, moving its RFL information, buffer pointer, and flags after the
+array. Factory and standalone constructor paths, prepare/reset loops, update and
+import scans, and RFL sizing/initialization arguments follow capacity. Native
+tests execute real allocation, constructor, prepare/reset, memory clearing, and
+RFL buffer-size code at 12, 13, 24, 48, and 100. They check all packet bytes,
+buffer guards, repeated-prepare behavior and preserved registers. RFL initialization
+is an explicit SDK fixture in these tests: the original SDK rejects capacities
+of 32 and above, so the larger storage tests do not establish online support.
+All five capacities and the 1,283-function consumer audit pass.

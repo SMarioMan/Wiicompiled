@@ -7,11 +7,11 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-// Expand a proven scalar stack-to-object copy into an array transfer. Safe
+// Expand a proven scalar copy into an array transfer. Safe
 // address setup between the load and store retains its original register effects.
 public sealed record GuestArrayTransfer(uint Begin, IReadOnlyList<uint> ExpectedWords,
     string SourceBase, string SourceOffset, string DestinationBase, string DestinationOffset,
-    string Value, string Stride, string Count, int Width = 4);
+    string Value, string Stride, string Count, int Width = 4, bool AllowObjectSource = false);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -23,13 +23,13 @@ public sealed partial class GuestLayoutRelocations
         foreach (var site in _arrayTransfers)
         {
             var registers = new[] { site.SourceBase, site.DestinationBase, site.Value };
-            if (site.Begin % 4 != 0 || site.ExpectedWords.Count is < 2 or > 16 || site.SourceBase != "r1" ||
+            if (site.Begin % 4 != 0 || site.ExpectedWords.Count is < 2 or > 16 || (!site.AllowObjectSource && site.SourceBase != "r1") || site.SourceBase is "r0" or "r2" ||
                 registers.Any(register => !IsGpr(register)) || registers.Distinct().Count() != 3 ||
                 site.DestinationBase is "r0" or "r2" || site.Width is not (2 or 4) ||
                 _original.Symbol(site.Count) != 1 || _expanded.Symbol(site.Count) < 1 || Players < OriginalPlayers ||
                 new[] { _original, _expanded }.Any(layout => layout.Symbol(site.Stride) < site.Width ||
                     layout.Symbol(site.SourceOffset) < 0 || layout.Symbol(site.DestinationOffset) < 0))
-                throw new InvalidDataException("Invalid stack-to-object array transfer.");
+                throw new InvalidDataException("Invalid scalar-to-array transfer.");
             var end = TransferEnd(site);
             bool Inside(uint pc) => site.Begin <= pc && pc < end;
             bool Overlap(uint begin, uint otherEnd) => begin < end && otherEnd > site.Begin;
@@ -47,7 +47,7 @@ public sealed partial class GuestLayoutRelocations
                 _authoredCountIndices.Any(index => Inside(index.Instruction)) ||
                 _traversalMarkers.Any(marker => Overlap(marker.Begin, MarkerEnd(marker))) ||
                 _heapRoutes.Any(route => Overlap(route.Begin, HeapRouteEnd(route))))
-                throw new InvalidDataException("Overlapping stack-to-object array transfer.");
+                throw new InvalidDataException("Overlapping scalar-to-array transfer.");
         }
     }
 
@@ -70,7 +70,7 @@ public sealed partial class GuestLayoutRelocations
                             address.Left.RegisterName == site.SourceBase && IsGpr(address.Destination) &&
                             address.Destination != site.SourceBase && address.Destination != site.DestinationBase &&
                             address.Destination != site.Value && address.Destination is not "r2";
-                if (!valid) throw new InvalidDataException($"Unproven stack-to-object transfer at 0x{pc:X8}.");
+                if (!valid) throw new InvalidDataException($"Unproven scalar-to-array transfer at 0x{pc:X8}.");
             }
         }
     }
@@ -91,6 +91,13 @@ public sealed partial class GuestLayoutRelocations
             var value = $"addr_layout_transfer_{site.Begin:X8}_{index}_loc";
             var offset = checked(index * _expanded.Symbol(site.Stride));
             result.Add(new IrLoad(value, new(site.SourceBase, checked(_expanded.Symbol(site.SourceOffset) + offset)), site.Width));
+        }
+        // Snapshot all words first so overlapping source/destination regions
+        // retain transfer semantics instead of repeatedly reading our own writes.
+        for (var index = 0; index < _expanded.Symbol(site.Count); index++)
+        {
+            var value = $"addr_layout_transfer_{site.Begin:X8}_{index}_loc";
+            var offset = checked(index * _expanded.Symbol(site.Stride));
             result.Add(new IrStore(new(site.DestinationBase, checked(_expanded.Symbol(site.DestinationOffset) + offset)), IrValue.Register(value), site.Width));
         }
         return result;

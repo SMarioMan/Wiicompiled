@@ -97,11 +97,11 @@ public class GuestLayoutBitsetTests
         Assert.NotEmpty(translator.Translate(Start,TranslationOptions.Default).CxxCode);
         if(players==24){
             var path=Path.GetTempFileName();
-            try{foreach(var version in new[] {20,21,22,23}){
+            try{foreach(var version in new[] {20,21,22,23,24}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types=types,References=Array.Empty<object>(),
                     BitsetStores=new[] {new {Begin=$"0x{Start:X8}",ExpectedWords=words.Select(word=>$"0x{word:X8}"),
                         site.Base,site.Index,site.Unit,site.Shift,site.Loaded,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer}}}));
-                if(version is 21 or 22)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 21 or 22 or 23)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }}finally{File.Delete(path);}
         }
@@ -143,12 +143,12 @@ public class GuestLayoutBitsetTests
         var path=Path.GetTempFileName();
         try
         {
-            foreach(var version in new[] {12,13,14,15,16,17,18,19,20,21,22,23})
+            foreach(var version in new[] {12,13,14,15,16,17,18,19,20,21,22,23,24})
             {
                 File.WriteAllText(path,JsonSerializer.Serialize(new {Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                     BitsetStores=new[] {new {Begin="0x80001000",ExpectedWords=Words.Select(word=>$"0x{word:X8}"),
                         Base="r3",Index="r12",Unit="r10",Shift="r0",Loaded="r7",Offset="Record.finished.offset",Count="Record.finished.count"}}}));
-                if(version is 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+                if(version is 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
             }
         }

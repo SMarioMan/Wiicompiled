@@ -138,9 +138,9 @@ public sealed partial class GuestLayoutRelocations
         BitsetLoads = _bitsetLoads.Select(site => new {Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",
             site.Node,site.Base,site.Index,site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer}),
         ArrayTransfers = _arrayTransfers.Select(site => new {Begin=$"0x{site.Begin:X8}",ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"),
-            site.SourceBase,site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width}),
+            site.SourceBase,site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource}),
         BitsetStores = _bitsetStores.Select(site => new { Begin=$"0x{site.Begin:X8}",
-            ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"), site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count, site.WordBits, site.WordBytes, site.BitsPerPlayer, site.ShiftInput }),
+            ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"), site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count, site.WordBits, site.WordBytes, site.BitsPerPlayer, site.ShiftInput, site.IndexBias, site.AllowScalarAuxiliaries }),
         AuthoredCountIndices = _authoredCountIndices.Select(site => new {
             Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",
             site.Input,site.Destination,site.FirstCount,site.LastCount,
@@ -267,7 +267,10 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 23 && (file.BitsetStores?.Any(site => site.IndexBias != 0 || site.AllowScalarAuxiliaries) == true ||
+            file.ArrayTransfers?.Any(site => site.AllowObjectSource) == true))
+            throw new InvalidDataException("Post-shift indices, scalar auxiliaries and object array transfers require layout format version 23.");
         if (file.Version < 22 && (file.BitsetLoads is {Length:>0} || file.ArrayTransfers is {Length:>0} || file.BitsetStores?.Any(site => site.ShiftInput is not null) == true))
             throw new InvalidDataException("Packed-word loads and stack array transfers require layout format version 22.");
         if (file.Version < 21 && file.BitsetStores?.Any(site => site.WordBits != 16 || site.WordBytes != 2 ||
@@ -347,7 +350,7 @@ public sealed partial class GuestLayoutRelocations
                     site.Base, site.Index, site.Destination, site.CountOffset, site.Position)).ToArray())),
             file.NormalizedRanks?.Select(site => new GuestNormalizedRank(Hex(site.Instruction), Hex(site.ExpectedWord), site.Register, site.Count, site.SourceCount)),
             file.BitsetStores?.Select(site => new GuestBitsetStore(Hex(site.Begin), site.ExpectedWords.Select(Hex).ToArray(),
-                site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count, site.WordBits, site.WordBytes, site.BitsPerPlayer, site.ShiftInput)),
+                site.Base, site.Index, site.Unit, site.Shift, site.Loaded, site.Offset, site.Count, site.WordBits, site.WordBytes, site.BitsPerPlayer, site.ShiftInput, site.IndexBias, site.AllowScalarAuxiliaries)),
             file.HeapRoutes?.Select(site => new GuestHeapRoute(Hex(site.Begin), site.ExpectedWords.Select(Hex).ToArray(), site.Scene,
                 site.PrimaryRegister, site.SecondaryRegister, site.ZeroRegister, site.PrimaryHeap, site.SecondaryHeap, site.PrimarySlot, site.SecondarySlot)),
             file.AuthoredCountIndices?.Select(site => new GuestAuthoredCountIndex(Hex(site.Instruction),Hex(site.ExpectedWord),
@@ -355,7 +358,7 @@ public sealed partial class GuestLayoutRelocations
             file.BitsetLoads?.Select(site => new GuestBitsetLoad(Hex(site.Instruction),Hex(site.ExpectedWord),site.Node,site.Base,site.Index,
                 site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer)),
             file.ArrayTransfers?.Select(site => new GuestArrayTransfer(Hex(site.Begin),site.ExpectedWords.Select(Hex).ToArray(),site.SourceBase,
-                site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width)))
+                site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -368,12 +371,12 @@ public sealed partial class GuestLayoutRelocations
     private sealed record BitsetLoadFile(string Instruction,string ExpectedWord,int Node,string Base,string Index,string Destination,
         string Offset,string Count,int WordBits=16,int WordBytes=2,int BitsPerPlayer=1);
     private sealed record ArrayTransferFile(string Begin,string[] ExpectedWords,string SourceBase,string SourceOffset,string DestinationBase,
-        string DestinationOffset,string Value,string Stride,string Count,int Width=4);
+        string DestinationOffset,string Value,string Stride,string Count,int Width=4,bool AllowObjectSource=false);
     private sealed record AuthoredCountIndexFile(string Instruction,string ExpectedWord,string Input,string Destination,int FirstCount,int LastCount);
     private sealed record HeapRouteFile(string Begin,string[] ExpectedWords,string Scene,string PrimaryRegister,string SecondaryRegister,
         string ZeroRegister,int PrimaryHeap,int SecondaryHeap,int PrimarySlot,int SecondarySlot);
     private sealed record BitsetStoreFile(string Begin, string[] ExpectedWords, string Base, string Index, string Unit, string Shift, string Loaded, string Offset, string Count,
-        int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1, string? ShiftInput = null);
+        int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1, string? ShiftInput = null, int IndexBias = 0, bool AllowScalarAuxiliaries = false);
     private sealed record NormalizedRankFile(string Instruction, string ExpectedWord, string Register, string Count, int SourceCount);
     private sealed record GridTableFile(string Address, string ExpectedHex, bool AdvanceRows, GridLookupFile[] Lookups);
     private sealed record GridLookupFile(string Instruction, string ExpectedWord, string Base, string Index, string Destination, string CountOffset, string? Position = null);

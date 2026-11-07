@@ -1315,3 +1315,14 @@ sites. Tests cover 12, 13, 24, 48, and 100, every team bit, shifted stack addres
 source/destination guards, register effects, invalid spans, and format gating.
 All 897 translator unit tests pass. These primitives do not themselves expand
 the public packet format or establish support for 24 active network players.
+
+Layout format 23 supports the actual team-writer instruction patterns:
+`IndexBias` recovers the original bit index after checked post-shift increments,
+and `AllowScalarAuxiliaries` retains independent constant assignments. The pass
+checks that the bias exactly compensates for the observed increments and rejects
+changes to the protected bases, mask, loaded value, or unit register.
+`AllowObjectSource` permits checked array transfers from another object as well
+as the stack. Transfers snapshot all source words before storing, preserving
+copy behavior for overlapping regions. All 908 unit tests pass; an optimized
+native C++ integration test also verifies overlapping transfers and guard words.
+These framework changes precede the game packet and team-algorithm migration.

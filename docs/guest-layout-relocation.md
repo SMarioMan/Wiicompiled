@@ -1206,3 +1206,8 @@ slot and both rows. All five capacities and the 1,202-consumer audit pass.
 The two-instance run now completes room startup and course voting, reaching race
 scene initialization. That transition exposed remaining byte-map accesses in
 race setup; the live LAN race check still has not passed.
+
+Unscaled register indices can now produce review candidates at byte loads/stores
+on a declared byte-array dimension. They cannot prove word accesses, address-only
+arithmetic or pointee identities. Unit checks cover the moved byte array, original
+emission and those rejection cases. All 877 default translator tests pass.

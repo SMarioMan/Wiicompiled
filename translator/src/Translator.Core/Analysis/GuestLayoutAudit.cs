@@ -24,7 +24,7 @@ public sealed class GuestLayoutAudit
     private sealed record IndexTerm(int Stride, ScaleOrigin? Scale, IndexTerm? Next = null);
     private sealed record IndexBinding(int Stride, ScaleOrigin? Scale, string Symbol, string Element);
     private sealed record Fact(uint? Constant = null, string? Type = null, int Offset = 0, int IndexStride = 0, int Rotation = 0,
-        ScaleOrigin? Scale = null, IndexTerm? ExtraIndices = null);
+        ScaleOrigin? Scale = null, IndexTerm? ExtraIndices = null, bool UnscaledByteIndex = false);
     private readonly Dictionary<string, GuestLayoutType> _definitions;
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
@@ -144,10 +144,14 @@ public sealed class GuestLayoutAudit
                 if (string.IsNullOrEmpty(name)) return;
                 if (fact is null) facts.Remove(name); else facts[name] = fact;
             }
-            void Propose(uint pc, int index, string operand, Fact? basis, int offset)
+            void Propose(uint pc, int index, string operand, Fact? basis, int offset, int? accessWidth = null)
             {
                 if (!collect) return;
                 if (basis?.Type is not { } type) return;
+                // An unscaled register sum is a review candidate only at an
+                // actual byte access to a declared byte-array dimension.
+                // It cannot establish a word field or a pointee identity.
+                if (basis.UnscaledByteIndex && accessWidth != 1) { unresolved++; return; }
                 // An interior pointer can also be an array cursor. Rebasing a
                 // cursor's final stride would skip the new elements; require review.
                 if (basis.Offset != 0) { unresolved++; return; }
@@ -226,6 +230,9 @@ public sealed class GuestLayoutAudit
                                 result = pointer.IndexStride == 0
                                     ? pointer with { IndexStride = scaled.IndexStride, Scale = scaled.Scale }
                                     : pointer with { ExtraIndices = new IndexTerm(scaled.IndexStride,scaled.Scale,pointer.ExtraIndices) };
+                            else if (pointer is { Offset: 0, IndexStride: 0 } && scaled is null &&
+                                (pointer == left ? binary.Right.RegisterName : binary.Left.RegisterName) is not null)
+                                result = pointer with { IndexStride = 1, UnscaledByteIndex = true };
                             else if (collect && pointer is not null) unresolved++;
                         }
                         else if (collect && (left?.Type is not null || right?.Type is not null)) unresolved++;
@@ -233,21 +240,21 @@ public sealed class GuestLayoutAudit
                         break;
                     }
                     case IrLoad load:
-                        Propose(pc, index, "offset", facts.GetValueOrDefault(load.Address.Base), load.Address.Offset);
+                        Propose(pc, index, "offset", facts.GetValueOrDefault(load.Address.Base), load.Address.Offset, load.SizeBytes);
                         var address = Address(load.Address);
                         string? pointedType = null;
                         if (load.Destination.StartsWith("r", StringComparison.Ordinal) && load.SizeBytes == 4)
                         {
                             if (address?.Constant is { } location) _globals.TryGetValue(location, out pointedType);
                             var basis = facts.GetValueOrDefault(load.Address.Base);
-                            if (pointedType is null && basis is { Type: not null, Offset: 0 } &&
+                            if (pointedType is null && basis is { Type: not null, Offset: 0, UnscaledByteIndex: false } &&
                                 BindIndices(basis,basis.Type,load.Address.Offset) is not null)
                                 pointedType = PointerAt(basis.Type, load.Address.Offset);
                         }
                         Set(load.Destination, pointedType is null ? null : new Fact(Type: pointedType));
                         break;
                     case IrStore store:
-                        Propose(pc, index, "offset", facts.GetValueOrDefault(store.Address.Base), store.Address.Offset);
+                        Propose(pc, index, "offset", facts.GetValueOrDefault(store.Address.Base), store.Address.Offset, store.SizeBytes);
                         break;
                     case IrCall call:
                         if (call.Target == "PPC_UpdateCarryAdd" && call.Arguments.Count == 3 &&

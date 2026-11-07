@@ -98,6 +98,31 @@ public class GuestLayoutAuditTests
     private static uint Add(uint destination,uint left,uint right) =>
         (31u<<26)|(destination<<21)|(left<<16)|(right<<11)|(266u<<1);
 
+    [Fact]
+    public void UnscaledIndicesAreProposedOnlyForByteAccessesToDeclaredByteArrays()
+    {
+        var types=new[] {new GuestLayoutType("Byte",1,1),new GuestLayoutType("Word",4,4),
+            new GuestLayoutType("Owner",4,Fields:new[] {new GuestLayoutField("words","Word",PerPlayer:true),
+                new GuestLayoutField("bytes","Byte",PerPlayer:true),new GuestLayoutField("tail","Word")})};
+        var audit=new GuestLayoutAudit(types,2,5);
+        var words=new uint[] {Add(5,3,4),0x88c50008,0x98c50008,0x4e800020};
+        var report=audit.Analyze(Discover(words),"Owner");
+        Assert.Equal(2,report.Candidates.Count);
+        Assert.All(report.Candidates,c=>{Assert.Equal(8,c.Before);Assert.Equal(20,c.After);Assert.Equal(1,c.IndexStride);});
+        var image=TranslatorCppTestHarness.CreateImage(words.Select((word,index)=>(Start+(uint)index*4,word)).ToArray());
+        var references=report.Candidates.Select(c=>c.Reference).ToArray();
+        Assert.Equal(new FunctionTranslator(image).Translate(Start).CxxCode,
+            new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,2,references)).Translate(Start).CxxCode);
+        var nodes=new FunctionTranslator(image,layoutRelocations:new GuestLayoutRelocations(types,2,5,references))
+            .Discover(Start,TranslationOptions.Default).LinearIr.Blocks.SelectMany(b=>b.Instructions).ToArray();
+        Assert.Contains(nodes,n=>n is IrLoad {SizeBytes:1,Address.Offset:20});
+        Assert.Contains(nodes,n=>n is IrStore {SizeBytes:1,Address.Offset:20});
+        Assert.Empty(audit.Analyze(Discover(Add(5,3,4),0x80c50008,0x4e800020),"Owner").Candidates);
+        Assert.Empty(audit.Analyze(Discover(Add(5,3,4),0x88c5000c,0x4e800020),"Owner").Candidates);
+        Assert.Empty(audit.Analyze(Discover(Add(5,3,4),0x88c50000,0x4e800020),"Owner").Candidates);
+        Assert.Empty(audit.Analyze(Discover(Add(5,3,4),0x38c50008,0x4e800020),"Owner").Candidates);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

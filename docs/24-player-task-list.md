@@ -80,4 +80,7 @@ and host settings import pass at 12, 13 and 24. Larger live LAN counts remain
 limited by 32-bit console masks; at 100, scanning repeats mask bits after console
 63. Storage tests do not establish online support above that limit. Discovery
 protocol 3 excludes earlier capacity-matched builds with incompatible SELECT
-sections. RH1 and other wire formats still need their own migration and testing.
+sections. RH1 now also has a capacity-sized serialized map, checked lengths,
+relocated temporary packets and complete creator/import loops. Native fixtures
+cover both buffers and snapshots through 24 active-addressable slots; the
+remaining packet formats and full 24-active-peer gameplay still need testing.

@@ -53,7 +53,7 @@ public class NetworkControllerStorageTests
                 #include <cstring>
                 #define FAIL() do { std::fprintf(stderr,"fixture failure at line %d\n",__LINE__);std::abort(); } while(false)
                 {{declarations}}
-                constexpr uint32_t fullCapacity={{layout.Symbol("RKNetPacket.size")}},selectCapacity={{layout.Symbol("RKNetSelectPacket.size")}},capacity={{players}},size={{layout.Symbol("RKNetController.size")}},
+                constexpr uint32_t fullCapacity={{layout.Symbol("RKNetPacket.size")}},selectCapacity={{layout.Symbol("RKNetSelectPacket.size")}},rh1Capacity={{layout.Symbol("RKNetWireRH1.size")}},capacity={{players}},size={{layout.Symbol("RKNetController.size")}},
                     send={{layout.Symbol("RKNetController.splitSend.offset")}},receive={{layout.Symbol("RKNetController.splitReceived.offset")}},
                     rowStride={{layout.Symbol("RKNetPointerRow.size")}},full={{layout.Symbol("RKNetController.fullSend.offset")}},
                     times={{layout.Symbol("RKNetController.lastSendTimes.offset")}},lastAid={{layout.Symbol("RKNetController.lastSendAid.offset")}},
@@ -497,8 +497,8 @@ public class NetworkControllerStorageTests
                     constexpr uint32_t extraRow=0x810f0000;
                     std::memset(Memory::GetPointer(extraRow-16,64),0x55,64);
                     ctx.gpr[3]=extraRow;func_80655F54(&ctx);
-                    const std::array<uint32_t,8> sectionSizes{16,40,40,selectCapacity,128,192,16,248};
-                    if(fullCapacity!=680+selectCapacity)return 55;
+                    const std::array<uint32_t,8> sectionSizes{16,rh1Capacity,40,selectCapacity,128,192,16,248};
+                    if(fullCapacity!=640+rh1Capacity+selectCapacity)return 55;
                     for(uint32_t section=0;section<8;section++){
                         auto holder=Memory::Read32(extraRow+section*4),buffer=Memory::Read32(holder);
                         if(Memory::Read32(holder+4)!=sectionSizes[section] || Memory::Read32(holder+8))return 56;

@@ -1,5 +1,5 @@
 {
-  "Version": 28,
+  "Version": 29,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -2478,8 +2478,22 @@
     },
     {
       "Name": "RKNetWireRH1",
-      "Size": 40,
-      "Alignment": 1
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "prefix",
+          "Type": "RKNetRH1WirePrefix"
+        },
+        {
+          "Name": "playerAids",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "flags",
+          "Type": "RKNetRH1WireFlags"
+        }
+      ]
     },
     {
       "Name": "RKNetWireRH2",
@@ -2500,6 +2514,90 @@
       "Name": "RKNetWireEvent",
       "Size": 248,
       "Alignment": 1
+    },
+    {
+      "Name": "RKNetRH1WirePrefix",
+      "Size": 24,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetRH1WireFlags",
+      "Size": 4,
+      "Alignment": 1
+    },
+    {
+      "Name": "RH1StackHeader",
+      "Size": 8,
+      "Alignment": 1
+    },
+    {
+      "Name": "RH1RaceGap",
+      "Size": 8,
+      "Alignment": 1
+    },
+    {
+      "Name": "RH1RaceSpills",
+      "Size": 72,
+      "Alignment": 4
+    },
+    {
+      "Name": "RH1SelectSpills",
+      "Size": 48,
+      "Alignment": 4
+    },
+    {
+      "Name": "RH1DefaultFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RH1StackHeader"
+        },
+        {
+          "Name": "packet",
+          "Type": "RKNetWireRH1"
+        }
+      ]
+    },
+    {
+      "Name": "RH1RaceFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RH1StackHeader"
+        },
+        {
+          "Name": "packet",
+          "Type": "RKNetWireRH1"
+        },
+        {
+          "Name": "gap",
+          "Type": "RH1RaceGap"
+        },
+        {
+          "Name": "spills",
+          "Type": "RH1RaceSpills"
+        }
+      ]
+    },
+    {
+      "Name": "RH1SelectFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RH1StackHeader"
+        },
+        {
+          "Name": "packet",
+          "Type": "RKNetWireRH1"
+        },
+        {
+          "Name": "spills",
+          "Type": "RH1SelectSpills"
+        }
+      ]
     }
   ],
   "References": [
@@ -56979,6 +57077,826 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x80650880",
+      "ExpectedWord": "0x9421FF80",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.size",
+      "Addend": 0,
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80650888",
+      "ExpectedWord": "0x90010084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.size",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CCC",
+      "ExpectedWord": "0x80010084",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.size",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CD4",
+      "ExpectedWord": "0x38210080",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RH1RaceFrame.size",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650A70",
+      "ExpectedWord": "0x9801002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.packet.offset+RKNetWireRH1.flags.offset"
+    },
+    {
+      "Instruction": "0x80650CDC",
+      "ExpectedWord": "0x9421FFA0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.size",
+      "Addend": 0,
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80650CE4",
+      "ExpectedWord": "0x90010064",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.size",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651008",
+      "ExpectedWord": "0x80010064",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.size",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651010",
+      "ExpectedWord": "0x38210060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RH1SelectFrame.size",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650E9C",
+      "ExpectedWord": "0x9801002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.packet.offset+RKNetWireRH1.flags.offset"
+    },
+    {
+      "Instruction": "0x8065CA70",
+      "ExpectedWord": "0x9421FFD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8065CA80",
+      "ExpectedWord": "0x90010034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8065CB18",
+      "ExpectedWord": "0x80010034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8065CB20",
+      "ExpectedWord": "0x38210030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RH1DefaultFrame.size"
+    },
+    {
+      "Instruction": "0x8065CAC8",
+      "ExpectedWord": "0x9901002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.packet.offset+RKNetWireRH1.flags.offset"
+    },
+    {
+      "Instruction": "0x8065CB28",
+      "ExpectedWord": "0x9421FFD0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8065CB38",
+      "ExpectedWord": "0x90010034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8065CBD0",
+      "ExpectedWord": "0x80010034",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8065CBD8",
+      "ExpectedWord": "0x38210030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RH1DefaultFrame.size"
+    },
+    {
+      "Instruction": "0x8065CB80",
+      "ExpectedWord": "0x9901002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RH1DefaultFrame.packet.offset+RKNetWireRH1.flags.offset"
+    },
+    {
+      "Instruction": "0x8065C8E0",
+      "ExpectedWord": "0x28040028",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetWireRH1.size"
+    },
+    {
+      "Instruction": "0x8065CAAC",
+      "ExpectedWord": "0x38A00028",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetWireRH1.size"
+    },
+    {
+      "Instruction": "0x8065CB64",
+      "ExpectedWord": "0x38A00028",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetWireRH1.size"
+    },
+    {
+      "Instruction": "0x80650C40",
+      "ExpectedWord": "0x38A00028",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetWireRH1.size"
+    },
+    {
+      "Instruction": "0x8065C948",
+      "ExpectedWord": "0x38A0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetWireRH1.playerAids.count"
+    },
+    {
+      "Instruction": "0x8065C970",
+      "ExpectedWord": "0x881C0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetWireRH1.flags.offset"
+    },
+    {
+      "Instruction": "0x806508BC",
+      "ExpectedWord": "0x39C00002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x80650D14",
+      "ExpectedWord": "0x3AA00002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x80650FB0",
+      "ExpectedWord": "0x38A00028",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetWireRH1.size"
+    },
+    {
+      "Instruction": "0x80650880",
+      "ExpectedWord": "0x9421FF80",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "RH1RaceFrame.size",
+      "Addend": 0,
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80650CDC",
+      "ExpectedWord": "0x9421FFA0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "RH1SelectFrame.size",
+      "Addend": 0,
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8065CA70",
+      "ExpectedWord": "0x9421FFD0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "RH1DefaultFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8065CB28",
+      "ExpectedWord": "0x9421FFD0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "RH1DefaultFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 1,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 2,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 3,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 4,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 5,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 6,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 7,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 8,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 9,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 10,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 11,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 12,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 13,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 14,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 56,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 15,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 16,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8065088C",
+      "ExpectedWord": "0xBDC10038",
+      "Node": 17,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 1,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 2,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 3,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 4,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 5,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 6,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 7,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 8,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 9,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 10,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 11,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 12,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 13,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 14,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 56,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 15,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 16,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC8",
+      "ExpectedWord": "0xB9C10038",
+      "Node": 17,
+      "Operand": "offset",
+      "Symbol": "RH1RaceFrame.spills.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 1,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 2,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 3,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 4,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 5,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 6,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 7,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 8,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 9,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 10,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CE8",
+      "ExpectedWord": "0xBE810030",
+      "Node": 11,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 1,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 2,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 3,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 4,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 5,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 6,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 7,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 8,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 9,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 10,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80651004",
+      "ExpectedWord": "0xBA810030",
+      "Node": 11,
+      "Operand": "offset",
+      "Symbol": "RH1SelectFrame.spills.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80650CC0",
+      "ExpectedWord": "0x2811000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80650FFC",
+      "ExpectedWord": "0x2817000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
+    },
+    {
+      "Instruction": "0x8065C9C0",
+      "ExpectedWord": "0x281D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players"
     }
   ],
   "GlobalPointers": {
@@ -66281,6 +67199,198 @@
       "Fallback": 255,
       "IndexStride": "SelectMapCompareStep.size",
       "IndexScale": 6
+    },
+    {
+      "Instruction": "0x80650AC4",
+      "ExpectedWord": "0x98050018",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650AE8",
+      "ExpectedWord": "0x98050019",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650B0C",
+      "ExpectedWord": "0x9805001A",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650B30",
+      "ExpectedWord": "0x9805001B",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650B54",
+      "ExpectedWord": "0x9805001C",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650B74",
+      "ExpectedWord": "0x9805001D",
+      "Node": 0,
+      "Index": "r7",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650ED4",
+      "ExpectedWord": "0x98050018",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650EF8",
+      "ExpectedWord": "0x98050019",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650F1C",
+      "ExpectedWord": "0x9805001A",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650F40",
+      "ExpectedWord": "0x9805001B",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650F64",
+      "ExpectedWord": "0x9805001C",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": -1,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650F84",
+      "ExpectedWord": "0x9805001D",
+      "Node": 0,
+      "Index": "r6",
+      "IndexBias": 0,
+      "GroupWidth": 6
+    },
+    {
+      "Instruction": "0x80650964",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650988",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x806509AC",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x806509D0",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x806509F4",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650A18",
+      "ExpectedWord": "0x800400CC",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650D90",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650DB4",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650DD8",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650DFC",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650E20",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
+    },
+    {
+      "Instruction": "0x80650E44",
+      "ExpectedWord": "0x800500CC",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 6,
+      "Fallback": 1
     }
   ],
   "ArrayFills": [
@@ -68088,6 +69198,60 @@
           "Width": 4
         }
       ]
+    },
+    {
+      "Begin": "0x8065CACC",
+      "ExpectedWords": [
+        "0x98C10020",
+        "0x98C10021",
+        "0x98C10022",
+        "0x98C10023",
+        "0x98C10024",
+        "0x98C10025",
+        "0x98C10026",
+        "0x98C10027",
+        "0x98C10028",
+        "0x98C10029",
+        "0x98C1002A",
+        "0x98C1002B"
+      ],
+      "BaseRegister": "r1",
+      "ValueRegister": "r6",
+      "Arrays": [
+        {
+          "Array": "RH1DefaultFrame.packet.offset+RKNetWireRH1.playerAids.offset",
+          "Stride": "InputByte.size",
+          "Count": "RKNetWireRH1.playerAids.count",
+          "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065CB84",
+      "ExpectedWords": [
+        "0x98C10020",
+        "0x98C10021",
+        "0x98C10022",
+        "0x98C10023",
+        "0x98C10024",
+        "0x98C10025",
+        "0x98C10026",
+        "0x98C10027",
+        "0x98C10028",
+        "0x98C10029",
+        "0x98C1002A",
+        "0x98C1002B"
+      ],
+      "BaseRegister": "r1",
+      "ValueRegister": "r6",
+      "Arrays": [
+        {
+          "Array": "RH1DefaultFrame.packet.offset+RKNetWireRH1.playerAids.offset",
+          "Stride": "InputByte.size",
+          "Count": "RKNetWireRH1.playerAids.count",
+          "Width": 1
+        }
+      ]
     }
   ],
   "ResampledCursors": [
@@ -68696,6 +69860,20 @@
       "RightBase": "r28",
       "RightOffset": "RKNetSelectHandler.received.offset+RKNetSelectPacket.teams.offset",
       "RightValue": "r0"
+    }
+  ],
+  "CountConversions": [
+    {
+      "Instruction": "0x80650954",
+      "ExpectedWord": "0x7FE903A6",
+      "Input": "r31",
+      "Count": "ceil(players/6)"
+    },
+    {
+      "Instruction": "0x80650D80",
+      "ExpectedWord": "0x7FA903A6",
+      "Input": "r29",
+      "Count": "ceil(players/6)"
     }
   ]
 }

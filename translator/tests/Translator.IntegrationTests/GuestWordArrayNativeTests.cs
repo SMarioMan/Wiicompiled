@@ -20,18 +20,18 @@ public class GuestWordArrayNativeTests
         try
         {
             var sources=new List<string>();var declarations=new List<string>();var cases=new List<string>();
-            foreach(var players in new[]{12,13,24,48,100})foreach(var kind in new[]{0,1,2,3,4})
+            foreach(var players in new[]{12,13,24,48,100})foreach(var kind in new[]{0,1,2,3,4,5})
             {
                 var name=$"word_array_{players}_{kind}";uint start=0x80001000u+(uint)cases.Count*0x100u;const uint table=0x80003000;
                 uint[] words=kind==0?new uint[]{0x80830050,0x80a60050,0x7c042840}:
                     kind==1?new uint[]{0x80830050,0x2c040000}:kind==2?new uint[]{0x80830050,0x28040000}:
-                    kind==3?new uint[]{0x80830000}:new uint[]{0x7c83002e};
+                    kind==3?new uint[]{0x80830000}:kind==4?new uint[]{0x7c83002e}:new uint[]{0x7c8903a6};
                 var image=TranslatorCppTestHarness.CreateImage(words.Append(0x4e800020u).Select((w,i)=>(start+(uint)i*4,w))
                     .Concat(new[]{(table,16u),(table+4,4u),(table+8,56u)}).ToArray());
                 GuestLayoutRelocations plan=kind<3?new(types,12,players,Array.Empty<GuestLayoutReference>(),wordComparisons:new[]{
                     new GuestWordComparison(start,words,"r3","Words.items.offset","r4","Words.items.count",IsUnsigned:kind!=1,
                         RightLoad:kind==0?start+4:null,RightBase:kind==0?"r6":null,RightOffset:kind==0?"Words.items.offset":null,RightValue:kind==0?"r5":null)})
-                    :new(types,12,players,Array.Empty<GuestLayoutReference>(),wordTables:new[]{
+                    :kind==5?new(types,12,players,Array.Empty<GuestLayoutReference>(),countConversions:new[]{new GuestCountConversion(start,words[0],"r4","ceil(players/6)")}):new(types,12,players,Array.Empty<GuestLayoutReference>(),wordTables:new[]{
                         new GuestWordTable(table,new uint[]{16,4,56},new[]{new GuestWordTableEntry(1,"Words.items.size")},
                             new[]{new GuestWordTableLoad(start,words[0],"r3","r4",Index:kind==4?"r0":null)})});
                 var source=Path.Combine(temp,name+".cpp");File.WriteAllText(source,new FunctionTranslator(image,layoutRelocations:plan).Translate(start,new TranslationOptions(PreferredName:name)).CxxCode);sources.Add(source);
@@ -57,7 +57,7 @@ public class GuestWordArrayNativeTests
                             for(uint32_t r=0;r<32;r++)if(r!=4 && !(kind==0 && r==5) && c.gpr[r]!=before.gpr[r])return false;
                         }
                     }
-                    if(kind>=3){
+                    if(kind>=3 && kind<5){
                         for(uint32_t at:std::array{0x80003000u,0x80003004u,0x80003008u,0x80004000u,0x80003001u}){
                             Memory::Write32(0x80003000,16);Memory::Write32(0x80003004,4);Memory::Write32(0x80003008,56);Memory::Write32(0x80004000,0xabcdef01);
                             for(uint32_t r=0;r<32;r++)c.gpr[r]=0x12340000+r;
@@ -66,6 +66,12 @@ public class GuestWordArrayNativeTests
                             fn(&c);if(c.gpr[4]!=expected || c.cr!=before.cr || c.xer!=before.xer || c.lr!=before.lr || c.ctr!=before.ctr)return false;
                             for(uint32_t r=0;r<32;r++)if(r!=4 && c.gpr[r]!=before.gpr[r])return false;
                         }
+                    }
+                    if(kind==5)for(uint32_t count:std::array{0u,1u,2u,3u,0xffffffffu}){
+                        for(uint32_t r=0;r<32;r++)c.gpr[r]=0x12340000+r;
+                        c.gpr[4]=count;c.cr=0x23456789;c.xer=0x80000000;c.lr=0x80006000;c.ctr=0x80008000;auto before=c;
+                        fn(&c);if(c.ctr!=(count==2?(capacity+5)/6:count) || c.cr!=before.cr || c.xer!=before.xer || c.lr!=before.lr)return false;
+                        for(uint32_t r=0;r<32;r++)if(c.gpr[r]!=before.gpr[r])return false;
                     }
                     return true;
                 }

@@ -147,6 +147,8 @@ public sealed partial class GuestLayoutRelocations
 
     private IReadOnlyList<IrInstruction>? ApplyWordArray(PpcInstruction instruction, IReadOnlyList<IrInstruction> nodes)
     {
+        var converted = ApplyCountConversion(instruction,nodes);
+        if(converted is not null)return converted;
         var comparison = _wordComparisons.FirstOrDefault(site => WordComparePc(site) == instruction.Address);
         if (comparison is not null)
         {
@@ -235,6 +237,7 @@ public sealed partial class GuestLayoutRelocations
                     #endif
                     """);
             }
+        EmitCountConversionHelpers(calls,output);
         return output.ToString();
     }
 }

@@ -1467,3 +1467,33 @@ reservation of a non-CPU final slot, duplicate/weight priorities, CPU context,
 stack usage and untouched scenario bytes. Eligibility, weights and RNG are
 fixtures here; this does not replace gameplay validation of the actual menu,
 vehicle selection or resource loading for 24 distinct character models.
+
+
+## RH1 wire map and real packet exporters
+
+The RH1 wire section now declares its fixed 24-byte prefix, capacity-sized player
+map and four-byte suffix. Its size is `28 + players` bytes (52 at 24), without
+adding padding to this byte-packed section. The combined 24-player packet is
+now 764 bytes. Section constructors and controller buffers follow that size.
+RH1 import checks the new exact section length, copies every map byte and reads
+the moved engine byte. Both ordinary packet creators and both default exporters
+use capacity-sized stack packets; stack updates, every multi-register spill,
+restores and LR slots move together. Creator/import peer loops now include IDs
+past eleven. Six-entry unrolls bound the final partial group.
+
+Format 29 adds checked register-to-CTR count conversions. The RH1 team scan's
+source register also supplies packet state `2`, so changing that register would
+corrupt the protocol. The conversion changes only CTR when its runtime input
+matches the authored count, preserves other runtime values and leaves the source
+register intact. Native checks cover both matching and unexpected counts,
+registers, CR, XER and LR. Team scans now cover the active capacity, with inactive
+partial-group entries excluded. RH1's 32-bit team bitmap still limits larger
+online fields; extending storage to 100 does not migrate that representation.
+
+All 944 unit tests pass. `RaceHeaderWireTests` runs actual default exporters at
+12/13/24/48/100 and actual ordinary creators/imports at 12/13/24, checking both
+snapshot/buffer rows, complete maps, team bits above eleven, unchanged packet
+states, short-packet rejection, register preservation and guards. Combined-buffer
+fixtures pass at all five capacities; the complete 1,307-consumer proof,
+stock-emission and expanded-C++ audit passes. No 24-active-peer race is claimed
+by these wire fixtures.

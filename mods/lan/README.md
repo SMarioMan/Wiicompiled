@@ -30,7 +30,7 @@ twelve players; 24-player layouts remain unfinished.
 Runtime configuration version 2 checks the module's capacity, controller address
 and race telemetry offsets against the linked native guest layout. Discovery
 protocol 3 advertises capacity and ignores incompatible peers, including earlier
-capacity-matched builds with the old SELECT wire layout. Use matching
+capacity-matched builds with the old SELECT/RH1 wire layouts. Use matching
 WiiCompiled LAN builds on every peer; the original Wii LAN v0.9 discovery format
 is not compatible with this version.
 

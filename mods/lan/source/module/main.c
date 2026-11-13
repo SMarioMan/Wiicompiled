@@ -174,6 +174,11 @@ static void setup_friends(void) {
 }
 
 static int MyDWC_LoginAsync(void *r3, int r4, void (*r5)(int, int, void *), void *r6) {
+#ifdef MKW_LAN_DIAGNOSTICS
+    /* Keep SDK handshake failures visible alongside the module's diagnostics. */
+    DWC_SetLogMask(DWC_Info | DWC_Error | DWC_Warn | DWC_Match_NN |
+                   DWC_Match_GT2 | DWC_Transport);
+#endif
 	setup_pid(get_dwc_gamedata());
 	get_mii();
 	setup_friends();

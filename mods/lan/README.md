@@ -223,7 +223,9 @@ control. A missing or truncated record supplies no input. This hook is disabled
 unless the environment variable is set. For example, `01 00 00 00` presses A,
 `00 00 50 00` moves the stick right, and `00 00 00 00` releases it.
 `--diagnostics` on the module builder additionally logs unique original BMG
-message IDs to help identify menu prompts.
+message IDs to help identify menu prompts and enables SDK error, warning,
+matching and transport logs. The runtime forwards the formatted console output,
+including the detailed SDK message bodies.
 
 The [two-peer capacity-24 trace](tests/results/two-peer-capacity24.json) records a
 Linux test of the uniform experimental layout with ABI 2. Runtime IDs 24 and 13

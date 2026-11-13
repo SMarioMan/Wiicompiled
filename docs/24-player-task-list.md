@@ -18,6 +18,13 @@ Video subtitles are observations and design references, not build instructions.
 - [ ] Complete network wire layouts, packed teams, rating-sort scratch storage,
   participant masks and SDK limits; exercise 24 active LAN participants through
   joining, voting, racing, results, disconnects and a second race.
+- [ ] **Lobby connection speed and reliability:** improve the connection algorithm
+  for large rooms. Measure discovery, membership and complete peer connectivity
+  separately; compare the original full mesh (276 links at 24 consoles) with a
+  deterministic connection schedule and direct LAN transport. Bound retries and
+  concurrent work, avoid reservation deadlocks, and verify late joins,
+  disconnects, rejoining and race-start barriers. Benchmark repeated 12/24-player
+  joins at normal timing; label clock-scaled functional results separately.
 - [ ] Test larger capacities (including 100) separately from the 24-player target.
   Larger storage fixtures do not establish larger playable or network capacity.
 

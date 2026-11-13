@@ -12,6 +12,7 @@ public class RaceHeaderStorageTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
@@ -30,8 +31,8 @@ public class RaceHeaderStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-race-header-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4};
-            var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8};
+            var entries=new uint[]{0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98};
+            var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x801aacbc,0x80020aa4,0x806609d8,0x8065ca70,0x8065cb28};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -55,6 +56,11 @@ public class RaceHeaderStorageTests
                 uint32_t allocations=0,clears=0;
                 void allocate(CpuContext* c){if(c->gpr[3]!=size || allocations++)std::abort();c->gpr[3]=root;}
                 void clear_split(CpuContext* c){if(c->gpr[3]!=controller)std::abort();clears++;}
+                uint32_t sent=0,last=255,tick=1000;
+                void clock(CpuContext* c){c->gpr[3]=0;c->gpr[4]=tick++;}
+                void elapsed(CpuContext* c){c->gpr[3]=0;c->gpr[4]=170;}
+                void user_data(CpuContext*){}
+                void send(CpuContext* c){if(c->gpr[3]!=root || c->gpr[4]>=capacity)std::abort();last=c->gpr[4];++sent;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="race header storage fixture";info.rawCpuInvoker=entry;
                     info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -64,6 +70,8 @@ public class RaceHeaderStorageTests
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x80652ab8,clear_split);Memory::Write32(0x809bd918,controller);
+                    register_entry(0x801aacbc,clock);register_entry(0x80020aa4,elapsed);register_entry(0x806609d8,user_data);
+                    register_entry(0x8065ca70,send);register_entry(0x8065cb28,send);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
                     std::array<uint8_t,size> expected{};
@@ -106,6 +114,43 @@ public class RaceHeaderStorageTests
                         ctx.gpr[3]=root;ctx.gpr[4]=p;func_8065B7B4(&ctx);
                         auto flag=p<32?1u<<p:0;word(4,~flag);word(8,~flag);word(12,~flag);reset_record(p);
                         if(!equal())return 13;
+                    }
+                    // Find a valid header even on a high console, then count the
+                    // complete serialized participant map, including partial groups.
+                    for(uint32_t selected : {0u,capacity-1})for(uint32_t active : {1u,capacity-1,capacity}){
+                        std::memset(Memory::GetPointer(root,size),0x55,size);
+                        for(uint32_t r=0;r<recordCount;r++)Memory::Write32(root+records+r*stride+20,0xffffffff);
+                        Memory::Write32(root+records+selected*stride+20,0);
+                        auto map=root+records+selected*stride+ids;
+                        for(uint32_t p=0;p<capacity;p++)Memory::Write8(map+p,p<active?p:255);
+                        // Poison the bytes beyond the map with valid AIDs. Rounded
+                        // unrolled loads must not count these as extra participants.
+                        for(uint32_t p=0;p<6 && map+capacity+p<root+size;p++)Memory::Write8(map+capacity+p,0);
+                        ctx.gpr[3]=root;func_8065BE78(&ctx);
+                        if(ctx.gpr[3]!=active){std::fprintf(stderr,"RH1 count selected=%u active=%u got=%u capacity=%u\n",selected,active,ctx.gpr[3],capacity);return 21;}
+                    }
+                    if(capacity<=32)for(uint32_t selected : {0u,capacity-1})for(uint32_t team=0;team<2;team++){
+                        for(uint32_t r=0;r<recordCount;r++)Memory::Write32(root+records+r*stride+20,0xffffffff);
+                        Memory::Write32(root+records+selected*stride+20,0);
+                        Memory::Write32(root+records+selected*stride+24,team?0xffffffffu:0);
+                        for(uint32_t p=0;p<capacity;p++)Memory::Write8(controller+{{layout.Symbol("RKNetController.playerAids.offset")}}+p,p);
+                        ctx.gpr[3]=root;ctx.gpr[4]=capacity-1;ctx.gpr[5]=0;func_8065BA98(&ctx);
+                        if(ctx.gpr[3]!=(team?0:1))return 23;
+                    }
+                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,capacity-1})for(bool sparse : {false,true}){
+                        uint32_t mask=capacity==32?0xffffffffu:((1u<<capacity)-1);
+                        if(sparse)mask=(1u<<local)|(1u<<(local?0:capacity-1));
+                        Memory::Write32(controller+{{layout.Symbol("RKNetController.currentSub.offset")}},current);
+                        auto sub=controller+{{layout.Symbol("RKNetController.subs.offset")}}+current*{{layout.Symbol("RKNetSub.size")}};
+                        Memory::Write32(sub+16,mask);Memory::Write8(sub+33,local);
+                        Memory::Write32(root+4,1);Memory::Write32(root+8,0);Memory::Write32(root+12,0);Memory::Write8(root+16,local);
+                        uint32_t previous=local;sent=0;
+                        for(uint32_t step=0;step<capacity*2;step++){
+                            auto next=(previous+1)%capacity;while(next==local || !(mask&(1u<<next)))next=(next+1)%capacity;
+                            ctx.gpr[3]=root;func_8065C714(&ctx);
+                            if(sent!=step+1 || last!=next || Memory::Read8(root+16)!=next){std::fprintf(stderr,"RH1 scheduler n=%u previous=%u expected=%u got=%u sends=%u\n",capacity,previous,next,last,sent);return 22;}
+                            previous=next;
+                        }
                     }
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 14;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 15;

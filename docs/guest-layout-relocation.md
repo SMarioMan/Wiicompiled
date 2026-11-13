@@ -1728,3 +1728,29 @@ pass at 12, 13, 24, 32, 48 and 100 capacity; wire paths execute through 32 AIDs.
 The 13-player fixture first reproduced the old allocation and then an incorrect
 sort order before those separate corrections. Live item synchronization and
 balance remain separate qualifications.
+
+Race-header participant counts now search the expanded header cache and scan the
+whole serialized map. The original search checks four headers per iteration;
+its final partial group returns an invalid course ID for nonexistent records.
+The map counter checks six bytes per iteration and advances its auxiliary cursor
+by five. `RKNetRH1MapCountStep` preserves that authored cursor unit so bounded
+loads can normalize it to six map entries without changing original-capacity
+code. Invalid trailing entries return the existing 255 sentinel.
+
+`RaceHeaderStorageTests` executes high-console header lookup, full/partial map
+counts, team lookup and round-robin header transmission. Poisoned map padding
+must not count as participants. Counts/storage pass at 12, 13, 24, 32, 48 and 100;
+team/mask/scheduler paths execute through the SDK's 32-AID limit, including both
+controller subrecords, sparse membership, local peers at either end and wraparound.
+
+Packet delivery, RH2 export/clearing, lag processing, connection bitfields and
+controller destruction scan the configured capacity. SELECT course choice and
+RH1 round-robin wraparound also use that bound. The packet receiver's unrolled
+PID-to-AID search guards partial groups. Native execution with the local console
+at the highest AID additionally exposed three stale RACEDATA-buffer accesses
+through a moving controller base; their index, row stride and pointer offset now
+relocate explicitly. `PacketManagerStorageTests` checks delivery masks, stale
+header handling, disconnected players, lag advancement, RH2 destinations and
+cleared holders in both subrecords. All six capacity cases pass, with live-mask
+paths bounded to 32 AIDs. Protocol status value 12 and twelve-byte packet holders
+remain their authored values.

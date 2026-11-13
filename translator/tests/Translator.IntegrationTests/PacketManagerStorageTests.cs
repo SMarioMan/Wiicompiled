@@ -12,6 +12,7 @@ public class PacketManagerStorageTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
@@ -30,8 +31,8 @@ public class PacketManagerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-packet-manager-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84};
-            var fixtures=new HashSet<uint>{0x80229a48,0x80656ecc,0x8065cd74,0x80652ab8};
+            var entries=new uint[]{0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84,0x806512c4,0x80651018,0x80650678,0x8064f780,0x8064f88c,0x8064f8f0};
+            var fixtures=new HashSet<uint>{0x80229a48,0x80656ecc,0x8065cd74,0x80652ab8,0x80008e44,0x80517a5c,0x805316e8,0x80655ec4,0x80655e84};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -54,6 +55,7 @@ public class PacketManagerStorageTests
                     aidMap={{layout.Symbol("RKNetController.playerAids.offset")}},
                     receive={{layout.Symbol("RKNetController.splitReceived.offset")}},rowStride={{layout.Symbol("RKNetPointerRow.size")}},
                     indices={{layout.Symbol("RKNetController.receiveIndices.offset")}},indexStride={{layout.Symbol("RKNetReceivedIndices.size")}},
+                    send={{layout.Symbol("RKNetController.splitSend.offset")}},sendIndices={{layout.Symbol("RKNetController.sendIndices.offset")}},
                     raceSettings={{layout.Symbol("Racedata.race.offset+Scenario.settings.offset")}},
                     root=0x81010000,controller=0x81030000,racedata=0x81060000,stack=0x81f00000;
                 uint32_t allocations=0,itemCreates=0,eventCreates=0,clears=0;
@@ -61,6 +63,12 @@ public class PacketManagerStorageTests
                 void create_item(CpuContext*){itemCreates++;}
                 void create_event(CpuContext*){eventCreates++;}
                 void clear_packets(CpuContext* c){if(c->gpr[3]!=controller)std::abort();clears++;}
+                uint32_t fakeSystem=0x811a0000,fakeScene=0x811b0000,deliveries=0,clearCount=0;
+                void system(CpuContext* c){c->gpr[3]=fakeSystem;}
+                void scene(CpuContext* c){c->gpr[3]=fakeScene;}
+                void flag(CpuContext* c){c->gpr[3]=0;}
+                void copy(CpuContext* c){if(c->gpr[3]<0x81280000 || c->gpr[3]>=0x81280000+capacity*256 || c->gpr[5]!=40)std::abort();++deliveries;}
+                void clear(CpuContext* c){if(c->gpr[3]<0x81280000 || c->gpr[3]>=0x81280000+capacity*256)std::abort();++clearCount;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="room packet fixture";info.rawCpuInvoker=entry;
                     info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -71,6 +79,8 @@ public class PacketManagerStorageTests
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x80656ecc,create_item);
                     register_entry(0x8065cd74,create_event);register_entry(0x80652ab8,clear_packets);
+                    register_entry(0x80008e44,system);register_entry(0x80517a5c,scene);register_entry(0x805316e8,flag);
+                    register_entry(0x80655ec4,copy);register_entry(0x80655e84,clear);
                     Memory::Write32(0x809bd918,controller);Memory::Write32(0x809b8f68,racedata);
                     Memory::Write32(0x80381c80,0x81090000);Memory::Write32(0x81090084,0x1234);
                     Memory::Write32(0x809bd508,0x810a0000);Memory::Write32(0x810a0098,0x810a1000);
@@ -159,6 +169,41 @@ public class PacketManagerStorageTests
                     for(uint32_t ordinal=0;ordinal<3;ordinal++){
                         ctx.gpr[3]=controller;ctx.gpr[4]=ordinal;func_806558D0(&ctx);
                         if(ctx.gpr[3]!=(ordinal==0?0:ordinal==1?capacity-1:0xffffffffu))return 20;
+                    }
+                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,capacity-1}){
+                        Memory::Write32(controller+currentSub,current);auto sub=controller+subs+current*subStride;
+                        auto remote=local?0:capacity-1,mask=(1u<<local)|(1u<<remote),remoteBit=1u<<remote;
+                        Memory::Write32(sub+16,mask);Memory::Write8(sub+33,local);
+                        for(uint32_t p=0;p<capacity;p++)Memory::Write8(controller+aidMap+p,p);
+                        for(uint32_t p=0;p<6;p++)Memory::Write8(controller+aidMap+capacity+p,remote);
+                        Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0);
+                        for(uint32_t aid=0;aid<capacity;aid++){
+                            auto row=0x81200000+aid*256,holder=row+64,payload=row+128;
+                            Memory::Write32(controller+receive+aid*4,row);Memory::Write32(controller+indices+aid*indexStride+4,0);
+                            Memory::Write32(controller+indices+aid*indexStride+12,0);
+                            Memory::Write32(row+4,holder);Memory::Write32(row+12,holder+16);
+                            Memory::Write32(holder,payload);Memory::Write32(holder+8,24);Memory::Write32(payload,1000+aid);
+                            Memory::Write32(payload+4,1);Memory::Write16(payload+12,4);Memory::Write8(payload+23,1);Memory::Write32(holder+24,16);
+                            auto sendRow=0x81280000+aid*256;
+                            Memory::Write32(controller+send+aid*4,sendRow);Memory::Write32(controller+sendIndices+aid*4,0);
+                            Memory::Write32(sendRow+8,sendRow+64);Memory::Write32(sendRow+16,sendRow+80);
+                        }
+                        std::memset(Memory::GetPointer(root,size),0,size);ctx.gpr[3]=root;func_806512C4(&ctx);
+                        if(Memory::Read32(root+4)!=remoteBit || Memory::Read32(root+8)!=remoteBit || Memory::Read32(root+12)!=remoteBit)return 21;
+                        for(uint32_t gameType : {0u,6u})for(uint32_t disconnected=0;disconnected<2;disconnected++){
+                            std::memset(Memory::GetPointer(root,size),0,size);
+                            Memory::Write32(racedata+raceSettings+12,gameType);
+                            Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},disconnected?remoteBit:0);
+                            ctx.gpr[3]=root;func_80651018(&ctx);
+                            if(Memory::Read32(root+4)!=remoteBit || Memory::Read32(root+8)!=remoteBit ||
+                               Memory::Read32(root+timers+remote*4)!=(gameType==6?1000+remote:0) ||
+                               Memory::Read8(root+1)!=(gameType!=6 && !disconnected))return 22;
+                        }
+                        Memory::Write8(fakeSystem+0x69,0);Memory::Write8(fakeScene+0x2538,0);
+                        std::memset(Memory::GetPointer(root,size),0,size);ctx.gpr[3]=root;func_80650678(&ctx);
+                        if(Memory::Read16(root+16)!=1 || Memory::Read8(fakeScene+0x2539)!=1)return 23;
+                        deliveries=0;ctx.gpr[3]=root;ctx.gpr[4]=0x810f0000;func_8064F780(&ctx);if(deliveries!=1)return 24;
+                        clearCount=0;ctx.gpr[3]=root;func_8064F88C(&ctx);func_8064F8F0(&ctx);if(clearCount!=capacity*2)return 25;
                     }
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 14;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 15;

@@ -1362,11 +1362,14 @@ int RuntimeMain(int argc, char** argv) {
     g_headless = std::any_of(argv + 1, argv + argc,
                              [](const char* arg) { return std::string_view(arg) == "--headless"; });
 
+    const bool allowSoftwareGpu = std::any_of(argv + 1, argv + argc,
+        [](const char* arg) { return std::string_view(arg) == "--allow-software-gpu"; });
+
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE and --headless, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE --headless and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
             }
         }
         LanRuntime::Validate();
@@ -1401,6 +1404,7 @@ int RuntimeMain(int argc, char** argv) {
         const std::string auroraCachePath = RuntimeConfigFile::PathToUtf8(rendererCacheDirectory);
         auroraConfig.userPath = auroraUserPath.c_str();
         auroraConfig.cachePath = auroraCachePath.c_str();
+        auroraConfig.allowCpuAdapter = allowSoftwareGpu;
         auroraConfig.logCallback = &RuntimeAuroraLogCallback;
         auroraConfig.logLevel = LOG_DEBUG;
         RuntimeConfigFile::MigrateLegacyForceAspect();

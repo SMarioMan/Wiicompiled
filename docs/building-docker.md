@@ -229,3 +229,12 @@ reused as a 24-player build. Exports include the resolved context/plan and recor
 player capacity and discovery protocol in `build-inputs.txt`. Expanded LAN exports
 also derive results variants and localized rank text from the extracted disc and
 include `lan-build/expanded-ui.json` with the changed-asset hashes.
+
+For visual checks on a machine with a software Vulkan driver, the runtime accepts
+`--allow-software-gpu`. This explicitly allows Aurora's CPU adapters; its normal
+adapter selection remains unchanged. For example, Mesa llvmpipe can render a
+window on a virtual X11 display for screenshots. Software rendering is slower
+and still needs a display surface. `--headless` hides the window, so omit that
+flag when capturing the game screen. The opt-in has been checked with Mesa
+25.2.8/LLVM 20.1.2; it initializes the Vulkan backend instead of falling back to
+Aurora's null backend.

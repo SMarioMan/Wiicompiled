@@ -225,6 +225,14 @@ reach the final count while those connections are still being negotiated;
 starting then can leave clients unable to request suspension. SDK states and
 observation ages are included in the periodic progress records.
 
+Room and advancing-race pass records include elapsed wall time from driver
+startup; the complete-mesh checkpoint has its own elapsed time. Compare these
+separately when benchmarking large-room joins. The room check includes a
+five-second stability interval and the race check includes menus/loading, so
+neither is a pure handshake measurement. Use repeated normal-clock runs on the
+same hosts and builds for performance comparisons; keep clock-scaled functional
+checks separate.
+
 Queued SDK reservations resume in both idle states: `SV_WAITING` for the room
 host and `CL_WAITING` for clients that also accept mesh links. Draining only in
 the host state leaves requests queued indefinitely on clients. The native

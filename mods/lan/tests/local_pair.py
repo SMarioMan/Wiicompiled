@@ -191,7 +191,7 @@ def run(args):
                             race_start_frames = {i: race[i][0]['frames'] for i in ids}
                         if room_confirmed is not None and now-race_since >= 5 and all(
                                 race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids):
-                            print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock)), flush=True)
+                            print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
                             return 0
                     else:
                         race_since = None
@@ -208,7 +208,7 @@ def run(args):
                 ready_since = (ready_since or now) if joined else None
                 if ready_since and now-ready_since >= 5:
                     if not room_reported:
-                        print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds', test_clock_divisor=test_clock)), flush=True)
+                        print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
                         room_reported = True
                     if not args.race:
                         return 0

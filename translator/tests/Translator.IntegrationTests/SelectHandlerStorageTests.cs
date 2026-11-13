@@ -31,7 +31,7 @@ public class SelectHandlerStorageTests
         try
         {
             var entries=new uint[]{0x80657f50,0x80658830,0x80658068,0x80658ac4,0x80658978,
-                0x80658598,0x806585e8,0x80658638,0x80658688,0x806586d0,0x80006038,0x80005f84};
+                0x80658718,0x80658bb8,0x80658598,0x806585e8,0x80658638,0x80658688,0x806586d0,0x80006038,0x80005f84};
             var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x806558d0,0x80660c9c,0x80660ce0};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -48,6 +48,7 @@ public class SelectHandlerStorageTests
                 #include <cstring>
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},size={{layout.Symbol("RKNetSelectHandler.size")}},
+                    packetSize={{layout.Symbol("RKNetSelectPacket.size")}},mapOffset={{layout.Symbol("RKNetSelectPacket.playerAids.offset")}},packetFlags={{layout.Symbol("RKNetSelectPacket.flags.offset")}},teamOffset={{layout.Symbol("RKNetSelectPacket.teams.offset")}},teamWords={{layout.Symbol("RKNetSelectPacket.teams.count")}},
                     send={{layout.Symbol("RKNetSelectHandler.send.offset")}},received={{layout.Symbol("RKNetSelectHandler.received.offset")}},
                     sendState={{layout.Symbol("RKNetSelectHandler.sendState.offset")}},sentTime={{layout.Symbol("RKNetSelectHandler.lastSentTime.offset")}},
                     recvTimes={{layout.Symbol("RKNetSelectHandler.lastReceivedTimes.offset")}},delays={{layout.Symbol("RKNetSelectHandler.delays.offset")}},
@@ -80,9 +81,9 @@ public class SelectHandlerStorageTests
                     auto word=[&](uint32_t at,uint32_t value){for(uint32_t b=0;b<4;b++)expected[at+b]=value>>(24-b*8);};
                     auto equal=[&](){return std::memcmp(expected.data(),Memory::GetPointer(root,size),size)==0;};
                     auto packet=[&](uint32_t at){
-                        std::memset(expected.data()+at,0,56);
+                        std::memset(expected.data()+at,0,packetFlags+4);
                         for(uint32_t local=0;local<2;local++){expected[at+16+local*8+4]=48;expected[at+16+local*8+5]=36;expected[at+16+local*8+6]=67;}
-                        std::memset(expected.data()+at+40,255,12);expected[at+52]=expected[at+54]=255;
+                        std::memset(expected.data()+at+mapOffset,255,capacity);expected[at+packetFlags]=expected[at+packetFlags+2]=255;
                     };
                     for(uint32_t kind=0;kind<2;kind++){
                         expected.fill(0x55);std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);
@@ -96,7 +97,7 @@ public class SelectHandlerStorageTests
                         if(!equal() || std::memcmp(expectedController.data(),Memory::GetPointer(controller,controllerSize),controllerSize))return 6;
                         Memory::Write32(controller+currentSub,1);Memory::Write8(controller+subs+subStride+32,0);
                         ctx.gpr[3]=root;func_80658068(&ctx);
-                        packet(send);for(uint32_t p=0;p<capacity;p++)packet(received+p*56);
+                        packet(send);for(uint32_t p=0;p<capacity;p++)packet(received+p*packetSize);
                         expected[sendState]=255;std::memset(expected.data()+sentTime,0,8);
                         std::memset(expected.data()+recvTimes,0,capacity*8);std::memset(expected.data()+delays,0,capacity*8);
                         std::memset(expected.data()+unknown,0,capacity*4);
@@ -104,14 +105,16 @@ public class SelectHandlerStorageTests
                             for(uint32_t b=0;b<size;b++)if(expected[b]!=Memory::Read8(root+b))
                                 std::fprintf(stderr,"init kind=%u byte=%u expected=%02x got=%02x\n",kind,b,expected[b],Memory::Read8(root+b));return 7;}
                         if(clears!=kind+1 || userCalls!=2*(kind+1) || Memory::Read32(user+userMiis))return 8;
-                        std::memset(Memory::GetPointer(root+received,capacity*56),0x66,capacity*56);
+                        std::memset(Memory::GetPointer(root+received,capacity*packetSize),0x66,capacity*packetSize);
+                        for(uint32_t p=0;p<capacity;p++)std::memset(expected.data()+received+p*packetSize+packetFlags+4,0x66,packetSize-packetFlags-4);
                         ctx.gpr[3]=root;func_80658AC4(&ctx);if(!equal())return 9;
-                        std::memset(Memory::GetPointer(root+send,56),0x66,56);
+                        std::memset(Memory::GetPointer(root+send,packetSize),0x66,packetSize);
+                        std::memset(expected.data()+send+packetFlags+4,0x66,packetSize-packetFlags-4);
                         ctx.gpr[3]=root;func_80658978(&ctx);if(!equal())return 10;
                     }
                     for(uint32_t aid=0;aid<capacity;aid++)for(uint32_t local=0;local<2;local++){
                         Memory::Write8(controller+subs+subStride+33,1);
-                        const uint32_t at=root+(aid==1?send:received+aid*56)+16+local*8;
+                        const uint32_t at=root+(aid==1?send:received+aid*packetSize)+16+local*8;
                         Memory::Write8(at+4,(aid+local)%48);Memory::Write8(at+5,(aid+local)%36);
                         Memory::Write8(at+6,(aid+local)%32);Memory::Write8(at+7,(aid+local)%5);
                         ctx.gpr[3]=root;ctx.gpr[4]=aid;ctx.gpr[5]=local;func_80658598(&ctx);if(ctx.gpr[3]!=(aid+local)%48)return 11;
@@ -120,6 +123,18 @@ public class SelectHandlerStorageTests
                         ctx.gpr[3]=root;ctx.gpr[4]=aid;ctx.gpr[5]=local;func_80658688(&ctx);if(ctx.gpr[3]!=at)return 14;
                         ctx.gpr[3]=root;ctx.gpr[4]=aid;ctx.gpr[5]=local;func_806586D0(&ctx);if(ctx.gpr[3]!=(aid+local)%5)return 15;
                     }
+                    // Team lookups must select the correct packed word and local slot.
+                    Memory::Write8(root+send+packetFlags+1,1);
+                    for(uint32_t aid=0;aid<capacity;aid++)for(uint32_t local=0;local<2;local++)for(uint32_t team=0;team<2;team++){
+                        for(uint32_t w=0;w<teamWords;w++)Memory::Write32(root+send+teamOffset+w*4,0xa5000000);
+                        const auto bit=(aid%12)*2+local;
+                        if(team)Memory::Write32(root+send+teamOffset+(aid/12)*4,0xa5000000|(1u<<bit));
+                        ctx.gpr[3]=root;ctx.gpr[4]=aid;ctx.gpr[5]=local;func_80658718(&ctx);
+                        if(ctx.gpr[3]!=(team?0:1))return 19;
+                    }
+                    // The standalone packet reset uses its second argument as packet pointer.
+                    ctx.gpr[3]=root;ctx.gpr[4]=root+send;func_80658BB8(&ctx);
+                    packet(send);if(std::memcmp(expected.data()+send,Memory::GetPointer(root+send,packetSize),packetSize))return 20;
                     for(uint32_t b=0;b<16;b++)if(Memory::Read8(root-16+b)!=0x55 || Memory::Read8(root+size+b)!=0x55 ||
                         Memory::Read8(user-16+b)!=0x55 || Memory::Read8(user+userSize+b)!=0x55)return 16;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 17;

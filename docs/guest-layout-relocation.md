@@ -1388,3 +1388,34 @@ boundaries, protected/unsafe drop conditions, driver reset and preserved registe
 Player-ID lookup is an explicit fixture; activation graphics and world geometry
 are not simulated. This verifies the target calculation and existing timer/drop
 logic, not a visually validated Bullet Bill ride or larger playable LAN capacity.
+
+## SELECT packet fields and team scratch storage
+
+The SELECT packet now declares its fixed 32-byte prefix, settings word, uniform
+packed team words (two bits per console, 24 usable bits per word), uniform
+player-to-console map, and four flag bytes. Its native guest alignment remains
+eight bytes. Packet strides and following handler fields move with that layout;
+the two physical local-player records remain fixed. Original-capacity emission
+is unchanged. Packet reset paths initialize every team word and map slot, and
+all getters follow the moved fields. Structural tail padding is preserved rather
+than mistaken for an additional semantic field.
+
+Team generation has capacity-sized public/private console-order stack buffers
+and a uniform rating-sort node pool. Only the original terminal free-list store
+is replaced to link added nodes; the SDK list operations and original rating
+ordering run unchanged. Stack allocations, saved GPRs, LR slots and the caller's
+RNG object move together. Packed writers retain the original group/last-console
+balancing rules and reserved upper bits. The caller and voting path copy every
+team word. The team getter selects the word containing the doubled console index
+before adding the physical local slot. Player-map construction and six-byte
+comparison unrolls cover the entire capacity, including partial final groups.
+
+Native storage and team fixtures pass at 12, 13, 24, 48 and 100 capacity. They
+exercise all resets/getters, both controller snapshots, empty/sparse/dense/mixed
+one- and two-player console rosters, both rating orders, deterministic shuffle,
+team balance, full word copies, map fills, per-slot mismatches, memory guards and
+saved registers. The 1,306-consumer proof/original-emission/expanded-compilation
+audit passes. Tests above the SDK mask width exercise storage and algorithms,
+with active console IDs restricted to 0..31. This is not yet a completed wire
+protocol: packet-buffer capacities and full packed-array readiness/equality
+checks still require migration before expanded live LAN validation.

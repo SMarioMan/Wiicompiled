@@ -180,7 +180,9 @@ independent portable directories (the default product currently supports twelve
 slots). The test driver accepts `--capacity N` for an experimental matched build
 and validates runtime IDs against that capacity.
 For many local instances on a constrained host, `--startup-gap 12` staggers
-bootstrap work. Alternatively, `--sequential-join` waits for all launched
+bootstrap work. `--host-first` waits for the host to create its active room,
+then starts all clients together to exercise concurrent admission without
+competing with host initialization. Alternatively, `--sequential-join` waits for all launched
 instances to report the expected active room before starting the next client;
 it fails on a join error dialog instead of silently retrying. This exercises
 incremental room admission separately from simultaneous joins.

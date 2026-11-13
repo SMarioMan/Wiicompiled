@@ -89,7 +89,7 @@ def run(args):
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
                 processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role], cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
-                if args.sequential_join:
+                if args.sequential_join or (args.host_first and index == 0):
                     launched = ids[:index+1]
                     while time.monotonic() - started < args.timeout:
                         for launched_id, process in zip(launched, processes):
@@ -220,6 +220,7 @@ if __name__ == '__main__':
     parser.add_argument('--client', type=Path, action='append', required=True, help='Repeat for additional portable client directories')
     parser.add_argument('--timeout', type=float, default=180)
     parser.add_argument('--sequential-join', action='store_true', help='Wait for every launched peer to report the expected active room before launching the next client')
+    parser.add_argument('--host-first', action='store_true', help='Wait for the host room before starting all clients; client admission remains concurrent')
     parser.add_argument('--telemetry-timeout', type=float, default=3, help='Maximum age of an observation on slow multi-instance test hosts; gameplay checks still require every peer to advance')
     parser.add_argument('--startup-gap', type=float, default=0, help='Seconds between process launches')
     parser.add_argument('--menu-pulse', type=float, default=0.2, help='Seconds to hold menu inputs; increase on slow multi-instance hosts')

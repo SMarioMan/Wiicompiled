@@ -179,6 +179,12 @@ to reverse the roles with the same executable. Repeat `--client` for additional
 independent portable directories (the default product currently supports twelve
 slots). The test driver accepts `--capacity N` for an experimental matched build
 and validates runtime IDs against that capacity.
+For many local instances on a constrained host, `--startup-gap 12` staggers
+bootstrap work. `--telemetry-timeout 90` can explicitly allow slower telemetry;
+the default freshness window remains three seconds. This changes only the test
+observer's tolerance: all peers must still report the full room, the same course
+and at least 120 advancing simulation frames. It does not extend game network
+timeouts or establish acceptable real-time performance.
 Optional repeated `--client-id` values follow the client directory order;
 otherwise the test assigns distinct IDs automatically. Run local processes in
 the same network namespace. Discovery uses multicast, with no peer list supplied.

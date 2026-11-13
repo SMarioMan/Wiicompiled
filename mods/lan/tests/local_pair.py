@@ -32,6 +32,8 @@ def run(args):
         raise ValueError('Runtime IDs must fit the requested build capacity')
     if len(set(ids)) != len(ids):
         raise ValueError('Local instances require different runtime IDs')
+    if not 3 <= args.telemetry_timeout <= 120:
+        raise ValueError('Telemetry timeout must be between three and 120 seconds')
     if not 0 <= args.startup_gap <= 30:
         raise ValueError('Startup gap must be between zero and thirty seconds')
     count = len(ids)
@@ -111,7 +113,7 @@ def run(args):
                     record = dict(stage=state, frames=players, course=section, players=page, mode=transition)
                     race[instance] = record, now
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, race=record)), flush=True)
-                    running = all(i in race and now-race[i][1] < 3 and
+                    running = all(i in race and now-race[i][1] < args.telemetry_timeout and
                         race[i][0]['stage'] == 2 and race[i][0]['players'] == count for i in ids)
                     if running and all(race[i][0]['course'] == race[ids[0]][0]['course'] for i in ids):
                         if race_since is None:
@@ -129,7 +131,7 @@ def run(args):
                 if status.get(instance, (None,))[0] != record:
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, **record)), flush=True)
                 status[instance] = record, now
-                joined = all(i in status and now-status[i][1] < 3 and
+                joined = all(i in status and now-status[i][1] < args.telemetry_timeout and
                     status[i][0]['state'] == (3 if i == args.host_id else 4) and
                     status[i][0]['players'] == count and status[i][0]['page'] == 0x9d and
                     status[i][0]['transition'] == 4 for i in ids)
@@ -163,6 +165,7 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=Path, required=True)
     parser.add_argument('--client', type=Path, action='append', required=True, help='Repeat for additional portable client directories')
     parser.add_argument('--timeout', type=float, default=180)
+    parser.add_argument('--telemetry-timeout', type=float, default=3, help='Maximum age of an observation on slow multi-instance test hosts; gameplay checks still require every peer to advance')
     parser.add_argument('--startup-gap', type=float, default=0, help='Seconds between process launches')
     parser.add_argument('--capacity', type=int, choices=range(1, 33), default=12, help='Capacity of the matched guest/module build')
     parser.add_argument('--host-id', type=int, choices=range(1, 33), default=1)

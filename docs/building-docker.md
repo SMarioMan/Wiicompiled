@@ -1,6 +1,6 @@
 # Container builds
 
-Validation status: all 922 translator unit tests pass. Complete base and optional LAN
+Validation status: all 929 translator unit tests pass. Complete base and optional LAN
 container workflows were tested with the USA RMCE01 RVZ, including Windows x64
 cross-compilation inside Linux Docker. Both LAN exports contain the required
 release artifacts and matching module source provenance; the Windows import audit
@@ -11,6 +11,18 @@ Multicast discovery and race progression also passed across two network namespac
 and with four simultaneous local instances. Rendering, Windows gameplay and
 completed LAN races remain unverified. Original guest-layout relocation and
 24-player support remain unfinished.
+
+The base Linux and Windows x64 Docker workflows were also rebuilt from the clean
+USA RVZ in a fresh environment. Both complete exports were moved into directories
+containing spaces. The moved Linux export resolves its shared libraries, creates
+a license through game menus with a valid save CRC, and passes a twelve-racer,
+one-lap VS finish/results/menus/second-race round trip. This used a virtual X11
+display and the null graphics backend; `--headless` still needs a display surface,
+and the base product needs a boot-race option with that flag. Windows PE import
+inspection finds the application DLLs present and the MSVC dependencies covered
+by the included redistributable. Native Windows execution and visual rendering
+remain unverified. See the [validation record](validation/docker-base-rmce01.json).
+These are stock twelve-player exports, not completed 24-player LAN releases.
 
 ## Linux x64
 

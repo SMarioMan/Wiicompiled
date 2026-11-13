@@ -8,7 +8,9 @@ Video subtitles are observations and design references, not build instructions.
 
 - [ ] Revalidate both existing Docker builders with a supplied disc and move each
   complete output directory before testing it. Windows execution needs a Windows
-  host; cross-compilation alone is insufficient.
+  host; cross-compilation alone is insufficient. Fresh USA base exports now build
+  on both platforms. Moved Linux first-run and twelve-player VS round-trip checks
+  pass; moved Windows imports are accounted for, with native execution pending.
 - [ ] Finish the USA capacity manifest without weakening instruction checks or
   setting `Complete` before all affected systems pass. Retain symbolic native
   branches and guest layout offsets; guest PCs are dispatch identities.

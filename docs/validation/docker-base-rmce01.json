@@ -1,0 +1,65 @@
+{
+  "scope": "Fresh base Docker workflows using the clean USA RVZ; stock 12-player exports. This is not a 24-player LAN release validation.",
+  "game_id": "RMCE01",
+  "dol_sha256": "d2beec1b1645fcd134efe9e7e63774b546667764ed8d431029daccd725995694",
+  "rel_sha256": "1168107f8fdef27a356df76036db55afe4fbf7752606dbac991726701133a617",
+  "linux": {
+    "builder": "docker/Dockerfile.linux --target builder",
+    "build_exit_code": 0,
+    "release_directory_moved": true,
+    "moved_path_contains_spaces": true,
+    "missing_shared_libraries": [],
+    "license_creation": {
+      "result": "passed",
+      "check": "license zero created by menu input with valid save CRC"
+    },
+    "round_trip": {
+      "result": "passed",
+      "players": 12,
+      "laps": 1,
+      "mode": "vs",
+      "check": "finish, menus, second race advancing",
+      "progress": {
+        "stage": 2,
+        "frames": 300,
+        "players": 12,
+        "capacity": 12,
+        "observed": 12,
+        "min_player_frames": 472,
+        "course": 8,
+        "mode": 1,
+        "finished": 0,
+        "min_lap": 0,
+        "max_lap": 1
+      }
+    },
+    "display": "Unprivileged dummy Xorg display; SDL dummy video driver alone could not create a surface.",
+    "visual_rendering_verified": false
+  },
+  "windows": {
+    "builder": "docker/Dockerfile.windows",
+    "build_exit_code": 0,
+    "format": "pei-x86-64",
+    "release_directory_moved": true,
+    "moved_path_contains_spaces": true,
+    "non_system_application_imports_present": true,
+    "msvc_dependencies": "VC_redist.x64.exe included; native Windows execution still required.",
+    "execution_verified": false
+  },
+  "expanded_source_checks": {
+    "translator_unit_tests_passed": 929,
+    "bullet_bill_native_capacity_cases_passed": [
+      12,
+      13,
+      24,
+      48,
+      100
+    ],
+    "consumer_audit_entries": 1305
+  },
+  "limitations": [
+    "Base exports retain twelve players.",
+    "Bullet Bill native fixtures do not validate a complete ride in world geometry.",
+    "24 active LAN participants, remaining SELECT wire formats, presentation and reported CPU/grid/rescue issues remain unfinished."
+  ]
+}

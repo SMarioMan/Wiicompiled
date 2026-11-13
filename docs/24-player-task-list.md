@@ -25,7 +25,10 @@ Video subtitles are observations and design references, not build instructions.
 
 - [ ] **CPU roster:** extend the real CPU character/vehicle selection and duplicate
   avoidance beyond slot 12. Check weight-compatible vehicles and define repeat
-  behavior after exhausting the eligible character pool.
+  behavior after exhausting the eligible character pool. The expanded normal-menu
+  counter/character selector now scan every slot, reserve non-CPU choices and
+  exhaust eligible characters before balanced repeats. Native checks pass through
+  100; normal-menu vehicle assignment and rendered races still need validation.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
   paginate or scroll as necessary. Check individual/team totals and menu return.
 - [ ] **Bullet Bill:** the overtaking-target lookup now follows the active field

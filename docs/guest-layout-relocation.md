@@ -1445,3 +1445,25 @@ audit passes. Live masks remain 32-bit: a 100-console voting fixture exposed mas
 aliasing after console 63, so larger-capacity storage results are explicitly not
 larger online support. Discovery protocol 3 rejects prior SELECT formats. These
 checks do not prove 24 active clients or complete the remaining wire migration.
+
+
+## Normal-menu CPU roster
+
+The original `GetActiveRacedataPlayers` scans twelve records. Character selection
+then stores its choices in a twelve-word stack array and retries until both the
+weight quota and duplicate test pass. Its quota calculation also cannot admit a
+thirteenth character in a 13-player field. Expanded-capacity native wrappers now
+count all configured slots and select CPU characters using the game's character
+eligibility, weight-class and RNG functions. Non-CPU choices are reserved even
+when their slots are sparse. Selection prefers the least-used eligible character,
+then the least-used weight, and chooses randomly among ties. It exhausts the
+eligible pool before repeating and terminates for fields larger than the pool.
+The original kart-selection code still chooses vehicles by character weight.
+Retail-capacity wrappers forward to the next implementation unchanged.
+
+`ExpandedCpuRosterTests` passes at capacities 12, 13, 24, 48 and 100. It checks
+retail forwarding, dense/sparse participants, full/restricted/empty eligibility,
+reservation of a non-CPU final slot, duplicate/weight priorities, CPU context,
+stack usage and untouched scenario bytes. Eligibility, weights and RNG are
+fixtures here; this does not replace gameplay validation of the actual menu,
+vehicle selection or resource loading for 24 distinct character models.

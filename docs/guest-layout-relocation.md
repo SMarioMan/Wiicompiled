@@ -1638,3 +1638,16 @@ removal, detecting collateral writes inside the allocation. All five capacities
 pass. A separate coverage check requires every moved member access in the
 manager's own methods to have a checked reference or fill span, including those
 for which exact pointer analysis cannot establish a receiver on a back edge.
+
+A later real two-peer VS start exposed interior-pointer consumers as well:
+`0x8062B4AC`, the queue reset, and packet setters receive `&manager.queue`.
+Their pending packet/sender and last-processed sender move relative to that
+pointer when the preceding per-console packet history expands. Those tail
+accesses now derive their offsets from the queue, count and history layout
+sizes, and the reset fills every history entry. The separate console scan at
+`0x8062AC40` now uses the configured console capacity. The completeness check
+also covers the interior-pointer tail accesses; native reset/setter checks
+compare the entire page through 100 players. A restored real room-to-race
+transition remains necessary evidence beyond these storage checks.
+The six friend-room coverage/lifecycle cases and complete 1,323-consumer audit
+pass with these interior-pointer corrections.

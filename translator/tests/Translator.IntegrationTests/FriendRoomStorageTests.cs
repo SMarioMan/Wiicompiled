@@ -38,6 +38,14 @@ public class FriendRoomStorageTests
             Assert.True(references.Contains(pc) || fills.Any(fill => fill.Begin <= pc && pc < fill.Begin + fill.Bytes),
                 $"Unchecked moved friend-room access at 0x{pc:X8}: 0x{word:X8}");
         }
+        // Packet helpers receive &manager.queue rather than the page base.
+        // Their tail offsets move relative to this interior pointer too.
+        for(var pc=0x8062b434u;pc<0x8062b8ccu;pc+=4) {
+            var word=BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(pc,4),4));
+            var opcode=word>>26;var offset=word&0xffff;
+            if(opcode is >=32 and <=55 && offset is >=0x154 and <=0x15c)
+                Assert.True(references.Contains(pc),$"Unchecked queue-relative room tail at 0x{pc:X8}: 0x{word:X8}");
+        }
     }
 
     [Theory]
@@ -56,7 +64,7 @@ public class FriendRoomStorageTests
         var translator=new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(manifest,players));
         var temp=Path.Combine(Path.GetTempPath(),"mkw-friend-room-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try {
-            uint[] entries={0x8062a0ac,0x8062a140,0x8062a1e8,0x8062a324,0x806299d0,0x80629a44,0x80020494,0x8002058c,0x8062ae74,0x8062a814};
+            uint[] entries={0x8062a0ac,0x8062a140,0x8062a1e8,0x8062a324,0x806299d0,0x80629a44,0x80020494,0x8002058c,0x8062ae74,0x8062a814,0x8062b434,0x8062b8bc};
             uint[] fixtures={0x805dd09c,0x805d4094,0x8060c378,0x805d9350,0x805d9594,0x805ddb94,0x80517a5c,0x805d9768,
                 0x805ddb7c,0x805ddb8c,0x808413a4,0x808417a4,0x80629a9c,0x805d93e4,0x805d9a8c,0x805d9674,0x805d938c,
                 0x8060c4a0,0x805d40b8,0x805dd124,0x80229a90};
@@ -138,6 +146,22 @@ public class FriendRoomStorageTests
                             CHECK(positions.emplace(x,y).second && x>=-275 && x<=275 && (y==140 || y==40));
                             if(active<=12)CHECK(y==140);
                         }
+                    }
+                    // Reset and set packets through the original interior-pointer
+                    // helpers. Compare the entire page to catch stale tail writes.
+                    {
+                        constexpr uint32_t lastConsole={{layout.Symbol("FriendRoomManager.lastConsole.offset")}},
+                            pendingPacket={{layout.Symbol("FriendRoomManager.pendingPacket.offset")}},pendingAid={{layout.Symbol("FriendRoomManager.pendingAid.offset")}};
+                        std::memset(Memory::GetPointer(page+queueCount,size-queueCount),0x7e,size-queueCount);
+                        std::vector<uint8_t> expected(size);std::memcpy(expected.data(),Memory::GetPointer(page,size),size);
+                        expectedWord(expected,queueCount,0);for(unsigned i=0;i<slots;i++)expectedWord(expected,timers+i*4,0);
+                        expected[lastConsole]=255;expectedWord(expected,pendingPacket,0);
+                        c.gpr[3]=page+queue;func_8062B434(&c);
+                        CHECK(std::memcmp(expected.data(),Memory::GetPointer(page,size),size)==0);
+                        constexpr uint32_t packet=0x01000315;Memory::Write32(heap,packet);
+                        c.gpr[3]=page+queue;c.gpr[4]=heap;c.gpr[5]=n-1;func_8062B8BC(&c);
+                        expectedWord(expected,pendingPacket,packet);expected[pendingAid]=n-1;
+                        CHECK(std::memcmp(expected.data(),Memory::GetPointer(page,size),size)==0);
                     }
                     // Run the original dequeue loop through a function boundary
                     // immediately before message processing. No game words are patched.

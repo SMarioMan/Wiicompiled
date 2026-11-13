@@ -59313,6 +59313,109 @@
       "Symbol": "FriendRoomManager.queue.offset",
       "Addend": 5,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8062B4A0",
+      "ExpectedWord": "0x98030154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8062B4A4",
+      "ExpectedWord": "0x90830158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8062B5A8",
+      "ExpectedWord": "0x83F90158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8062B5BC",
+      "ExpectedWord": "0x8879015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8062B5C0",
+      "ExpectedWord": "0x88190154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8062B668",
+      "ExpectedWord": "0x88B9015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8062B674",
+      "ExpectedWord": "0x8819015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8062B678",
+      "ExpectedWord": "0x98190154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8062B89C",
+      "ExpectedWord": "0x90030158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8062B8B4",
+      "ExpectedWord": "0x9803015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8062B8C0",
+      "ExpectedWord": "0x90030158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8062B8C4",
+      "ExpectedWord": "0x98A3015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size+FriendRoomManager.timers.size",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8062AC40",
+      "ExpectedWord": "0x2813000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.count"
     }
   ],
   "GlobalPointers": {
@@ -66050,6 +66153,16 @@
       "Entry": "0x8062B8CC",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x8062B434",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8062B8BC",
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -70834,6 +70947,45 @@
           "Stride": "FriendRoomManager.consoleSequences.stride",
           "Count": "FriendRoomManager.consoleSequences.count",
           "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8062B440",
+      "ExpectedWords": [
+        "0x908300F4",
+        "0x908300F8",
+        "0x908300FC",
+        "0x90830100",
+        "0x90830104",
+        "0x90830108",
+        "0x9083010C",
+        "0x90830110",
+        "0x90830114",
+        "0x90830118",
+        "0x9083011C",
+        "0x90830120",
+        "0x90830124",
+        "0x90830128",
+        "0x9083012C",
+        "0x90830130",
+        "0x90830134",
+        "0x90830138",
+        "0x9083013C",
+        "0x90830140",
+        "0x90830144",
+        "0x90830148",
+        "0x9083014C",
+        "0x90830150"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "FriendRoomManager.queue.size+FriendRoomManager.queueCount.size",
+          "Stride": "FriendRoomManager.timers.stride",
+          "Count": "FriendRoomManager.timers.count",
+          "Width": 4
         }
       ]
     }

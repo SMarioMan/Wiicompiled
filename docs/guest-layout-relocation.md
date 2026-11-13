@@ -1506,3 +1506,28 @@ valid weight-compatible vehicle and the local player's choices preserved.
 License eligibility and random/timing entry points remain fixtures. This tests
 the normal selector rather than the direct-boot fixed roster; rendering and
 loading all resulting models still require gameplay validation.
+
+
+## Results controls and rank messages
+
+The original results BRCTR contains only `rank1`..`rank12`; `GetVariant` falls
+back to its first record for unknown names. Extending the participant array
+therefore draws ranks 13..24 over rank one. `mods/expanded-ui/build.py` derives
+new named records from the user's disc: at 24, individual results use two columns
+and team results use twelve compact rows per team. Original control flags,
+aspect-specific transforms and in-column animation delays are retained.
+
+The original rank-message helper adds `0x514`; values above twelve then select
+unrelated score/control messages. An expanded-capacity native wrapper maps only
+ranks 13..capacity to reserved `0x70000000 + rank` IDs. The asset generator adds
+localized UTF-16 messages and rebuilds sorted BMG indices, retaining every
+original message. Stock ranks and retail-capacity builds forward unchanged.
+The LAN Docker workflow derives these assets in its extracted output directory
+and exports their change/hash report. The input disc is unchanged.
+
+Three Python checks and the native original-loader fixture pass. That fixture
+loads all 24 VS/GP/TT variants, all twelve team variants, both aspect ratios and
+English/French/Spanish BMGs through the real USA game functions, checking distinct
+positions, scales and correct rank digits/suffixes. It does not establish rendered
+readability or complete every results/podium flow; HUD rank textures remain a
+separate migration. Generated layouts beyond 24 require a readable paging policy.

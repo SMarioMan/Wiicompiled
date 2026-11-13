@@ -44,6 +44,7 @@ if (( layout_players != 12 )); then
     # dispatch decisions. Planning emits the same checked context as translation.
     dotnet "$cli" plan-guest-layouts --project "$project" "${layout_args[@]}" \
         --out build/layout-plan.json --artifacts-dir build/layout-context
+    python3 mods/expanded-ui/build.py --data "$output/DATA" --players "$layout_players" --report build/expanded-ui.json
     module_layout_args=(--guest-layout-context build/layout-context/guest_layout_context.json --experimental-guest-layouts)
 fi
 python3 mods/lan/build.py --toolchain "$(dirname "$native")" "${module_layout_args[@]}" --out build/lan
@@ -89,6 +90,7 @@ mkdir "$output/lan-build"
 cp "build/lan/Code.pul" "build/lan/"*.json "$output/lan-build/"
 cp generated/functions/guest_layout_context.json "$output/lan-build/"
 [[ ! -f build/layout-plan.json ]] || cp build/layout-plan.json "$output/lan-build/"
+[[ ! -f build/expanded-ui.json ]] || cp build/expanded-ui.json "$output/lan-build/"
 touch "$output/portable.txt"
 mkdir -p "$output/UserData"
 printf '[paths]\ndvd_root = "../DATA"\n' > "$output/UserData/Config.toml"

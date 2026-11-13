@@ -30,7 +30,10 @@ Video subtitles are observations and design references, not build instructions.
   exhaust eligible characters before balanced repeats. Native checks pass through
   100; normal-menu vehicle assignment and rendered races still need validation.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
-  paginate or scroll as necessary. Check individual/team totals and menu return.
+  paginate or scroll as necessary. At 24, generated individual controls now use
+  two columns, team controls have twelve rows per team, and reserved localized
+  message IDs avoid unrelated strings. Original-loader checks pass; rendered
+  readability, totals and menu return still need gameplay checks.
 - [ ] **Bullet Bill:** the overtaking-target lookup now follows the active field
   with exact authored small-field behavior. Native target/timer/drop-gate checks
   pass at 12, 13, 24, 48 and 100 capacity; visually verify rides and safe drop

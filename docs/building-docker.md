@@ -226,4 +226,6 @@ inlining sees the correct module hooks. Base and mod translation use identical
 layout arguments. The local build cache also binds the manifest contents,
 capacity and experimental mode, preventing a twelve-player cache from being
 reused as a 24-player build. Exports include the resolved context/plan and record
-player capacity and discovery protocol in `build-inputs.txt`.
+player capacity and discovery protocol in `build-inputs.txt`. Expanded LAN exports
+also derive results variants and localized rank text from the extracted disc and
+include `lan-build/expanded-ui.json` with the changed-asset hashes.

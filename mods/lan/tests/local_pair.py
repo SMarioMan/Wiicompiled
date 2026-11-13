@@ -55,6 +55,7 @@ def run(args):
     race_start_frames = {}
     started = time.monotonic()
     ready_since = None
+    next_summary = started + 30
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as monitor:
         # Bind before launching either process. Failure means another test owns it.
         monitor.bind(('127.0.0.254', 27900))
@@ -79,6 +80,12 @@ def run(args):
                     if process.poll() is not None:
                         raise RuntimeError(f'Instance {instance} exited with {process.returncode}')
                 now = time.monotonic()
+                if now >= next_summary:
+                    snapshot = {str(i): dict(status[i][0], age=round(now-status[i][1], 1))
+                                if i in status else dict(missing=True) for i in ids}
+                    print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='room-observations',
+                                          peers=snapshot)), flush=True)
+                    next_summary = now + 30
                 if args.race and room_confirmed is not None:
                     elapsed = now - room_confirmed
                     for instance, pad in zip(ids, pads):

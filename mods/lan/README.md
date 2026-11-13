@@ -192,7 +192,9 @@ the same network namespace. Discovery uses multicast, with no peer list supplied
 The test checks unique source addresses, host/client states, the expected player
 count on every peer and five seconds in the active room. It exits nonzero on
 process exit, timeout or address mismatch, writes `lan-test-game.log` in each
-product, and terminates its processes on exit. Add `--race` to drive the host's
+product, and terminates its processes on exit. Every thirty seconds it also
+prints the latest room observation and its age for each peer, including missing
+peers, so an unchanged room can be distinguished from missing telemetry. Add `--race` to drive the host's
 Start button, character/kart/drift selection and course voting through controller
 input:
 

@@ -57225,6 +57225,34 @@
       "Symbol": "RKNetPacket.size"
     },
     {
+      "Instruction": "0x806544AC",
+      "ExpectedWord": "0x38A02280",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetController.receivedPackets.size"
+    },
+    {
+      "Instruction": "0x806544E8",
+      "ExpectedWord": "0x281E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.receivedPackets.count"
+    },
+    {
+      "Instruction": "0x806547EC",
+      "ExpectedWord": "0x38A02280",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetController.receivedPackets.size"
+    },
+    {
+      "Instruction": "0x80654814",
+      "ExpectedWord": "0x281E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.receivedPackets.count"
+    },
+    {
       "Instruction": "0x806544D8",
       "ExpectedWord": "0x38A002E0",
       "Node": 0,

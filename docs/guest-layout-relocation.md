@@ -1669,3 +1669,13 @@ end, full and sparse masks, disconnected state, and invalid packet lengths.
 The expanded 13/24 cases failed before correction; all six lifecycle capacities
 (12, 13, 24, 32, 48, 100) pass afterward. Mask-dependent import execution covers
 12 through 32; the larger cases check storage and non-mask lifecycle methods.
+
+Both SDK receive-buffer setup paths (`SetDWCRecvBuffers` and the copy inside
+`ConnectToWFC`) used twelve iterations and cleared only the original packet
+arena. Their loop bounds and clear lengths now derive from
+`RKNetController.receivedPackets.count/size`. `NetworkReceiveBufferTests`
+executes both original functions with real guest memset helpers and mocks only
+the SDK, service setup and license boundaries. It checks every registered AID,
+packet stride/size, the entire cleared arena, adjacent bytes and preserved
+registers. This covers 12, 13, 24 and 32 peers; it is a setup check, with live
+room/race delivery checked separately.

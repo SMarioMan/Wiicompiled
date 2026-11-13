@@ -47,8 +47,10 @@ Video subtitles are observations and design references, not build instructions.
   interpolation for all item settings and partial fields, plus rank-sensitive
   effects. Do not merely extend the lookup bound over twelve authored columns.
 - [ ] **Starting grid:** replace unlimited backward extension with course-aware
-  placement. Check all courses, alternate starts, collision bounds and capacities
-  through 100; generated grid tables alone do not prove safe spawn coordinates.
+  placement. The native KTPT wrapper now packs expanded fields inside the actual
+  original twelve-racer footprint, with native coordinate/spacing checks through
+  100. Check all courses, alternate starts, collision bounds and checkpoint state;
+  footprint membership alone does not prove safe spawn coordinates.
 - [ ] **Stranded CPUs / Lakitu:** distinguish bad initial coordinates, route or
   checkpoint state and rescue storage/limits. Force falls for every slot and
   verify rescue, checkpoint progress and subsequent lap completion.

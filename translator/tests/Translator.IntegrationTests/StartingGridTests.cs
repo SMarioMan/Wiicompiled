@@ -14,7 +14,7 @@ public class StartingGridTests
     [InlineData(48)]
     [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
-    public void RealGridGeometryPreservesAuthoredFieldsAndExtendsDistinctStaggeredRows(int players)
+    public void RealGridGeometryPreservesStockFieldsAndBoundsExpandedSpawns(int players)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);
         while(directory is not null && !File.Exists(Path.Combine(directory.FullName,"translator/Translator.sln")))directory=directory.Parent;
@@ -30,7 +30,7 @@ public class StartingGridTests
         {
             var entries=new uint[] {0x8050fef4,0x80510360,0x80510388,0x8051039c,0x805103c4,0x805103f8,
                 0x80239bd4,0x80239f4c,0x8023a1bc,0x8022f4dc,0x8022f4e8,0x80085070,0x800850e0,0x80020a30,0x80020a7c};
-            var sources=new List<string>();
+            var sources=new List<string>{Path.Combine(root,"runtime/src/hle/starting_grid.cpp"),Path.Combine(root,"runtime/src/guest_region.cpp")};
             foreach(var pc in entries)
             {
                 var file=Path.Combine(temp,$"{pc:X8}.cpp");File.WriteAllText(file,translator.Translate(pc,options).CxxCode);sources.Add(file);
@@ -45,12 +45,14 @@ public class StartingGridTests
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include "starting_grid.h"
                 #include <array>
                 #include <cstdlib>
                 #include <cstring>
                 #include <cstdio>
                 {{declarations}}
                 extern "C" void grid_original(CpuContext*);
+                extern "C" void KTPT_ExpandedStartingGrid(CpuContext*);
                 #include <bit>
                 #include <cmath>
                 #include <set>
@@ -69,6 +71,7 @@ public class StartingGridTests
                     auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
                     {{registrations}}
+                    register_entry(0x80514368,func_8050FEF4);
                     Memory::Write32(0x809b8f28,manager);Memory::Write32(manager+0x3c,section);
                     Memory::Write32(section,holders);Memory::Write16(section+4,1);Memory::Write32(holders,stgi);Memory::Write32(stgi,rawStgi);
                     Memory::Write32(ktpt,rawKtpt);write_float(rawKtpt,1000);write_float(rawKtpt+4,120);write_float(rawKtpt+8,2000);
@@ -102,14 +105,34 @@ public class StartingGridTests
                         Vec rowStep{};for(uint32_t axis=0;axis<3;axis++)rowStep[axis]=(authored[6][axis]-authored[0][axis])/2;
                         for(uint32_t count=1;count<=n;count++){
                             if(count>13 && count!=n)continue;
-                            std::set<Vec> occupied;
+                            std::set<Vec> occupied; std::vector<Vec> packedOccupied;
                             for(uint32_t i=0;i<count;i++){
                                 auto actual=calculate(func_8050FEF4,count,i);
-                                if(count<=12){if(actual!=calculate(grid_original,count,i))return 4;}
+                                if(count<=12){if(actual!=calculate(grid_original,count,i) || actual!=calculate(KTPT_ExpandedStartingGrid,count,i))return 4;}
                                 else for(uint32_t axis=0;axis<3;axis++){
                                     const float expected=authored[i%12][axis]+rowStep[axis]*4*(i/12);
                                     if(std::abs(actual[axis]-expected)>0.02f+std::abs(expected)*0.00001f){
                                         std::fprintf(stderr,"grid count=%u index=%u axis=%u got=%f expected=%f\n",count,i,axis,actual[axis],expected);return 5;}
+                                }
+                                if(count>12){
+                                    auto packed=calculate(KTPT_ExpandedStartingGrid,count,i);
+                                    // Membership in any authored triangle proves membership
+                                    // in the original convex footprint, independently of the
+                                    // planner's hull/row construction.
+                                    bool inside=false;
+                                    for(uint32_t a=0;a<12 && !inside;a++)for(uint32_t b=a+1;b<12 && !inside;b++)for(uint32_t c=b+1;c<12;c++){
+                                        auto u=StartingGrid::Sub(authored[b],authored[a]),v=StartingGrid::Sub(authored[c],authored[a]),w=StartingGrid::Sub(packed,authored[a]);
+                                        const float uu=StartingGrid::Dot(u,u),uv=StartingGrid::Dot(u,v),vv=StartingGrid::Dot(v,v),wu=StartingGrid::Dot(w,u),wv=StartingGrid::Dot(w,v),det=uu*vv-uv*uv;
+                                        if(std::abs(det)<1)continue;
+                                        const float x=(wu*vv-wv*uv)/det,y=(wv*uu-wu*uv)/det;
+                                        if(x>=-.0001f && y>=-.0001f && x+y<=1.0001f)inside=true;
+                                    }
+                                    if(!inside){std::fprintf(stderr,"packed slot %u/%u leaves the authored footprint\n",i,count);return 8;}
+                                    for(uint32_t j=0;j<packedOccupied.size();j++){
+                                        const auto delta=StartingGrid::Sub(packed,packedOccupied[j]);
+                                        if(StartingGrid::Dot(delta,delta)<200.f*200.f){std::fprintf(stderr,"packed count=%u slots=%u,%u separation=%f\n",count,i,j,std::sqrt(StartingGrid::Dot(delta,delta)));return 9;}
+                                    }
+                                    packedOccupied.push_back(packed);
                                 }
                                 if(!occupied.insert(actual).second){std::fprintf(stderr,"duplicate grid narrow=%u yaw=%f count=%u index=%u point=%f,%f,%f\n",narrow,yaw,count,i,actual[0],actual[1],actual[2]);return 6;}
                             }

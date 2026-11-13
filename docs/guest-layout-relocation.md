@@ -1564,3 +1564,27 @@ one/two local players, sparse occupancy including the highest AID, every
 occupancy boundary, complete callback scans and preserved nonvolatile registers.
 The SDK's existing 32-node storage is retained. These checks do not establish a
 24-active-participant race or support beyond the SDK/mask limit.
+
+## Bounded expanded starting footprint
+
+The original grid-table extension can put later rows arbitrarily far behind a
+course's start. The expanded KTPT wrapper instead samples the actual original
+12-racer coordinates for that course/start and packs the active field inside
+their convex footprint. It derives a plane from the transformed coordinates,
+keeps the original orientation and chooses balanced rows with the greatest
+minimum pair distance. Columns and rows follow the active field rather than a
+fixed twelve-player pattern. The plan is reused while the authored transform
+and field size stay the same. Fields of twelve or fewer and single-slot battle
+starts continue through the original routine.
+
+`StartingGridTests` retains the raw table-extension checks and additionally runs
+the native wrapper against the real translated coordinate/quaternion functions
+at 12, 13, 24, 48 and 100 capacity, both pole-side settings and four course yaws.
+Every expanded point lies in an authored triangle (independent convex-footprint
+membership proof), all pair distances are at least 200 game units in those
+fixtures, and guest registers, rotations and output/stack guards remain valid.
+This prevents unbounded backward extension; it does not prove collision
+clearance, checkpoint initialization or rescue on every original/custom course.
+Course-specific collision and full-race checks remain on the task list. Very
+large fields can eventually exceed the usable area of any finite footprint;
+those need an additional course-route allocation policy.

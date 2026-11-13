@@ -1,5 +1,5 @@
 {
-  "Version": 20,
+  "Version": 27,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -61620,6 +61620,11 @@
       "Entry": "0x80660ED4",
       "Receiver": "RKNetUserHandler",
       "Name": ""
+    },
+    {
+      "Entry": "0x805B07A0",
+      "Receiver": null,
+      "Name": "Kart::Killer::Activate"
     }
   ],
   "BoundedAccesses": [
@@ -65628,6 +65633,38 @@
           "Index": "r0",
           "Destination": "r0",
           "Count": "r30"
+        }
+      ]
+    },
+    {
+      "Address": "0x8088E158",
+      "ExpectedValues": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5
+      ],
+      "SignedHalfwords": true,
+      "Formula": {
+        "Bias": -1,
+        "Divisor": 2
+      },
+      "Lookups": [
+        {
+          "Instruction": "0x805B098C",
+          "ExpectedWord": "0x7C8532AE",
+          "Base": "r5",
+          "Index": "r6",
+          "Destination": "r4",
+          "Count": "r28"
         }
       ]
     }

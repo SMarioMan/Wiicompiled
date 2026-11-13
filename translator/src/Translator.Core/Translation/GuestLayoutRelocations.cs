@@ -152,7 +152,7 @@ public sealed partial class GuestLayoutRelocations
             Policy = "floor of zero-based runtime rank scaled to the authored axis"
         }),
         CapacityTables = _capacityTables.Select(table=>new {
-            Address=$"0x{table.Address:X8}",table.ExpectedValues,Extension="floor-scaled-terminal-threshold",
+            Address=$"0x{table.Address:X8}",table.ExpectedValues,table.SignedHalfwords,table.Formula,Extension=table.Formula is null ? "floor-scaled-terminal-threshold" : "checked-count-formula",
             Lookups=table.Lookups.Select(site=>new {Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",
                 site.Base,site.Index,site.Destination,site.Count})
         }),
@@ -267,7 +267,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 27 && file.CapacityTables?.Any(table => table.SignedHalfwords || table.Formula is not null) == true)
+            throw new InvalidDataException("Signed halfword capacity tables and checked formulas require layout format version 27.");
         if (file.Version < 26 && file.ArrayTransfers?.Any(site => site.OriginalElements != 1 || site.Width == 1) == true)
             throw new InvalidDataException("Unrolled and byte array transfers require layout format version 26.");
         if (file.Version < 25 && file.BoundedAccesses?.Any(site => site.IndexBase is null && site.IndexStride is not null) == true)
@@ -350,7 +352,7 @@ public sealed partial class GuestLayoutRelocations
                 site.Source,site.Player,site.Destination)),
             file.CapacityTables?.Select(table=>new GuestCapacityTable(Hex(table.Address),table.ExpectedValues,
                 table.Lookups.Select(site=>new GuestCapacityLookup(Hex(site.Instruction),Hex(site.ExpectedWord),
-                    site.Base,site.Index,site.Destination,site.Count)).ToArray())),
+                    site.Base,site.Index,site.Destination,site.Count)).ToArray(),table.SignedHalfwords,table.Formula)),
             file.GridTables?.Select(table => new GuestGridTable(Hex(table.Address), Convert.FromHexString(table.ExpectedHex), table.AdvanceRows,
                 table.Lookups.Select(site => new GuestGridLookup(Hex(site.Instruction), Hex(site.ExpectedWord),
                     site.Base, site.Index, site.Destination, site.CountOffset, site.Position)).ToArray())),
@@ -386,7 +388,8 @@ public sealed partial class GuestLayoutRelocations
     private sealed record NormalizedRankFile(string Instruction, string ExpectedWord, string Register, string Count, int SourceCount);
     private sealed record GridTableFile(string Address, string ExpectedHex, bool AdvanceRows, GridLookupFile[] Lookups);
     private sealed record GridLookupFile(string Instruction, string ExpectedWord, string Base, string Index, string Destination, string CountOffset, string? Position = null);
-    private sealed record CapacityTableFile(string Address,uint[] ExpectedValues,CapacityLookupFile[] Lookups);
+    private sealed record CapacityTableFile(string Address,uint[] ExpectedValues,CapacityLookupFile[] Lookups,
+        bool SignedHalfwords=false,GuestCapacityFormula? Formula=null);
     private sealed record CapacityLookupFile(string Instruction,string ExpectedWord,string Base,string Index,string Destination,string Count);
     private sealed record TraversalMarkerFile(string Begin,string[] ExpectedWords,string Source,string Player,string Destination);
     private sealed record ResampledCursorFile(string Instruction,string ExpectedWord,string Cursor,string NextIndex,

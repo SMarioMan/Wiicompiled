@@ -1355,3 +1355,36 @@ entries inside a multi-element span are rejected. Tests cover 12, 13, 24, 48,
 and 100, byte/halfword/word elements, overlap, guards, invalid spans, and format
 gating. All 922 unit tests pass. The optimized native test also exercises an
 expanded 24-byte overlapping copy, along with pointer chains and word transfers.
+
+## Bullet Bill overtaking targets
+
+Layout format 27 adds `SignedHalfwords` and an optional checked `Formula` to
+capacity tables. The signed form verifies the complete indexed halfword load and
+its sign extension. A formula computes `max(1, (count + Bias) / Divisor)`; its
+divisor must be positive, its bias nonpositive, and it must reproduce every
+authored table entry. The expanded result must fit the signed load. Old word
+tables retain their existing terminal-proportion policy. Both forms verify all
+original table bytes and the exact lookup instruction, retain original-capacity
+emission, and return zero for invalid expanded counts.
+
+The USA Bullet Bill activation at `0x805B07A0` copies twelve halfwords from
+`0x8088E158` to its stack. Its `lhax` at `0x805B098C` indexes that copy using the
+**active racer count**, not the current rank. Counts above twelve therefore read
+unrelated stack contents. The checked lookup now uses the original count in
+`r28` and the verified formula `max(1, (count - 1) / 2)`. It retains the exact
+authored counts through twelve and permits eleven overtakes in a 24-racer field,
+regardless of whether a larger build capacity is configured. The original rank
+subtraction, first-place clamp, timers and safe-drop checks remain in guest code.
+The original stack copy remains twelve halfwords; the expanded lookup performs
+no read from it, so enlarging that temporary or moving its saved registers is
+unnecessary.
+
+All 929 translator unit tests and the 1,305-consumer proof/original-emission/
+expanded-compilation audit pass. The native Bullet Bill fixture executes the
+actual activation target region and complete duration function at capacities
+12, 13, 24, 48 and 100. It checks every rank in every partial field, poisons stack
+bytes beyond the authored table, and checks the target, minimum/maximum timer
+boundaries, protected/unsafe drop conditions, driver reset and preserved registers.
+Player-ID lookup is an explicit fixture; activation graphics and world geometry
+are not simulated. This verifies the target calculation and existing timer/drop
+logic, not a visually validated Bullet Bill ride or larger playable LAN capacity.

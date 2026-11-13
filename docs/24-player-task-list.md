@@ -26,8 +26,10 @@ Video subtitles are observations and design references, not build instructions.
   behavior after exhausting the eligible character pool.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
   paginate or scroll as necessary. Check individual/team totals and menu return.
-- [ ] **Bullet Bill:** audit the overtaking-target lookup beyond rank 12, preserve
-  authored small-field behavior, and verify termination at safe drop locations.
+- [ ] **Bullet Bill:** the overtaking-target lookup now follows the active field
+  with exact authored small-field behavior. Native target/timer/drop-gate checks
+  pass at 12, 13, 24, 48 and 100 capacity; visually verify rides and safe drop
+  locations on courses before closing this issue.
 - [ ] **Position indicators:** supply valid rank indicators beyond 12 instead of
   reusing the twelfth-place asset; verify HUD, results and localization.
 - [ ] **Item tables:** revalidate existing capacity-sized probabilities/roulette

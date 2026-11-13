@@ -1,7 +1,7 @@
 namespace Translator.Core.Loading;
 
 /// <summary>PowerPC ABI layouts, independent of the host compiler's pointer size and alignment.</summary>
-public sealed record GuestLayoutField(string Name, string Type, int Count = 1, bool PerPlayer = false, string? PointerTo = null, int PlayersPerElement = 1);
+public sealed record GuestLayoutField(string Name, string Type, int Count = 1, bool PerPlayer = false, string? PointerTo = null, int PlayersPerElement = 1, bool Packed = false);
 public sealed record GuestLayoutType(string Name, int Alignment, int Size = 0,
     IReadOnlyList<GuestLayoutField>? Fields = null);
 public sealed record ResolvedGuestField(int Offset, int Size, int Count, int Stride);
@@ -41,11 +41,12 @@ public sealed class GuestLayouts
                 foreach (var member in members)
                 {
                     var element = Resolve(member.Type);
-                    if (member.Count < 1 || element.Alignment > type.Alignment || member.PlayersPerElement is < 1 or > 65535 ||
+                    var alignment = member.Packed ? 1 : element.Alignment;
+                    if (member.Count < 1 || alignment > type.Alignment || member.PlayersPerElement is < 1 or > 65535 ||
                         !member.PerPlayer && member.PlayersPerElement != 1)
                         throw new InvalidDataException($"Invalid field alignment/count: {name}.{member.Name}.");
                     var count = checked(member.Count * (member.PerPlayer ? (players + member.PlayersPerElement - 1) / member.PlayersPerElement : 1));
-                    var offset = Align(size, element.Alignment);
+                    var offset = Align(size, alignment);
                     var bytes = checked(element.Size * count);
                     fields.Add(member.Name, new ResolvedGuestField(offset, bytes, count, element.Size));
                     size = checked(offset + bytes);

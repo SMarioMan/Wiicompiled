@@ -20,6 +20,8 @@
 #define DISCOVERY_GROUP 0xefff4d4b /* 239.255.77.75 */
 #define BROADCAST_INTERVAL 60
 #define BROADCAST_TIMEOUT (BROADCAST_INTERVAL * 5)
+// Version 3 uses capacity-sized SELECT sections and packed team words.
+#define DISCOVERY_PROTOCOL 3
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
 #define BROADCAST_TRACK_MAX 32
 
@@ -225,7 +227,7 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 
 	struct broadcast_packet packet = {
 		.magic = BROADCAST_MAGIC,
-        .protocol = 2, .capacity = MKW_LAN_CAPACITY,
+        .protocol = DISCOVERY_PROTOCOL, .capacity = MKW_LAN_CAPACITY,
 		.pid = my_fake_pid,
 		.communication_port = communication_port,
 		.status = game_state,
@@ -316,7 +318,7 @@ static int find_peer_by_pid(uint32_t pid) {
 }
 
 static void process_broadcast(const struct broadcast_packet buffer, const so_addr_t raddr) {
-	if (buffer.magic != BROADCAST_MAGIC || buffer.protocol != 2 || buffer.capacity != MKW_LAN_CAPACITY) return;
+	if (buffer.magic != BROADCAST_MAGIC || buffer.protocol != DISCOVERY_PROTOCOL || buffer.capacity != MKW_LAN_CAPACITY) return;
 	int peer = find_or_alloc_peer(&raddr);
 	if (peer == -1) return;
 	tracked_peers[peer].last_update = timestamp;

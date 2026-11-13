@@ -62,30 +62,19 @@ For detailed existing verification and limitations, see
 [guest layouts](guest-layout-relocation.md), [Docker builds](building-docker.md)
 and [LAN tests](../mods/lan/README.md).
 
-## Next LAN wire-layout checkpoint
+## LAN wire-layout checkpoint
 
-The current `RKNetSelectPacket` remains an opaque 56-byte type. Inspection of the
-verified USA `SELECTHandler::ResetPacket` (`0x80658BB8`) establishes these ranges:
+The SELECT packet now has symbolic fields for its fixed prefix, two physical
+local-player records, settings word, packed teams, participant map and flags.
+Team words grow in groups of twelve consoles, the map grows with capacity, and
+packet alignment is preserved. Public/private team assignment, rating-sort
+scratch frames, resets, copies, getters and voting comparisons use these fields.
+The combined receive packet and all section-holder constructors use symbolic
+section capacities; the original byte-packed controller arena remains packed.
 
-| Original packet offset | Storage |
-| --- | --- |
-| `0x00..0x0f` | Fixed prefix, cleared as four words |
-| `0x10..0x1f` | Two physical local-player records, eight bytes each |
-| `0x20..0x23` | Fixed word, cleared separately |
-| `0x24..0x27` | Packed team word |
-| `0x28..0x33` | Twelve player-to-console bytes, reset to `0xff` |
-| `0x34..0x37` | Fixed suffix, reset to `ff 00 ff 00` |
-
-`SELECTHandler::GetTeam` (`0x80658718`) reads the one team word at handler
-offset `0x2c` (send packet offset `0x24`) and selects bit `2 * console + local`.
-It still cannot read a second packed word. Expanding the cache count did not fix
-that wire representation. Keep the two physical local records fixed when
-expanding participant storage.
-
-Migrate packet fields, team readers/writers, temporary sort/copy frames, packet
-resets, nested handler strides and send/receive section sizes together. Apply the
-existing checked packed loads/stores, array transfers and terminal pointer fills
-only after matching their actual instruction spans. Re-run the full consumer
-audit: existing references with literal offsets inside the previously opaque
-packet may need more specific symbols. Preserve stock emission at twelve and
-test packet bytes and bounds before attempting 24 active LAN participants.
+Native storage/team fixtures pass at 12, 13, 24, 48 and 100 capacity. Actual voting
+and host settings import pass at 12, 13 and 24. Larger live LAN counts remain
+limited by 32-bit console masks; at 100, scanning repeats mask bits after console
+63. Storage tests do not establish online support above that limit. Discovery
+protocol 3 excludes earlier capacity-matched builds with incompatible SELECT
+sections. RH1 and other wire formats still need their own migration and testing.

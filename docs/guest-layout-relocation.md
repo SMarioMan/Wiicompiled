@@ -1419,3 +1419,29 @@ audit passes. Tests above the SDK mask width exercise storage and algorithms,
 with active console IDs restricted to 0..31. This is not yet a completed wire
 protocol: packet-buffer capacities and full packed-array readiness/equality
 checks still require migration before expanded live LAN validation.
+
+
+## Full SELECT negotiation and combined packet buffers
+
+Format 28 adds checked word-array comparisons and symbolic read-only word-table
+loads. Comparisons preserve the original source loads and register effects, set
+only the declared CR field, and compare all capacity-sized team words. Exact
+instruction spans, operands and interior control-flow entries are validated.
+Section-size lookup loads verify all eight original table words and return
+symbolic section sizes, retaining ordinary memory reads outside that table.
+Both features emit unchanged code at the original twelve-player capacity.
+
+SELECT readiness, equality and host settings import now cover all packed words.
+The combined `RKNetPacket` uses eight symbolic sections, and controller allocation,
+clear/copy strides and both section-holder constructors follow its size. Explicit
+packed field placement preserves the original byte-aligned receive arena while
+retaining padding inside the SELECT section. At 24, SELECT is 72 bytes and the
+combined packet is 752 bytes (originally 56 and 736).
+
+All 938 unit tests pass. Native comparison/table fixtures pass through capacity
+100, network buffer fixtures pass at 12/13/24/48/100, actual voting/import fixtures
+pass at 12/13/24, and the full 1,307-consumer proof/original-emission/expanded C++
+audit passes. Live masks remain 32-bit: a 100-console voting fixture exposed mask
+aliasing after console 63, so larger-capacity storage results are explicitly not
+larger online support. Discovery protocol 3 rejects prior SELECT formats. These
+checks do not prove 24 active clients or complete the remaining wire migration.

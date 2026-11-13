@@ -34,7 +34,7 @@ public class NetworkControllerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-network-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652468,0x80652480,0x8065543c,0x80654508,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
+            var entries=new uint[]{0x80655f54,0x8065169c,0x80652b7c,0x80651788,0x80654af8,0x80652818,0x80655c2c,0x80653628,0x806555fc,0x806539a8,0x806609d8,0x80655ec4,0x80652468,0x80652480,0x8065543c,0x80654508,0x80652ab8,0x806548b4,0x80654958,0x80652a78,0x80653c3c,0x80005f34,0x80005f84,0x80006038};
             var fixtures=new HashSet<uint>{0x801a7e0c,0x80226744,0x80229a48,0x80229a5c,0x80229a6c,0x80241a2c,0x8065a83c,0x80660694,0x800ccbe0,0x800d2414,0x800d20b8,0x800d21bc,0x800d48f4,0x800d20d0,0x800d2648,0x800d4a28,0x800d4914,0x80005f34,0x8066f108,0x80241d5c,0x800ec3f8,0x800ccac4,0x8065ae04,0x800ce0f0,0x801d1c00,0x801aacbc,0x800e85b4};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -53,7 +53,7 @@ public class NetworkControllerStorageTests
                 #include <cstring>
                 #define FAIL() do { std::fprintf(stderr,"fixture failure at line %d\n",__LINE__);std::abort(); } while(false)
                 {{declarations}}
-                constexpr uint32_t capacity={{players}},size={{layout.Symbol("RKNetController.size")}},
+                constexpr uint32_t fullCapacity={{layout.Symbol("RKNetPacket.size")}},selectCapacity={{layout.Symbol("RKNetSelectPacket.size")}},capacity={{players}},size={{layout.Symbol("RKNetController.size")}},
                     send={{layout.Symbol("RKNetController.splitSend.offset")}},receive={{layout.Symbol("RKNetController.splitReceived.offset")}},
                     rowStride={{layout.Symbol("RKNetPointerRow.size")}},full={{layout.Symbol("RKNetController.fullSend.offset")}},
                     times={{layout.Symbol("RKNetController.lastSendTimes.offset")}},lastAid={{layout.Symbol("RKNetController.lastSendAid.offset")}},
@@ -155,15 +155,15 @@ public class NetworkControllerStorageTests
                     std::set<uint32_t> used;
                     auto pointer=[&](uint32_t at){auto value=Memory::Read32(root+at);if(!used.insert(value).second || value<0x81100000 || value>=cursor)FAIL();word(at,value);return value;};
                     for(uint32_t p=0;p<capacity;p++){
-                        auto h=pointer(full+p*4);if(Memory::Read32(h+4)!=736 || Memory::Read32(h+8)!=0)return 5;
+                        auto h=pointer(full+p*4);if(Memory::Read32(h+4)!=fullCapacity || Memory::Read32(h+8)!=0)return 5;
                         auto buffer=Memory::Read32(h);if(!used.insert(buffer).second)return 6;
-                        for(uint32_t i=0;i<736;i++)if(Memory::Read8(buffer+i)!=0)return 7;
+                        for(uint32_t i=0;i<fullCapacity;i++)if(Memory::Read8(buffer+i)!=0)return 7;
                         for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
                             auto row=pointer(start+b*rowStride+p*4);
                             for(uint32_t section=0;section<8;section++){
                                 auto holder=Memory::Read32(row+section*4);if(!used.insert(holder).second)return 8;
                                 auto buffer=Memory::Read32(holder),n=Memory::Read32(holder+4);
-                                if(!used.insert(buffer).second || n>8192 || Memory::Read32(holder+8)!=0)return 9;
+                                if(!used.insert(buffer).second || n>8192 || Memory::Read32(holder+8)!=0 || (section==3 && n!=selectCapacity))return 9;
                                 for(uint32_t i=0;i<n;i++)if(Memory::Read8(buffer+i)!=0)return 10;
                             }
                         }
@@ -227,7 +227,7 @@ public class NetworkControllerStorageTests
                         }
                     for(uint32_t p=0;p<capacity;p++){
                         auto fullHolder=Memory::Read32(root+full+p*4);
-                        std::memset(Memory::GetPointer(Memory::Read32(fullHolder),736),0x7b,736);
+                        std::memset(Memory::GetPointer(Memory::Read32(fullHolder),fullCapacity),0x7b,fullCapacity);
                         for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
                             auto row=Memory::Read32(root+start+b*rowStride+p*4);
                             for(uint32_t section=0;section<8;section++){
@@ -240,7 +240,7 @@ public class NetworkControllerStorageTests
                     if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 20;
                     for(uint32_t p=0;p<capacity;p++){
                         auto fullHolder=Memory::Read32(root+full+p*4);
-                        for(uint32_t i=0;i<736;i++)if(Memory::Read8(Memory::Read32(fullHolder)+i)!=0x7b)return 21;
+                        for(uint32_t i=0;i<fullCapacity;i++)if(Memory::Read8(Memory::Read32(fullHolder)+i)!=0x7b)return 21;
                         for(uint32_t b=0;b<2;b++)for(auto start:{send,receive}){
                             auto row=Memory::Read32(root+start+b*rowStride+p*4);
                             for(uint32_t section=0;section<8;section++){
@@ -327,7 +327,7 @@ public class NetworkControllerStorageTests
                             std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                             for(uint32_t p=0;p<capacity;p++){
                                 auto fullHolder=Memory::Read32(root+full+p*4);Memory::Write32(fullHolder+8,0);
-                                std::memset(Memory::GetPointer(Memory::Read32(fullHolder),736),0x7b,736);
+                                std::memset(Memory::GetPointer(Memory::Read32(fullHolder),fullCapacity),0x7b,fullCapacity);
                                 for(uint32_t row=0;row<2;row++){
                                     auto split=Memory::Read32(root+send+row*rowStride+p*4);
                                     for(uint32_t section=0;section<8;section++){
@@ -343,7 +343,7 @@ public class NetworkControllerStorageTests
                                 for(uint32_t section=1;section<8;section++)total+=1+(p+section)%7;
                                 if(Memory::Read32(fullHolder+8)!=(selected?total:0))return 30;
                                 uint32_t offset=16;
-                                for(uint32_t i=0;i<736;i++){
+                                for(uint32_t i=0;i<fullCapacity;i++){
                                     uint8_t value=selected?0:0x7b;
                                     if(selected && i>=8 && i<16)value=i==8?16:1+(p+i-8)%7;
                                     if(selected && i>=16 && i<total){uint32_t at=16;for(uint32_t section=1;section<8;section++){
@@ -412,12 +412,12 @@ public class NetworkControllerStorageTests
                         std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                         for(uint32_t p=0;p<capacity;p++)Memory::Write32(Memory::Read32(root+full+p*4)+8,0);
                         auto holder=Memory::Read32(root+full+sendAid*4);sendAddress=Memory::Read32(holder);packetSize=16;
-                        std::memset(Memory::GetPointer(sendAddress,736),0x6a,736);Memory::Write32(sendAddress,0x52414345);Memory::Write32(sendAddress+4,0);Memory::Write32(holder+8,packetSize);
+                        std::memset(Memory::GetPointer(sendAddress,fullCapacity),0x6a,fullCapacity);Memory::Write32(sendAddress,0x52414345);Memory::Write32(sendAddress+4,0);Memory::Write32(holder+8,packetSize);
                         sending=true;crcCalls=timeCalls=sendCalls=0;ctx.gpr[3]=root;func_806539A8(&ctx);sending=false;
                         if(crcCalls!=1 || sendCalls!=1 || timeCalls!=sendResult)return 39;
                         if(sendResult){expected[lastAid]=sendAid;word(times+sendAid*8,0);word(times+sendAid*8+4,2000);}
                         if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size) || Memory::Read32(holder+8))return 40;
-                        for(uint32_t i=0;i<736;i++)if(Memory::Read8(sendAddress+i))return 41;
+                        for(uint32_t i=0;i<fullCapacity;i++)if(Memory::Read8(sendAddress+i))return 41;
                     }
                     constexpr uint32_t userHandler=0x810e0000;
                     for(uint32_t i=0;i<192;i++)Memory::Write8(userHandler+8+i,0x20+i%64);
@@ -471,7 +471,7 @@ public class NetworkControllerStorageTests
                         for(uint32_t p=0;p<capacity;p++)expected[playerAids+p]=p%peerLimit;
                         std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                         for(uint32_t p=0;p<capacity;p++){
-                            auto holder=Memory::Read32(root+full+p*4);Memory::Write32(holder+8,736);std::memset(Memory::GetPointer(Memory::Read32(holder),736),0x7b,736);
+                            auto holder=Memory::Read32(root+full+p*4);Memory::Write32(holder+8,fullCapacity);std::memset(Memory::GetPointer(Memory::Read32(holder),fullCapacity),0x7b,fullCapacity);
                         }
                         split_packets([](uint32_t holder,uint32_t buffer,uint32_t n){Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(buffer,n),0x6a,n);});
                         ctx.gpr[3]=root;ctx.gpr[4]=aid;func_80654508(&ctx);
@@ -481,8 +481,8 @@ public class NetworkControllerStorageTests
                         if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 50;
                         for(uint32_t p=0;p<capacity;p++){
                             auto holder=Memory::Read32(root+full+p*4);bool cleared=p==aid;
-                            if(Memory::Read32(holder+8)!=(cleared?0:736))return 51;
-                            for(uint32_t i=0;i<736;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=(cleared?0:0x7b))return 52;
+                            if(Memory::Read32(holder+8)!=(cleared?0:fullCapacity))return 51;
+                            for(uint32_t i=0;i<fullCapacity;i++)if(Memory::Read8(Memory::Read32(holder)+i)!=(cleared?0:0x7b))return 52;
                             for(uint32_t row=0;row<2;row++)for(auto start : {send,receive}){
                                 auto split=Memory::Read32(root+start+row*rowStride+p*4);
                                 for(uint32_t section=0;section<8;section++){
@@ -493,6 +493,18 @@ public class NetworkControllerStorageTests
                             }
                         }
                     }
+                    // Standalone split-packet construction must use the same symbolic section table.
+                    constexpr uint32_t extraRow=0x810f0000;
+                    std::memset(Memory::GetPointer(extraRow-16,64),0x55,64);
+                    ctx.gpr[3]=extraRow;func_80655F54(&ctx);
+                    const std::array<uint32_t,8> sectionSizes{16,40,40,selectCapacity,128,192,16,248};
+                    if(fullCapacity!=680+selectCapacity)return 55;
+                    for(uint32_t section=0;section<8;section++){
+                        auto holder=Memory::Read32(extraRow+section*4),buffer=Memory::Read32(holder);
+                        if(Memory::Read32(holder+4)!=sectionSizes[section] || Memory::Read32(holder+8))return 56;
+                        for(uint32_t i=0;i<sectionSizes[section];i++)if(Memory::Read8(buffer+i))return 57;
+                    }
+                    for(uint32_t i=0;i<16;i++)if(Memory::Read8(extraRow-16+i)!=0x55 || Memory::Read8(extraRow+32+i)!=0x55)return 58;
                     for(const auto& allocation:allocations)for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(allocation.address-16+i)!=0x77 || Memory::Read8(allocation.address+allocation.size+i)!=0x77)return 12;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 13;

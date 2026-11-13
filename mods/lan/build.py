@@ -172,7 +172,7 @@ def build(args):
     (output / 'lan_runtime_config.h').write_text(
         '#pragma once\n#include <cstdint>\n'
         f'inline constexpr uint32_t kLanConfigGuestAddress = 0x{config_address:08X}u;\n')
-    provenance = dict(runtime_configuration_version=2, diagnostics=args.diagnostics,
+    provenance = dict(runtime_configuration_version=2, discovery_protocol=3, diagnostics=args.diagnostics,
         guest_layout=layout, guest_layout_context_sha256=layout_hash,
         compiler_sha256=hashlib.sha256(compiler.read_bytes()).hexdigest(),
         source_sha256={str(p.relative_to(SOURCE)): hashlib.sha256(p.read_bytes()).hexdigest()

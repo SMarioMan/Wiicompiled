@@ -123,6 +123,7 @@ public sealed partial class GuestLayoutRelocations
 
     public void ValidateCopyControlFlow(IReadOnlyList<PpcInstruction> instructions, IReadOnlyList<BasicBlock> blocks)
     {
+        ValidateWordCompareControlFlow(instructions);
         ValidateFillControlFlow(instructions, blocks);
         ValidateTransferControlFlow(instructions, blocks);
         ValidateMarkerControlFlow(instructions, blocks);

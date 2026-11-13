@@ -1,5 +1,5 @@
 {
-  "Version": 27,
+  "Version": 28,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -1667,8 +1667,49 @@
     },
     {
       "Name": "RKNetPacket",
-      "Size": 736,
-      "Alignment": 1
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RKNetWireHeader",
+          "Packed": true
+        },
+        {
+          "Name": "rh1",
+          "Type": "RKNetWireRH1",
+          "Packed": true
+        },
+        {
+          "Name": "rh2",
+          "Type": "RKNetWireRH2",
+          "Packed": true
+        },
+        {
+          "Name": "select",
+          "Type": "RKNetSelectPacket",
+          "Packed": true
+        },
+        {
+          "Name": "racedata",
+          "Type": "RKNetWireRacedata",
+          "Packed": true
+        },
+        {
+          "Name": "user",
+          "Type": "RKNetUserPacket",
+          "Packed": true
+        },
+        {
+          "Name": "item",
+          "Type": "RKNetWireItem",
+          "Packed": true
+        },
+        {
+          "Name": "event",
+          "Type": "RKNetWireEvent",
+          "Packed": true
+        }
+      ]
     },
     {
       "Name": "RKNetStatus",
@@ -2428,6 +2469,36 @@
     {
       "Name": "SelectMapCompareStep",
       "Size": 5,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireHeader",
+      "Size": 16,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireRH1",
+      "Size": 40,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireRH2",
+      "Size": 40,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireRacedata",
+      "Size": 128,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireItem",
+      "Size": 16,
+      "Alignment": 1
+    },
+    {
+      "Name": "RKNetWireEvent",
+      "Size": 248,
       "Alignment": 1
     }
   ],
@@ -56866,6 +56937,48 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "players"
+    },
+    {
+      "Instruction": "0x80652BFC",
+      "ExpectedWord": "0x3AE002E0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x80652C28",
+      "ExpectedWord": "0x386002E0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x806544D8",
+      "ExpectedWord": "0x38A002E0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x806544E4",
+      "ExpectedWord": "0x3BFF02E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x80654804",
+      "ExpectedWord": "0x38A002E0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetPacket.size"
+    },
+    {
+      "Instruction": "0x80654810",
+      "ExpectedWord": "0x3BBD02E0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetPacket.size"
     }
   ],
   "GlobalPointers": {
@@ -63523,6 +63636,11 @@
       "Entry": "0x805B07A0",
       "Receiver": null,
       "Name": "Kart::Killer::Activate"
+    },
+    {
+      "Entry": "0x80655F54",
+      "Receiver": null,
+      "Name": "RKNet::SplitRACEPointers::__ct"
     }
   ],
   "BoundedAccesses": [
@@ -68440,6 +68558,144 @@
       "Width": 4,
       "AllowObjectSource": true,
       "OriginalElements": 1
+    }
+  ],
+  "WordTables": [
+    {
+      "Address": "0x80895AC4",
+      "ExpectedValues": [
+        16,
+        40,
+        40,
+        56,
+        128,
+        192,
+        16,
+        248
+      ],
+      "Entries": [
+        {
+          "Index": 0,
+          "Symbol": "RKNetWireHeader.size"
+        },
+        {
+          "Index": 1,
+          "Symbol": "RKNetWireRH1.size"
+        },
+        {
+          "Index": 2,
+          "Symbol": "RKNetWireRH2.size"
+        },
+        {
+          "Index": 3,
+          "Symbol": "RKNetSelectPacket.size"
+        },
+        {
+          "Index": 4,
+          "Symbol": "RKNetWireRacedata.size"
+        },
+        {
+          "Index": 5,
+          "Symbol": "RKNetUserPacket.size"
+        },
+        {
+          "Index": 6,
+          "Symbol": "RKNetWireItem.size"
+        },
+        {
+          "Index": 7,
+          "Symbol": "RKNetWireEvent.size"
+        }
+      ],
+      "Loads": [
+        {
+          "Instruction": "0x80652CB8",
+          "ExpectedWord": "0x80130000",
+          "Base": "r19",
+          "Destination": "r0"
+        },
+        {
+          "Instruction": "0x80652D40",
+          "ExpectedWord": "0x80140000",
+          "Base": "r20",
+          "Destination": "r0"
+        },
+        {
+          "Instruction": "0x80655F94",
+          "ExpectedWord": "0x801D0000",
+          "Base": "r29",
+          "Destination": "r0"
+        }
+      ]
+    }
+  ],
+  "WordComparisons": [
+    {
+      "Begin": "0x80658E34",
+      "ExpectedWords": [
+        "0x8003002C",
+        "0x2C000000"
+      ],
+      "LeftBase": "r3",
+      "LeftOffset": "RKNetSelectHandler.send.offset+RKNetSelectPacket.teams.offset",
+      "LeftValue": "r0",
+      "Count": "RKNetSelectPacket.teams.count",
+      "IsUnsigned": false
+    },
+    {
+      "Begin": "0x80659490",
+      "ExpectedWords": [
+        "0x801C002C",
+        "0x2C000000"
+      ],
+      "LeftBase": "r28",
+      "LeftOffset": "RKNetSelectHandler.send.offset+RKNetSelectPacket.teams.offset",
+      "LeftValue": "r0",
+      "Count": "RKNetSelectPacket.teams.count",
+      "IsUnsigned": false
+    },
+    {
+      "Begin": "0x80659654",
+      "ExpectedWords": [
+        "0x8078002C",
+        "0x2C030000"
+      ],
+      "LeftBase": "r24",
+      "LeftOffset": "RKNetSelectHandler.send.offset+RKNetSelectPacket.teams.offset",
+      "LeftValue": "r3",
+      "Count": "RKNetSelectPacket.teams.count",
+      "IsUnsigned": false
+    },
+    {
+      "Begin": "0x806596AC",
+      "ExpectedWords": [
+        "0x8018002C",
+        "0x2C000000"
+      ],
+      "LeftBase": "r24",
+      "LeftOffset": "RKNetSelectHandler.send.offset+RKNetSelectPacket.teams.offset",
+      "LeftValue": "r0",
+      "Count": "RKNetSelectPacket.teams.count",
+      "IsUnsigned": false
+    },
+    {
+      "Begin": "0x80659654",
+      "ExpectedWords": [
+        "0x8078002C",
+        "0x2C030000",
+        "0x4182003C",
+        "0x801C0064",
+        "0x7C030040"
+      ],
+      "LeftBase": "r24",
+      "LeftOffset": "RKNetSelectHandler.send.offset+RKNetSelectPacket.teams.offset",
+      "LeftValue": "r3",
+      "Count": "RKNetSelectPacket.teams.count",
+      "IsUnsigned": true,
+      "RightLoad": "0x80659660",
+      "RightBase": "r28",
+      "RightOffset": "RKNetSelectHandler.received.offset+RKNetSelectPacket.teams.offset",
+      "RightValue": "r0"
     }
   ]
 }

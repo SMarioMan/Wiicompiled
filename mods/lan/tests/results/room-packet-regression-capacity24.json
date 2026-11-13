@@ -1,0 +1,752 @@
+{
+  "date": "2026-11-13",
+  "source_commit": "9f24dab",
+  "platform": "Linux x86-64 null graphics backend",
+  "build_capacity": 24,
+  "active_instances": [
+    1,
+    2
+  ],
+  "executable_sha256": "acacb92eebad5ec18d954d4a90491126108157d648dce3ff53895f2ac5fe7f97",
+  "check": "room command regression: both peers join, select VS and advance in the same race",
+  "limitations": [
+    "Two active racers; full 24-player and race-finish validation remain pending"
+  ],
+  "trace": [
+    {
+      "elapsed": 9.84,
+      "instance": 1,
+      "state": 0,
+      "players": 0,
+      "section": 85,
+      "page": 141,
+      "transition": 3
+    },
+    {
+      "elapsed": 10.94,
+      "instance": 1,
+      "state": 3,
+      "players": 1,
+      "section": 85,
+      "page": 157,
+      "transition": 2
+    },
+    {
+      "elapsed": 11.94,
+      "instance": 1,
+      "state": 3,
+      "players": 1,
+      "section": 85,
+      "page": 157,
+      "transition": 4
+    },
+    {
+      "elapsed": 11.94,
+      "checkpoint": "sequential-join",
+      "joined": 1,
+      "requested": 2
+    },
+    {
+      "elapsed": 18.83,
+      "instance": 2,
+      "state": 0,
+      "players": 0,
+      "section": 132,
+      "page": 80,
+      "transition": 3
+    },
+    {
+      "elapsed": 20.46,
+      "instance": 2,
+      "state": 4,
+      "players": 2,
+      "section": 132,
+      "page": 157,
+      "transition": 2
+    },
+    {
+      "elapsed": 21.46,
+      "instance": 1,
+      "state": 3,
+      "players": 2,
+      "section": 85,
+      "page": 157,
+      "transition": 4
+    },
+    {
+      "elapsed": 21.55,
+      "instance": 2,
+      "state": 4,
+      "players": 2,
+      "section": 132,
+      "page": 157,
+      "transition": 4
+    },
+    {
+      "elapsed": 21.55,
+      "checkpoint": "sequential-join",
+      "joined": 2,
+      "requested": 2
+    },
+    {
+      "result": "passed",
+      "check": "all 2 peers in one room for five seconds"
+    },
+    {
+      "elapsed": 30.05,
+      "checkpoint": "room-observations",
+      "peers": {
+        "1": {
+          "state": 3,
+          "players": 2,
+          "section": 85,
+          "page": 157,
+          "transition": 4,
+          "age": 0.2
+        },
+        "2": {
+          "state": 4,
+          "players": 2,
+          "section": 132,
+          "page": 157,
+          "transition": 4,
+          "age": 0.2
+        }
+      }
+    },
+    {
+      "elapsed": 31.9,
+      "instance": 1,
+      "state": 3,
+      "players": 2,
+      "section": 85,
+      "page": 158,
+      "transition": 4
+    },
+    {
+      "elapsed": 33.97,
+      "instance": 1,
+      "state": 3,
+      "players": 2,
+      "section": 85,
+      "page": 158,
+      "transition": 5
+    },
+    {
+      "elapsed": 34.95,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 156,
+      "transition": 4
+    },
+    {
+      "elapsed": 34.97,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 156,
+      "transition": 4
+    },
+    {
+      "elapsed": 36.99,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 156,
+      "transition": 5
+    },
+    {
+      "elapsed": 38.04,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 107,
+      "transition": 4
+    },
+    {
+      "elapsed": 38.12,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 107,
+      "transition": 4
+    },
+    {
+      "elapsed": 40.06,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 107,
+      "transition": 5
+    },
+    {
+      "elapsed": 40.15,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 107,
+      "transition": 5
+    },
+    {
+      "elapsed": 42.07,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 108,
+      "transition": 4
+    },
+    {
+      "elapsed": 42.16,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 108,
+      "transition": 4
+    },
+    {
+      "elapsed": 43.09,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 108,
+      "transition": 5
+    },
+    {
+      "elapsed": 43.16,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 108,
+      "transition": 5
+    },
+    {
+      "elapsed": 44.07,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 109,
+      "transition": 4
+    },
+    {
+      "elapsed": 44.18,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 109,
+      "transition": 4
+    },
+    {
+      "elapsed": 46.31,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 85,
+      "page": 109,
+      "transition": 5
+    },
+    {
+      "elapsed": 46.38,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 132,
+      "page": 109,
+      "transition": 5
+    },
+    {
+      "elapsed": 47.54,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 80,
+      "transition": 4
+    },
+    {
+      "elapsed": 47.54,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 80,
+      "transition": 4
+    },
+    {
+      "elapsed": 48.56,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 145,
+      "transition": 4
+    },
+    {
+      "elapsed": 48.56,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 145,
+      "transition": 4
+    },
+    {
+      "elapsed": 49.58,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 145,
+      "transition": 5
+    },
+    {
+      "elapsed": 49.59,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 145,
+      "transition": 5
+    },
+    {
+      "elapsed": 50.58,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 78,
+      "transition": 4
+    },
+    {
+      "elapsed": 50.59,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 78,
+      "transition": 4
+    },
+    {
+      "elapsed": 52.67,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 110,
+      "transition": 4
+    },
+    {
+      "elapsed": 52.69,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 110,
+      "transition": 4
+    },
+    {
+      "elapsed": 55.28,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 111,
+      "transition": 4
+    },
+    {
+      "elapsed": 55.33,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 111,
+      "transition": 4
+    },
+    {
+      "elapsed": 58.52,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 111,
+      "transition": 5
+    },
+    {
+      "elapsed": 58.52,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 111,
+      "transition": 5
+    },
+    {
+      "elapsed": 59.52,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 146,
+      "transition": 4
+    },
+    {
+      "elapsed": 59.53,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 146,
+      "transition": 4
+    },
+    {
+      "elapsed": 60.13,
+      "checkpoint": "room-observations",
+      "peers": {
+        "1": {
+          "state": 11,
+          "players": 2,
+          "section": 96,
+          "page": 146,
+          "transition": 4,
+          "age": 0.6
+        },
+        "2": {
+          "state": 13,
+          "players": 2,
+          "section": 96,
+          "page": 146,
+          "transition": 4,
+          "age": 0.6
+        }
+      }
+    },
+    {
+      "elapsed": 66.67,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 96,
+      "page": 146,
+      "transition": 5
+    },
+    {
+      "elapsed": 66.7,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 96,
+      "page": 146,
+      "transition": 5
+    },
+    {
+      "elapsed": 68.08,
+      "instance": 2,
+      "state": 13,
+      "players": 2,
+      "section": 112,
+      "page": 66,
+      "transition": 4
+    },
+    {
+      "elapsed": 68.08,
+      "instance": 2,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 68.19,
+      "instance": 1,
+      "state": 11,
+      "players": 2,
+      "section": 112,
+      "page": 66,
+      "transition": 4
+    },
+    {
+      "elapsed": 68.19,
+      "instance": 1,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 69.08,
+      "instance": 2,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 69.19,
+      "instance": 1,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 70.08,
+      "instance": 2,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 70.19,
+      "instance": 1,
+      "race": {
+        "stage": 0,
+        "frames": 0,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 71.14,
+      "instance": 2,
+      "race": {
+        "stage": 1,
+        "frames": 29,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 71.19,
+      "instance": 1,
+      "race": {
+        "stage": 1,
+        "frames": 36,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 72.2,
+      "instance": 2,
+      "race": {
+        "stage": 1,
+        "frames": 78,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 72.31,
+      "instance": 1,
+      "race": {
+        "stage": 1,
+        "frames": 87,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 73.24,
+      "instance": 2,
+      "race": {
+        "stage": 1,
+        "frames": 134,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 73.34,
+      "instance": 1,
+      "race": {
+        "stage": 1,
+        "frames": 141,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 74.3,
+      "instance": 2,
+      "race": {
+        "stage": 1,
+        "frames": 190,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 74.42,
+      "instance": 1,
+      "race": {
+        "stage": 1,
+        "frames": 195,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 75.3,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 249,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 75.42,
+      "instance": 1,
+      "race": {
+        "stage": 2,
+        "frames": 255,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 76.47,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 309,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 76.59,
+      "instance": 1,
+      "race": {
+        "stage": 2,
+        "frames": 315,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 77.46,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 367,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 77.59,
+      "instance": 1,
+      "race": {
+        "stage": 2,
+        "frames": 375,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 78.56,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 428,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 78.67,
+      "instance": 1,
+      "race": {
+        "stage": 2,
+        "frames": 434,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 79.56,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 485,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 79.67,
+      "instance": 1,
+      "race": {
+        "stage": 2,
+        "frames": 494,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "elapsed": 80.56,
+      "instance": 2,
+      "race": {
+        "stage": 2,
+        "frames": 545,
+        "course": 8,
+        "players": 2,
+        "mode": 7
+      }
+    },
+    {
+      "result": "passed",
+      "check": "all 2 peers advancing in the same race"
+    }
+  ]
+}

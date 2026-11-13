@@ -48,6 +48,8 @@ def run(args):
         raise ValueError('Telemetry timeout must be between three and 120 seconds')
     if not 0 <= args.startup_gap <= 30:
         raise ValueError('Startup gap must be between zero and thirty seconds')
+    if not 0.05 <= args.menu_pulse <= 3:
+        raise ValueError('Menu pulse must be between 0.05 and three seconds')
     count = len(ids)
     binary = 'WiiCompiledLAN.exe' if os.name == 'nt' else 'WiiCompiledLAN'
     hashes = []
@@ -133,14 +135,15 @@ def run(args):
                     for instance, pad in zip(ids, pads):
                         page = status.get(instance, ({}, 0))[0].get('page')
                         buttons, x = 0, 0
-                        if elapsed < 3:
+                        if elapsed < max(3, args.menu_pulse * 2):
                             # A short left pulse selects Start without menu auto-repeat
                             # wrapping back to the initial Message button.
-                            x = -80 if instance == args.host_id and elapsed < 0.2 else 0
+                            x = -80 if instance == args.host_id and elapsed < args.menu_pulse else 0
                         elif page == 0x42:
                             buttons = 0x100  # accelerate after countdown
                         elif not (instance != args.host_id and page == 0x9d):
-                            buttons = 0x100 if elapsed % 3 < 0.35 else 0
+                            period = max(3, args.menu_pulse * 2)
+                            buttons = 0x100 if elapsed % period < max(0.35, args.menu_pulse) else 0
                         controls = buttons, x
                         if last_input.get(instance) != controls:
                             write_pad(pad, buttons, x)
@@ -189,6 +192,11 @@ def run(args):
                         return 0
                     if room_confirmed is None:
                         room_confirmed = now
+                        # Start the first pulse immediately: waiting for the
+                        # next socket iteration can consume the whole pulse.
+                        host_pad = pads[ids.index(args.host_id)]
+                        write_pad(host_pad, x=-80)
+                        last_input[args.host_id] = (0, -80)
             raise TimeoutError('Requested LAN checkpoint timed out; inspect telemetry and lan-test-game.log files')
         finally:
             for pad in pads:
@@ -214,6 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('--sequential-join', action='store_true', help='Wait for every launched peer to report the expected active room before launching the next client')
     parser.add_argument('--telemetry-timeout', type=float, default=3, help='Maximum age of an observation on slow multi-instance test hosts; gameplay checks still require every peer to advance')
     parser.add_argument('--startup-gap', type=float, default=0, help='Seconds between process launches')
+    parser.add_argument('--menu-pulse', type=float, default=0.2, help='Seconds to hold menu inputs; increase on slow multi-instance hosts')
     parser.add_argument('--capacity', type=int, choices=range(1, 33), default=12, help='Capacity of the matched guest/module build')
     parser.add_argument('--host-id', type=int, choices=range(1, 33), default=1)
     parser.add_argument('--client-id', type=int, choices=range(1, 33), action='append', help='Optional IDs in client-directory order')

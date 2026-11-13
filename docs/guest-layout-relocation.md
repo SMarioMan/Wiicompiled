@@ -1647,7 +1647,7 @@ accesses now derive their offsets from the queue, count and history layout
 sizes, and the reset fills every history entry. The separate console scan at
 `0x8062AC40` now uses the configured console capacity. The completeness check
 also covers the interior-pointer tail accesses; native reset/setter checks
-compare the entire page through 100 players. A restored real room-to-race
-transition remains necessary evidence beyond these storage checks.
+compare the entire page through 100 players. The real two-peer room-to-race
+transition now passes again, including voting and advancing race simulations.
 The six friend-room coverage/lifecycle cases and complete 1,323-consumer audit
 pass with these interior-pointer corrections.

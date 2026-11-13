@@ -184,6 +184,9 @@ bootstrap work. Alternatively, `--sequential-join` waits for all launched
 instances to report the expected active room before starting the next client;
 it fails on a join error dialog instead of silently retrying. This exercises
 incremental room admission separately from simultaneous joins.
+`--menu-pulse 2` can hold test inputs longer on very slow local hosts; the
+default remains 0.2 seconds. The first selection pulse starts immediately when
+the room checkpoint passes so socket scheduling cannot consume it beforehand.
 `--telemetry-timeout 90` can explicitly allow slower telemetry;
 the default freshness window remains three seconds. This changes only the test
 observer's tolerance: all peers must still report the full room, the same course
@@ -239,3 +242,8 @@ The [four-peer capacity-24 trace](tests/results/four-peer-capacity24.json) repea
 the check after the USER and SELECT cache migrations. All four isolated local
 instances share one lobby and advance in the same four-racer online VS race.
 It has the same finish/rendering/item/battle limitations as the two-peer check.
+
+The [room-command regression trace](tests/results/room-packet-regression-capacity24.json)
+records the restored two-peer VS transition after relocating queue-relative
+pending packet state. It includes voting and advancing race simulations, but
+does not establish a full 24-player race.

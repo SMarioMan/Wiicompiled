@@ -220,9 +220,7 @@ static void update_game_state(struct dwc_gamedata *gamedata) {
  * Telemetry is independent of the versioned lobby discovery record. */
 extern const uint8_t *MKWRaceInfo;
 extern const uint8_t *MKWRaceData;
-#ifdef MKW_LAN_DIAGNOSTICS
 extern const uint8_t *MKWNetController;
-#endif
 
 static bool compute_and_broadcast_status(so_fd_t fd) {
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
@@ -230,11 +228,11 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 		// DCed from wifi
 		return false;
 	update_game_state(gamedata);
-#ifdef MKW_LAN_DIAGNOSTICS
-    static uint32_t previous_count, previous_votes, previous_suspend, previous_first, previous_active;
     const uint8_t *controller=MKWNetController;
     const uint32_t current=controller ? *(const uint32_t *)(controller+MKW_LAN_NET_CURRENT_SUB) : 2;
     const uint8_t *sub=current<2 ? controller+MKW_LAN_NET_SUBS+current*MKW_LAN_NET_SUB_STRIDE : 0;
+#ifdef MKW_LAN_DIAGNOSTICS
+    static uint32_t previous_count, previous_votes, previous_suspend, previous_first, previous_active;
     const uint32_t active=sub ? *(const uint32_t *)(sub+16) : 0;
     if (previous_count != gamedata->player_count || previous_votes != gamedata->suspend_votes ||
         previous_suspend != gamedata->dwc_suspend || previous_first != gamedata->peers[0].player_id || previous_active!=active) {
@@ -310,7 +308,7 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
     const uint32_t network_status[7] = {
         0x4d4b574e, MKW_INSTANCE_ID, gamedata->dwc_host_state,
         gamedata->dwc_match_state, gamedata->player_count,
-        gamedata->suspend_votes, gamedata->dwc_suspend
+        sub ? *(const uint32_t *)(sub+20) : 0, gamedata->dwc_suspend
     };
     SOSendTo(fd, network_status, sizeof(network_status), 0, &monitor);
     if (status[4] >= 0x70 && status[4] <= 0x77 && MKWRaceInfo && MKWRaceData) {

@@ -37,6 +37,8 @@ def decode_observation(packet, peer, ids):
 def sdk_ready(network, ids, host_id, count, now, timeout):
     return all(i in network and 0 <= now-network[i][1] < timeout and
         network[i][0]['players'] == count and not network[i][0]['suspended'] and
+        network[i][0]['connected'].bit_count() == count and
+        network[i][0]['connected'] == network[host_id][0]['connected'] and
         network[i][0]['role'] == (2 if i == host_id else 1) and
         network[i][0]['match'] == (12 if i == host_id else 1) for i in ids)
 
@@ -173,7 +175,7 @@ def run(args):
                 magic, instance, state, players, section, page, transition = observation
                 if magic == 0x4d4b574e:
                     network[instance] = dict(role=state, match=players, players=section,
-                                             votes=page, suspended=transition), now
+                                             connected=page, suspended=transition), now
                     continue
                 if magic == 0x4d4b5752:
                     # The seven-word race packet contains stage, frames, course,

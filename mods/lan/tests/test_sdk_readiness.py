@@ -8,7 +8,7 @@ class SdkReadiness(unittest.TestCase):
     def setUp(self):
         self.ids = [1, 2, 23]
         self.network = {i: (dict(role=2 if i == 1 else 1,
-            match=12 if i == 1 else 1, players=3, suspended=0), 100) for i in self.ids}
+            match=12 if i == 1 else 1, players=3, suspended=0, connected=7), 100) for i in self.ids}
 
     def ready(self):
         return sdk_ready(self.network, self.ids, 1, 3, 102, 3)
@@ -31,6 +31,15 @@ class SdkReadiness(unittest.TestCase):
         self.setUp()
         self.network[2][0]['players'] = 2
         self.assertFalse(self.ready())
+
+    def test_waiting_state_still_requires_every_direct_connection(self):
+        self.network[23][0]['connected'] = 3
+        self.assertFalse(self.ready())
+        self.network[23][0]['connected'] = 11
+        self.assertFalse(self.ready())
+        for record, _ in self.network.values():
+            record['connected'] = 0x80000101
+        self.assertTrue(self.ready())
 
     def test_incorrect_roles_and_already_suspended_sessions_are_not_ready(self):
         self.network[2][0]['role'] = 2

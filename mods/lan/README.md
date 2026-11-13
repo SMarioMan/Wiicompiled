@@ -218,7 +218,9 @@ player count on the same course, reach racing stage 2, and advance at least 120
 simulation frames each over five seconds. Before pressing Start, the driver also
 requires fresh `MKWN` SDK telemetry from every peer: all expected members,
 no suspension already active, the host waiting for clients, and every client
-finished with its mesh reservations. The room's displayed player count can
+finished with its mesh reservations. Every peer must also report the same
+direct-connection bitmap containing the entire room; an idle SDK state can
+occur between individual peer negotiations. The room's displayed player count can
 reach the final count while those connections are still being negotiated;
 starting then can leave clients unable to request suspension. SDK states and
 observation ages are included in the periodic progress records.

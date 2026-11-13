@@ -7,7 +7,7 @@ using Translator.Core.Loading;
 
 namespace Translator.Core.Translation;
 
-public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null, int StartIndex = 0, bool LinkToNext = false);
+public sealed record GuestFillArray(string Array, string Stride, string Count, int Width, string? ValueRegister = null, int StartIndex = 0, bool LinkToNext = false, int CountAddend = 0);
 public sealed record GuestFillConstant(string Register, uint Value);
 public sealed record GuestFillAddress(string Register, string Array);
 public sealed record GuestFillCopy(string Register, string Source);
@@ -18,6 +18,7 @@ public sealed record GuestArrayFill(uint Begin, IReadOnlyList<uint> ExpectedWord
 public sealed partial class GuestLayoutRelocations
 {
     private readonly GuestArrayFill[] _arrayFills;
+    private static int FillCount(GuestFillArray array, GuestLayouts layout) => checked(layout.Symbol(array.Count) + array.CountAddend);
     private static uint FillEnd(GuestArrayFill fill) => checked(fill.Begin + (uint)fill.ExpectedWords.Count * 4);
     private static bool IsGpr(string register) => register.Length >= 2 && register[0] == 'r' &&
         int.TryParse(register.AsSpan(1), out var index) && index is >= 0 and < 32;
@@ -55,7 +56,7 @@ public sealed partial class GuestLayoutRelocations
                     addresses.Any(address => address.Register == copy.Register) || constants.Any(item => item.Register == copy.Register)))
                 throw new InvalidDataException("Guest fill copies must preserve the unchanged base in distinct registers independent of stores and setup.");
             if(fill.Arrays.Any(array => array.LinkToNext && (array.Width != 4 ||
-                IsFpr(array.ValueRegister ?? fill.ValueRegister) || array.StartIndex != _original.Symbol(array.Count)-1)))
+                IsFpr(array.ValueRegister ?? fill.ValueRegister) || array.StartIndex != FillCount(array, _original)-1)))
                 throw new InvalidDataException("Pointer-chain extension must replace only the original terminal pointer store.");
             foreach (var layout in new[] { _original, _expanded })
             {
@@ -63,7 +64,7 @@ public sealed partial class GuestLayoutRelocations
                 foreach (var array in fill.Arrays)
                 {
                     var begin = layout.Symbol(array.Array); var stride = layout.Symbol(array.Stride);
-                    var count = layout.Symbol(array.Count);
+                    var count = FillCount(array, layout);
                     if (begin < 0 || count <= 0 || array.StartIndex < 0 || array.StartIndex >= count ||
                         (IsFpr(array.ValueRegister ?? fill.ValueRegister) ? array.Width is not (4 or 8) : array.Width is not (1 or 2 or 4)) ||
                         stride < array.Width || stride % array.Width != 0 || begin % array.Width != 0)
@@ -79,9 +80,9 @@ public sealed partial class GuestLayoutRelocations
                     if(intervals[index].Begin<intervals[index-1].End)
                         throw new InvalidDataException("Overlapping guest fill array fields.");
             }
-            if (fill.Arrays.Any(array => _expanded.Symbol(array.Count) < _original.Symbol(array.Count)) ||
-                fill.Arrays.Select(array => _original.Symbol(array.Count)).Distinct().Count() != 1 ||
-                fill.Arrays.Select(array => _expanded.Symbol(array.Count)).Distinct().Count() != 1)
+            if (fill.Arrays.Any(array => FillCount(array, _expanded) < FillCount(array, _original)) ||
+                fill.Arrays.Select(array => FillCount(array, _original)).Distinct().Count() != 1 ||
+                fill.Arrays.Select(array => FillCount(array, _expanded)).Distinct().Count() != 1)
                 throw new InvalidDataException("Guest fill arrays must grow together.");
             var endPc = FillEnd(fill);
             if (references.Any(site => site.Instruction >= fill.Begin && site.Instruction < endPc) ||
@@ -128,7 +129,7 @@ public sealed partial class GuestLayoutRelocations
 
     private static IEnumerable<IrInstruction> FillStores(GuestArrayFill fill, GuestLayouts layout)
     {
-        var count=layout.Symbol(fill.Arrays[0].Count);
+        var count=FillCount(fill.Arrays[0],layout);
         for (var index = 0; index < count; index++)
             for(var arrayIndex=0;arrayIndex<fill.Arrays.Count;arrayIndex++){
                 var array=fill.Arrays[arrayIndex];if(index<array.StartIndex)continue;

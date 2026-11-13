@@ -1696,3 +1696,12 @@ player-to-AID mappings. All six capacities (12, 13, 24, 32, 48, 100) pass; wire
 paths execute through the SDK's 32-AID limit and larger cases check storage.
 The 13-player case reproduced the stale allocation before the correction.
 Live item/event synchronization remains a separate qualification.
+
+Format 30 adds an optional per-array `CountAddend` to checked scalar fills.
+For example, a count of `players` with `CountAddend: -11` proves one element
+at the original twelve-player capacity and grows to thirteen elements at 24.
+This lets a short store pattern extend a partially unrolled initializer without
+rounding the loop up past its array. Counts must stay positive and grow together;
+the original instructions and ordered stores are still checked exactly. Earlier
+formats reject nonzero adjustments, and a missing adjustment keeps its original
+meaning of zero.

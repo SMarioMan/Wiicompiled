@@ -281,7 +281,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27 or 28 or 29)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27 or 28 or 29 or 30)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 30 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.CountAddend != 0)) == true)
+            throw new InvalidDataException("Adjusted array-fill counts require layout format version 30.");
         if (file.Version < 29 && file.CountConversions is {Length:>0})
             throw new InvalidDataException("Register count conversions require layout format version 29.");
         if (file.Version < 28 && (file.WordComparisons is {Length:>0} || file.WordTables is {Length:>0} || file.Types.Any(type => type.Fields?.Any(field => field.Packed) == true)))

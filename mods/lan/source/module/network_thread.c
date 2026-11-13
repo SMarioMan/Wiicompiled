@@ -470,7 +470,10 @@ static void check_for_status_or_broadcast(void) {
     receive_packets(broadcast_socket, true);
     receive_packets(multicast_socket, false);
     struct dwc_gamedata *gamedata = get_dwc_gamedata();
-    if (gamedata && gamedata->dwc_match_state == DWC_MATCH_STATE_SV_WAITING) {
+    /* Clients also accept peer links while the SDK builds the mesh. They
+     * return to CL_WAITING after accepting a link, rather than SV_WAITING. */
+    if (gamedata && (gamedata->dwc_match_state == DWC_MATCH_STATE_SV_WAITING ||
+                     gamedata->dwc_match_state == DWC_MATCH_STATE_CL_WAITING)) {
         for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++) {
             struct pending_reservation *pending = &pending_reservations[i];
             if (!pending->length) continue;

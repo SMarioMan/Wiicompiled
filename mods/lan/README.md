@@ -225,6 +225,12 @@ reach the final count while those connections are still being negotiated;
 starting then can leave clients unable to request suspension. SDK states and
 observation ages are included in the periodic progress records.
 
+Queued SDK reservations resume in both idle states: `SV_WAITING` for the room
+host and `CL_WAITING` for clients that also accept mesh links. Draining only in
+the host state leaves requests queued indefinitely on clients. The native
+`test_pending_reservations.py` fixture executes the actual queuing and polling
+code, including busy states, expiry, and one resumed request per poll.
+
 The race check uses separate `MKWR` telemetry
 packets; the original `MKWL` room-status packet stays compatible. This test passed
 with both cleaned native Linux builds. It does not verify finishing a race,

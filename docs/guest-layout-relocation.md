@@ -1705,3 +1705,26 @@ rounding the loop up past its array. Counts must stay positive and grow together
 the original instructions and ordered stores are still checked exactly. Earlier
 formats reject nonzero adjustments, and a missing adjustment keeps its original
 meaning of zero.
+
+The network ITEM handler now keeps its authored two local-player records and
+15 item-category totals while expanding received records, per-player status and
+acquisition times. Both factory and constructor extend the last store pattern
+in each partially unrolled group using format-30 fill counts. Peer scans and
+player-to-AID searches cover the configured field, with partial six-entry groups
+returning an invalid-AID sentinel instead of reading past the mapping array.
+
+The acquisition-order helper's fixed twelve-node list and its caller's player-ID
+workspace also grow with the field. Stack allocation, spills, bookkeeping and
+the list's final links use checked layout references and fills. Native execution
+caught an additional acquisition-time access through a moving base pointer;
+that access and the analogous moving item-total stores now relocate explicitly.
+
+`NetworkItemStorageTests` executes the original allocation/initialization,
+acquisition-time sorting with the real list helpers, packet import/export and
+acknowledgements. It covers both subrecords, alternating buffers, full/sparse
+membership, one/two local players, two-player remote consoles, absent packets,
+preserved acquisition times and high AIDs. Whole-object and adjacent-byte checks
+pass at 12, 13, 24, 32, 48 and 100 capacity; wire paths execute through 32 AIDs.
+The 13-player fixture first reproduced the old allocation and then an incorrect
+sort order before those separate corrections. Live item synchronization and
+balance remain separate qualifications.

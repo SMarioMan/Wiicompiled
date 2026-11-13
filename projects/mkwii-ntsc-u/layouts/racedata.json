@@ -59250,6 +59250,69 @@
       "Symbol": "FriendRoomManager.sendPacket.offset",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8062A83C",
+      "ExpectedWord": "0x9A432ADB",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.playerIds.offset",
+      "Addend": -1,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AE9C",
+      "ExpectedWord": "0x80052B10",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEA4",
+      "ExpectedWord": "0x90052B08",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEA8",
+      "ExpectedWord": "0x88052B14",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEAC",
+      "ExpectedWord": "0x98052B0C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEB0",
+      "ExpectedWord": "0x88052B15",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 13,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8062AEB4",
+      "ExpectedWord": "0x98052B0D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "FriendRoomManager.queue.offset",
+      "Addend": 5,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {

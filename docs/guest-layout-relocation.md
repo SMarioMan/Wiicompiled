@@ -1625,3 +1625,16 @@ stack and page guards. Native presentation checks at 13/24 include the highest
 reserved slot and room shrinkage. All five cases, all 944 unit tests and the
 complete consumer proof/stock-emission/expanded-syntax audit pass. Live admission,
 rendering and voting beyond twelve remain separate validation checkpoints.
+
+The next live run exposed seven accesses that needed explicit checks beyond the
+pointer suggestions: six queue-copy loads/stores use an incremented page cursor,
+and the disconnect path clears `playerIds[count - 1]` through an adjusted base.
+Their old offsets could overwrite an already-constructed avatar. All seven now
+use checked field symbols. The native fixtures execute the original bounded
+queue/removal instruction ranges without modifying game words, stopping at
+fixture function boundaries before unrelated message processing. They compare
+the entire page after empty/full queue compaction and first/middle/last player
+removal, detecting collateral writes inside the allocation. All five capacities
+pass. A separate coverage check requires every moved member access in the
+manager's own methods to have a checked reference or fill span, including those
+for which exact pointer analysis cannot establish a receiver on a back edge.

@@ -1531,3 +1531,17 @@ English/French/Spanish BMGs through the real USA game functions, checking distin
 positions, scales and correct rank digits/suffixes. It does not establish rendered
 readability or complete every results/podium flow; HUD rank textures remain a
 separate migration. Generated layouts beyond 24 require a readable paging policy.
+
+
+The HUD asset derivation now expands both single/multiplayer rank animations,
+including their texture-name lists, frame/tag ranges and material step tracks.
+It appends one distinct texture per higher rank and retains the original first
+twelve texture bytes. New textures compose digit and ordinal glyphs extracted
+from the user's original icons, preserving their outlines/shadows and borrowing
+the original non-podium row palette for podium-colored glyphs. No substitute font
+is used. IA4, IA8 and RGB5A3 source artwork is supported; composites use RGB5A3.
+The archive writer retains directories and can add resource files. Six Python
+checks pass, and the original USA step-curve reader selects every 1..24 texture
+index at integer/fractional frames and clamps both ends correctly. Original
+results and BMG loader checks pass with those expanded archives too. Rendered
+HUD appearance and larger-than-24 readability remain gameplay checks.

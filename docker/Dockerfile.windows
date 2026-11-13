@@ -9,6 +9,8 @@ RUN --mount=type=tmpfs,target=/tmp \
       export CURL_CA_BUNDLE=/run/secrets/proxy_ca SSL_CERT_FILE=/run/secrets/proxy_ca \
         CMAKE_TLS_CAINFO=/run/secrets/proxy_ca GIT_SSL_CAINFO=/run/secrets/proxy_ca; \
     fi; \
+    apt-get update && apt-get install -y --no-install-recommends python3-pil && \
+    rm -rf /var/lib/apt/lists/* && \
     bash docker/prepare-windows-cross.sh && \
     chmod -R a+rX /opt/wiicompiled /opt/windows-cross
 # Product selection does not change the compiler/toolchain image layers.

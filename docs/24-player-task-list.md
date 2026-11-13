@@ -39,7 +39,10 @@ Video subtitles are observations and design references, not build instructions.
   pass at 12, 13, 24, 48 and 100 capacity; visually verify rides and safe drop
   locations on courses before closing this issue.
 - [ ] **Position indicators:** supply valid rank indicators beyond 12 instead of
-  reusing the twelfth-place asset; verify HUD, results and localization.
+  reusing the twelfth-place asset. The generator now composes original digit
+  and ordinal artwork and expands both single/multiplayer texture-pattern
+  animations. Original step-curve checks pass; verify the rendered HUD and
+  localization.
 - [ ] **Item tables:** revalidate existing capacity-sized probabilities/roulette
   interpolation for all item settings and partial fields, plus rank-sensitive
   effects. Do not merely extend the lookup bound over twelve authored columns.

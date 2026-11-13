@@ -31,4 +31,11 @@ variants. `ExpandedResultsAssetTests` executes the original USA variant loader,
 control-transform loader and BMG index/text readers against freshly generated
 assets. It checks every individual/team row, both aspect ratios and all 24 rank
 labels in the English/French/Spanish archives. Rendering and complete results
-flows still need gameplay validation. HUD indicator textures are separate work.
+flows still need gameplay validation. HUD indicator animations also gain one texture/frame per rank. New digit and
+ordinal glyphs come from the original position artwork, with the original
+non-podium palette used for borrowed podium digits; no replacement font is used.
+The original first twelve textures remain byte-for-byte unchanged. IA4, IA8 and
+RGB5A3 inputs are decoded and new glyph composites use RGB5A3. Pillow is required
+(`python3-pil` in the Docker builders); no external font package is needed.
+The original game step-curve reader checks every generated texture index. HUD
+rendering still needs gameplay verification.

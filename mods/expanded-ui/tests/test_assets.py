@@ -40,4 +40,27 @@ class ExpandedResultsTests(unittest.TestCase):
         self.assertEqual(len(positions),24)
         with self.assertRaises(ValueError): UI.expand_results(expanded,24)
 
+    def test_archive_tree_can_add_nested_resources_and_round_trip(self):
+        raw = bytearray(64); struct.pack_into('>4sIII',raw,0,b'U\xaa8-',32,13,64); struct.pack_into('>III',raw,32,0x1000000,0,1)
+        archive = UI.Archive(bytes(raw)); archive.files['game_image/timg/rank13.tpl'] = b'new texture'; archive.files['message/Race.bmg'] = b'other data'
+        decoded = UI.Archive(archive.encode())
+        self.assertEqual(decoded.files,archive.files)
+
+    def test_blank_artwork_is_rejected_instead_of_substituting_a_font(self):
+        template = bytearray(64+180*128*2); struct.pack_into('>III',template,0,0x20af30,1,12); struct.pack_into('>I',template,12,20)
+        struct.pack_into('>HHII',template,20,128,180,5,64)
+        with self.assertRaisesRegex(ValueError,'no digit ink'):
+            UI.rank_texture(tuple(bytes(template) for _ in range(12)),24,'U')
+
+    def test_digit_segmentation_keeps_original_ink_and_removes_suffix_ink(self):
+        from PIL import Image, ImageDraw
+        original = Image.new('RGBA',(180,128)); draw = ImageDraw.Draw(original)
+        draw.rectangle((20,10,70,110),fill=(255,200,80,255))
+        draw.rectangle((90,80,120,110),fill=(255,100,20,255))
+        digit,suffix = UI.split_original_glyph(original,'single')
+        self.assertEqual(digit.getpixel((30,30)),original.getpixel((30,30)))
+        self.assertEqual(digit.getpixel((100,90))[3],0)
+        self.assertEqual(suffix.getpixel((100,90)),original.getpixel((100,90)))
+        self.assertEqual(suffix.getpixel((30,30))[3],0)
+
 if __name__=='__main__': unittest.main()

@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0.408-noble AS builder
 ENV DEBIAN_FRONTEND=noninteractive DOTNET_CLI_TELEMETRY_OPTOUT=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl git g++ binutils unzip xz-utils python3 \
+    ca-certificates curl git g++ binutils unzip xz-utils python3 python3-pil \
     pkg-config libvulkan-dev libx11-dev libxrandr-dev libxi-dev libxcursor-dev \
     libxinerama-dev libxss-dev libxtst-dev libxfixes-dev libxrender-dev libxext-dev \
     libwayland-dev libxkbcommon-dev libasound2-dev libudev-dev \

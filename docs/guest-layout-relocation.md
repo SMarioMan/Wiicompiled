@@ -1651,3 +1651,12 @@ compare the entire page through 100 players. The real two-peer room-to-race
 transition now passes again, including voting and advancing race simulations.
 The six friend-room coverage/lifecycle cases and complete 1,323-consumer audit
 pass with these interior-pointer corrections.
+
+`ROOMHandler::ExportROOMandUSER` also retained a twelve-iteration scan and a
+wraparound at twelve despite its relocated packet arrays. Both now use the
+send-array capacity. `RoomPacketExportTests` executes the actual exporter with
+both subrecords, alternate send-buffer rows, local AIDs at either end, full
+fields and sparse highest-AID fields through the SDK's 32-AID limit. Expanded
+13/24-player cases reproduced missing destinations before the correction;
+12/13/24/32 all pass afterward. Actual multiplayer start progression remains a
+separate check.

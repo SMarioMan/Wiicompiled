@@ -24,7 +24,7 @@ extern "C" void JGPT_ExpandedRespawnGrid(CpuContext* ctx) {
         *ctx=saved;ctx->gpr[5]=i;MKW_GUEST_NEXT(8051896C)(ctx);
         for(unsigned axis=0;axis<3;axis++)authored[i][axis]=std::bit_cast<float>(Memory::Read32(output+axis*4));
     }
-    // Battle modes deliberately use the exact JGPT center for every racer.
+    // Some modes deliberately use the exact JGPT center for every racer.
     if(authored[0]==authored[1]) { *ctx=saved;MKW_GUEST_NEXT(8051896C)(ctx);return; }
     // JGPT has four racers per row; the shared packing helper expects its
     // fourth sample to establish the second axis of the authored footprint.

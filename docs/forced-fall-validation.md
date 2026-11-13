@@ -34,11 +34,11 @@ The first expanded-field run exposed an additional twelve-entry limit:
 coordinate pairs directly with the player ID. Slots above twelve read adjacent
 constants, and several CPUs repeatedly respawned outside the road. The native
 wrapper samples the original twelve transformed positions and packs expanded
-fields inside their footprint. The original twelve-player path, battle center
+fields inside their footprint. The original twelve-player path, mode-specific center
 placement, and `255` center sentinel retain the original helper.
 
 `RespawnGridTests` executes the actual translated helper and wrapper through
 100 players, checking rotated footprints, distinct bounded positions, stock
-placement, battle centers, the sentinel, registers and output guards. These
+placement, mode-specific centers, the sentinel, registers and output guards. These
 geometry checks complement the actual-game fall test; neither alone proves
 all-course collision and checkpoint safety.

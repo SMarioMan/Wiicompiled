@@ -41,8 +41,9 @@ Video subtitles are observations and design references, not build instructions.
 - [ ] **Position indicators:** supply valid rank indicators beyond 12 instead of
   reusing the twelfth-place asset. The generator now composes original digit
   and ordinal artwork and expands both single/multiplayer texture-pattern
-  animations. Original step-curve checks pass; verify the rendered HUD and
-  localization.
+  animations. Original step-curve checks pass, and the original-style 24th
+  indicator now renders correctly during an actual Luigi Circuit race. Still
+  check the other ranks, split-screen variants and localization.
 - [ ] **Item tables:** revalidate existing capacity-sized probabilities/roulette
   interpolation for all item settings and partial fields, plus rank-sensitive
   effects. Do not merely extend the lookup bound over twelve authored columns.

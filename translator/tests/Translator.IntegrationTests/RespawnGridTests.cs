@@ -11,7 +11,7 @@ public class RespawnGridTests
     [Theory]
     [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(48)] [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
-    public void RealRescueGeometryBoundsEveryPlayerAndPreservesBattleCenters(int players)
+    public void RealRescueGeometryBoundsEveryPlayerAndPreservesCenterRequests(int players)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);
         while(directory is not null && !File.Exists(Path.Combine(directory.FullName,"translator/Translator.sln")))directory=directory.Parent;

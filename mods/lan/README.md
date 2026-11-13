@@ -215,7 +215,15 @@ python3 mods/lan/tests/local_pair.py --race \
 
 The race check requires every game's in-race scenario to contain the expected
 player count on the same course, reach racing stage 2, and advance at least 120
-simulation frames each over five seconds. It uses separate `MKWR` telemetry
+simulation frames each over five seconds. Before pressing Start, the driver also
+requires fresh `MKWN` SDK telemetry from every peer: all expected members,
+no suspension already active, the host waiting for clients, and every client
+finished with its mesh reservations. The room's displayed player count can
+reach the final count while those connections are still being negotiated;
+starting then can leave clients unable to request suspension. SDK states and
+observation ages are included in the periodic progress records.
+
+The race check uses separate `MKWR` telemetry
 packets; the original `MKWL` room-status packet stays compatible. This test passed
 with both cleaned native Linux builds. It does not verify finishing a race,
 rendering, item synchronization or battle modes.

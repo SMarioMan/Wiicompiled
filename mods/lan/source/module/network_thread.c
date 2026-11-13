@@ -305,6 +305,14 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
     so_addr_t monitor = baddr;
     monitor.sa_addr = 0x7f0000fe;
     SOSendTo(fd, status, sizeof(status), 0, &monitor);
+    /* Visible room membership can precede the SDK's remaining mesh joins.
+     * Export readiness separately so test clients do not suspend those joins. */
+    const uint32_t network_status[7] = {
+        0x4d4b574e, MKW_INSTANCE_ID, gamedata->dwc_host_state,
+        gamedata->dwc_match_state, gamedata->player_count,
+        gamedata->suspend_votes, gamedata->dwc_suspend
+    };
+    SOSendTo(fd, network_status, sizeof(network_status), 0, &monitor);
     if (status[4] >= 0x70 && status[4] <= 0x77 && MKWRaceInfo && MKWRaceData) {
         const uint32_t race_status[7] = {
             0x4d4b5752, MKW_INSTANCE_ID,

@@ -26,11 +26,19 @@ def decode_observation(packet, peer, ids):
         return None
     words = struct.unpack('>7I', packet)
     magic, instance = words[:2]
-    if magic not in (0x4d4b574c, 0x4d4b5752) or instance not in ids:
+    if magic not in (0x4d4b574c, 0x4d4b5752, 0x4d4b574e) or instance not in ids:
         return None
     if peer[0] != f'127.0.0.{instance}':
         raise RuntimeError(f'Instance {instance} used unexpected source address {peer}')
     return words
+
+
+
+def sdk_ready(network, ids, host_id, count, now, timeout):
+    return all(i in network and 0 <= now-network[i][1] < timeout and
+        network[i][0]['players'] == count and not network[i][0]['suspended'] and
+        network[i][0]['role'] == (2 if i == host_id else 1) and
+        network[i][0]['match'] == (12 if i == host_id else 1) for i in ids)
 
 
 def run(args):
@@ -70,7 +78,8 @@ def run(args):
     if len(set(directories)) != len(directories):
         raise ValueError('Every instance requires a different portable directory')
     processes, logs, pads = [], [], []
-    status, race, last_input = {}, {}, {}
+    status, race, network, last_input = {}, {}, {}, {}
+    room_reported = False
     room_confirmed = race_since = None
     race_start_frames = {}
     started = time.monotonic()
@@ -134,7 +143,7 @@ def run(args):
                     snapshot = {str(i): dict(status[i][0], age=round(now-status[i][1], 1))
                                 if i in status else dict(missing=True) for i in ids}
                     print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='room-observations',
-                                          peers=snapshot)), flush=True)
+                                          peers=snapshot, sdk={str(i): dict(network[i][0], age=round(now-network[i][1], 1)) if i in network else dict(missing=True) for i in ids})), flush=True)
                     next_summary = now + 30
                 if args.race and room_confirmed is not None:
                     elapsed = now - room_confirmed
@@ -162,6 +171,10 @@ def run(args):
                 if observation is None:
                     continue
                 magic, instance, state, players, section, page, transition = observation
+                if magic == 0x4d4b574e:
+                    network[instance] = dict(role=state, match=players, players=section,
+                                             votes=page, suspended=transition), now
+                    continue
                 if magic == 0x4d4b5752:
                     # The seven-word race packet contains stage, frames, course,
                     # actual in-race player count and game mode after the ID.
@@ -192,11 +205,15 @@ def run(args):
                     status[i][0]['transition'] == 4 for i in ids)
                 ready_since = (ready_since or now) if joined else None
                 if ready_since and now-ready_since >= 5:
-                    if room_confirmed is None:
+                    if not room_reported:
                         print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds', test_clock_divisor=test_clock)), flush=True)
+                        room_reported = True
                     if not args.race:
                         return 0
+                    if not sdk_ready(network, ids, args.host_id, count, now, args.telemetry_timeout):
+                        continue
                     if room_confirmed is None:
+                        print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='all SDK mesh joins complete')), flush=True)
                         room_confirmed = now
                         # Start the first pulse immediately: waiting for the
                         # next socket iteration can consume the whole pulse.

@@ -24,6 +24,9 @@
 #define DISCOVERY_PROTOCOL 3
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
 #define BROADCAST_TRACK_MAX 32
+/* Leave time for SDK matching and the other receive socket during discovery
+ * bursts. Draining until EAGAIN can monopolize this thread on a busy link. */
+#define RECEIVE_BATCH_MAX 8
 
 #define STATUS_MAGIC 0xbb49cc4d
 #define STATUS_SIZE_MAX 512
@@ -408,11 +411,13 @@ bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status) {
 
 static void receive_packets(so_fd_t socket, bool allow_status) {
 	so_ret_t r;
+	unsigned received = 0;
 	do {
 		uint32_t buffer[STATUS_SIZE_MAX / 4];
 		so_addr_t raddr = { .sa_len = sizeof(so_addr_t) };
 		r = SORecvFrom(socket, &buffer, sizeof(buffer), 0, &raddr);
 		if (r <= 0) break;
+		++received;
 		if (r < 0x4) {
 			LOG_ERROR("received overly short message. %u length", (unsigned)r);
 			continue;
@@ -425,7 +430,7 @@ static void receive_packets(so_fd_t socket, bool allow_status) {
 		} else {
 			LOG_ERROR("received unknown message. %u length %x header", (unsigned)r, (unsigned)buffer[0]);
 		}
-	} while (r > 0);
+	} while (received < RECEIVE_BATCH_MAX);
  }
 
 static void check_for_status_or_broadcast(void) {

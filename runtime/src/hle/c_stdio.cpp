@@ -35,7 +35,12 @@ extern "C" uint32_t ConsoleWrite_HLE_80015500(
             return 1;
         }
 
-        return 0;
+        // VReport and the SDK's variadic diagnostics arrive here after the
+        // guest has formatted them. Preserve those bytes at the host console;
+        // silently accepting the write loses the actual handshake error.
+        const size_t written = std::fwrite(data, 1, length, stdout);
+        Memory::Write32(lengthPtr, static_cast<uint32_t>(written));
+        return written == length && std::fflush(stdout) == 0 ? 0 : 1;
     } catch (const Memory::AccessViolation&) {
         try {
             Memory::Write32(lengthPtr, 0);

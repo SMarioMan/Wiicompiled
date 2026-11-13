@@ -1590,3 +1590,38 @@ clearance, checkpoint initialization or rescue on every original/custom course.
 Course-specific collision and full-race checks remain on the task list. Very
 large fields can eventually exceed the usable area of any finite footprint;
 those need an additional course-route allocation policy.
+
+## Friend-room controls and presentation
+
+With the DWC setup limits removed, admitting console 13 exposed an unconstructed
+`FriendMatchingPlayer`: the manager indexed control `aid * 2 + localPlayer`, but
+its page allocation, constructor, loader, control group and Mii group reserved
+only 24 controls for twelve consoles. The first additional console reached the
+following field and attempted an animation through a null object.
+
+`FriendRoomManager` now declares those two control slots per possible console,
+the message control, Mii group, active-player map, console sequences, fixed
+bounded 30-message queue, per-control timers and pending packet fields. Its page
+allocation, constructor/destructor counts, initialization and all referencing
+friend-room/message/waiting routines use their checked layout symbols. The
+unrolled map, sequence and timer resets grow with their arrays. The physical
+local-player count stays two; it is not the online console capacity. The
+original animation-group list stays unchanged because it describes animation
+types rather than participants.
+
+The native updater forwards the original network/UI logic, then lays out the
+same original avatar widgets in balanced rows of at most twelve. It retains the
+authored horizontal spacing and slide targets. A 24-player room uses two rows;
+shrinking back to twelve restores the original row height. This does not add
+substitute artwork. Storage fixtures above 24 do not certify their presentation
+or SDK support: the original update scans 24 possible AIDs and larger room
+counts still need further mask/scan/presentation work.
+
+`FriendRoomStorageTests` runs the actual translated manager/slot constructors,
+array construction/destruction helpers, initialization and activation at
+12/13/24/48/100 capacity. UI/resource allocation boundaries are fixtures. It
+checks every reserved slot, control IDs, Mii counts, full resets, callee saves,
+stack and page guards. Native presentation checks at 13/24 include the highest
+reserved slot and room shrinkage. All five cases, all 944 unit tests and the
+complete consumer proof/stock-emission/expanded-syntax audit pass. Live admission,
+rendering and voting beyond twelve remain separate validation checkpoints.

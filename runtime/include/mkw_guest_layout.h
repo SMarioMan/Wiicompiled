@@ -18,6 +18,10 @@ struct Layout {
     uint32_t racedataSize;
     uint32_t inputRealHolders;
     uint32_t inputGCNControllers;
+    uint32_t friendRoomControls;
+    uint32_t friendRoomControlStride;
+    uint32_t friendRoomPlayerIds;
+    uint32_t friendRoomPlayerCount;
 };
 extern const Layout kLayout;
 }

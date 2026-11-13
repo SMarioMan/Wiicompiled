@@ -95,4 +95,9 @@ remaining packet formats and full 24-active-peer gameplay still need testing.
 A thirteen-instance attempt additionally exposed literal twelve-player DWC setup
 and reservation admission limits. All three server setup calls (including the
 main-loop call that bypasses the standalone method), public matching and the
-connection callbacks now use the checked capacity; live retesting is pending.
+connection callbacks now use the checked capacity. The next live run admitted
+the additional console far enough to expose the friend-room manager's fixed
+24-control storage. That page, its two slots per console, Mii/control counts,
+active-player map, reset arrays and referencing callbacks are now migrated.
+Native lifecycle checks pass through 100; the 24-player room uses the original
+widgets in two rows. Live admission/rendering/voting retesting is pending.

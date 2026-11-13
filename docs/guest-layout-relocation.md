@@ -1497,3 +1497,12 @@ states, short-packet rejection, register preservation and guards. Combined-buffe
 fixtures pass at all five capacities; the complete 1,307-consumer proof,
 stock-emission and expanded-C++ audit passes. No 24-active-peer race is claimed
 by these wire fixtures.
+
+
+`ExpandedCpuVehicleTests` additionally runs the original USA vehicle selector,
+character/vehicle weight lookups, vehicle lists and type/unlock checks after the
+new roster assignment. It passes at 13, 24 and 100, with every CPU receiving a
+valid weight-compatible vehicle and the local player's choices preserved.
+License eligibility and random/timing entry points remain fixtures. This tests
+the normal selector rather than the direct-boot fixed roster; rendering and
+loading all resulting models still require gameplay validation.

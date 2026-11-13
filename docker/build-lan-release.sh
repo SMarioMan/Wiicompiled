@@ -29,11 +29,28 @@ project=$(mkw_resolve_project "$PWD" "$PWD/Assets")
 native=$PWD/Launcher/artifacts/portable-tools/toolchain-x86_64/bin
 cli=$PWD/translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll
 dotnet build translator/src/Translator.Cli/Translator.Cli.csproj -c Release
-python3 mods/lan/build.py --toolchain "$(dirname "$native")" --out build/lan
-bash Launcher/local-build.sh --output-dir "$output" --translate-only --parallel "$jobs" \
+layout_args=()
+module_layout_args=()
+layout_players=${WIICOMPILED_LAYOUT_PLAYERS:-12}
+[[ "$layout_players" =~ ^(1[2-9]|2[0-9]|3[0-2])$ ]] || {
+    echo 'WIICOMPILED_LAYOUT_PLAYERS must be an integer from 12 to 32.' >&2; exit 2;
+}
+if (( layout_players != 12 )); then
+    [[ ${WIICOMPILED_EXPERIMENTAL_LAYOUTS:-0} == 1 ]] || {
+        echo 'Expanded LAN releases require WIICOMPILED_EXPERIMENTAL_LAYOUTS=1 while the migration is incomplete.' >&2; exit 2;
+    }
+    layout_args=(--guest-layouts projects/mkwii-ntsc-u/layouts/racedata.json --layout-players "$layout_players" --experimental-guest-layouts)
+    # Compile the correct module before the base translator makes inlining and
+    # dispatch decisions. Planning emits the same checked context as translation.
+    dotnet "$cli" plan-guest-layouts --project "$project" "${layout_args[@]}" \
+        --out build/layout-plan.json --artifacts-dir build/layout-context
+    module_layout_args=(--guest-layout-context build/layout-context/guest_layout_context.json --experimental-guest-layouts)
+fi
+python3 mods/lan/build.py --toolchain "$(dirname "$native")" "${module_layout_args[@]}" --out build/lan
+bash Launcher/local-build.sh --output-dir "$output" --translate-only --parallel "$jobs" "${layout_args[@]}" \
     --translator-dll "$cli" --cc "$native/clang" --cxx "$native/clang++" \
     --cmake "$native/cmake" --ninja "$native/ninja"
-dotnet "$cli" translate-mod --project "$project" --profile "lan" \
+dotnet "$cli" translate-mod --project "$project" --profile "lan" "${layout_args[@]}" \
     --base-manifest build/base/mkwii_base_manifest.json \
     --base-translation-output-metadata generated/base_translation_output.json \
     --mod-name 'WiiCompiled LAN' --region E --emit-cpp --threads "$jobs"
@@ -70,9 +87,11 @@ cp LICENSE THIRD-PARTY-NOTICES.md "$output/"
 cp mods/lan/source/COPYING "$output/LAN-COPYING"
 mkdir "$output/lan-build"
 cp "build/lan/Code.pul" "build/lan/"*.json "$output/lan-build/"
+cp generated/functions/guest_layout_context.json "$output/lan-build/"
+[[ ! -f build/layout-plan.json ]] || cp build/layout-plan.json "$output/lan-build/"
 touch "$output/portable.txt"
 mkdir -p "$output/UserData"
 printf '[paths]\ndvd_root = "../DATA"\n' > "$output/UserData/Config.toml"
-printf 'game_id=RMCE01\nlan_runtime_configuration=2\ndol_sha256=%s\nrel_sha256=%s\n' \
-    "$(mkw_sha256 Assets/main.dol)" "$(mkw_sha256 Assets/StaticR.rel)" \
+printf 'game_id=RMCE01\nlan_runtime_configuration=2\ndiscovery_protocol=3\nplayer_capacity=%s\ndol_sha256=%s\nrel_sha256=%s\n' \
+    "$layout_players" "$(mkw_sha256 Assets/main.dol)" "$(mkw_sha256 Assets/StaticR.rel)" \
     > "$output/build-inputs.txt"

@@ -71,6 +71,10 @@ native_prebuilt_dir=""
 sysroot=""
 setup_version=""
 x86_cpu_profile=auto
+guest_layouts=""
+layout_players=""
+experimental_guest_layouts=0
+layout_args=()
 
 usage() {
     cat <<'EOF'
@@ -85,6 +89,9 @@ Usage: local-build.sh --output-dir DIR [options]
   --skip-retro-wfc-payload        Build Retro Rewind without a Retro-WFC payload
   --force-clean-build             Discard every translation/build cache first
   --parallel N                    Pin translator threads, translated-shard job pool, and Ninja parallelism to N
+  --guest-layouts PATH            Checked guest layout manifest (requires --layout-players)
+  --layout-players N              Capacity for the supplied guest layout
+  --experimental-guest-layouts    Explicit private-build opt-in for incomplete layouts
   --translate-only                Generate verified translation and build shards without compiling
   --cc PATH / --cxx PATH          C/C++ compiler (default: cc/c++ on PATH)
   --fuse-ld NAME_OR_PATH          Linker passed to clang as -fuse-ld=NAME_OR_PATH (default: clang's own default linker)
@@ -115,6 +122,9 @@ while [[ $# -gt 0 ]]; do
         --force-clean-build) force_clean_build=1; shift ;;
         --parallel) parallel_override=$2; shift 2 ;;
         --translate-only) translate_only=1; shift ;;
+        --guest-layouts) guest_layouts=$2; shift 2 ;;
+        --layout-players) layout_players=$2; shift 2 ;;
+        --experimental-guest-layouts) experimental_guest_layouts=1; shift ;;
         --cc) cc_override=$2; shift 2 ;;
         --cxx) cxx_override=$2; shift 2 ;;
         --fuse-ld) fuse_ld_override=$2; shift 2 ;;
@@ -131,6 +141,16 @@ while [[ $# -gt 0 ]]; do
         *) fail "unknown argument: $1" ;;
     esac
 done
+
+if [[ -n "$guest_layouts" || -n "$layout_players" ]]; then
+    [[ -f "$guest_layouts" && "$layout_players" =~ ^[1-9][0-9]*$ ]] || fail "--guest-layouts and positive --layout-players must be supplied together"
+    [[ "$profile" == base ]] || fail "Guest layout builds currently support the base translation profile only"
+    guest_layouts=$(realpath "$guest_layouts")
+    layout_args=(--guest-layouts "$guest_layouts" --layout-players "$layout_players")
+    (( ! experimental_guest_layouts )) || layout_args+=(--experimental-guest-layouts)
+elif (( experimental_guest_layouts )); then
+    fail "--experimental-guest-layouts requires a guest layout"
+fi
 
 if [[ -z "$setup_version" && -f "$workspace/Launcher/Directory.Build.props" ]]; then
     setup_version=$(sed -nE 's/.*<Version>([^<]+)<\/Version>.*/\1/p' "$workspace/Launcher/Directory.Build.props" | head -n 1)
@@ -318,6 +338,9 @@ fi
 
 translator_identity_input=${translator_bin:-$(dirname "$translator_dll")}
 translation_fingerprint=$(mkw_translation_identity "$workspace" "$translator_identity_input" "$script_dir/local-build.sh")
+if (( ${#layout_args[@]} )); then
+    translation_fingerprint=$(printf '%s\n' "$translation_fingerprint" "$(mkw_sha256 "$guest_layouts")" "$layout_players" "$experimental_guest_layouts" | mkw_sha256)
+fi
 reuse_base=0
 if [[ "$(mkw_read_identity "$translation_provenance" TranslationFingerprint)" == "$translation_fingerprint" \
       && -f "$base_metadata" && -f "$base_manifest" ]]; then
@@ -360,7 +383,7 @@ else
     mkdir -p "$generated" "$base_manifest_dir"
 
     log_step translate-base "Translating the user-owned base game"
-    translator translate-recursive "$entry_point" --project "$project" \
+    translator translate-recursive "$entry_point" --project "$project" "${layout_args[@]}" \
         --outdir "$functions" --output-metadata "$base_metadata" \
         --production-source-bundle "$generated/base_translation_sources.bin" \
         --no-function-files --prune-stale --threads "$translator_threads"

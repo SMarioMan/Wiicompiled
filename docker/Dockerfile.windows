@@ -13,5 +13,9 @@ RUN --mount=type=tmpfs,target=/tmp \
     chmod -R a+rX /opt/wiicompiled /opt/windows-cross
 # Product selection does not change the compiler/toolchain image layers.
 ARG PRODUCT=base
-ENV WIICOMPILED_PRODUCT=$PRODUCT
+ARG LAYOUT_PLAYERS=12
+ARG EXPERIMENTAL_LAYOUTS=0
+ENV WIICOMPILED_PRODUCT=$PRODUCT \
+    WIICOMPILED_LAYOUT_PLAYERS=$LAYOUT_PLAYERS \
+    WIICOMPILED_EXPERIMENTAL_LAYOUTS=$EXPERIMENTAL_LAYOUTS
 ENTRYPOINT ["bash", "/opt/wiicompiled/docker/build-windows-cross.sh"]

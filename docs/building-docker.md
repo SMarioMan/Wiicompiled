@@ -195,3 +195,35 @@ These network settings do not restrict who can create a
 room. See the [LAN tests](../mods/lan/README.md) for first-run, room and race checks.
 Rendering, completed races and Windows LAN gameplay remain unverified;
 24-player support is not implemented.
+
+
+## Private expanded-layout LAN builds
+
+Both Docker builders accept `LAYOUT_PLAYERS` and `EXPERIMENTAL_LAYOUTS` build
+arguments, or the corresponding runtime environment variables below. Expanded
+builds currently require the clean USA game and an explicit experimental opt-in;
+the checked migration is incomplete. This exposes reproducible development
+artifacts and does not certify a complete 24-player release.
+
+```sh
+docker run --rm --user "$(id -u):$(id -g)" \
+  -e WIICOMPILED_PRODUCT=lan -e WIICOMPILED_LAYOUT_PLAYERS=24 \
+  -e WIICOMPILED_EXPERIMENTAL_LAYOUTS=1 \
+  --mount "type=bind,src=/absolute/path/game.rvz,dst=/input/game.rvz,readonly" \
+  --mount "type=bind,src=/absolute/path/empty-output,dst=/output" \
+  wiicompiled-linux /input/game.rvz /output
+```
+
+The Windows builder uses the same variables. For a BuildKit `release` export,
+pass `--build-arg PRODUCT=lan --build-arg LAYOUT_PLAYERS=24
+--build-arg EXPERIMENTAL_LAYOUTS=1` along with the documented game context and
+hash. LAN build capacity is currently 12..32; larger storage fixtures do not
+remove SDK mask limits.
+
+Planning first validates the real game instructions and emits the layout context.
+The LAN module is compiled against that context before base translation, so
+inlining sees the correct module hooks. Base and mod translation use identical
+layout arguments. The local build cache also binds the manifest contents,
+capacity and experimental mode, preventing a twelve-player cache from being
+reused as a 24-player build. Exports include the resolved context/plan and record
+player capacity and discovery protocol in `build-inputs.txt`.

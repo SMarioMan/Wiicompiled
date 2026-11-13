@@ -51,8 +51,8 @@ var layoutRelocations = layoutOption is null ? null : GuestLayoutRelocations.Rea
     int.Parse(layoutPlayersOption!, CultureInfo.InvariantCulture));
 var nativeLayoutConstants = new Lazy<string>(() => layoutRelocations?.EmitNativeConstants()
     ?? "#pragma once\n#define MKW_GUEST_LAYOUT_EXPLICIT 0\n");
-if (experimentalGuestLayouts && (layoutRelocations is null || command is not ("translate-recursive" or "translate-mod")))
-    throw new ArgumentException("--experimental-guest-layouts requires a guest layout and a translation command.");
+if (experimentalGuestLayouts && (layoutRelocations is null || command is not ("translate-recursive" or "translate-mod" or "plan-guest-layouts")))
+    throw new ArgumentException("--experimental-guest-layouts requires a guest layout and a translation or planning command.");
 if (layoutRelocations is not null && command is not ("plan-guest-layouts" or "audit-guest-layouts") &&
     (!layoutRelocations.Complete && layoutRelocations.Players != layoutRelocations.OriginalPlayers) && !experimentalGuestLayouts)
     throw new InvalidOperationException("This guest layout manifest is incomplete. Use plan-guest-layouts to inspect it or --experimental-guest-layouts for private development translation.");
@@ -210,6 +210,8 @@ int RunPlanGuestLayouts(string[] argsTail)
     var output = OptionValue(argsTail, "--out") ?? throw new ArgumentException("An output path is required.");
     FileOutput.WriteTextIfChanged(output, JsonSerializer.Serialize(layoutRelocations.Describe(),
         new JsonSerializerOptions { WriteIndented = true }));
+    var artifacts = OptionValue(argsTail, "--artifacts-dir");
+    if (artifacts is not null) WriteGuestLayoutArtifacts(artifacts);
     Console.WriteLine($"[translator] validated guest layout plan for {layoutRelocations.Players} players: {output}");
     return 0;
 }
@@ -3850,7 +3852,7 @@ static void WriteUsage(TextWriter writer, IReadOnlyList<string> commands)
     }
     writer.WriteLine("Every command also accepts [--project path] [--profile name] [--prefer-cached-inputs] [--help].");
     writer.WriteLine("Translation, plan-guest-layouts and audit-guest-layouts also accept [--guest-layouts path --layout-players N].");
-    writer.WriteLine("Translation may use [--experimental-guest-layouts] for incomplete layouts during private development testing.");
+    writer.WriteLine("Translation and planning may use [--experimental-guest-layouts] for incomplete layouts during private development testing.");
 }
 
 static string[] KnownCommands() => new[]
@@ -3879,7 +3881,7 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
     "info" or "--info" or "--version" =>
         (null, Array.Empty<CommandOption>()),
     "generate-data-init" => (null, Array.Empty<CommandOption>()),
-    "plan-guest-layouts" => (null, new CommandOption[] { new("--out", "path", Required: true) }),
+    "plan-guest-layouts" => (null, new CommandOption[] { new("--out", "path", Required: true), new("--artifacts-dir", "dir") }),
     "audit-guest-layouts" => ("<start_addr>", new CommandOption[]
     {
         new("--receiver", "type"), new("--out", "path", Required: true)

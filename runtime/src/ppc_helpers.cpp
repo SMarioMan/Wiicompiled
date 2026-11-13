@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "runtime_log.h"
 #include "timebase_contract.h"
+#include "headless_test_clock.h"
 
 #include <array>
 #include <bitset>
@@ -86,7 +87,8 @@ uint64_t GetTimeBase() {
     const auto elapsed = std::chrono::steady_clock::now() - g_timeBaseStart;
     const auto nanoseconds =
         std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count();
-    return g_timeBaseOrigin + TimeBaseContract::NanosecondsToTicks(static_cast<uint64_t>(nanoseconds));
+    return g_timeBaseOrigin + TimeBaseContract::NanosecondsToTicks(
+        HeadlessTestClock::Nanoseconds(static_cast<uint64_t>(nanoseconds)));
 }
 
 constexpr uint32_t kFpscrFx = 1u << 31;

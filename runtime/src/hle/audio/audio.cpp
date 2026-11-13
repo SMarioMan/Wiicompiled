@@ -6,6 +6,7 @@
 #include "ax_dsp.h"
 #include "music_attenuation.h"
 #include "runtime_log.h"
+#include "headless_test_clock.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -512,11 +513,11 @@ int64_t ConsumeAudioPollDeltaMicros()
     const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - lastPoll);
     if (elapsed.count() < 0 || elapsed > kMaxPollDelta) {
         lastPoll = now;
-        return elapsed.count() < 0 ? 0 : kMaxPollDelta.count();
+        return elapsed.count() < 0 ? 0 : HeadlessTestClock::DeltaMicros(kMaxPollDelta.count());
     }
     // Keep the sub-microsecond remainder for the next poll.
     lastPoll += elapsed;
-    return elapsed.count();
+    return HeadlessTestClock::DeltaMicros(static_cast<uint32_t>(elapsed.count()));
 }
 
 } // namespace

@@ -249,3 +249,20 @@ The [room-command regression trace](tests/results/room-packet-regression-capacit
 records the restored two-peer VS transition after relocating queue-relative
 pending packet state. It includes voting and advancing race simulations, but
 does not establish a full 24-player race.
+
+For functional testing on a host that cannot run many real-time instances,
+`MKW_TEST_CLOCK_DIVISOR=16` explicitly slows the guest time base and audio-device
+poll time. It is accepted only with `--headless`; the default divisor is one.
+The LAN test driver labels modified-clock traces and pass records. All peers
+must use the same setting. This is a diagnostic aid, not evidence of default
+network timing or acceptable real-time performance. Keep default-timing checks
+separate; do not use this setting to claim a release's real-time network limit.
+The setting does not change the emulated VI/frame counter or physics updates.
+
+The standalone clock guard/rounding checks can be run with:
+
+```sh
+c++ -std=c++20 -Iruntime/include runtime/tests/headless_test_clock_tests.cpp \
+  -o /tmp/headless-test-clock-tests
+/tmp/headless-test-clock-tests
+```

@@ -34,6 +34,12 @@ def decode_observation(packet, peer, ids):
 
 
 def run(args):
+    test_clock = int(os.environ.get('MKW_TEST_CLOCK_DIVISOR', '1'))
+    if not 1 <= test_clock <= 64:
+        raise ValueError('Test clock divisor must be between one and 64')
+    if test_clock != 1:
+        print(json.dumps(dict(test_clock_divisor=test_clock,
+            validation='functional only; not default-timing or real-time performance')), flush=True)
     directories = [args.host.resolve()] + [path.resolve() for path in args.client]
     available = [i for i in range(1, args.capacity+1) if i != args.host_id]
     client_ids = args.client_id if args.client_id is not None else available[:len(args.client)]
@@ -170,7 +176,7 @@ def run(args):
                             race_start_frames = {i: race[i][0]['frames'] for i in ids}
                         if room_confirmed is not None and now-race_since >= 5 and all(
                                 race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids):
-                            print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race')), flush=True)
+                            print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock)), flush=True)
                             return 0
                     else:
                         race_since = None
@@ -187,7 +193,7 @@ def run(args):
                 ready_since = (ready_since or now) if joined else None
                 if ready_since and now-ready_since >= 5:
                     if room_confirmed is None:
-                        print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds')), flush=True)
+                        print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds', test_clock_divisor=test_clock)), flush=True)
                     if not args.race:
                         return 0
                     if room_confirmed is None:

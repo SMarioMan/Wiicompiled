@@ -68,6 +68,7 @@
 #include "system_bridge.h"
 #include "ppc_runtime.h"
 #include "aurora_events.h"
+#include "headless_test_clock.h"
 #include "wiimote_host.h"
 #include "discord_presence.h"
 #include "steam_input_layout.h"
@@ -1373,6 +1374,9 @@ int RuntimeMain(int argc, char** argv) {
             }
         }
         LanRuntime::Validate();
+        const auto testClockDivisor=HeadlessTestClock::Configure(std::getenv("MKW_TEST_CLOCK_DIVISOR"),g_headless);
+        if(testClockDivisor!=1)
+            RT_LOGF("test-clock", "headless functional test: clock divisor=%u; not default-timing validation\n",testClockDivisor);
         if (g_headless && !BootRace::Requested() && RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
             throw std::invalid_argument("--headless needs a boot race or the LAN product");
         }

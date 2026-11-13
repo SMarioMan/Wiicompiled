@@ -1679,3 +1679,20 @@ the SDK, service setup and license boundaries. It checks every registered AID,
 packet stride/size, the entire cleared arena, adjacent bytes and preserved
 registers. This covers 12, 13, 24 and 32 peers; it is a setup check, with live
 room/race delivery checked separately.
+
+The EVENT handler's factory, constructor and reset previously allocated and
+initialized only twelve receive rows, while its importer already used the active
+race count. The handler now declares one 24-entry receive row and timestamp row
+per participant. Its fixed 24-event send queue and 224-byte payload budget remain
+the authored per-console limits. The participant scan, allocation, timestamp
+base and payload-budget fields are checked symbolic references, including the
+separate `PacketMgr::GetEVENTFreeDataSpace` getter.
+
+`EventHandlerStorageTests` executes the original factory, constructor, reset,
+exporter, importer and budget getter. It checks whole-object initialization,
+padding and adjacent bytes, serialized event tags/payloads, full and sparse
+peer masks, both controller subrecords, alternate packet rows and reversed
+player-to-AID mappings. All six capacities (12, 13, 24, 32, 48, 100) pass; wire
+paths execute through the SDK's 32-AID limit and larger cases check storage.
+The 13-player case reproduced the stale allocation before the correction.
+Live item/event synchronization remains a separate qualification.

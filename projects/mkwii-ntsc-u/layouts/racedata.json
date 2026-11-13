@@ -2709,6 +2709,55 @@
           "Count": 3
         }
       ]
+    },
+    {
+      "Name": "RKNetEventHeader",
+      "Size": 4,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetEventEntry",
+      "Size": 32,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetEventRow",
+      "Size": 768,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetEventTimes",
+      "Size": 96,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetEventHandler",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "RKNetEventHeader"
+        },
+        {
+          "Name": "send",
+          "Type": "RKNetEventEntry",
+          "Count": 24
+        },
+        {
+          "Name": "received",
+          "Type": "RKNetEventRow",
+          "PerPlayer": true
+        },
+        {
+          "Name": "receiveTimes",
+          "Type": "RKNetEventTimes",
+          "PerPlayer": true
+        },
+        {
+          "Name": "remaining",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -59472,6 +59521,112 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RKNetRoomHandler.send.count"
+    },
+    {
+      "Instruction": "0x806570F4",
+      "ExpectedWord": "0x90772B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.remaining.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657450",
+      "ExpectedWord": "0x90772B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.remaining.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657638",
+      "ExpectedWord": "0x901A2B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.remaining.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80657838",
+      "ExpectedWord": "0x3BA32704",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetEventHandler.receiveTimes.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80656EEC",
+      "ExpectedWord": "0x38602B88",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "RKNetEventHandler.size"
+    },
+    {
+      "Instruction": "0x80656F90",
+      "ExpectedWord": "0x93D72704",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.receiveTimes.offset"
+    },
+    {
+      "Instruction": "0x806570C4",
+      "ExpectedWord": "0x93D82704",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.receiveTimes.offset"
+    },
+    {
+      "Instruction": "0x80657420",
+      "ExpectedWord": "0x93D82704",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.receiveTimes.offset"
+    },
+    {
+      "Instruction": "0x80656FBC",
+      "ExpectedWord": "0x901D2B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.remaining.offset"
+    },
+    {
+      "Instruction": "0x80656FAC",
+      "ExpectedWord": "0x281B000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetEventHandler.received.count"
+    },
+    {
+      "Instruction": "0x806570E0",
+      "ExpectedWord": "0x281C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetEventHandler.received.count"
+    },
+    {
+      "Instruction": "0x8065743C",
+      "ExpectedWord": "0x281D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetEventHandler.received.count"
+    },
+    {
+      "Instruction": "0x806576AC",
+      "ExpectedWord": "0x281D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetEventHandler.received.count"
+    },
+    {
+      "Instruction": "0x80650390",
+      "ExpectedWord": "0x80632B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetEventHandler.remaining.offset"
     }
   ],
   "GlobalPointers": {
@@ -59493,7 +59648,8 @@
     "0x809BD790": "RKNetPacketMgr",
     "0x809BD508": "SectionMgr",
     "0x809BD958": "RKNetUserHandler",
-    "0x809BD930": "RKNetSelectHandler"
+    "0x809BD930": "RKNetSelectHandler",
+    "0x809BD928": "RKNetEventHandler"
   },
   "ArrayCopies": [
     {
@@ -65167,17 +65323,17 @@
     },
     {
       "Entry": "0x80657578",
-      "Receiver": null,
+      "Receiver": "RKNetEventHandler",
       "Name": "RKNet::EVENTHandler::ExportSendEntries"
     },
     {
       "Entry": "0x806576C8",
-      "Receiver": null,
+      "Receiver": "RKNetEventHandler",
       "Name": "RKNet::EVENTHandler::ImportReceivedEntries"
     },
     {
       "Entry": "0x80657824",
-      "Receiver": null,
+      "Receiver": "RKNetEventHandler",
       "Name": "RKNet::EVENTHandler::ProcessReceivedEntries"
     },
     {
@@ -66219,6 +66375,51 @@
       "Entry": "0x8062B8BC",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x80656ECC",
+      "Receiver": null,
+      "Name": "RKNet::EVENTHandler::CreateInstance"
+    },
+    {
+      "Entry": "0x80656FE4",
+      "Receiver": null,
+      "Name": "RKNet::EVENTHandler::DestroyInstance"
+    },
+    {
+      "Entry": "0x80657024",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::__ct"
+    },
+    {
+      "Entry": "0x80657114",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::Update"
+    },
+    {
+      "Entry": "0x80657164",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::AddEntry"
+    },
+    {
+      "Entry": "0x8065737C",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::Reset"
+    },
+    {
+      "Entry": "0x80657470",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::__dt"
+    },
+    {
+      "Entry": "0x806574B0",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::FreeExpiredSendEntries"
+    },
+    {
+      "Entry": "0x80657A30",
+      "Receiver": "RKNetEventHandler",
+      "Name": "RKNet::EVENTHandler::ResetEntry"
     }
   ],
   "BoundedAccesses": [

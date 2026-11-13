@@ -227,6 +227,19 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 		// DCed from wifi
 		return false;
 	update_game_state(gamedata);
+#ifdef MKW_LAN_DIAGNOSTICS
+    static uint32_t previous_count, previous_votes, previous_suspend, previous_first;
+    if (previous_count != gamedata->player_count || previous_votes != gamedata->suspend_votes ||
+        previous_suspend != gamedata->dwc_suspend || previous_first != gamedata->peers[0].player_id) {
+        MKWDebugReport("LAN SDK role=%u count=%u self=%x first=%x first_aid=%u votes=%x suspend=%u match=%u\n",
+            (unsigned)gamedata->dwc_host_state, (unsigned)gamedata->player_count,
+            (unsigned)gamedata->my_pid, (unsigned)gamedata->peers[0].player_id,
+            (unsigned)gamedata->peers[0].peer_index, (unsigned)gamedata->suspend_votes,
+            (unsigned)gamedata->dwc_suspend, (unsigned)gamedata->dwc_match_state);
+        previous_count=gamedata->player_count;previous_votes=gamedata->suspend_votes;
+        previous_suspend=gamedata->dwc_suspend;previous_first=gamedata->peers[0].player_id;
+    }
+#endif
 
 	struct broadcast_packet packet = {
 		.magic = BROADCAST_MAGIC,

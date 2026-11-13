@@ -61830,6 +61830,27 @@
       "Operand": "offset",
       "Symbol": "RKNetController.ratingRange.offset",
       "Addend": 20
+    },
+    {
+      "Instruction": "0x80652FCC",
+      "ExpectedWord": "0x83DD01B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.fullSend.offset"
+    },
+    {
+      "Instruction": "0x8065301C",
+      "ExpectedWord": "0x3BFF0030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitReceived.stride"
+    },
+    {
+      "Instruction": "0x80653024",
+      "ExpectedWord": "0x3BDE0030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.splitSend.stride"
     }
   ],
   "GlobalPointers": {

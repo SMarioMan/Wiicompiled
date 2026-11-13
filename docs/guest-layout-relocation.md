@@ -1766,3 +1766,13 @@ whole-object writes and adjacent bytes at 12, 13, 24 and 32 capacity. The new
 13-player login case faulted on the stale subrecord offset before correction.
 These checks mock the SDK boundary; public matchmaking service behavior is not
 established by this fixture.
+
+The controller destructor also needs the moved full-packet pointer array and the
+expanded strides between its two send/receive rows. Checking only its peer-loop
+bound was insufficient. `NetworkControllerDestructionTests` executes the original
+function, mocking allocator, task and singleton boundaries. It checks all packet
+buffers/holders, null slots, both rows, optional root deletion, heap teardown,
+callee-saved registers and adjacent storage at 12, 13, 24, 32, 48 and 100 capacity.
+The 13-player case first faulted on the old array base; freeing the second row
+then exposed the separate stale strides. This is allocator-call coverage, not a
+completed live disconnect/rejoin qualification.

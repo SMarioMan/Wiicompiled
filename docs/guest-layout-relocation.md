@@ -1776,3 +1776,13 @@ callee-saved registers and adjacent storage at 12, 13, 24, 32, 48 and 100 capaci
 The 13-player case first faulted on the old array base; freeing the second row
 then exposed the separate stale strides. This is allocator-call coverage, not a
 completed live disconnect/rejoin qualification.
+
+The alternate RH1 constructor, full-cache reset and single-record reset now use
+the same expanded row strides, participant maps and relocated tails as the named
+factory/reset paths. Their paired initializers cover the cache's rounded-even
+record count. The first-valid-header flag helper and destructor's maximum-time
+scan also cover the expanded field, with invalid/zero sentinels for partial
+unrolled groups. The storage fixture executes these additional original entry
+points through 100 slots, including every single-record reset and high-console
+time selection. Two further moving-subrecord strides in SELECT course choice
+are explicitly relocated. Live voting and round trips remain separate checks.

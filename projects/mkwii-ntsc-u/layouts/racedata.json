@@ -61851,6 +61851,246 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RKNetController.splitSend.stride"
+    },
+    {
+      "Instruction": "0x8065BD80",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065BDBC",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065BDF8",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065BE34",
+      "ExpectedWord": "0x1C000030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C344",
+      "ExpectedWord": "0x1CC00030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C368",
+      "ExpectedWord": "0x9BE7004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C374",
+      "ExpectedWord": "0x9BE7004D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8065C380",
+      "ExpectedWord": "0x9BE7004E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8065C358",
+      "ExpectedWord": "0x1CC00030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C3C8",
+      "ExpectedWord": "0x9BE7004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C3D4",
+      "ExpectedWord": "0x9BE7004D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8065C3E0",
+      "ExpectedWord": "0x9BE7004E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8065C5C8",
+      "ExpectedWord": "0x1CE00030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C5EC",
+      "ExpectedWord": "0x98C8004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C5F8",
+      "ExpectedWord": "0x98C8004D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8065C604",
+      "ExpectedWord": "0x98C8004E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8065C5DC",
+      "ExpectedWord": "0x1CE00030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C64C",
+      "ExpectedWord": "0x98C8004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C658",
+      "ExpectedWord": "0x98C8004D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8065C664",
+      "ExpectedWord": "0x98C8004E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x8065C6A0",
+      "ExpectedWord": "0x1CC40030",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRH1Handler.records.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C6C4",
+      "ExpectedWord": "0x98A3004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C6D0",
+      "ExpectedWord": "0x98A3004D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8065C6DC",
+      "ExpectedWord": "0x98A3004E",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetRH1Handler.records.offset+RKNetRH1Data.tail.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80659F28",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80659F80",
+      "ExpectedWord": "0x1C630058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065BD70",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C310",
+      "ExpectedWord": "0x38000006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/2)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C5A8",
+      "ExpectedWord": "0x38000006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/2)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C464",
+      "ExpectedWord": "0x38000002",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/6)",
+      "Addend": 0
     }
   ],
   "GlobalPointers": {
@@ -67688,7 +67928,7 @@
     },
     {
       "Entry": "0x8065C2D4",
-      "Receiver": null,
+      "Receiver": "RKNetRH1Handler",
       "Name": ""
     },
     {
@@ -67698,7 +67938,7 @@
     },
     {
       "Entry": "0x8065C714",
-      "Receiver": null,
+      "Receiver": "RKNetRH1Handler",
       "Name": ""
     },
     {
@@ -67708,7 +67948,7 @@
     },
     {
       "Entry": "0x8065C9DC",
-      "Receiver": null,
+      "Receiver": "RKNetRH1Handler",
       "Name": ""
     },
     {
@@ -68835,6 +69075,21 @@
       "Entry": "0x80654494",
       "Name": "RKNet::Controller::BuddyFriendCallback",
       "Receiver": null
+    },
+    {
+      "Entry": "0x8065BD70",
+      "Receiver": "RKNetRH1Handler",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8065C5A8",
+      "Receiver": "RKNetRH1Handler",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8065C6A0",
+      "Receiver": "RKNetRH1Handler",
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -71969,6 +72224,86 @@
       "Index": "r7",
       "GroupWidth": 6,
       "Fallback": 255
+    },
+    {
+      "Instruction": "0x8065BD88",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BDC4",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BE00",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BE3C",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C49C",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8065C4C4",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8065C4EC",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8065C514",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8065C53C",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8065C564",
+      "ExpectedWord": "0x80050020",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 6,
+      "Fallback": 0
     }
   ],
   "ArrayFills": [
@@ -74419,6 +74754,141 @@
           "Stride": "ItemStatusFrame.players.stride",
           "Count": "ItemStatusFrame.players.count",
           "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065C384",
+      "ExpectedWords": [
+        "0x98870040",
+        "0x98870041",
+        "0x98870042",
+        "0x98870043",
+        "0x98870044",
+        "0x98870045",
+        "0x98870046",
+        "0x98870047",
+        "0x98870048",
+        "0x98870049",
+        "0x9887004A",
+        "0x9887004B"
+      ],
+      "BaseRegister": "r7",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRH1Handler.records.offset+RKNetRH1Data.playerAids.offset",
+          "Stride": "RKNetRH1Data.playerAids.stride",
+          "Count": "RKNetRH1Data.playerAids.count",
+          "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065C3E4",
+      "ExpectedWords": [
+        "0x98870040",
+        "0x98870041",
+        "0x98870042",
+        "0x98870043",
+        "0x98870044",
+        "0x98870045",
+        "0x98870046",
+        "0x98870047",
+        "0x98870048",
+        "0x98870049",
+        "0x9887004A",
+        "0x9887004B"
+      ],
+      "BaseRegister": "r7",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRH1Handler.records.offset+RKNetRH1Data.playerAids.offset",
+          "Stride": "RKNetRH1Data.playerAids.stride",
+          "Count": "RKNetRH1Data.playerAids.count",
+          "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065C608",
+      "ExpectedWords": [
+        "0x98880040",
+        "0x98880041",
+        "0x98880042",
+        "0x98880043",
+        "0x98880044",
+        "0x98880045",
+        "0x98880046",
+        "0x98880047",
+        "0x98880048",
+        "0x98880049",
+        "0x9888004A",
+        "0x9888004B"
+      ],
+      "BaseRegister": "r8",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRH1Handler.records.offset+RKNetRH1Data.playerAids.offset",
+          "Stride": "RKNetRH1Data.playerAids.stride",
+          "Count": "RKNetRH1Data.playerAids.count",
+          "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065C668",
+      "ExpectedWords": [
+        "0x98880040",
+        "0x98880041",
+        "0x98880042",
+        "0x98880043",
+        "0x98880044",
+        "0x98880045",
+        "0x98880046",
+        "0x98880047",
+        "0x98880048",
+        "0x98880049",
+        "0x9888004A",
+        "0x9888004B"
+      ],
+      "BaseRegister": "r8",
+      "ValueRegister": "r4",
+      "Arrays": [
+        {
+          "Array": "RKNetRH1Handler.records.offset+RKNetRH1Data.playerAids.offset",
+          "Stride": "RKNetRH1Data.playerAids.stride",
+          "Count": "RKNetRH1Data.playerAids.count",
+          "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065C6E0",
+      "ExpectedWords": [
+        "0x98030040",
+        "0x98030041",
+        "0x98030042",
+        "0x98030043",
+        "0x98030044",
+        "0x98030045",
+        "0x98030046",
+        "0x98030047",
+        "0x98030048",
+        "0x98030049",
+        "0x9803004A",
+        "0x9803004B"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetRH1Handler.records.offset+RKNetRH1Data.playerAids.offset",
+          "Stride": "RKNetRH1Data.playerAids.stride",
+          "Count": "RKNetRH1Data.playerAids.count",
+          "Width": 1
         }
       ]
     }

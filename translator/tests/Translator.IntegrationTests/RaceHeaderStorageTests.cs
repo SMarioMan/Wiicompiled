@@ -31,7 +31,7 @@ public class RaceHeaderStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-race-header-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98};
+            var entries=new uint[]{0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98,0x8065bd70,0x8065c2d4,0x8065c5a8,0x8065c6a0,0x8065c444};
             var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x801aacbc,0x80020aa4,0x806609d8,0x8065ca70,0x8065cb28};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -80,20 +80,27 @@ public class RaceHeaderStorageTests
                         for(uint32_t at=4;at<=20;at+=4)word(base+at,0xffffffff);word(base+24,0);word(base+28,0);
                         std::memset(expected.data()+base+ids,255,capacity);std::memset(expected.data()+base+tail,0,3);};
                     auto equal=[&](){return std::memcmp(expected.data(),Memory::GetPointer(root,size),size)==0;};
-                    for(uint32_t kind=0;kind<2;kind++){
+                    for(uint32_t kind=0;kind<3;kind++){
                         std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);expected.fill(0x55);
                         std::memset(Memory::GetPointer(controller,controllerSize),0x22,controllerSize);clears=0;
                         if(kind==0){Memory::Write32(0x809bd940,0);func_8065B14C(&ctx);
                             if(allocations!=1 || Memory::Read32(0x809bd940)!=root)return 4;expected[1]=0;
                             func_8065B14C(&ctx);if(allocations!=1)return 5;
-                        }else{ctx.gpr[3]=root;func_8065B330(&ctx);}
+                        }else{ctx.gpr[3]=root;if(kind==1)func_8065B330(&ctx);else{func_8065C2D4(&ctx);expected[1]=0;} }
                         expected[0]=0;word(4,0);word(8,0);word(12,0);expected[16]=255;word(24,0);word(28,0);
                         for(uint32_t p=0;p<recordCount;p++)reset_record(p);
                         if(!equal()){
                             for(uint32_t at=0;at<size;at++)if(expected[at]!=Memory::Read8(root+at))std::fprintf(stderr,"kind %u offset %u actual %u expected %u\n",kind,at,Memory::Read8(root+at),expected[at]);return 6;}
                         if(clears!=1)return 7;
-                        for(uint32_t at=0;at<controllerSize;at++)if(Memory::Read8(controller+at)!=(kind==0 && at>=biggestTimer && at<biggestTimer+4?0:0x22))return 8;
+                        for(uint32_t at=0;at<controllerSize;at++)if(Memory::Read8(controller+at)!=(kind!=1 && at>=biggestTimer && at<biggestTimer+4?0:0x22))return 8;
                     }
+                    for(uint32_t p=0;p<recordCount;p++){
+                        expected.fill(0x55);std::memset(Memory::GetPointer(root,size),0x55,size);reset_record(p);
+                        ctx.gpr[3]=root;ctx.gpr[4]=p;func_8065C6A0(&ctx);if(!equal())return 24;
+                    }
+                    expected.fill(0x55);std::memset(Memory::GetPointer(root,size),0x55,size);
+                    for(uint32_t p=0;p<recordCount;p++)reset_record(p);
+                    ctx.gpr[3]=root;func_8065C5A8(&ctx);if(!equal())return 25;
                     for(uint32_t p=0;p<capacity;p++){
                         auto base=records+p*stride;
                         for(uint32_t local=0;local<2;local++){
@@ -136,6 +143,7 @@ public class RaceHeaderStorageTests
                         for(uint32_t p=0;p<capacity;p++)Memory::Write8(controller+{{layout.Symbol("RKNetController.playerAids.offset")}}+p,p);
                         ctx.gpr[3]=root;ctx.gpr[4]=capacity-1;ctx.gpr[5]=0;func_8065BA98(&ctx);
                         if(ctx.gpr[3]!=(team?0:1))return 23;
+                        ctx.gpr[3]=root;func_8065BD70(&ctx);if(ctx.gpr[3]!=team)return 26;
                     }
                     if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,capacity-1})for(bool sparse : {false,true}){
                         uint32_t mask=capacity==32?0xffffffffu:((1u<<capacity)-1);
@@ -151,6 +159,14 @@ public class RaceHeaderStorageTests
                             if(sent!=step+1 || last!=next || Memory::Read8(root+16)!=next){std::fprintf(stderr,"RH1 scheduler n=%u previous=%u expected=%u got=%u sends=%u\n",capacity,previous,next,last,sent);return 22;}
                             previous=next;
                         }
+                    }
+                    for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,capacity-1}){
+                        Memory::Write32(controller+{{layout.Symbol("RKNetController.currentSub.offset")}},current);
+                        Memory::Write8(controller+{{layout.Symbol("RKNetController.subs.offset")}}+current*{{layout.Symbol("RKNetSub.size")}}+33,local);
+                        for(uint32_t p=0;p<recordCount;p++)Memory::Write32(root+records+p*stride,p<capacity?100+p:0);
+                        Memory::Write32(controller+biggestTimer,0);
+                        ctx.gpr[3]=root;ctx.gpr[4]=0;func_8065C444(&ctx);
+                        if(ctx.gpr[3]!=root || Memory::Read32(controller+biggestTimer)!=100+capacity-1-(local==capacity-1))return 27;
                     }
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 14;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 15;

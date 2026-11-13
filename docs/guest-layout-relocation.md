@@ -1754,3 +1754,15 @@ header handling, disconnected players, lag advancement, RH2 destinations and
 cleared holders in both subrecords. All six capacity cases pass, with live-mask
 paths bounded to 32 AIDs. Protocol status value 12 and twelve-byte packet holders
 remain their authored values.
+
+SDK login and friend-status callbacks receive their controller through callback
+arguments rather than the usual receiver/global pointer. Their active-subrecord
+lookup, query-output pointers and server-update flag now use explicit checked
+references. The public matching helper's four rating-range loads through moving
+pointers likewise relocate with the existing range-base references.
+`NetworkReceiveBufferTests` executes login with one/two local players in both
+subrecords and all three status-update callbacks, checking SDK argument pointers,
+whole-object writes and adjacent bytes at 12, 13, 24 and 32 capacity. The new
+13-player login case faulted on the stale subrecord offset before correction.
+These checks mock the SDK boundary; public matchmaking service behavior is not
+established by this fixture.

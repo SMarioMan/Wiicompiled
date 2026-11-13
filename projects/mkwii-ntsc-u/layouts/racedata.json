@@ -61734,6 +61734,102 @@
       "Operand": "offset",
       "Symbol": "RKNetController.splitReceived.offset+RKNetPointerRow.players.offset",
       "Addend": 0
+    },
+    {
+      "Instruction": "0x806541EC",
+      "ExpectedWord": "0x801F291C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.currentSub.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806541F0",
+      "ExpectedWord": "0x1C000058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.subs.stride",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x806541F8",
+      "ExpectedWord": "0x88030058",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.subs.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x80654228",
+      "ExpectedWord": "0x38FF2758",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.status.offset",
+      "Addend": 372
+    },
+    {
+      "Instruction": "0x8065422C",
+      "ExpectedWord": "0x391F275C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetController.status.offset",
+      "Addend": 376
+    },
+    {
+      "Instruction": "0x80654468",
+      "ExpectedWord": "0x98052754",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset",
+      "Addend": 368
+    },
+    {
+      "Instruction": "0x80654488",
+      "ExpectedWord": "0x98052754",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset",
+      "Addend": 368
+    },
+    {
+      "Instruction": "0x80654498",
+      "ExpectedWord": "0x98042754",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.status.offset",
+      "Addend": 368
+    },
+    {
+      "Instruction": "0x80654E7C",
+      "ExpectedWord": "0xA0032936",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.ratingRange.offset",
+      "Addend": 2
+    },
+    {
+      "Instruction": "0x80654EB0",
+      "ExpectedWord": "0xA0032934",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.ratingRange.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x80654F5C",
+      "ExpectedWord": "0xA003294A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.ratingRange.offset",
+      "Addend": 22
+    },
+    {
+      "Instruction": "0x80654F90",
+      "ExpectedWord": "0xA0032948",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "RKNetController.ratingRange.offset",
+      "Addend": 20
     }
   ],
   "GlobalPointers": {
@@ -68698,6 +68794,26 @@
       "Entry": "0x8065BA98",
       "Name": "",
       "Receiver": "RKNetRH1Handler"
+    },
+    {
+      "Entry": "0x8065418C",
+      "Name": "RKNet::Controller::LoginCallback",
+      "Receiver": null
+    },
+    {
+      "Entry": "0x80654450",
+      "Name": "RKNet::Controller::UpdateServerCallback",
+      "Receiver": null
+    },
+    {
+      "Entry": "0x80654474",
+      "Name": "RKNet::Controller::UpdateServerCallbackAlt",
+      "Receiver": null
+    },
+    {
+      "Entry": "0x80654494",
+      "Name": "RKNet::Controller::BuddyFriendCallback",
+      "Receiver": null
     }
   ],
   "BoundedAccesses": [

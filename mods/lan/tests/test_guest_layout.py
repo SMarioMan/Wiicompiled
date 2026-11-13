@@ -16,7 +16,9 @@ class GuestLayoutTests(unittest.TestCase):
                     Layout=dict(Format='guest-layout-plan-v4', Players=capacity, Complete=False,
                                 Types={'InputManager': {'Fields': {'gcnControllers': {'Offset': 0x12348765}}},
                                        'Racedata': {'Fields': {'race': {'Offset': 32}}},
-                                       'Scenario': {'Fields': {'settings': {'Offset': 8+capacity*240}}}}))
+                                       'Scenario': {'Fields': {'settings': {'Offset': 8+capacity*240}}},
+                                       'RKNetController': {'Fields': {'subs': {'Offset': 56}, 'currentSub': {'Offset': 20000}}},
+                                       'RKNetSub': {'Size': 40+capacity*4}}))
 
     def resolve(self, context, experimental=False):
         with tempfile.TemporaryDirectory() as directory:
@@ -42,6 +44,8 @@ class GuestLayoutTests(unittest.TestCase):
         self.assertEqual((defines['MKW_LAN_INPUT_GCN_HI'] << 16) | defines['MKW_LAN_INPUT_GCN_LO'],
                          values['input_gcn'])
         self.assertEqual(len(context_hash), 64)
+        self.assertEqual(defines['MKW_LAN_NET_SUB_STRIDE'],40+24*4)
+        self.assertEqual(defines['MKW_LAN_NET_CURRENT_SUB'],20000)
 
     def test_incomplete_context_requires_the_explicit_experimental_switch(self):
         with self.assertRaises(ValueError):

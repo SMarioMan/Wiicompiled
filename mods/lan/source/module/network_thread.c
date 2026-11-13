@@ -220,6 +220,9 @@ static void update_game_state(struct dwc_gamedata *gamedata) {
  * Telemetry is independent of the versioned lobby discovery record. */
 extern const uint8_t *MKWRaceInfo;
 extern const uint8_t *MKWRaceData;
+#ifdef MKW_LAN_DIAGNOSTICS
+extern const uint8_t *MKWNetController;
+#endif
 
 static bool compute_and_broadcast_status(so_fd_t fd) {
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
@@ -228,16 +231,27 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
 		return false;
 	update_game_state(gamedata);
 #ifdef MKW_LAN_DIAGNOSTICS
-    static uint32_t previous_count, previous_votes, previous_suspend, previous_first;
+    static uint32_t previous_count, previous_votes, previous_suspend, previous_first, previous_active;
+    const uint8_t *controller=MKWNetController;
+    const uint32_t current=controller ? *(const uint32_t *)(controller+MKW_LAN_NET_CURRENT_SUB) : 2;
+    const uint8_t *sub=current<2 ? controller+MKW_LAN_NET_SUBS+current*MKW_LAN_NET_SUB_STRIDE : 0;
+    const uint32_t active=sub ? *(const uint32_t *)(sub+16) : 0;
     if (previous_count != gamedata->player_count || previous_votes != gamedata->suspend_votes ||
-        previous_suspend != gamedata->dwc_suspend || previous_first != gamedata->peers[0].player_id) {
+        previous_suspend != gamedata->dwc_suspend || previous_first != gamedata->peers[0].player_id || previous_active!=active) {
         MKWDebugReport("LAN SDK role=%u count=%u self=%x first=%x first_aid=%u votes=%x suspend=%u match=%u\n",
             (unsigned)gamedata->dwc_host_state, (unsigned)gamedata->player_count,
             (unsigned)gamedata->my_pid, (unsigned)gamedata->peers[0].player_id,
             (unsigned)gamedata->peers[0].peer_index, (unsigned)gamedata->suspend_votes,
             (unsigned)gamedata->dwc_suspend, (unsigned)gamedata->dwc_match_state);
+        MKWDebugReport("LAN controller sub=%u active=%x local_aid=%u\n",(unsigned)current,
+            (unsigned)active,sub ? (unsigned)sub[33] : 255);
+        if(previous_count!=gamedata->player_count && gamedata->player_count<=32)
+            for(unsigned i=0;i<gamedata->player_count;i++)
+                MKWDebugReport("LAN SDK node %u pid=%x aid=%u\n",i,
+                    (unsigned)gamedata->peers[i].player_id,(unsigned)gamedata->peers[i].peer_index);
         previous_count=gamedata->player_count;previous_votes=gamedata->suspend_votes;
         previous_suspend=gamedata->dwc_suspend;previous_first=gamedata->peers[0].player_id;
+        previous_active=active;
     }
 #endif
 

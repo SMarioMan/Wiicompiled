@@ -74,7 +74,8 @@ def static_patches():
 def guest_layout(context_path=None, allow_experimental=False):
     """Resolve the guest ABI once for all C code and assembly in the module."""
     values = dict(capacity=12, input_gcn=0x3ba0, race_course=0xb68,
-                  race_mode=0xb70, race_player_count=0x24)
+                  race_mode=0xb70, race_player_count=0x24,
+                  net_subs=0x38, net_sub_stride=0x58, net_current_sub=0x291c)
     if context_path is None:
         return values, None
     data = context_path.read_bytes()
@@ -98,7 +99,12 @@ def guest_layout(context_path=None, allow_experimental=False):
     race = offset('Racedata', 'race')
     settings = race + offset('Scenario', 'settings')
     values = dict(capacity=capacity, input_gcn=offset('InputManager', 'gcnControllers'),
-                  race_course=settings, race_mode=settings+8, race_player_count=race+4)
+                  race_course=settings, race_mode=settings+8, race_player_count=race+4,
+                  net_subs=offset('RKNetController','subs'),
+                  net_sub_stride=types['RKNetSub']['Size'],
+                  net_current_sub=offset('RKNetController','currentSub'))
+    if type(values['net_sub_stride']) is not int or values['net_sub_stride'] < 1:
+        raise ValueError('Invalid guest network subrecord stride')
     if any(value > 0xffffffff for value in values.values()):
         raise ValueError('Guest layout offsets exceed a 32-bit address')
     return values, hashlib.sha256(data).hexdigest()
@@ -111,7 +117,10 @@ def guest_layout_header(values):
             f'#define MKW_LAN_INPUT_GCN_LO {values["input_gcn"] & 0xffff}\n'
             f'#define MKW_LAN_RACE_COURSE_OFFSET {values["race_course"]}\n'
             f'#define MKW_LAN_RACE_MODE_OFFSET {values["race_mode"]}\n'
-            f'#define MKW_LAN_RACE_PLAYER_COUNT_OFFSET {values["race_player_count"]}\n')
+            f'#define MKW_LAN_RACE_PLAYER_COUNT_OFFSET {values["race_player_count"]}\n'
+            f'#define MKW_LAN_NET_SUBS {values["net_subs"]}\n'
+            f'#define MKW_LAN_NET_SUB_STRIDE {values["net_sub_stride"]}\n'
+            f'#define MKW_LAN_NET_CURRENT_SUB {values["net_current_sub"]}\n')
 
 
 def build(args):
@@ -160,7 +169,8 @@ def build(args):
                                    'MKWHasLicense': '0x8053F7D4', 'MKWSaveManager': '0x809B8F88',
                                    'MKWDebugReport': '0x801A2530',
                                    'MKWOriginalRoster': '0x80619D8C', 'MKWCreateRoom': '0x8061A01C',
-                                   'MKWRaceInfo': '0x809B8F70', 'MKWRaceData': '0x809B8F68'}, indent=2) + '\n')
+                                   'MKWRaceInfo': '0x809B8F70', 'MKWRaceData': '0x809B8F68',
+                                   'MKWNetController': '0x809BD918'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
                     str(ROOT / 'projects/mkwii-ntsc-u/recomp.yml'), '--module', str(elf),

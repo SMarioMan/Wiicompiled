@@ -12,6 +12,7 @@ public class RoomPacketStorageTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
@@ -31,11 +32,11 @@ public class RoomPacketStorageTests
         try
         {
             var entries=new uint[]{0x80656600,0x80656704,0x8065680c,0x806569e8,0x80656afc,0x80656dd8,
-                0x80656adc,0x80656e64,0x80656e78,0x80656e8c,0x80656e9c,0x80656eac,0x80656ebc};
-            var fixtures=new HashSet<uint>{0x80229a48};
+                0x80656890,0x80656d0c,0x80005f34,0x80656adc,0x80656e64,0x80656e78,0x80656e8c,0x80656e9c,0x80656eac,0x80656ebc};
+            var fixtures=new HashSet<uint>{0x80229a48,0x80652a78,0x80656bc0};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
-                File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
+                File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
             var declarations=string.Join("\n",entries.Select(pc=>$"extern \"C\" void func_{pc:X8}(CpuContext*);"));
             var registrations=string.Join("\n",entries.Select(pc=>$"register_entry(0x{pc:X8},func_{pc:X8});"));
             var binary=Path.Combine(temp,"image.bin");File.WriteAllBytes(binary,image.Memory);
@@ -54,7 +55,9 @@ public class RoomPacketStorageTests
                     subStride={{layout.Symbol("RKNetSub.size")}},currentSub={{layout.Symbol("RKNetController.currentSub.offset")}},
                     status={{layout.Symbol("RKNetController.status.offset")}},
                     root=0x81010000,controller=0x81030000,stack=0x81f00000;
-                uint32_t allocations=0;
+                uint32_t allocations=0,exports=0,connected=0;
+                void has_peers(CpuContext* c){c->gpr[3]=connected;}
+                void export_room(CpuContext* c){if(c->gpr[3]!=root)std::abort();exports++;}
                 void allocate(CpuContext* c){if(c->gpr[3]!=size || allocations++)std::abort();c->gpr[3]=root;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="room packet fixture";info.rawCpuInvoker=entry;
@@ -64,7 +67,7 @@ public class RoomPacketStorageTests
                     auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
                     {{registrations}}
-                    register_entry(0x80229a48,allocate);Memory::Write32(0x809bd918,controller);
+                    register_entry(0x80652a78,has_peers);register_entry(0x80656bc0,export_room);register_entry(0x80229a48,allocate);Memory::Write32(0x809bd918,controller);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
                     std::array<uint8_t,size> expected{};
@@ -112,6 +115,35 @@ public class RoomPacketStorageTests
                         ctx.gpr[3]=root;ctx.gpr[4]=p;func_80656E64(&ctx);word(send+p*4,0);
                         ctx.gpr[3]=root;ctx.gpr[4]=p;func_80656E78(&ctx);word(received+p*4,0);if(!equal())return 14;
                     }
+                    // Execute the original per-frame importer through both ping-pong
+                    // rows. Invalid lengths, absent peers and our own slot must stay intact.
+                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t local:{0u,capacity-1})
+                        for(bool sparse:{false,true})for(uint32_t valid=0;valid<2;valid++)for(connected=0;connected<2;connected++)for(bool direct:{false,true}){
+                            constexpr uint32_t rows={{layout.Symbol("RKNetController.splitReceived.offset")}},
+                                rowStride={{layout.Symbol("RKNetPointerRow.size")}},indices={{layout.Symbol("RKNetController.receiveIndices.offset")}},
+                                user=0x81080000,pool=0x81100000;
+                            auto sub=controller+subs+current*subStride;
+                            uint32_t mask=sparse?((1u<<local)|(1u<<(local?0:capacity-1))):(0xffffffffu>>(32-capacity));
+                            Memory::Write32(controller+currentSub,current);Memory::Write32(sub+16,mask);Memory::Write8(sub+33,local);
+                            Memory::Write32(0x809bd958,user);Memory::Write32(user+{{layout.Symbol("RKNetUserHandler.aidBitflag.offset")}},mask);
+                            expected.fill(0x55);expected[0]=1;
+                            std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                            for(uint32_t p=0;p<capacity;p++){
+                                Memory::Write32(controller+indices+p*32+12,p%2);
+                                for(uint32_t row=0;row<2;row++){
+                                    auto split=pool+p*256+row*64,holder=split+32,payload=holder+16;
+                                    Memory::Write32(controller+rows+row*rowStride+p*4,split);Memory::Write32(split+12,holder);
+                                    Memory::Write32(holder,payload);Memory::Write32(holder+8,valid?4:3);Memory::Write32(payload,0x33440000+p+row*256);
+                                }
+                                if((connected || direct) && valid && p!=local && (mask&(1u<<p)))word(received+p*4,0x33440000+p+(p%2)*256);
+                            }
+                            exports=0;ctx.gpr[3]=root;if(direct)func_80656D0C(&ctx);else func_80656890(&ctx);
+                            if(!equal() || exports!=(direct?0:connected)){
+                                std::fprintf(stderr,"import n=%u sub=%u local=%u sparse=%u valid=%u connected=%u direct=%u exports=%u\n",capacity,current,local,sparse,valid,connected,direct,exports);
+                                for(uint32_t i=0;i<size;i++)if(expected[i]!=Memory::Read8(root+i)){std::fprintf(stderr,"offset %x expected %x actual %x\n",i,expected[i],Memory::Read8(root+i));break;}
+                                return 18;
+                            }
+                        }
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return 15;
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 16;
                     if(ctx.gpr[1]!=stack)return 17;

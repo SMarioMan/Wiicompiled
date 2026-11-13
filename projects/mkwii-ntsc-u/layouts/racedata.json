@@ -59418,6 +59418,20 @@
       "Symbol": "Scenario.players.count"
     },
     {
+      "Instruction": "0x8065695C",
+      "ExpectedWord": "0x281D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRoomHandler.received.count"
+    },
+    {
+      "Instruction": "0x80656DB0",
+      "ExpectedWord": "0x281C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "RKNetRoomHandler.received.count"
+    },
+    {
       "Instruction": "0x80656C34",
       "ExpectedWord": "0x3800000C",
       "Node": 0,

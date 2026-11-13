@@ -1660,3 +1660,12 @@ fields and sparse highest-AID fields through the SDK's 32-AID limit. Expanded
 13/24-player cases reproduced missing destinations before the correction;
 12/13/24/32 all pass afterward. Actual multiplayer start progression remains a
 separate check.
+
+The per-frame ROOM importer and `ImportNewPackets` independently retained
+12-peer loops at `0x8065695C` and `0x80656DB0`. Both bounds now derive from the
+receive-array count. The native lifecycle fixture executes both original
+functions with both subrecords, alternating receive rows, local AIDs at either
+end, full and sparse masks, disconnected state, and invalid packet lengths.
+The expanded 13/24 cases failed before correction; all six lifecycle capacities
+(12, 13, 24, 32, 48, 100) pass afterward. Mask-dependent import execution covers
+12 through 32; the larger cases check storage and non-mask lifecycle methods.

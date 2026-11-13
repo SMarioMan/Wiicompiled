@@ -2602,6 +2602,55 @@
   ],
   "References": [
     {
+      "Instruction": "0x806550EC",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x80654C60",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x806543DC",
+      "ExpectedWord": "0x281E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x80654370",
+      "ExpectedWord": "0x281C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x8065433C",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x80654330",
+      "ExpectedWord": "0x281D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.count"
+    },
+    {
+      "Instruction": "0x806542C0",
+      "ExpectedWord": "0x281E000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "Scenario.players.count"
+    },
+    {
       "Instruction": "0x8052909C",
       "ExpectedWord": "0x38E0000C",
       "Node": 0,
@@ -43171,6 +43220,13 @@
       "Scale": 1
     },
     {
+      "Instruction": "0x80655170",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
       "Instruction": "0x80655160",
       "ExpectedWord": "0x8003291C",
       "Node": 0,
@@ -58030,6 +58086,21 @@
     }
   ],
   "AuditedConsumers": [
+    {
+      "Entry": "0x8065439C",
+      "Receiver": null,
+      "Name": "RKNet::Controller::ConnectionClosedCallback"
+    },
+    {
+      "Entry": "0x806542E0",
+      "Receiver": null,
+      "Name": "RKNet::Controller::ConnectionAttemptCallback"
+    },
+    {
+      "Entry": "0x80654290",
+      "Receiver": null,
+      "Name": "RKNet::Controller::MatchedSCCallback"
+    },
     {
       "Entry": "0x805128D8",
       "Receiver": null,

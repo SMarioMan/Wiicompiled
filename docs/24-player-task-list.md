@@ -90,3 +90,6 @@ sections. RH1 now also has a capacity-sized serialized map, checked lengths,
 relocated temporary packets and complete creator/import loops. Native fixtures
 cover both buffers and snapshots through 24 active-addressable slots; the
 remaining packet formats and full 24-active-peer gameplay still need testing.
+A thirteen-instance attempt additionally exposed literal twelve-player DWC setup
+and reservation admission limits. Both setup paths, public matching and the
+connection callbacks now use the checked capacity; live retesting is pending.

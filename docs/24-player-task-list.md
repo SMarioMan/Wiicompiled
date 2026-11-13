@@ -54,8 +54,8 @@ Video subtitles are observations and design references, not build instructions.
 - [ ] **Stranded CPUs / Lakitu:** distinguish bad initial coordinates, route or
   checkpoint state and rescue storage/limits. The actual-game forced-fall test
   exposed the original twelve-pair JGPT offset table; the bounded rescue wrapper
-  now passes all 24 slots on Luigi Circuit, including resumed movement and lap
-  advancement. See [the test and limits](forced-fall-validation.md). Still check
+  now passes all 24 slots in Luigi Circuit VS and Mario Circuit team VS,
+  including resumed movement and lap advancement. See [the test and limits](forced-fall-validation.md). Still check
   other courses, battle modes and online synchronization.
 
 ## Subtitle lessons to retain

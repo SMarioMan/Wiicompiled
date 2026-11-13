@@ -26,7 +26,8 @@ return to course height, move at least 200 units after 120 simulation frames,
 and advance its lap. The JSON report retains per-slot checkpoints and the
 executable SHA-256, including an incomplete report on failure. This is one
 course and one race mode per invocation; it does not certify every course or
-online rescue synchronization.
+online rescue synchronization. Recorded passes cover 24-player Luigi Circuit
+VS and Mario Circuit team VS; their per-slot reports are in `docs/validation`.
 
 The first expanded-field run exposed an additional twelve-entry limit:
 `KMP::Holder<JGPT>::GetPosition` (USA `0x805144F8`) indexes twelve signed-byte

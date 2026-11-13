@@ -32,8 +32,10 @@ Video subtitles are observations and design references, not build instructions.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
   paginate or scroll as necessary. At 24, generated individual controls now use
   two columns, team controls have twelve rows per team, and reserved localized
-  message IDs avoid unrelated strings. Original-loader checks pass; rendered
-  readability, totals and menu return still need gameplay checks.
+  message IDs avoid unrelated strings. Original-loader checks and an actual
+  24-player individual results screen confirm distinct, readable ranks through
+  24th and the expected one-race points. Still check accumulated totals, team
+  results and menu return.
 - [ ] **Bullet Bill:** the overtaking-target lookup now follows the active field
   with exact authored small-field behavior. Native target/timer/drop-gate checks
   pass at 12, 13, 24, 48 and 100 capacity; visually verify rides and safe drop

@@ -26,7 +26,7 @@ public class LanServerCapacityTests
         Directory.CreateDirectory(temp);
         try
         {
-            uint[] entries = { 0x80655130, 0x80654290, 0x806542e0 };
+            uint[] entries = { 0x80655130, 0x80654290, 0x806542e0, 0x806532e4 };
             var sources = new List<string>();
             foreach (var pc in entries)
             {
@@ -45,10 +45,12 @@ public class LanServerCapacityTests
                 extern "C" void func_80655130(CpuContext*);
                 extern "C" void func_80654290(CpuContext*);
                 extern "C" void func_806542E0(CpuContext*);
+                extern "C" void func_806532E4(CpuContext*);
                 constexpr uint32_t root=0x81010000, stack=0x81f00000, capacity={{players}},
                     current={{layout.Symbol("RKNetController.currentSub.offset")}},
                     subs={{layout.Symbol("RKNetController.subs.offset")}}, stride={{layout.Symbol("RKNetSub.size")}};
                 uint32_t calls=0, expectedLocal=0, active=0, queries[capacity]{};
+                bool stopAtSetup=false;
                 void userData(CpuContext* c) {
                     const auto aid=c->gpr[3]; if(aid>=capacity) std::abort(); ++queries[aid];
                     const bool present=active && (aid==capacity-1 || aid<active-1);
@@ -59,7 +61,7 @@ public class LanServerCapacityTests
                     if(c->gpr[3]!=capacity || c->gpr[4]!=0x80654290 || c->gpr[5]!=root ||
                        c->gpr[6] || c->gpr[7] || c->gpr[8]!=0x806542e0 || c->gpr[10]!=root ||
                        Memory::Read8(c->gpr[9])!=expectedLocal) std::abort();
-                    ++calls; c->gpr[3]=1;
+                    ++calls; if(stopAtSetup) throw 42; c->gpr[3]=1;
                 }
                 int main() {
                     Memory::Init(32*1024*1024);
@@ -88,7 +90,16 @@ public class LanServerCapacityTests
                     for(auto& value:queries) value=0;
                     func_80654290(&c);
                     for(auto value:queries) if(value!=1) return 8;
-                    return 0;
+                    // The main loop has its own setup call instead of invoking the
+                    // standalone setup method. Enter its exact setup block and
+                    // stop at the SDK boundary before the infinite service loop.
+                    stopAtSetup=true;
+                    for(uint32_t sub=0;sub<2;sub++) for(expectedLocal=1;expectedLocal<=2;expectedLocal++) {
+                        Memory::Write32(root+current,sub); Memory::Write8(root+subs+sub*stride+0x20,expectedLocal);
+                        c.gpr[1]=stack; c.gpr[15]=root; c.gpr[24]=0; c.gpr[28]=c.gpr[29]=0x80650000;
+                        try { func_806532E4(&c); return 9; } catch(int marker) { if(marker!=42) return 10; }
+                    }
+                    return calls==8 ? 0 : 11;
                 }
                 """);
             using (var compile = Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX") ?? "clang++",

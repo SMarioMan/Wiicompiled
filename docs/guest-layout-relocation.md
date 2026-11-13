@@ -1551,8 +1551,10 @@ HUD appearance and larger-than-24 readability remain gameplay checks.
 A thirteen-instance run exposed a separate retail limit after twelve clients
 could enter the friend room: the game still passed literal `12` to DWC server
 setup. LAN discovery's advertised capacity did not change that SDK argument.
-Both server setup paths and public matching now pass the symbolic participant
-capacity. The matched, connection-attempt and connection-closed callbacks also
+All three server setup calls (the main loop, StartMatching and the standalone
+setup method) and public matching now pass the symbolic participant capacity.
+The main-loop call bypasses the standalone method; a live SDK snapshot retaining
+maximum-peer byte `11` exposed that additional path after the first patch. The matched, connection-attempt and connection-closed callbacks also
 scan that capacity. The admission callback sums all connected consoles' local
 player counts and compares the incoming count plus that sum against capacity;
 it must cover high AIDs and reject a two-player console when only one slot is
@@ -1560,7 +1562,7 @@ free. Expanding only the advertised server size would leave this second limit.
 
 `LanServerCapacityTests` executes the original translated setup and admission
 callbacks at capacities 12, 13, 24 and 32. It checks both controller snapshots,
-one/two local players, sparse occupancy including the highest AID, every
+one/two local players, the main loop's exact setup block, sparse occupancy including the highest AID, every
 occupancy boundary, complete callback scans and preserved nonvolatile registers.
 The SDK's existing 32-node storage is retained. These checks do not establish a
 24-active-participant race or support beyond the SDK/mask limit.

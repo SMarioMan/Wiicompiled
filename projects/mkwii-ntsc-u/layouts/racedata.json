@@ -2602,6 +2602,13 @@
   ],
   "References": [
     {
+      "Instruction": "0x80653300",
+      "ExpectedWord": "0x3860000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "Scenario.players.count"
+    },
+    {
       "Instruction": "0x806550EC",
       "ExpectedWord": "0x3860000C",
       "Node": 0,

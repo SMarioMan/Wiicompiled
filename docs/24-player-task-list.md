@@ -93,5 +93,6 @@ relocated temporary packets and complete creator/import loops. Native fixtures
 cover both buffers and snapshots through 24 active-addressable slots; the
 remaining packet formats and full 24-active-peer gameplay still need testing.
 A thirteen-instance attempt additionally exposed literal twelve-player DWC setup
-and reservation admission limits. Both setup paths, public matching and the
+and reservation admission limits. All three server setup calls (including the
+main-loop call that bypasses the standalone method), public matching and the
 connection callbacks now use the checked capacity; live retesting is pending.

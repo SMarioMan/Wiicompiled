@@ -28,6 +28,7 @@ void UpdateMkwDynamicAspectSurface(uint32_t surfaceWidth, uint32_t surfaceHeight
 // the GX viewport path so it beats bakes that never cross a frame boundary.
 void AssertMkwOffscreenScreenBypass();
 inline std::atomic_bool g_mkwDynamicAspectSurfacePending{false};
+inline std::atomic_bool g_auroraRenderHostUi{true};
 
 namespace WindowPlacementPersistence {
 inline bool sizeDirty = false;
@@ -170,11 +171,22 @@ inline bool BeginAuroraFrame() {
 inline void EndAuroraFrame() {
     if (GxWorker::ShouldDefer()) {
         AuroraImguiFrame* imgui = aurora_end_frame_window();
+        if (!g_auroraRenderHostUi.load(std::memory_order_relaxed)) {
+            aurora_release_imgui_frame(imgui);
+            imgui = nullptr;
+        }
         GxWorker::Submit([imgui] { GxWorkerEndFrame(imgui); });
         GxWorker::Sync();
         return;
     }
-    aurora_end_frame();
+    if (g_auroraRenderHostUi.load(std::memory_order_relaxed)) {
+        aurora_end_frame();
+    } else {
+        // Finish ImGui's frame, but do not rasterize an invisible host overlay.
+        // GX work and its guest-visible synchronization still finish normally.
+        aurora_release_imgui_frame(aurora_end_frame_window());
+        aurora_end_frame_gx(nullptr);
+    }
     SetAuroraFrameGxBegun(false);
 }
 

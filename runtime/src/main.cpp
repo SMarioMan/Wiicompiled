@@ -1378,6 +1378,7 @@ int RuntimeMain(int argc, char** argv) {
         }
         if (g_headless) {
             AudioBackend::Instance().SetSilenced(true);
+            g_auroraRenderHostUi.store(false, std::memory_order_relaxed);
         }
         RuntimeConfigFile::LogLoadedConfig();
         if (!g_headless && RuntimeConfigFile::DiscordPresenceEnabled()) {

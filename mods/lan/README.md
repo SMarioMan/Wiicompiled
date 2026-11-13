@@ -180,7 +180,11 @@ independent portable directories (the default product currently supports twelve
 slots). The test driver accepts `--capacity N` for an experimental matched build
 and validates runtime IDs against that capacity.
 For many local instances on a constrained host, `--startup-gap 12` staggers
-bootstrap work. `--telemetry-timeout 90` can explicitly allow slower telemetry;
+bootstrap work. Alternatively, `--sequential-join` waits for all launched
+instances to report the expected active room before starting the next client;
+it fails on a join error dialog instead of silently retrying. This exercises
+incremental room admission separately from simultaneous joins.
+`--telemetry-timeout 90` can explicitly allow slower telemetry;
 the default freshness window remains three seconds. This changes only the test
 observer's tolerance: all peers must still report the full room, the same course
 and at least 120 advancing simulation frames. It does not extend game network

@@ -21,6 +21,18 @@ def write_pad(path, buttons=0, x=0, y=0):
     os.replace(temporary, path)
 
 
+def decode_observation(packet, peer, ids):
+    if len(packet) != 28:
+        return None
+    words = struct.unpack('>7I', packet)
+    magic, instance = words[:2]
+    if magic not in (0x4d4b574c, 0x4d4b5752) or instance not in ids:
+        return None
+    if peer[0] != f'127.0.0.{instance}':
+        raise RuntimeError(f'Instance {instance} used unexpected source address {peer}')
+    return words
+
+
 def run(args):
     directories = [args.host.resolve()] + [path.resolve() for path in args.client]
     available = [i for i in range(1, args.capacity+1) if i != args.host_id]
@@ -75,6 +87,36 @@ def run(args):
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
                 processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role], cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
+                if args.sequential_join:
+                    launched = ids[:index+1]
+                    while time.monotonic() - started < args.timeout:
+                        for launched_id, process in zip(launched, processes):
+                            if process.poll() is not None:
+                                raise RuntimeError(f'Instance {launched_id} exited with {process.returncode}')
+                        try:
+                            packet, peer = monitor.recvfrom(4096)
+                        except socket.timeout:
+                            continue
+                        observation = decode_observation(packet, peer, launched)
+                        if observation is None or observation[0] != 0x4d4b574c:
+                            continue
+                        _, observed, state, players, section, page, transition = observation
+                        now = time.monotonic()
+                        record = dict(state=state, players=players, section=section, page=page, transition=transition)
+                        if status.get(observed, (None,))[0] != record:
+                            print(json.dumps(dict(elapsed=round(now-started, 2), instance=observed, **record)), flush=True)
+                        status[observed] = record, now
+                        if all(i in status and now-status[i][1] < args.telemetry_timeout and
+                               status[i][0]['state'] == (3 if i == args.host_id else 4) and
+                               status[i][0]['players'] == len(launched) and status[i][0]['page'] == 0x9d and
+                               status[i][0]['transition'] == 4 for i in launched):
+                            print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='sequential-join',
+                                                  joined=len(launched), requested=count)), flush=True)
+                            break
+                        if observed == instance and page == 0x4d and transition == 4:
+                            raise RuntimeError(f'Instance {instance} reached an error dialog while joining; inspect its game log')
+                    else:
+                        raise TimeoutError(f'Instance {instance} did not finish sequential room startup')
             while time.monotonic() - started < args.timeout:
                 for instance, process in zip(ids, processes):
                     if process.poll() is not None:
@@ -107,13 +149,10 @@ def run(args):
                     packet, peer = monitor.recvfrom(4096)
                 except socket.timeout:
                     continue
-                if len(packet) != 28:
+                observation = decode_observation(packet, peer, ids)
+                if observation is None:
                     continue
-                magic, instance, state, players, section, page, transition = struct.unpack('>7I', packet)
-                if magic not in (0x4d4b574c, 0x4d4b5752) or instance not in ids:
-                    continue
-                if peer[0] != f'127.0.0.{instance}':
-                    raise RuntimeError(f'Instance {instance} used unexpected source address {peer}')
+                magic, instance, state, players, section, page, transition = observation
                 if magic == 0x4d4b5752:
                     # The seven-word race packet contains stage, frames, course,
                     # actual in-race player count and game mode after the ID.
@@ -172,6 +211,7 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=Path, required=True)
     parser.add_argument('--client', type=Path, action='append', required=True, help='Repeat for additional portable client directories')
     parser.add_argument('--timeout', type=float, default=180)
+    parser.add_argument('--sequential-join', action='store_true', help='Wait for every launched peer to report the expected active room before launching the next client')
     parser.add_argument('--telemetry-timeout', type=float, default=3, help='Maximum age of an observation on slow multi-instance test hosts; gameplay checks still require every peer to advance')
     parser.add_argument('--startup-gap', type=float, default=0, help='Seconds between process launches')
     parser.add_argument('--capacity', type=int, choices=range(1, 33), default=12, help='Capacity of the matched guest/module build')

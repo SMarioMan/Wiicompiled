@@ -223,7 +223,13 @@ void Observe(uint32_t address,uint32_t width,Operation op){
                     if(newAddress<=UINT32_MAX){expected=uint32_t(newAddress);exact=stale;}
                 }else{
                     if(contains(newStart,field.newSize,address,width))continue;
-                    if(!contains(oldStart,field.oldSize,address,width))continue;
+                    // A known field consumer may retain its old base while
+                    // indexing racers beyond the original twelve entries.
+                    // Project the old stride over the new count, but only
+                    // outside the intended current field; unknown accesses
+                    // retain the smaller historical range and stay leads.
+                    const uint64_t oldExtent=known?std::max<uint64_t>(field.oldSize,uint64_t(field.newCount)*field.oldStride):field.oldSize;
+                    if(!contains(oldStart,oldExtent,address,width))continue;
                     stale=known&&unique;
                     if(stale){
                         const uint32_t relative=uint32_t(address-oldStart);index=relative/field.oldStride;

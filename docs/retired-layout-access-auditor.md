@@ -82,6 +82,14 @@ capacity. Correct current-field accesses are accepted even at a former field's
 offset. Multiple overlapping instances of the same type require explicit base
 provenance for strict classification.
 
+For a known array consumer, the old stride is also projected over the expanded
+count. This catches a stale computed racer index beyond the original twelve
+entries when it still lies outside the intended current field. A controlled
+translated read at index 23 exercises this path, while a legitimate current-pool
+read of exactly the same bytes is accepted. If the old computed address also
+lies inside the intended current field, an explicit index is needed to separate
+the two interpretations; the auditor does not invent one from an ambiguous address.
+
 Without field intent, an old-region overlap is only an optional lead. It may
 be legitimate storage in another current field. No page protection, canaries or
 poisoning are applied. No strict action is taken solely on an old-address match.

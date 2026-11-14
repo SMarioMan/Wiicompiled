@@ -17,6 +17,7 @@ public class ExpandedResultsAssetTests
         try {
             var ui=Path.Combine(temp,"DATA/files/Scene/UI");Directory.CreateDirectory(ui);
             foreach(var file in Directory.GetFiles(Path.Combine(disc,"files/Scene/UI"),"Race*.szs"))File.Copy(file,Path.Combine(ui,Path.GetFileName(file)));
+            foreach(var name in new[]{"MenuMulti.szs","MenuSingle.szs"})File.Copy(Path.Combine(disc,"files/Scene/UI",name),Path.Combine(ui,name));
             var script=Path.Combine(temp,"assets.py");
             File.WriteAllText(script,$$"""
                 import importlib.util,pathlib,sys
@@ -26,6 +27,10 @@ public class ExpandedResultsAssetTests
                     a=m.Archive((root/'files/Scene/UI'/name).read_bytes())
                     for key in ('result/ctrl/ResultVS.brctr','result/ctrl/ResultGP.brctr','result/ctrl/ResultTA.brctr','result/ctrl/ResultVSTeam.brctr','message/Race.bmg','game_image/anim/game_image_position_texture_pattern.brlan','game_image/anim/game_image_position_multi_texture_pattern.brlan'):
                         if key in a.files:(root.parent/(name+'-'+pathlib.Path(key).name)).write_bytes(a.files[key])
+                for name in ('MenuMulti.szs','MenuSingle.szs'):
+                    a=m.Archive((root/'files/Scene/UI'/name).read_bytes())
+                    for control in ('Vote','WifiMemberConfirm'):
+                        (root.parent/(name+'-'+control+'.brctr')).write_bytes(a.files['control/ctrl/'+control+'.brctr'])
                 """);
             Run("python3",new[]{script,Path.Combine(root,"mods/expanded-ui/build.py"),Path.Combine(temp,"DATA")},120000);
             var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
@@ -53,7 +58,7 @@ public class ExpandedResultsAssetTests
                 void original_rank(CpuContext* c){c->gpr[3]+=0x514;}
                 bool load(const char* path,uint32_t address){auto file=std::fopen(path,"rb");if(!file)return false;std::fseek(file,0,SEEK_END);auto size=std::ftell(file);std::rewind(file);auto n=std::fread(Memory::GetPointer(address,size),1,size,file);std::fclose(file);return n==size;}
                 float f(uint32_t address){return std::bit_cast<float>(Memory::Read32(address));}
-                int main(int argc,char** argv){if(argc!=11)return 1;Memory::Init(32*1024*1024);if(!load(argv[1],0x80000000))return 2;
+                int main(int argc,char** argv){if(argc!=15)return 1;Memory::Init(32*1024*1024);if(!load(argv[1],0x80000000))return 2;
                     entry(0x8001273c,compare);entry(0x8060bfac,matrix);entry(0x80833764,original_rank);
                     Memory::Write32(0x80381c80,systemState);Memory::Write32(loader,control);
                     CpuContext c{};CpuContextScope scope(&c);c.gpr[1]=stack;c.gpr[2]=0x8038ac20;c.gpr[13]=0x80388880;c.lr=0x80006000;
@@ -100,12 +105,26 @@ public class ExpandedResultsAssetTests
                             for(double frame:{-1.,100.}){c.gpr[3]=keys;c.gpr[4]=24;c.fpr[1].d=frame;func_80082640(&c);if(c.gpr[3]!=(frame<0?0u:23u))return 19;}
                         }
                     }
+                    for(uint32_t selection=11;selection<=14;selection++){
+                        if(!load(argv[selection],asset))return 20;
+                        auto section=asset+Memory::Read16(asset+14),strings=asset+Memory::Read16(asset+16);
+                        Memory::Write32(loader+0x14,section);Memory::Write32(loader+0x18,section+Memory::Read16(section));Memory::Write32(loader+0x24,strings);
+                        bool vote=selection%2==1;
+                        for(uint32_t aspect=0;aspect<2;aspect++)for(uint32_t index=0;index<24;index++){
+                            char name[16];std::snprintf(name,sizeof(name),vote?"Vote%02u":"Member%02u",index);std::memcpy(Memory::GetPointer(text,sizeof(name)),name,sizeof(name));
+                            c.gpr[3]=loader;c.gpr[4]=text;func_805BA994(&c);auto record=c.gpr[3];
+                            if(record!=section+12+index*60)return 21;
+                            Memory::Write32(systemState+0x58,aspect);c.gpr[3]=loader;c.gpr[4]=record;func_805BAA14(&c);
+                            float x=(int(index%3)-1)*520.f/3.f,y=140.f-(vote?225.f:200.f)*(index/3)/7.f;
+                            if(std::abs(f(control+4)-x)>.0001f || std::abs(f(control+8)-y)>.0001f || std::abs(f(control+0x10)-2.f/3.f)>.0001f || std::abs(f(control+0x14)-2.f/3.f)>.0001f)return 22;
+                        }
+                    }
                     if(c.gpr[1]!=stack || c.lr!=0x80006000)return 13;for(uint32_t r=14;r<32;r++)if(c.gpr[r]!=0x12340000+r)return 14;
                     return 0;
                 }
                 """);
             Run(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false),120000);
-            Run(exe,new[]{binary,Path.Combine(temp,"Race.szs-ResultVS.brctr"),Path.Combine(temp,"Race.szs-ResultGP.brctr"),Path.Combine(temp,"Race.szs-ResultTA.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeam.brctr"),Path.Combine(temp,"Race_U.szs-Race.bmg"),Path.Combine(temp,"Race_M.szs-Race.bmg"),Path.Combine(temp,"Race_Q.szs-Race.bmg"),Path.Combine(temp,"Race_U.szs-game_image_position_texture_pattern.brlan"),Path.Combine(temp,"Race_U.szs-game_image_position_multi_texture_pattern.brlan")},10000);
+            Run(exe,new[]{binary,Path.Combine(temp,"Race.szs-ResultVS.brctr"),Path.Combine(temp,"Race.szs-ResultGP.brctr"),Path.Combine(temp,"Race.szs-ResultTA.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeam.brctr"),Path.Combine(temp,"Race_U.szs-Race.bmg"),Path.Combine(temp,"Race_M.szs-Race.bmg"),Path.Combine(temp,"Race_Q.szs-Race.bmg"),Path.Combine(temp,"Race_U.szs-game_image_position_texture_pattern.brlan"),Path.Combine(temp,"Race_U.szs-game_image_position_multi_texture_pattern.brlan"),Path.Combine(temp,"MenuMulti.szs-Vote.brctr"),Path.Combine(temp,"MenuMulti.szs-WifiMemberConfirm.brctr"),Path.Combine(temp,"MenuSingle.szs-Vote.brctr"),Path.Combine(temp,"MenuSingle.szs-WifiMemberConfirm.brctr")},10000);
         }finally{Directory.Delete(temp,recursive:true);}
     }
     private static void Run(string command,IEnumerable<string> args,int timeout){var start=new ProcessStartInfo(command){RedirectStandardError=true};foreach(var arg in args)start.ArgumentList.Add(arg);Run(start,timeout);}

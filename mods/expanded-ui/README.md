@@ -1,4 +1,4 @@
-# Expanded results assets
+# Expanded race and selection assets
 
 `build.py` derives results controls and text from a clean, extracted copy of the
 user's disc. It ships no game artwork or message data. The experimental LAN
@@ -39,3 +39,9 @@ RGB5A3 inputs are decoded and new glyph composites use RGB5A3. Pillow is require
 (`python3-pil` in the Docker builders); no external font package is needed.
 The original game step-curve reader checks every generated texture index. HUD
 rendering still needs gameplay verification.
+
+The vote and rating screens in `MenuMulti.szs` and `MenuSingle.szs` gain named
+`Vote00` / `Member00` card variants through capacity. At 24 they use three columns
+of eight cards within the original vertical window. Card artwork, Mii images and
+text resources come from the retail controls. Clean input must include both menu
+archives; all changes are validated before any archive is replaced.

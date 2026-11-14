@@ -141,6 +141,44 @@ def expand_results(data, players):
     struct.pack_into('>H', output, 16, variants+len(section))
     return bytes(output)
 
+def expand_selection_cards(data, players, prefix):
+    """Reuse the retail vote/member panels, with a bounded grid in both aspect ratios."""
+    if data[:8] != b'bctr\x00\x02\x00\x01': raise ValueError('Unsupported selection BRCTR version')
+    variants, strings = u16(data, 14), u16(data, 16)
+    if struct.unpack_from('>6H', data, variants) != (12, 12, 732, 0, 732, 0) or strings != variants+732:
+        raise ValueError('Expected twelve plain selection variants')
+    originals = {}
+    for index in range(12):
+        record = data[variants+12+index*60:variants+12+(index+1)*60]
+        at = strings+u16(record, 0); name = data[at:data.index(0, at)].decode('ascii')
+        if name not in {f'{prefix}{i:02d}' for i in range(12)} or name in originals or record[52:] != bytes(8):
+            raise ValueError('Unexpected selection variant data')
+        originals[name] = record
+    if players == 12: return data
+    if not 12 < players <= 100: raise ValueError('Selection presentation supports 12..100 participants')
+    names = bytearray(data[strings:]); records = bytearray()
+    columns = max(2, math.ceil(players/8)); rows = math.ceil(players/columns)
+    scale = min(1, 2/columns, 5/(rows-1))
+    for index in range(players):
+        record = bytearray(originals[f'{prefix}{index%12:02d}'])
+        if index >= 12:
+            struct.pack_into('>H', record, 0, len(names)); names.extend(f'{prefix}{index:02d}\0'.encode())
+        row, column = divmod(index, columns)
+        struct.pack_into('>f', record, 8, row)
+        for offset in (12, 32):
+            top = max(struct.unpack_from('>f', r, offset+4)[0] for r in originals.values())
+            bottom = min(struct.unpack_from('>f', r, offset+4)[0] for r in originals.values())
+            x = (column-(columns-1)/2)*520/columns
+            y = top+(bottom-top)*row/(rows-1)
+            struct.pack_into('>ff', record, offset, x, y)
+            struct.pack_into('>ff', record, offset+12, scale, scale)
+        records.extend(record)
+    section = struct.pack('>6H', 12, players, 12+players*60, 0, 12+players*60, 0)+records
+    if variants+len(section) > 65535 or len(names) > 65535: raise ValueError('BRCTR offsets exceed 16 bits')
+    output = bytearray(data[:variants])+section+names
+    struct.pack_into('>H', output, 16, variants+len(section))
+    return bytes(output)
+
 def expand_team_results(data, players):
     if data[:8] != b'bctr\x00\x02\x00\x01': raise ValueError('Unsupported team BRCTR version')
     variants, strings = u16(data, 14), u16(data, 16)
@@ -427,6 +465,17 @@ def build(root, players):
             # Validate lossless archive reconstruction before touching the disc tree.
             if Archive(data).files != archive.files: raise ValueError('Archive round-trip mismatch')
             pending.append((path, data)); changes.append(dict(file=str(path.relative_to(root)), files=modified, sha256=hashlib.sha256(data).hexdigest()))
+    for name in ('MenuMulti', 'MenuSingle'):
+        path = folder/(name+'.szs')
+        if not path.exists(): raise ValueError(f'Missing online selection archive: {path.name}')
+        archive = Archive(path.read_bytes()); modified = []
+        for control, prefix in (('Vote', 'Vote'), ('WifiMemberConfirm', 'Member')):
+            key = f'control/ctrl/{control}.brctr'
+            if key not in archive.files: raise ValueError(f'Missing selection control: {key}')
+            archive.files[key] = expand_selection_cards(archive.files[key], players, prefix); modified.append(key)
+        data = archive.encode()
+        if Archive(data).files != archive.files: raise ValueError('Selection archive round-trip mismatch')
+        pending.append((path, data)); changes.append(dict(file=str(path.relative_to(root)), files=modified, sha256=hashlib.sha256(data).hexdigest()))
     if not changes: raise ValueError('No supported race assets found')
     for path, data in pending: write_atomic(path, data)
     return changes

@@ -40,6 +40,36 @@ class ExpandedResultsTests(unittest.TestCase):
         self.assertEqual(len(positions),24)
         with self.assertRaises(ValueError): UI.expand_results(expanded,24)
 
+    def test_selection_grids_keep_retail_styles_and_unique_named_slots(self):
+        for prefix in ('Vote', 'Member'):
+            names = bytearray(b'\0'); records = bytearray()
+            # Vote variants are not necessarily stored in numeric order.
+            for i in list(range(12))[::-1]:
+                record = bytearray(60); struct.pack_into('>H', record, 0, len(names)); names.extend(f'{prefix}{i:02d}\0'.encode())
+                struct.pack_into('>3H11f', record, 2, 255, 1, 0, float(i%6), (-130.,130.)[i%2], 140.-45*(i//2), 50., 1., 1., (-130.,130.)[i%2], 140.-40*(i//2), 50., 1., 1.)
+                records.extend(record)
+            source = bytearray(b'bctr\0\2\0\1'+bytes(12))
+            struct.pack_into('>HHH', source, 12, 20, 20, 752)
+            source.extend(struct.pack('>6H', 12, 12, 732, 0, 732, 0)+records+names)
+            self.assertEqual(UI.expand_selection_cards(bytes(source), 12, prefix), source)
+            for players in (13,24,32,48,100):
+                with self.subTest(prefix=prefix, players=players):
+                    output = UI.expand_selection_cards(bytes(source), players, prefix); strings = UI.u16(output,16)
+                    self.assertEqual(UI.u16(output,22), players)
+                    for offset in (12,32):
+                        positions = set()
+                        for i in range(players):
+                            at = 32+i*60; name = strings+UI.u16(output,at)
+                            self.assertEqual(output[name:output.index(0,name)], f'{prefix}{i:02d}'.encode())
+                            self.assertEqual(output[at+2:at+8], records[2:8])
+                            x,y,z,sx,sy = struct.unpack_from('>5f',output,at+offset)
+                            positions.add((x,y)); self.assertEqual(z,50.)
+                            self.assertAlmostEqual(sx,sy); self.assertGreater(sx,0)
+                            self.assertLessEqual(abs(x)+130*sx,260.001)
+                            self.assertLessEqual(y,140.001); self.assertGreaterEqual(y,-85.001)
+                        self.assertEqual(len(positions),players)
+                    with self.assertRaises(ValueError): UI.expand_selection_cards(output,players,prefix)
+
     def test_archive_tree_can_add_nested_resources_and_round_trip(self):
         raw = bytearray(64); struct.pack_into('>4sIII',raw,0,b'U\xaa8-',32,13,64); struct.pack_into('>III',raw,32,0x1000000,0,1)
         archive = UI.Archive(bytes(raw)); archive.files['game_image/timg/rank13.tpl'] = b'new texture'; archive.files['message/Race.bmg'] = b'other data'

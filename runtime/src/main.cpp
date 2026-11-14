@@ -1374,6 +1374,12 @@ int RuntimeMain(int argc, char** argv) {
             }
         }
         LanRuntime::Validate();
+        if (const auto value=std::getenv("MKW_TEST_LAN_CPU")) {
+            if (std::string_view(value)!="1" || !g_headless || BootRace::Requested() || RuntimeProduct::Active().kind!=RuntimeProduct::Kind::Lan)
+                throw std::invalid_argument("MKW_TEST_LAN_CPU=1 requires headless LAN menu automation without direct race boot");
+            BootRace::EnableLanTestDriving();
+            RT_LOGF("test-driving", "headless LAN test: CPU drives local racers; remote ownership, RNG and race settings are preserved\n");
+        }
         const auto testClockDivisor=HeadlessTestClock::Configure(std::getenv("MKW_TEST_CLOCK_DIVISOR"),g_headless);
         if(testClockDivisor!=1)
             RT_LOGF("test-clock", "headless functional test: clock divisor=%u; not default-timing validation\n",testClockDivisor);

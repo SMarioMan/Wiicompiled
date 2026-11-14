@@ -72,9 +72,30 @@ const char* ModeName() { return Battle() ? (g_mode == Mode::Coin ? "coin battle"
     g_mode == Mode::TeamVs ? "team VS" : g_mode == Mode::GrandPrix ? "grand prix" : g_mode == Mode::TimeTrial ? "time trial" : "VS"; }
 
 bool g_cpuDriven = false;
+bool g_lanCpuDriven = false;
 bool g_cpuMenuInput = false;
 std::optional<uint32_t> g_players;
 std::optional<uint32_t> g_laps;
+
+bool OnlineScenario(uint32_t scenario) {
+    const auto mode=Memory::Read32(scenario+kLayout.scenarioSettings+8);
+    return mode>=6 && mode<=9;
+}
+
+// The original Kart::Link::GetPlayerIdx follows these two pointers. Read the
+// racer identity without changing the guest context or the network-owned type.
+bool LanLocalRacer(uint32_t link) {
+    const auto data=Memory::Read32(MKW_GADDR(809BD728));
+    if(!data || !link) return false;
+    const auto scenario=data+kLayout.racedataRace;
+    if(!OnlineScenario(scenario)) return false;
+    const auto holder=Memory::Read32(link);
+    const auto kart=holder?Memory::Read32(holder):0;
+    if(!kart) return false;
+    const auto index=Memory::Read8(kart+0x10);
+    return index<Memory::Read8(scenario+4) && index<kLayout.playerCapacity &&
+        Memory::Read32(scenario+kLayout.scenarioPlayers+index*kLayout.playerStride+kPlayerTypeOffset)==kPlayerRealLocal;
+}
 
 uint32_t ParseCourse(std::string_view text) {
     int base = 10;
@@ -213,6 +234,11 @@ bool ParseArgument(std::string_view arg) {
     return true;
 }
 
+void EnableLanTestDriving() {
+    g_lanCpuDriven=true;
+    g_cpuMenuInput=true;
+}
+
 bool Requested() {
     return g_course.has_value();
 }
@@ -287,20 +313,21 @@ REGISTER_NATIVE_FUNCTION_AS(0x805B9344, ArgumentParser_Parse_805b9344, "Argument
 
 // RacedataScenario::InitScreens; local racers keep no real controller channel.
 extern "C" void RacedataScenario_InitScreens_8052f4e8(CpuContext* ctx) {
-    if (!g_cpuDriven) {
+    if (!g_cpuDriven && !(g_lanCpuDriven && OnlineScenario(ctx->gpr[3]))) {
         MKW_GUEST_NEXT(8052F4E8)(ctx);
         return;
     }
     const uint32_t players = ctx->gpr[3] + kLayout.scenarioPlayers;
+    const uint32_t active = g_lanCpuDriven ? std::min(kLayout.playerCapacity, uint32_t(Memory::Read8(ctx->gpr[3]+4))) : kLayout.playerCapacity;
     std::vector<uint8_t> channels(kLayout.playerCapacity);
     for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
         channels[i] = Memory::Read8(players + i * kLayout.playerStride + kPlayerControllerChannelOffset);
     }
     MKW_GUEST_NEXT(8052F4E8)(ctx);
-    for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
+    for (uint32_t i = 0; i < active; ++i) {
         const uint32_t player = players + i * kLayout.playerStride;
         if (Memory::Read32(player + kPlayerTypeOffset) == kPlayerRealLocal) {
-            Memory::Write8(player + kPlayerControllerChannelOffset, channels[i]);
+            Memory::Write8(player + kPlayerControllerChannelOffset, g_lanCpuDriven ? 0xff : channels[i]);
         }
     }
 }
@@ -308,8 +335,9 @@ REGISTER_NATIVE_WRAPPER_AS(0x8052F4E8, RacedataScenario_InitScreens_8052f4e8, "R
 
 // KartAIController::IsCPU
 extern "C" void KartAIController_IsCPU_8072624c(CpuContext* ctx) {
+    const bool local=g_lanCpuDriven && LanLocalRacer(ctx->gpr[3]);
     MKW_GUEST_FUNC(8072624C)(ctx);
-    if (g_cpuDriven) {
+    if (g_cpuDriven || local) {
         ctx->gpr[3] = 1;
     }
 }
@@ -317,9 +345,12 @@ REGISTER_NATIVE_FUNCTION_AS(0x8072624C, KartAIController_IsCPU_8072624c, "KartAI
 
 // Kart::Link::IsCPU; bit 0 marks a CPU racer, bit 1 the local one.
 extern "C" void KartLink_IsCPU_80590664(CpuContext* ctx) {
+    const bool local=g_lanCpuDriven && LanLocalRacer(ctx->gpr[3]);
     MKW_GUEST_FUNC(80590664)(ctx);
     if (g_cpuDriven) {
         ctx->gpr[3] = ctx->gpr[0] & 3;
+    } else if (local) {
+        ctx->gpr[3] = 1;
     }
 }
 REGISTER_NATIVE_FUNCTION_AS(0x80590664, KartLink_IsCPU_80590664, "KartLink_IsCPU_80590664");
@@ -350,7 +381,7 @@ REGISTER_NATIVE_FUNCTION_AS(0x8061B9BC, SectionPad_GetFirstDeactivatedPad_8061b9
 extern "C" void Raceinfo_Update_805331b4(CpuContext* ctx) {
     const uint32_t raceinfo = ctx->gpr[3];
     MKW_GUEST_NEXT(805331B4)(ctx);
-    if (!g_cpuDriven) return;
+    if (!g_cpuDriven && !g_lanCpuDriven) return;
     static uint32_t previous = 0, lastStage = std::numeric_limits<uint32_t>::max(), ticks = 0;
     const auto progress = BootRace::ReadProgress(raceinfo);
     if (!progress) return;

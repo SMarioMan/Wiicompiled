@@ -301,3 +301,12 @@ c++ -std=c++20 -Iruntime/include runtime/tests/headless_test_clock_tests.cpp \
   -o /tmp/headless-test-clock-tests
 /tmp/headless-test-clock-tests
 ```
+
+For headless finish/results automation, `MKW_TEST_LAN_CPU=1` lets the original
+CPU driver control real local racers after the normal LAN menus. It requires the
+LAN product and `--headless`, and cannot be combined with direct `--race` boot.
+It retains the local network player type, leaves remote racers under network
+control, preserves race RNG/settings and keeps a controller for menu input.
+Native layout fixtures cover local/remote selection, channel assignment and RNG
+at 12/24/48 capacity. This opt-in test facility does not establish a completed
+24-console race; finish and results must be observed from the simulation.

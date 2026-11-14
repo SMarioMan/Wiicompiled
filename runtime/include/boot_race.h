@@ -13,6 +13,8 @@ namespace BootRace {
 // False when `arg` is not a boot-race option; throws on a malformed one.
 bool ParseArgument(std::string_view arg);
 bool Requested();
+// Headless LAN automation: drive only real local racers through the normal menus.
+void EnableLanTestDriving();
 
 struct Progress {
     uint32_t capacity, players, course, mode, stage, frames;

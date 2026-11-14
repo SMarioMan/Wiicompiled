@@ -43,6 +43,12 @@ public class NativeBootLayoutTests
                 extern "C" void InputManager_InitControllerHolders_805242d8(CpuContext*);
                 extern "C" void RealControllerHolder_SetController_80521554(CpuContext*);
                 extern "C" void Raceinfo_CreateInstance_80532084(CpuContext*);
+                extern "C" void RacedataScenario_InitScreens_8052f4e8(CpuContext*);
+                extern "C" void KartAIController_IsCPU_8072624c(CpuContext*);
+                extern "C" void KartLink_IsCPU_80590664(CpuContext*);
+                void cpu_default(CpuContext* c){c->gpr[0]=0x40;c->gpr[3]=0;}
+                void screens_default(CpuContext* c){const auto& l=MkwGuestLayout::kLayout;for(unsigned p=0;p<l.playerCapacity;p++)Memory::Write8(c->gpr[3]+l.scenarioPlayers+p*l.playerStride+6,p%4);}
+                void rng_default(CpuContext* c){const auto& l=MkwGuestLayout::kLayout;Memory::Write32(c->gpr[3]+l.scenarioSettings+0x2c,0x11112222);Memory::Write32(c->gpr[3]+l.scenarioSettings+0x30,0x33334444);}
                 unsigned updateCalls=0,holderCalls=0,bootCalls=0;
                 bool hasLicense=true,rejectBoot=false,customLap=true;
                 uint32_t expectedController=0;
@@ -79,6 +85,34 @@ public class NativeBootLayoutTests
                     Memory::Write32(0x809bd728, data); // Harness region is PAL.
                     for (uint32_t i=0;i<16;i++) {
                         Memory::Write8(data-16+i, 0x55); Memory::Write8(data+l.racedataSize+i, 0x55);
+                    }
+                    if(argc>1 && !std::strcmp(argv[1],"lan-driving")){
+                        if(BootRace::Requested())return 30;
+                        BootRace::EnableLanTestDriving();if(BootRace::Requested())return 31;
+                        register_entry(0x8072624c,cpu_default);register_entry(0x80590664,cpu_default);
+                        register_entry(0x8052f4e8,screens_default);register_entry(0x8052f924,rng_default);
+                        const uint32_t scenario=data+l.racedataRace,settings=scenario+l.scenarioSettings;
+                        constexpr uint32_t link=0x800b0000,holder=link+0x100,kart=link+0x200;
+                        Memory::Write32(link,holder);Memory::Write32(holder,kart);Memory::Write8(scenario+4,{{players}});
+                        for(unsigned p=0;p<l.playerCapacity;p++)Memory::Write32(scenario+l.scenarioPlayers+p*l.playerStride+0x10,p%3);
+                        CpuContext c{};c.gpr[1]=0x80080000;
+                        for(unsigned online:{0u,1u}){
+                            Memory::Write32(settings+8,online?7:1);
+                            for(unsigned p=0;p<l.playerCapacity;p++){
+                                Memory::Write8(kart+0x10,p);c.gpr[3]=link;KartAIController_IsCPU_8072624c(&c);
+                                if(c.gpr[3]!=(online && p%3==0))return 32;
+                                c.gpr[3]=link;KartLink_IsCPU_80590664(&c);if(c.gpr[3]!=(online && p%3==0))return 33;
+                                if(Memory::Read32(scenario+l.scenarioPlayers+p*l.playerStride+0x10)!=p%3)return 34;
+                            }
+                            c.gpr[3]=scenario;RacedataScenario_InitScreens_8052f4e8(&c);
+                            for(unsigned p=0;p<l.playerCapacity;p++)if(Memory::Read8(scenario+l.scenarioPlayers+p*l.playerStride+6)!=(online && p%3==0?255:p%4))return 35;
+                            c.gpr[3]=scenario;RacedataScenario_InitRng_8052f924(&c);
+                            if(Memory::Read32(settings+0x2c)!=0x11112222 || Memory::Read32(settings+0x30)!=0x33334444)return 36;
+                        }
+                        Memory::Write32(settings+8,7);Memory::Write8(scenario+4,2);Memory::Write8(kart+0x10,3);
+                        c.gpr[3]=link;KartAIController_IsCPU_8072624c(&c);if(c.gpr[3])return 37;
+                        Memory::Write8(kart+0x10,0);Memory::Write32(holder,0);c.gpr[3]=link;KartLink_IsCPU_80590664(&c);if(c.gpr[3])return 38;
+                        return 0;
                     }
                     const std::string mode=argc>2?argv[2]:"vs";
                     const bool battle=mode=="balloon" || mode=="coin",teams=battle || mode=="team-vs",tt=mode=="time-trial";
@@ -187,7 +221,7 @@ public class NativeBootLayoutTests
             if(!finished) run.Kill(entireProcessTree:true);
             Assert.True(finished, "Native boot execution timed out");
             Assert.True(run.ExitCode==0, $"Native boot returned {run.ExitCode}: {output.GetAwaiter().GetResult()}");
-            foreach(var variant in new[]{"missing-license","rejected-args"})
+            foreach(var variant in new[]{"missing-license","rejected-args","lan-driving"})
             {
                 using var fallback=Process.Start(new ProcessStartInfo(exe,variant) {RedirectStandardError=true,UseShellExecute=false})!;
                 var fallbackOutput=fallback.StandardError.ReadToEndAsync();var fallbackFinished=fallback.WaitForExit(5000);

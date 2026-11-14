@@ -1939,3 +1939,9 @@ Unit regressions cover the byte boundary at 25/26 racers for a ten-per-racer poo
 full-width indexes, scaled offsets, halfword scratch addressing, wrong words/IR,
 conflicting rules and insufficient scratch/index range. Actual consumer and
 lifecycle fixtures are still required before enabling rules in a game profile.
+
+The read-only `audit-guest-layouts --include-unchanged` option also inventories
+field accesses whose offsets/strides do not move. This is useful for independent
+counter-width audits: a byte count can overflow even when its field remains at
+the correct address. These entries are review candidates, not instructions to
+relocate unchanged fields. The default changed-field audit is unchanged.

@@ -32,10 +32,11 @@ public sealed class GuestLayoutAudit
     private readonly uint? _sda;
     private readonly uint? _sda2;
     private readonly ProgramImage? _image;
+    private readonly bool _includeUnchanged;
     private readonly ConcurrentDictionary<uint,uint> _verifiedCallWrites = new();
 
     public GuestLayoutAudit(IEnumerable<GuestLayoutType> definitions, int originalPlayers, int players,
-        IReadOnlyDictionary<uint, string>? globalPointers = null, uint? sda = null, uint? sda2 = null, ProgramImage? image = null)
+        IReadOnlyDictionary<uint, string>? globalPointers = null, uint? sda = null, uint? sda2 = null, ProgramImage? image = null, bool includeUnchanged = false)
     {
         var types = definitions.ToArray();
         _definitions = types.ToDictionary(t => t.Name, StringComparer.Ordinal);
@@ -46,6 +47,7 @@ public sealed class GuestLayoutAudit
         _sda = sda;
         _sda2 = sda2;
         _image = image;
+        _includeUnchanged = includeUnchanged;
     }
 
     public GuestLayoutAuditResult Analyze(FunctionDiscoveryResult function, string? receiverType = null)
@@ -177,7 +179,7 @@ public sealed class GuestLayoutAudit
                 if (checked(_original.Symbol(path.Value.Symbol) + path.Value.Addend) != offset)
                     throw new InvalidDataException("Layout audit produced an inconsistent original field path.");
                 var after = checked(_expanded.Symbol(path.Value.Symbol) + path.Value.Addend);
-                if (after == offset) return;
+                if (after == offset && !_includeUnchanged) return;
                 var site = new GuestLayoutReference(pc, words[pc], index, operand, path.Value.Symbol, path.Value.Addend);
                 candidates.Add(new GuestLayoutCandidate(site, offset, after, type, basis.IndexStride));
             }

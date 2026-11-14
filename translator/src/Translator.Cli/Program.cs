@@ -256,13 +256,15 @@ int RunAuditGuestLayouts(string[] argsTail)
     var discovery = new FunctionTranslator(image.Value).Discover(address, new TranslationOptions(
         EnableLeafInlining: false, KnownFunctionEntryPoints: functionMap?.Addresses.ToHashSet()));
     var audit = new GuestLayoutAudit(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
-        globals, project?.Memory.SdaBase, project?.Memory.Sda2Base, image.Value).Analyze(discovery, receiver);
+        globals, project?.Memory.SdaBase, project?.Memory.Sda2Base, image.Value,
+        includeUnchanged: HasFlag(argsTail, "--include-unchanged")).Analyze(discovery, receiver);
     new GuestLayoutRelocations(types, layoutRelocations.OriginalPlayers, layoutRelocations.Players,
         audit.Candidates.Select(candidate => candidate.Reference)).ValidateImage(image.Value);
     var output = OptionValue(argsTail, "--out")!;
     FileOutput.WriteTextIfChanged(output, JsonSerializer.Serialize(new
     {
         Format = "guest-layout-audit-v1", Function = $"0x{address:X8}", Receiver = receiver,
+        IncludeUnchanged = HasFlag(argsTail, "--include-unchanged"),
         image.Value.Sha256, ManifestSha256 = ChecksumUtilities.Sha256Hex(File.ReadAllBytes(layoutOption)),
         audit.Candidates, audit.UnresolvedPointerOperations, audit.Note
     }, new JsonSerializerOptions { WriteIndented = true }));
@@ -3887,7 +3889,7 @@ static (string? Positional, CommandOption[] Options)? CommandSpec(string command
     "plan-guest-layouts" => (null, new CommandOption[] { new("--out", "path", Required: true), new("--artifacts-dir", "dir") }),
     "audit-guest-layouts" => ("<start_addr>", new CommandOption[]
     {
-        new("--receiver", "type"), new("--out", "path", Required: true)
+        new("--receiver", "type"), new("--include-unchanged"), new("--out", "path", Required: true)
     }),
     "translate-recursive" => ("<start_addr>", new CommandOption[]
     {

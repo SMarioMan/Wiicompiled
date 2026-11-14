@@ -58,6 +58,7 @@ static uint64_t time_in_state_1;
 static bool sdk_service_ready;
 static bool sdk_polling;
 static void clear_deferred_syn(void);
+static void clear_deferred_node(void);
 static void replay_deferred_syn(struct dwc_gamedata *game);
 
 static so_ret_t set_nonblock(so_fd_t fd) {
@@ -116,6 +117,7 @@ static bool initialise(void) {
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
 	clear_deferred_syn();
+    clear_deferred_node();
 	/* Discovery deadlines use the SDK clock, not the rate this thread runs. */
 	timestamp = lan_discovery_time(OSGetTime());
 	broadcast_timer = timestamp;
@@ -458,6 +460,69 @@ static void update_reservation_budget(struct dwc_gamedata *gamedata) {
         gamedata->reservation_timeout_ms = budget;
 }
 
+/* UDP new-node notification can overtake the preceding reliable SYN-2.
+ * Applying it in CL_SYN lets that older completion resume mesh creation after
+ * the next admission has stopped it. Keep its owned control until SYN-2 has
+ * actually completed, before the SDK can start another outgoing reservation.
+ * Only one next admission can exist: its host barrier needs this client's ACK
+ * before announcing a further node. */
+static struct deferred_node_control {
+    unsigned length;
+    struct dwc_gamedata *game;
+    uint32_t host_pid;
+    uint64_t received_at;
+    so_addr_t address;
+    uint32_t packet[7];
+} deferred_node;
+
+static void clear_deferred_node(void) {
+    deferred_node.length = 0;
+}
+
+static bool retain_next_node(struct dwc_gamedata *game, const uint32_t *packet,
+                             unsigned payload, so_addr_t address) {
+    if (MKW_LAN_CAPACITY <= 12 || !network_thread_running || broadcast_socket < 0 ||
+        !game || game->dwc_host_state != 1 || game->player_count < 2 || game->player_count > 32 ||
+        game->dwc_match_state != DWC_MATCH_STATE_CL_SYN || (packet[2] >> 24) != 7 ||
+        payload != 8 || !game->peers[0].player_id ||
+        __builtin_bswap32(packet[4]) != game->peers[0].player_id) return false;
+    deferred_node.game = game;
+    deferred_node.host_pid = game->peers[0].player_id;
+    deferred_node.received_at = lan_discovery_time(OSGetTime());
+    deferred_node.address = address;
+    for (unsigned i = 0; i < 7; i++) deferred_node.packet[i] = packet[i];
+    deferred_node.length = 28;
+    LOG_INFO("retaining next node until preceding SYN completion");
+    return true;
+}
+
+static void dispatch_status(struct dwc_gamedata *, uint32_t *, so_addr_t);
+
+static void replay_deferred_node(struct dwc_gamedata *game) {
+    if (!deferred_node.length) return;
+    if (game != get_dwc_gamedata() || game != deferred_node.game ||
+        !network_thread_running || broadcast_socket < 0 || !game ||
+        game->dwc_host_state != 1 || game->peers[0].player_id != deferred_node.host_pid ||
+        lan_discovery_time(OSGetTime()) - deferred_node.received_at > RESERVATION_TIMEOUT ||
+        game->dwc_match_state == DWC_MATCH_STATE_WAIT_CLOSE) {
+        clear_deferred_node();
+        return;
+    }
+    if (game->dwc_match_state != DWC_MATCH_STATE_CL_WAITING) return;
+    uint32_t packet[7];
+    for (unsigned i = 0; i < 7; i++) packet[i] = deferred_node.packet[i];
+    const so_addr_t address = deferred_node.address;
+    clear_deferred_node();
+    LOG_INFO("replaying next node after preceding SYN completion");
+    dispatch_status(game, packet, address);
+}
+
+void network_thread_after_syn(uint32_t aid, uint32_t type) {
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    if (type != 3 || (game && aid != game->peers[0].peer_index)) return;
+    replay_deferred_node(game);
+}
+
 static void dispatch_status(struct dwc_gamedata *gamedata, uint32_t *buffer,
                             const so_addr_t raddr) {
     gamedata->public_ip = MKW_ADVERTISED_IP;
@@ -476,6 +541,7 @@ static void process_status(uint32_t *buffer, int32_t length, const so_addr_t rad
     struct dwc_gamedata *gamedata = get_dwc_gamedata();
     if (!gamedata) return;
     learn_status_peer(buffer, raddr);
+    if (retain_next_node(gamedata, buffer, payload, raddr)) return;
     const enum dwc_match_state state = gamedata->dwc_match_state;
     if ((buffer[2] >> 24) == 1 &&
         (state == DWC_MATCH_STATE_CL_WAITING || state == DWC_MATCH_STATE_SV_WAITING ||
@@ -653,6 +719,7 @@ void* network_thread_main(void *arg) {
 	}
 	LOG_INFO("network_thread exit");
     clear_deferred_syn();
+    clear_deferred_node();
     close_discovery();
     reservation_cursor = 0;
 	my_mii = 0;
@@ -680,6 +747,8 @@ static void fill_in_peer_0(struct dwc_gamedata *gamedata) {
 }
 
 void network_thread_after_server_setup(struct dwc_gamedata *gamedata) {
+    clear_deferred_syn();
+    clear_deferred_node();
 	LOG_INFO("network_thread_after_server_setup()");
 	fill_in_peer_0(gamedata);
 	gamedata->peers[0].peer_index = 0;
@@ -691,6 +760,7 @@ void network_thread_after_server_setup(struct dwc_gamedata *gamedata) {
 
 void network_thread_on_server_join(struct dwc_gamedata *gamedata) {
 	clear_deferred_syn();
+    clear_deferred_node();
 	LOG_INFO("network_thread_on_server_join()");
 	fill_in_peer_0(gamedata);
 	gamedata->peers[0].peer_index = 0xff;

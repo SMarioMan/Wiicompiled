@@ -366,3 +366,21 @@ A same-binary, normal-timing two-console control completed three laps and
 finished both racers on both peers at 211.98 seconds. The CPU-driving hook did
 not cause an immediate finish in that baseline. This does not qualify the
 24-player race path.
+
+The `8559287` revalidation failed admission at 96.00 seconds, with thirteen
+room members and the host waiting for AID 6's SYN ACK. Console 2/AID 6 received
+the next node's UDP notification while still in `CL_SYN` for the preceding
+admission. The preceding reliable SYN-2 then completed, resumed mesh creation,
+and started another outgoing reservation to console 22. Its next host SYN was
+retained in `CL_WAIT_RESV` indefinitely. SDK-thread ownership alone does not
+order delivery across UDP controls and reliable GT2 SYN packets.
+
+Expanded clients now retain an owned next-node notification received during
+`CL_SYN` and apply it immediately after the preceding original SYN-2 handler
+returns to `CL_WAITING`, before the SDK can create another peer reservation.
+The control remains scoped to its SDK instance and host, expires, and clears
+on room lifecycle changes. The original status/SYN handlers still perform all
+state changes and ACK generation. Native regressions reproduce the overwritten
+stop before correction, then cover buffer reuse, callback order, stale contexts,
+expiry, unrelated callbacks, stock builds and malformed lengths. This requires
+another live admission/race qualification.

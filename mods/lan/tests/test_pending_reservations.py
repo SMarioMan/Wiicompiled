@@ -10,7 +10,7 @@ import unittest
 class PendingReservations(unittest.TestCase):
     def test_busy_peers_resume_queued_requests_in_both_idle_states(self):
         source = (Path(__file__).parents[1] / 'source/module/network_thread.c').read_text()
-        declaration = source[source.index('static struct pending_reservation {'):source.index('bool network_thread_get_fake_pid_status(')]
+        declaration = source[source.index('static struct pending_reservation {'):source.index('/* UDP new-node notification')] + source[source.index('static void dispatch_status(struct dwc_gamedata *gamedata,'):source.index('bool network_thread_get_fake_pid_status(')]
         poll = source[source.index('static void check_for_status_or_broadcast('):source.index('void network_thread_poll_sdk(')]
         header = (Path(__file__).parents[1] / 'source/module/mkw.h').read_text()
         states = re.search(r'enum dwc_match_state \{.*?\};', header, re.S)[0]
@@ -32,6 +32,7 @@ typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
         harness += states + r'''
 static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;uint32_t player_count;} game;
 static void replay_deferred_syn(struct dwc_gamedata *g){(void)g;}
+static bool retain_next_node(struct dwc_gamedata *g,const uint32_t *p,unsigned n,so_addr_t a){(void)g;(void)p;(void)n;(void)a;return false;}
 static bool have_game=true;
 static struct dwc_gamedata *get_dwc_gamedata(void){return have_game?&game:NULL;}
 static uint64_t timestamp=100;

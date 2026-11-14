@@ -9,7 +9,7 @@ import unittest
 class ReservationBudget(unittest.TestCase):
     def test_queued_peer_budget_is_bounded_and_preserves_stock_builds(self):
         source = (Path(__file__).parents[1]/'source/module/network_thread.c').read_text()
-        policy = source[source.index('static void update_reservation_budget('):source.index('static void dispatch_status(')]
+        policy = source[source.index('static void update_reservation_budget('):source.index('/* UDP new-node notification')]
         harness = r'''
 #include <stdint.h>
 #include <stdlib.h>

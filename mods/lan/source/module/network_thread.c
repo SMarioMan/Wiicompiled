@@ -55,6 +55,8 @@ static uint16_t my_latitude;
 static uint8_t my_country;
 static uint8_t my_state;
 static uint64_t time_in_state_1;
+static bool sdk_service_ready;
+static bool sdk_polling;
 static void clear_deferred_syn(void);
 static void replay_deferred_syn(struct dwc_gamedata *game);
 
@@ -76,6 +78,7 @@ static struct tracked_peer {
 } tracked_peers[BROADCAST_TRACK_MAX];
 
 static void close_discovery(void) {
+    sdk_service_ready = false;
     if (multicast_socket >= 0) SOClose(multicast_socket);
     if (broadcast_socket >= 0) SOClose(broadcast_socket);
     multicast_socket = broadcast_socket = -1;
@@ -108,6 +111,7 @@ static bool initialise_multicast(void) {
 }
 
 static bool initialise(void) {
+	sdk_service_ready = false;
 	if (game_state != 0)
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
@@ -580,6 +584,31 @@ static void check_for_status_or_broadcast(void) {
 	}
 }
 
+/* The SDK can yield to another guest thread while finishing a barrier's
+ * socket writes. Dispatching the next reservation from that other thread
+ * reverses stop/resume control order. Expanded matching mutations run only
+ * at the owning SDK thread's complete-update boundaries. */
+void network_thread_poll_sdk(void) {
+    if (MKW_LAN_CAPACITY <= 12 || !network_thread_running || !sdk_service_ready || sdk_polling) return;
+    sdk_polling = true;
+    timestamp = lan_discovery_time(OSGetTime());
+    check_for_status_or_broadcast();
+    sdk_polling = false;
+}
+
+static void service_network_thread(void) {
+    if (MKW_LAN_CAPACITY <= 12) {
+        check_for_status_or_broadcast();
+        return;
+    }
+    /* Discovery updates no SDK matching state. The control socket, pending
+     * reservations, SYN replay and SDK timers belong to poll_sdk above. */
+    receive_packets(multicast_socket, false);
+    for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++)
+        if (timestamp - tracked_peers[i].last_update > BROADCAST_TIMEOUT)
+            tracked_peers[i].info.status = 0;
+}
+
 void* network_thread_main(void *arg) {
 	network_thread_running = true;
 	LOG_INFO("network_thread startup");
@@ -590,13 +619,14 @@ void* network_thread_main(void *arg) {
 		return NULL;
 	}
 	LOG_INFO("network_thread initialised");
+    sdk_service_ready = true;
     /* Automation joins the first advertising host, independent of instance ID.
        Manual login does not wait for a host; users can create their own room. */
     if (MKW_AUTOMATION == 2) {
         for (unsigned frame = 0; frame < 600; frame++) {
             bool found = false;
             if (broadcast_due()) compute_and_broadcast_status(broadcast_socket);
-            check_for_status_or_broadcast();
+            service_network_thread();
             for (unsigned peer = 0; peer < BROADCAST_TRACK_MAX; peer++) {
                 if (tracked_peers[peer].info.status == 4) {
                     if (peer) {
@@ -618,7 +648,7 @@ void* network_thread_main(void *arg) {
 			if (!compute_and_broadcast_status(broadcast_socket))
 				break;
 		}
-		check_for_status_or_broadcast();
+		service_network_thread();
 		VIWaitForRetrace();
 	}
 	LOG_INFO("network_thread exit");
@@ -820,7 +850,6 @@ static void replay_deferred_syn(struct dwc_gamedata *game) {
 }
 
 bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *packet) {
-    static bool polling;
     struct dwc_gamedata *game = get_dwc_gamedata();
     if (!syn_client(game, aid)) return false;
     if (type != 1) {
@@ -828,10 +857,10 @@ bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *pac
         return false;
     }
     if (!packet) return false;
-    if (negotiating_peer(game->dwc_match_state) && !polling) {
-        polling = true;
+    if (negotiating_peer(game->dwc_match_state) && !sdk_polling) {
+        sdk_polling = true;
         receive_packets(broadcast_socket, true);
-        polling = false;
+        sdk_polling = false;
         game = get_dwc_gamedata();
         if (!syn_client(game, aid)) return false;
     }

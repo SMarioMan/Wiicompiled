@@ -253,6 +253,12 @@ static void MyDWCi_ProcessMatchSynPacket(uint32_t aid, uint32_t type, const uint
     DWCi_ProcessMatchSynPacket(aid, type, packet);
 }
 
+static void Mydwc_think(int argument) {
+    network_thread_poll_sdk();
+    dwc_think(argument);
+    network_thread_poll_sdk();
+}
+
 static uint32_t MyServerBrowserGetMyPublicIPAddr(void *sb) {
 	return MKW_ADVERTISED_IP;
 }
@@ -267,6 +273,7 @@ BSLUG_MUST_REPLACE(dwc_qr2_init, Mydwc_qr2_init);
 BSLUG_MUST_REPLACE(DWCi_SBUpdateAsync, MyDWCi_SBUpdateAsync);
 BSLUG_MUST_REPLACE(dwc_send_status_record, Mydwc_send_status_record);
 BSLUG_MUST_REPLACE(DWCi_ProcessMatchSynPacket, MyDWCi_ProcessMatchSynPacket);
+BSLUG_MUST_REPLACE(dwc_think, Mydwc_think);
 BSLUG_MUST_REPLACE(ServerBrowserGetMyPublicIPAddr, MyServerBrowserGetMyPublicIPAddr);
 
 /* Host-side sockets must bind the same per-instance identity we advertise. */

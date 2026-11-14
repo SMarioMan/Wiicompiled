@@ -26,6 +26,7 @@ struct dwc_gamedata {unsigned dwc_host_state,player_count;enum dwc_match_state d
 static struct dwc_gamedata game,other;
 static struct dwc_gamedata *current=&game;
 static bool network_thread_running=true;
+static bool sdk_polling;
 static int broadcast_socket=4;
 static uint64_t clock_units;
 static uint64_t OSGetTime(void){return clock_units;}

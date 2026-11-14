@@ -311,3 +311,24 @@ SDK's signed time comparison, rather than an expiring grace period or negative
 sentinel. Active retries keep their bounded jitter/backoff and original SDK
 attempt/connection/teardown handling. Stock capacity and unsupported states keep
 the original scheduler. Native pair/ABI checks pass; live comparison is pending.
+
+The first strict-ownership attempt (`2c12a20`) failed admission on console 20's
+error dialog at 91.28 seconds. The host received fourteen of fifteen SYN ACKs;
+console 11/AID 8 retained the remaining SYN while waiting on a peer reservation.
+Its control log shows the next admission's stop-mesh command followed by the
+previous barrier's resume-mesh command, then a new outgoing reservation and the
+host SYN. Retaining that SYN cannot finish the barrier when the cancellation
+has already been undone by the late resume.
+
+The host could dispatch another reservation from the background thread after
+the SDK published `SV_WAITING` but before the previous `dwc_think` call finished
+its post-barrier socket writes. Guest I/O can yield between those steps even at
+equal thread priority. Expanded builds now process control packets, queued
+reservations, SYN replay and reservation budgets at the SDK thread's complete
+`dwc_think` boundaries. The background thread serves discovery and telemetry.
+An initialization-ready flag excludes unbound/blocking startup sockets; a shared
+poll guard bounds callback re-entry. Stock-capacity builds keep their previous
+service path. A native scheduling fixture yields after publishing idle and
+checks that the old resume precedes the next stop, with initialization, shutdown
+and re-entry guards. Live comparison and the rebuilt hook's linked ABI still
+require validation.

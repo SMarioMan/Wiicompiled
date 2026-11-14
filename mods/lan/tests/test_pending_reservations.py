@@ -11,7 +11,7 @@ class PendingReservations(unittest.TestCase):
     def test_busy_peers_resume_queued_requests_in_both_idle_states(self):
         source = (Path(__file__).parents[1] / 'source/module/network_thread.c').read_text()
         declaration = source[source.index('static struct pending_reservation {'):source.index('bool network_thread_get_fake_pid_status(')]
-        poll = source[source.index('static void check_for_status_or_broadcast('):source.index('void* network_thread_main(')]
+        poll = source[source.index('static void check_for_status_or_broadcast('):source.index('void network_thread_poll_sdk(')]
         header = (Path(__file__).parents[1] / 'source/module/mkw.h').read_text()
         states = re.search(r'enum dwc_match_state \{.*?\};', header, re.S)[0]
         harness = r'''

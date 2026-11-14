@@ -80,3 +80,24 @@ seconds. Binary SHA-256:
 `26991633eefefb4bf7a3d78087653f0350ce6073ce18d74e59adbb07d42c978a`.
 This is a connectivity pass, with no race/finish claim. Earlier failed candidates
 remain failed evidence; timings do not establish an isolated statistical speedup.
+
+## Thirteen-player online position tracking
+
+With source `ea947ef`, thirteen consoles completed the normal-timing SDK mesh
+in 35.67 seconds and race setup reported thirteen active participants. The
+race then failed inside `GMDataOnlineVS::HandlePositionTracking` (`80539F64`),
+which retained twelve-entry stack arrays for IDs, ranking scores and timers.
+The executable SHA-256 was
+`26991633eefefb4bf7a3d78087653f0350ce6073ce18d74e59adbb07d42c978a`.
+This is a failed race qualification, not a thirteen-player race pass.
+
+The online tracker now declares a capacity-sized frame, score initialization
+count, timer constructor/destructor counts, array addresses and floating-point
+conversion scratch offsets. Timer stride remains twelve **bytes**. The original
+twelve seed IDs remain valid: the tracker overwrites every active ID before
+sorting. Native tests execute the original online and offline tracker bodies
+with live, finished, mixed and tied fields at 12, 13, 24, 48 and 100 capacity.
+They check final order, rank uniqueness, saved registers and frame/output guards.
+Before the migration, the new thirteen-player online test terminated with a
+memory fault; the original offline test already passed. Live race revalidation
+is still required.

@@ -3136,6 +3136,54 @@
           "PerPlayer": true
         }
       ]
+    },
+    {
+      "Name": "OnlinePositionHeader",
+      "Size": 20,
+      "Alignment": 4
+    },
+    {
+      "Name": "OnlinePositionPadding",
+      "Size": 12,
+      "Alignment": 4
+    },
+    {
+      "Name": "OnlinePositionTrackingFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "OnlinePositionHeader"
+        },
+        {
+          "Name": "ids",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "scores",
+          "Type": "FloatSlot",
+          "PerPlayer": true
+        },
+        {
+          "Name": "timers",
+          "Type": "GuestTimer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "conversion",
+          "Type": "FloatSlot",
+          "Count": 2
+        },
+        {
+          "Name": "padding",
+          "Type": "OnlinePositionPadding"
+        },
+        {
+          "Name": "gprs",
+          "Type": "SavedGprs19"
+        }
+      ]
     }
   ],
   "References": [
@@ -62999,6 +63047,258 @@
       "Symbol": "MenuVoteScan.pairs.count",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x80539F64",
+      "ExpectedWord": "0x9421FEA0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80539F64",
+      "ExpectedWord": "0x9421FEA0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x80539F70",
+      "ExpectedWord": "0x39610160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x8053A4BC",
+      "ExpectedWord": "0x39610160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x8053A4CC",
+      "ExpectedWord": "0x38210160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x80539F6C",
+      "ExpectedWord": "0x90010164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053A4C4",
+      "ExpectedWord": "0x80010164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80539F88",
+      "ExpectedWord": "0x3800000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "OnlinePositionTrackingFrame.scores.count"
+    },
+    {
+      "Instruction": "0x80539F90",
+      "ExpectedWord": "0x3881001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.scores.offset",
+      "Addend": -4
+    },
+    {
+      "Instruction": "0x80539FC8",
+      "ExpectedWord": "0x38610080",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.timers.offset"
+    },
+    {
+      "Instruction": "0x8053A054",
+      "ExpectedWord": "0x39210080",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.timers.offset"
+    },
+    {
+      "Instruction": "0x8053A110",
+      "ExpectedWord": "0x39610080",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.timers.offset"
+    },
+    {
+      "Instruction": "0x8053A4A8",
+      "ExpectedWord": "0x38610080",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.timers.offset"
+    },
+    {
+      "Instruction": "0x80539FE8",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "OnlinePositionTrackingFrame.timers.count"
+    },
+    {
+      "Instruction": "0x8053A4B4",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "OnlinePositionTrackingFrame.timers.count"
+    },
+    {
+      "Instruction": "0x8053A0B4",
+      "ExpectedWord": "0x38C10020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x8053A1E0",
+      "ExpectedWord": "0x38A10020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x8053A1FC",
+      "ExpectedWord": "0x39010020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x8053A1D8",
+      "ExpectedWord": "0x38C10028",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.scores.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053A0BC",
+      "ExpectedWord": "0x38A10014",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x8053A1E4",
+      "ExpectedWord": "0x38810014",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x8053A200",
+      "ExpectedWord": "0x39210014",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x8053A290",
+      "ExpectedWord": "0x38C10014",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x8053A458",
+      "ExpectedWord": "0x38C10014",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x8053A1DC",
+      "ExpectedWord": "0x38E10015",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlinePositionTrackingFrame.ids.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8053A118",
+      "ExpectedWord": "0x9141011C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053A120",
+      "ExpectedWord": "0x91010118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053A134",
+      "ExpectedWord": "0xC8010118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053A140",
+      "ExpectedWord": "0x91010110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8053A154",
+      "ExpectedWord": "0x91210114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053A158",
+      "ExpectedWord": "0xC8010110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x8053A18C",
+      "ExpectedWord": "0x91010118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053A198",
+      "ExpectedWord": "0x9121011C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053A1A0",
+      "ExpectedWord": "0xC8010118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
+      "Addend": 8
     }
   ],
   "GlobalPointers": {
@@ -70548,6 +70848,11 @@
       "Entry": "0x8064E630",
       "Receiver": "MenuVRPage",
       "Name": "Pages::VR::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x80539F64",
+      "Receiver": null,
+      "Name": "GMDataOnlineVS::HandlePositionTracking"
     }
   ],
   "BoundedAccesses": [

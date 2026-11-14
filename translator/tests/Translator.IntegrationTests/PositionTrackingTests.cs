@@ -9,13 +9,18 @@ namespace Translator.Tests;
 public class PositionTrackingTests
 {
     [Theory]
-    [InlineData(12)]
-    [InlineData(13)]
-    [InlineData(24)]
-    [InlineData(48)]
-    [InlineData(100)]
+    [InlineData(12, false)]
+    [InlineData(12, true)]
+    [InlineData(13, false)]
+    [InlineData(13, true)]
+    [InlineData(24, false)]
+    [InlineData(24, true)]
+    [InlineData(48, false)]
+    [InlineData(48, true)]
+    [InlineData(100, false)]
+    [InlineData(100, true)]
     [Trait("Requires", "USA game assets and Clang")]
-    public void RealPositionTrackingSortsAllParticipantsAndPreservesItsExpandedFrame(int players)
+    public void RealPositionTrackingSortsAllParticipantsAndPreservesItsExpandedFrame(int players, bool online)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);
         while(directory is not null && !File.Exists(Path.Combine(directory.FullName,"translator/Translator.sln")))directory=directory.Parent;
@@ -30,7 +35,9 @@ public class PositionTrackingTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-ai-objects-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[] {0x8052eb90,0x80020a20,0x80020a6c};
+            var entry=online?0x80539f64u:0x8052eb90u;
+            var frameType=online?"OnlinePositionTrackingFrame":"PositionTrackingFrame";
+            var entries=new uint[] {entry,0x80020a20,0x80020a6c,0x80020494,0x8002058c,0x80517f00,0x80517ec0};
             var sources=new List<string>();
             foreach(var pc in entries)
             {
@@ -50,7 +57,7 @@ public class PositionTrackingTests
                 #include <algorithm>
                 {{declarations}}
                 constexpr uint32_t root=0x81000000,info=0x81100000,gm=0x81110000,array=0x81120000,
-                    ids=0x81130000,nodes=0x81200000,timers=0x81300000,sp=0x81f00000,n={{players}},frame={{layout.Symbol("PositionTrackingFrame.size")}};
+                    ids=0x81130000,nodes=0x81200000,timers=0x81300000,sp=0x81f00000,n={{players}},frame={{layout.Symbol(frameType+".size")}};
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="position tracking";
                     info.rawCpuInvoker=entry;info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
@@ -63,7 +70,8 @@ public class PositionTrackingTests
                     Memory::Write32(0x809b8f68,root);Memory::Write8(root+0x24,n);
                     Memory::Write32(0x809b8f70,info);Memory::Write32(gm+4,info);
                     Memory::Write32(info+0xc,array);Memory::Write32(info+0x18,ids);
-                    for(uint32_t i=0;i<16;i++){Memory::Write8(sp-frame-16+i,0x55);Memory::Write8(sp+8+i,0x55);
+                    // Constructor/destructor helpers use nested frames below the tracked frame.
+                    for(uint32_t i=0;i<16;i++){Memory::Write8(sp-frame-0x100+i,0x55);Memory::Write8(sp+8+i,0x55);
                         Memory::Write8(ids-16+i,0x55);Memory::Write8(ids+n+i,0x55);}
                     CpuContext ctx{};ctx.gpr[1]=sp;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t mode=0;mode<4;mode++){
@@ -81,12 +89,12 @@ public class PositionTrackingTests
                         std::stable_sort(expected.begin(),expected.end(),[&](auto a,auto b){return keys[a]>keys[b];});
                         for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
                         for(uint32_t r=14;r<32;r++)ctx.fpr[r].raw=0x1234000000000000ull+r;
-                        ctx.gpr[3]=gm;func_8052EB90(&ctx);
+                        ctx.gpr[3]=gm;func_{{entry:X8}}(&ctx);
                         for(uint32_t i=0;i<n;i++)if(Memory::Read8(ids+i)!=expected[i] ||
                             Memory::Read8(nodes+expected[i]*0x100+0x20)!=i+1)return 4+mode;
                         if(ctx.gpr[1]!=sp)return 8;
                         for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r || ctx.fpr[r].raw!=0x1234000000000000ull+r)return 9;
-                        for(uint32_t i=0;i<16;i++)if(Memory::Read8(sp-frame-16+i)!=0x55 || Memory::Read8(sp+8+i)!=0x55 ||
+                        for(uint32_t i=0;i<16;i++)if(Memory::Read8(sp-frame-0x100+i)!=0x55 || Memory::Read8(sp+8+i)!=0x55 ||
                             Memory::Read8(ids-16+i)!=0x55 || Memory::Read8(ids+n+i)!=0x55)return 10;
                     }
                     return 0;

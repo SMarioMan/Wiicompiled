@@ -31,7 +31,7 @@ public class PacketManagerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-packet-manager-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84,0x806512c4,0x80651018,0x80650678,0x8064f780,0x8064f88c,0x8064f8f0};
+            var entries=new uint[]{0x8064f634,0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84,0x806512c4,0x80651018,0x80650678,0x8064f780,0x8064f88c,0x8064f8f0};
             var fixtures=new HashSet<uint>{0x80229a48,0x80656ecc,0x8065cd74,0x80652ab8,0x80008e44,0x80517a5c,0x805316e8,0x80655ec4,0x80655e84};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -112,6 +112,33 @@ public class PacketManagerStorageTests
                     }
                     if(clears!=4)return 9;
                     constexpr uint32_t peerCount=capacity<32?capacity:32;
+                    // Execute the real RACEDATA getter, including its unrolled
+                    // player-to-console ordinal search beyond the twelfth slot.
+                    for(uint32_t buffer=0;buffer<2;buffer++)for(uint32_t pattern=0;pattern<3;pattern++){
+                        for(uint32_t p=0;p<capacity;p++){
+                            const uint32_t aid=pattern==0?p%peerCount:pattern==1?(p/2)%peerCount:
+                                p>=capacity-2?peerCount-1:255;
+                            Memory::Write8(controller+aidMap+p,aid);
+                        }
+                        for(uint32_t aid=0;aid<peerCount;aid++){
+                            const uint32_t row=0x81300000+aid*1024,holder=row+64,payload=row+128;
+                            Memory::Write32(controller+receive+buffer*rowStride+aid*4,row);
+                            Memory::Write32(controller+indices+aid*indexStride+16,buffer);
+                            Memory::Write32(row+16,holder);Memory::Write32(holder,payload);
+                        }
+                        for(uint32_t p=0;p<capacity;p++){
+                            const uint32_t aid=Memory::Read8(controller+aidMap+p);
+                            if(aid==255)continue;
+                            uint32_t ordinal=0;
+                            for(uint32_t prior=0;prior<p;prior++)if(Memory::Read8(controller+aidMap+prior)==aid)ordinal++;
+                            const uint32_t expectedPacket=0x81300000+aid*1024+128+ordinal*64;
+                            Memory::Write32(expectedPacket,0xabc00000+p);
+                            ctx.gpr[3]=root;ctx.gpr[4]=p;func_8064F634(&ctx);
+                            if(ctx.gpr[3]!=expectedPacket || Memory::Read32(ctx.gpr[3])!=0xabc00000+p){
+                                std::fprintf(stderr,"RACEDATA buffer=%u pattern=%u player=%u aid=%u ordinal=%u got=%08x expected=%08x\n",
+                                    buffer,pattern,p,aid,ordinal,ctx.gpr[3],expectedPacket);return 26;}
+                        }
+                    }
                     // Player IDs cover the entire capacity; console IDs remain
                     // within the SDK's 32-bit connection mask.
                     for(uint32_t p=0;p<capacity;p++)Memory::Write8(controller+aidMap+p,p%peerCount);

@@ -251,3 +251,23 @@ It shares the observed matching caller's priority 17 without preempting that
 caller on priority alone. Stock capacity, a missing caller and unsupported
 priorities retain priority 24. Policy regressions pass; repeated live admission
 and race checks are still required to qualify this scheduling change.
+
+With `fd10c82`, thirteen consoles completed SDK connectivity at 33.30 seconds
+and reached race creation/countdown. The run failed at 181.67 seconds as racing
+started, with an unmapped read reported on console 2. Captured RAM identifies
+player ID 12/AID 12 and its selected RACEDATA payload at `901f52fc`.
+`PacketMgr::GetRacedata` (`8064F634`) still searched only twelve map entries:
+the four-entry loop's count at `8064F65C` remained three. For the thirteenth
+player, its ordinal stayed minus one, returning `901f52bc`, 64 bytes before
+the payload. That memory contains allocator metadata. Decoding it as remote
+kart state triggered invalid actions, including cannon entry on Luigi Circuit.
+The earlier previous-rank heap failure did not recur before this distinct fault.
+
+The new native getter regression reproduces exactly the minus-64-byte result
+at thirteen players. Its checked loop count now uses `ceil(players/4)` while
+retaining the existing guarded map loads and authored 64-byte local-player
+payload stride. Packet-manager tests pass at 12, 13, 24, 32, 48 and 100
+capacity, covering both receive buffers, unique/shared console mappings and
+sparse high-index players. The complete layout-consumer audit also passes.
+These fixtures validate storage/getter behavior, not playable networking above
+the SDK console/local-player limits. Live race revalidation remains pending.

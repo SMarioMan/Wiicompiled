@@ -41723,6 +41723,14 @@
       "Scale": 1
     },
     {
+      "Instruction": "0x8064F65C",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
       "Instruction": "0x8064F75C",
       "ExpectedWord": "0x808427AC",
       "Node": 0,

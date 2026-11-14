@@ -132,6 +132,13 @@ public class RetiredLayoutAuditTests
                         Memory::Write32(0x800d0000,sp);
                         RetireExecutionContext(3);fiber=1;
                         SetGuestPc(0x80007004);Memory::Read32(0x800d0038);}
+                    // A flattened/inlined frame cannot borrow the lifetime of
+                    // its enclosing translated function. Report lost coverage
+                    // instead of watching its reused stack after it returns.
+                    {FunctionScope outer(0x80009000);SetGuestPc(0x80007000);
+                        Memory::Write32(0x800c0000,sp);
+                        if(ReportJson().find("\"activeInstances\":0")==std::string::npos)return 8;
+                        SetGuestPc(0x80007004);Memory::Read32(0x800c0038);}
                     WriteReport();
                 }
                 """);
@@ -163,6 +170,9 @@ public class RetiredLayoutAuditTests
             Assert.Equal("translated stack frame",stackHit.GetProperty("lifetime").GetString());
             Assert.Equal(1,stackHit.GetProperty("count").GetInt32());
             Assert.Equal(0,output.RootElement.GetProperty("activeInstances").GetInt32());
+            var skipped=Assert.Single(output.RootElement.GetProperty("unscopedStackEntries").EnumerateArray());
+            Assert.Equal("0x80007000",skipped.GetProperty("guestPc").GetString());
+            Assert.Equal(1,skipped.GetProperty("count").GetInt32());
         }
         finally{Directory.Delete(temp,recursive:true);}
     }

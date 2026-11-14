@@ -36,7 +36,11 @@ must precede memory reuse. Register before construction when auditing constructo
 accesses. These APIs deliberately do not discover allocations by scanning RAM.
 
 Checked `stwu r1,-Frame.size(r1)` references automatically create frame watches
-at their effective write address. Each translated function invocation owns its
+at their effective write address when the prologue matches the current translated
+function entry. Inlined/non-entry prologues lack a proven C++ invocation lifetime;
+they are skipped and counted in JSON `unscopedStackEntries`. They must not borrow
+the enclosing function's longer lifetime and watch reused stack bytes. Each
+tracked translated function invocation owns its
 watch, which retires on return or exception. Invocation identity and provenance
 are isolated by guest execution context, rather than host thread or CpuContext
 address: cooperative guest fibers share those. The guest fiber manager calls `RetireExecutionContext` when a thread exits,

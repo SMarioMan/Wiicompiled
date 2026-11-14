@@ -39,6 +39,7 @@ struct State {
     std::map<std::string,OwnedType,std::less<>> types;
     std::map<uint32_t,OwnedSite> sites;
     std::map<uint32_t,std::string> stackSites;
+    std::map<uint32_t,uint64_t> unscopedStackSites;
     std::map<uint64_t,Instance> instances;
     std::map<std::string,Hit> hits;
     uint64_t nextGeneration=1, nextFrame=1, observedAccesses=0, watchedAccesses=0;
@@ -89,6 +90,11 @@ std::string reportLocked(const State& s){
            <<",\"function\":"<<quote(h.function)<<",\"relocationRule\":"<<quote(h.rule)
            <<",\"phase\":"<<quote(h.phase)<<",\"lifetime\":"<<quote(h.lifetime)<<",\"translatedStack\":[";
         for(size_t i=0;i<h.stack.size();i++){if(i)out<<',';out<<quote(hex(h.stack[i]));}out<<"]}";
+    }
+    out<<"],\"unscopedStackEntries\":[";first=true;
+    for(const auto& [pc,count]:s.unscopedStackSites){
+        if(!std::exchange(first,false))out<<',';
+        out<<"{\"guestPc\":"<<quote(hex(pc))<<",\"type\":"<<quote(s.stackSites.at(pc))<<",\"count\":"<<count<<'}';
     }
     out<<"]}\n";return out.str();
 }
@@ -174,12 +180,20 @@ void Observe(uint32_t address,uint32_t width,Operation op){
         std::lock_guard lock(s.mutex);++s.observedAccesses;bool watched=false;Site site=context().site;
         // A checked stwu r1,-Frame.size(r1) writes at the new frame base.
         // Its watch belongs to this invocation, not the reused stack address.
-        if(op==Operation::Write && width==4 && !context().frames.empty()){
+        if(op==Operation::Write && width==4){
             if(const auto binding=s.stackSites.find(site.pc);binding!=s.stackSites.end()){
-                const auto frame=context().frames.back();
-                const bool live=std::any_of(s.instances.begin(),s.instances.end(),[&](const auto& x){return x.second.frame==frame;});
-                if(!live){const auto id=s.nextGeneration++;
-                    s.instances.emplace(id,Instance{id,binding->second,address,s.types.at(binding->second).newSize,0,"translated stack frame",frame,contextKey()});}
+                if(context().frames.empty() || context().stack.empty() || context().stack.back()!=site.pc){
+                    // An inlined or non-entry prologue has no matching C++
+                    // invocation lifetime. Never retain its dead stack as if
+                    // it belonged to the enclosing function's longer lifetime.
+                    const auto count=++s.unscopedStackSites[site.pc];
+                    changed|=(count&(count-1))==0;
+                }else{
+                    const auto frame=context().frames.back();
+                    const bool live=std::any_of(s.instances.begin(),s.instances.end(),[&](const auto& x){return x.second.frame==frame;});
+                    if(!live){const auto id=s.nextGeneration++;
+                        s.instances.emplace(id,Instance{id,binding->second,address,s.types.at(binding->second).newSize,0,"translated stack frame",frame,contextKey()});}
+                }
             }
         }
         if(site.type.empty())if(const auto binding=s.sites.find(site.pc);binding!=s.sites.end())site=binding->second.view();
@@ -237,7 +251,7 @@ void Observe(uint32_t address,uint32_t width,Operation op){
 }
 std::string ReportJson(){auto& s=state();std::lock_guard lock(s.mutex);return reportLocked(s);}
 void WriteReport(){auto& s=state();std::string path,report;{std::lock_guard lock(s.mutex);path=s.options.reportPath;report=reportLocked(s);}if(path.empty())return;if(!writeSnapshot(path,report))throw std::runtime_error("Cannot write retired-layout audit report: "+path);}
-void Reset(){enabled.store(false,std::memory_order_relaxed);auto& s=state();std::lock_guard lock(s.mutex);s.options={};s.types.clear();s.sites.clear();s.stackSites.clear();s.instances.clear();s.hits.clear();s.nextGeneration=1;s.nextFrame=1;s.observedAccesses=0;s.watchedAccesses=0;s.phase.clear();contexts.clear();contextProvider.store(nullptr,std::memory_order_relaxed);}
+void Reset(){enabled.store(false,std::memory_order_relaxed);auto& s=state();std::lock_guard lock(s.mutex);s.options={};s.types.clear();s.sites.clear();s.stackSites.clear();s.unscopedStackSites.clear();s.instances.clear();s.hits.clear();s.nextGeneration=1;s.nextFrame=1;s.observedAccesses=0;s.watchedAccesses=0;s.phase.clear();contexts.clear();contextProvider.store(nullptr,std::memory_order_relaxed);}
 bool ParseArgument(std::string_view arg){
     auto& s=state();Options options;{std::lock_guard lock(s.mutex);options=s.options;}
     if(arg.starts_with("--layout-audit=")){

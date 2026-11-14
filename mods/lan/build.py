@@ -42,6 +42,10 @@ def static_patches():
     add('Copy16', 'module:dwc_gamedata_offset', 'game:dwc_process_status_record+0x16')
     write('game:dwc_unknown_800ccc38+0x3C', 0x60000000)
     write('game:dwc_unknown_800d577c+0x80C', 0x48000014)
+    # Both original calls hold the candidate SDK node in r31. Keep the SDK's
+    # own deadline routine available for stock/small fields and other callers.
+    add('BranchLink', 'game:dwc_think+0x1D34', 'module:LANMeshTryTick')
+    add('BranchLink', 'game:dwc_think+0x1D8C', 'module:LANMeshTryTick')
     pointer_pair('game:dwc_think+0x110', 0x3C600000, 0x80630000, 0x809BD508)
     for index, word in enumerate([0x80630000, 0x80630274, 0x80A3035C, 0x2C050001,
                                   0x40821A80, 0x38A00002, 0x90A3035C, 0x48001A74]):

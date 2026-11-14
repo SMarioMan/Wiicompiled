@@ -86,4 +86,10 @@
             80630004 2C030000 41822244 80630000
         </data>
     </symbol>
+    <symbol name="DWCi_GetNextMeshMakeTryTick" size="0x1a0" offset="0x78" >
+        <data>
+            38000BB8 54C6F0BE 3BA00000 7CC73016
+            80E50030 3B800000 2C070002 54C5D1BE
+        </data>
+    </symbol>
 </symbols>

@@ -62,6 +62,23 @@ class LinkedAbiTests(unittest.TestCase):
                 address = int(re.search(r'kLanConfigGuestAddress = 0x([0-9A-Fa-f]+)u', header)[1], 16)
                 self.assertEqual(address, linked['ModuleGuestBase']+linked['SymbolOffsets']['mkw_lan_config'])
 
+    def test_mesh_deadlines_use_scoped_r31_shims_and_retain_the_original_sdk(self):
+        for capacity, path in json.loads(os.environ['MKW_LAN_TEST_MODULES']).items():
+            with self.subTest(capacity=capacity):
+                path=Path(path)
+                shim,_=elf_symbol(path,'LANMeshTryTick',8)
+                move,branch=struct.unpack('>2I',shim[:8])
+                self.assertEqual(move,0x7fe3fb78)  # mr r3,r31: candidate node
+                self.assertEqual(branch & 0xfc000003,0x48000000)  # tail branch, preserve LR
+                linked=json.loads((path.parent/'Code.pul.json').read_text())
+                self.assertEqual(linked['ResolvedImports']['DWCi_GetNextMeshMakeTryTick'],0x800e7ef8)
+                self.assertIn('LANMeshNextTick',linked['SymbolOffsets'])
+                self.assertFalse(any(h['Name']=='DWCi_GetNextMeshMakeTryTick' for h in linked['Hooks']))
+                patches=json.loads((path.parent/'static-patches.json').read_text())
+                sites=[p for p in patches if p['Value']=='module:LANMeshTryTick']
+                self.assertEqual(sites,[dict(Operation='BranchLink',Address='game:dwc_think+0x1D34',Value='module:LANMeshTryTick'),
+                                        dict(Operation='BranchLink',Address='game:dwc_think+0x1D8C',Value='module:LANMeshTryTick')])
+
 
 if __name__ == '__main__':
     unittest.main()

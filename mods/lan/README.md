@@ -335,3 +335,19 @@ The driver fails immediately on a game's error dialog during the main join/race
 loop. Finish checks require matching course and mode, retain two seconds of
 process liveness after complete finish evidence, and report any child exit as a
 failure. Normal race-progress checks also require every peer's mode to match.
+
+Larger fields also use a constant-work mesh deadline calculation. The retail
+`DWCi_GetNextMeshMakeTryTick` repeatedly scans the SDK connection list and adds
+multi-second delays based on existing connections and node position. Two scoped
+call-site shims pass their candidate node from r31 to the LAN scheduler. Fields
+through twelve and unsupported states retain the original SDK routine.
+
+For larger fields, stable PID ordering chooses a preferred initiator for each
+pair. Pair-specific jitter spreads attempts; the opposite endpoint has a grace
+period before it can initiate. Retry backoff is bounded, and the SDK keeps its
+own connection checks, attempt limits and teardown. The mesh still has 276 links
+at 24 consoles. The shims preserve LR and use symbolic linker/patch targets;
+the original no-argument SDK function remains available to other callers.
+Native tests cover ordering, jitter, bounded backoff and stock fallback. Linked
+PowerPC checks verify both scoped sites, the candidate register and SDK import.
+Live timing and reliability comparisons remain required.

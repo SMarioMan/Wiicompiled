@@ -52,3 +52,13 @@ executable SHA-256 was
 The CPU driver preserves network player ownership and race RNG. The reusable
 `--finish` driver checks this simulation evidence; results and a second race
 remain separate requirements.
+
+With source `b4706a8`, the live-peer reservation allowance was active: a failed
+normal-timing client logged a 31.316-second reservation wait. That 24-console
+attempt still failed and does not establish reliable normal-timing joining.
+In a separate clock-divisor-16 functional attempt, all 24 consoles held room
+membership at 50.50 seconds and complete SDK connectivity at 187.45 seconds.
+They voted and entered the race scene, where telemetry and RAM snapshots showed
+only twelve active race/menu participants. The run was stopped as failed;
+controller AID-map copies, subsequently fixed in `b2fd63f`, had left the last
+twelve entries inactive. No 24-player race/finish pass is claimed from this run.

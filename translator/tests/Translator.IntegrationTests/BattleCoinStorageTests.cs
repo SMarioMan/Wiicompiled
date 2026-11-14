@@ -14,6 +14,10 @@ public class BattleCoinStorageTests
     [InlineData(24)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(116)]
+    [InlineData(118)]
+    [InlineData(127)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealCoinConstructorAndResetKeepNestedPlayerArraysSeparate(int players)
     {
@@ -176,7 +180,7 @@ public class BattleCoinStorageTests
                         // row and every used-list length, preserving all neighbors.
                         constexpr uint32_t scratch=0x81500000;
                         auto scratchSize=capacity*scratchStride;
-                        std::array<uint8_t,32768> scratchExpected{};if(scratchSize>scratchExpected.size())return 29;
+                        std::array<uint8_t,frameSize> scratchExpected{};if(scratchSize>scratchExpected.size())return 29;
                         for(uint32_t row=0;row<capacity;row++)for(uint32_t used=0;used<=active;used++){
                             std::memset(Memory::GetPointer(scratch-16,scratchSize+32),0x55,scratchSize+32);
                             auto record=scratch+row*scratchStride;Memory::Write8(record+20,used);

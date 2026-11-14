@@ -3222,6 +3222,38 @@
   ],
   "References": [
     {
+      "Instruction": "0x8065BC08",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065BFEC",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C0E4",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8065C1DC",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)",
+      "Addend": 0
+    },
+    {
       "Instruction": "0x80653300",
       "ExpectedWord": "0x3860000C",
       "Node": 0,
@@ -72538,6 +72570,134 @@
     }
   ],
   "BoundedAccesses": [
+    {
+      "Instruction": "0x8065BC20",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BC74",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BCC8",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065BD1C",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r6",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C004",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C03C",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C074",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C0AC",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C0FC",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C134",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C16C",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C1A4",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C1F4",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C22C",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C264",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065C29C",
+      "ExpectedWord": "0x80840034",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
     {
       "Instruction": "0x80529960",
       "ExpectedWord": "0xB1690CF0",

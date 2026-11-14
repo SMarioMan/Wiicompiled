@@ -1767,6 +1767,15 @@ whole-object writes and adjacent bytes at 12, 13, 24 and 32 capacity. The new
 These checks mock the SDK boundary; public matchmaking service behavior is not
 established by this fixture.
 
+The RH1 summary getters also had independent four-entry searches capped at
+twelve records. `GetValidCourse`, `GetSELECTId`, `GetEngineClass` and
+`GetAidsBelongingToPlayer` now search `ceil(players/4)` groups. Their initial
+course loads reject indices beyond the configured field, so valid-looking
+padding cannot become a selected header. Native fixtures reproduce the missing
+thirteenth header before the change and pass at 12, 13, 24, 32, 48 and 100,
+including no-valid-header cases with poisoned trailing groups, unchanged objects
+and neighboring bytes. The full consumer audit passes.
+
 The controller destructor also needs the moved full-packet pointer array and the
 expanded strides between its two send/receive rows. Checking only its peer-loop
 bound was insufficient. `NetworkControllerDestructionTests` executes the original

@@ -31,7 +31,7 @@ public class RaceHeaderStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-race-header-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98,0x8065bd70,0x8065c2d4,0x8065c5a8,0x8065c6a0,0x8065c444};
+            var entries=new uint[]{0x8065bc08,0x8065bfec,0x8065c0e4,0x8065c1dc,0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98,0x8065bd70,0x8065c2d4,0x8065c5a8,0x8065c6a0,0x8065c444};
             var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x801aacbc,0x80020aa4,0x806609d8,0x8065ca70,0x8065cb28};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -80,6 +80,31 @@ public class RaceHeaderStorageTests
                         for(uint32_t at=4;at<=20;at+=4)word(base+at,0xffffffff);word(base+24,0);word(base+28,0);
                         std::memset(expected.data()+base+ids,255,capacity);std::memset(expected.data()+base+tail,0,3);};
                     auto equal=[&](){return std::memcmp(expected.data(),Memory::GetPointer(root,size),size)==0;};
+                    // Summary queries must find the sole valid high-index header,
+                    // and must reject valid-looking padding in partial unrolled groups.
+                    for(uint32_t selected : {0u,capacity-1,capacity}){
+                        expected.fill(0x55);
+                        for(uint32_t p=0;p<recordCount;p++)reset_record(p);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        auto populate=[&](uint32_t p){auto base=root+records+p*stride;
+                            Memory::Write32(base,1);Memory::Write32(base+20,8);
+                            Memory::Write32(base+28,0x12345678);Memory::Write8(base+tail,2);};
+                        if(selected<capacity)populate(selected);
+                        for(uint32_t p=capacity;p<(capacity+3)/4*4;p++)populate(p);
+                        std::memcpy(expected.data(),Memory::GetPointer(root,size),size);
+                        std::array<uint8_t,4*stride> padding{};
+                        std::memcpy(padding.data(),Memory::GetPointer(root+size,padding.size()),padding.size());
+                        ctx.gpr[3]=root;func_8065BC08(&ctx);
+                        if(ctx.gpr[3]!=(selected<capacity?8u:0xffffffffu)){
+                            std::fprintf(stderr,"RH1 valid course selected=%u n=%u got=%u\n",selected,capacity,ctx.gpr[3]);return 27;}
+                        ctx.gpr[3]=root;func_8065BFEC(&ctx);
+                        if(ctx.gpr[3]!=(selected<capacity?0x12345678u:0u))return 28;
+                        ctx.gpr[3]=root;func_8065C0E4(&ctx);
+                        if(ctx.gpr[3]!=(selected<capacity?2u:0u))return 29;
+                        ctx.gpr[3]=root;func_8065C1DC(&ctx);
+                        if(ctx.gpr[3]!=(selected<capacity?root+records+selected*stride+ids:0u))return 30;
+                        if(!equal() || std::memcmp(padding.data(),Memory::GetPointer(root+size,padding.size()),padding.size()))return 31;
+                    }
                     for(uint32_t kind=0;kind<3;kind++){
                         std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);expected.fill(0x55);
                         std::memset(Memory::GetPointer(controller,controllerSize),0x22,controllerSize);clears=0;

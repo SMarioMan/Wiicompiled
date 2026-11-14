@@ -36,3 +36,12 @@ const Layout kLayout{players, playerSize, scenarioHeader, settings, mission,
                      ghost, scenarioSize, race, menu, awards, ghosts, ghosts + 2 * 0x2800, 4, 0x3ba0, 0x1c8, 0x1a0, 0x2adc, 0x2ae8};
 #endif
 }
+
+#if defined(MKW_ENABLE_LAYOUT_ACCESS_AUDIT) && defined(MKW_GUEST_LAYOUT_EXPLICIT) && MKW_GUEST_LAYOUT_EXPLICIT
+namespace {
+const bool registeredLayoutAuditMap = [] {
+    RegisterGeneratedLayoutAccessAuditMap();
+    return true;
+}();
+}
+#endif

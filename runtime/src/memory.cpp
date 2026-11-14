@@ -450,6 +450,7 @@ GuestFlat::Backing ClassifyBacking(uint32_t baseAddress) {
 
 template <typename T>
 T ReadScalar(uint32_t address) {
+    MKW_LAYOUT_AUDIT_READ(address, sizeof(T));
     // This is the cold *Slow path; Memory::GetPointer already tries the fast
     // probe first, so repeating it here only guaranteed a second miss.
     auto* ptr = Memory::GetPointer(address, sizeof(T));
@@ -464,6 +465,7 @@ T ReadScalar(uint32_t address) {
 
 template <typename T>
 void WriteScalar(uint32_t address, T value) {
+    MKW_LAYOUT_AUDIT_WRITE(address, sizeof(T));
     if (RecompMod::HandleExecutableWrite(address, sizeof(T), static_cast<uint64_t>(value))) {
         return;
     }
@@ -604,6 +606,9 @@ void Memory::Init(const Config& config) {
 }
 
 void Memory::Reset() {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    LayoutAccessAudit::RetireAllInstances();
+#endif
     ClearDeferredReads();
     std::lock_guard<std::mutex> lock(RegionMutex());
     Regions().clear();

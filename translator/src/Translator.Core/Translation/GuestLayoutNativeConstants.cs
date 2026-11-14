@@ -41,6 +41,7 @@ public sealed partial class GuestLayoutRelocations
             }
         }
         if (_rankTables.Length != 0) Define("MKW_LAYOUT_RACE_WINNER_POINTS", RankPoints(0, Players, 1));
+        source.Append(EmitRetiredAccessRegistration());
         return source.ToString();
     }
 }

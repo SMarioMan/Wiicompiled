@@ -223,6 +223,9 @@ void WriteGuestLayoutArtifacts(string directory)
         Console.Error.WriteLine($"[translator] Experimental guest layout output; manifest Complete={layoutRelocations!.Complete}.");
     FileOutput.WriteTextIfChanged(Path.Combine(directory, "guest_layout_constants.h"),
         nativeLayoutConstants.Value);
+    if (layoutRelocations is not null)
+        FileOutput.WriteTextIfChanged(Path.Combine(directory, "guest_layout_retired_map.json"),
+            JsonSerializer.Serialize(layoutRelocations.DescribeRetiredAccessMap(), new JsonSerializerOptions { WriteIndented = true }));
     FileOutput.WriteTextIfChanged(Path.Combine(directory, "guest_layout_context.json"), JsonSerializer.Serialize(new {
         Format = "guest-layout-build-context-v1", Experimental = experimentalGuestLayouts,
         ProgramImageSha256 = image.Value.Sha256,

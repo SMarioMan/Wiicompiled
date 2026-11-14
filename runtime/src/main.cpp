@@ -1,3 +1,4 @@
+#include "guest_abi/layout_access_audit.h"
 #include "lan_runtime.h"
 #include <algorithm>
 #include <atomic>
@@ -1368,11 +1369,12 @@ int RuntimeMain(int argc, char** argv) {
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
                                             "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE --headless and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
             }
         }
+        LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
         LanRuntime::Validate();
         if (const auto value=std::getenv("MKW_TEST_LAN_CPU")) {
             if (std::string_view(value)!="1" || !g_headless || BootRace::Requested() || RuntimeProduct::Active().kind!=RuntimeProduct::Kind::Lan)
@@ -1561,6 +1563,7 @@ int RuntimeMain(int argc, char** argv) {
         aurora_shutdown();
         DiscordPresence::Shutdown();
         SetRuntimeExitCodeImpl(0);
+        LayoutAccessAudit::WriteReport();
         ShutdownProcessTranscript();
         return 0;
     } catch (const Memory::AccessViolation& ex) {

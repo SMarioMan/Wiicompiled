@@ -3,6 +3,7 @@
 // The only header translated code includes. Everything reachable from here is the
 // guest ABI; runtime-only headers must never be pulled in.
 #include "guest_abi/abi_version.h"
+#include "guest_abi/layout_access_audit.h"
 
 #include "isa/ppc_isa_config.h"
 #include "isa/big_endian.h"

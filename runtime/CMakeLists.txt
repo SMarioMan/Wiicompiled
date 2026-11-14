@@ -52,6 +52,7 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     message(FATAL_ERROR "WiiCompiled only supports Release builds")
 endif()
 
+option(MKW_ENABLE_LAYOUT_ACCESS_AUDIT "Instrument retired guest-layout reads/writes for diagnostics" OFF)
 option(MKW_BUILD_PRODUCTS "Build translated WiiCompiled product targets" ON)
 option(MKW_BUILD_PSQ_TESTS "Build focused PSQ ISA tests" OFF)
 set(MKW_X86_CPU_PROFILE "v3" CACHE STRING
@@ -334,6 +335,13 @@ endif()
 #     cmake/RuntimeLibrary.cmake and cmake/PublicProducts.cmake are all created
 #     below (those files are include()d, not add_subdirectory()d, so they share
 #     this directory scope) -> they pick the definitions up exactly as before.
+if(MKW_ENABLE_LAYOUT_ACCESS_AUDIT)
+    if(MKW_USE_PREBUILT_RUNTIME)
+        message(FATAL_ERROR "Layout access auditing requires MKW_USE_PREBUILT_RUNTIME=OFF so memory paths are instrumented")
+    endif()
+    add_compile_definitions(MKW_ENABLE_LAYOUT_ACCESS_AUDIT=1)
+endif()
+
 if(MKW_PROJECT_COMPILE_DEFINITIONS)
     add_compile_definitions(${MKW_PROJECT_COMPILE_DEFINITIONS})
 endif()

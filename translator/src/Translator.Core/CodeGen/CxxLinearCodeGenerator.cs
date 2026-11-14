@@ -304,6 +304,7 @@ public sealed partial class CxxLinearCodeGenerator
             try
             {
                 body.AppendLine("{");
+                body.AppendLine($"    MKW_LAYOUT_AUDIT_FUNCTION(0x{entryPoint:X8}u);");
                 foreach (var local in orderedLocals)
                 {
                     var representation = types.Get(local);
@@ -378,8 +379,20 @@ public sealed partial class CxxLinearCodeGenerator
                         ? suppressedMask
                         : null;
 
+                    // IR traces follow the instruction's non-terminator nodes.
+                    // Associate each group before emitting any memory operation.
+                    var auditGroupSites = new Dictionary<int, uint>();
+                    var auditGroupStart = 0;
+                    for (var t = 0; t < nonTerminatorCount; t++)
+                        if (block.Instructions[t] is IrTracePpc auditTrace)
+                        {
+                            auditGroupSites[auditGroupStart] = auditTrace.Address;
+                            auditGroupStart = t + 1;
+                        }
                     for (var i = 0; i < nonTerminatorCount; i++)
                     {
+                        if (auditGroupSites.TryGetValue(i, out var auditPc))
+                            body.AppendLine($"    MKW_LAYOUT_AUDIT_SITE(0x{auditPc:X8}u);");
                         var directCallOrdinal = -1;
                         if (block.Instructions[i] is IrCall ordinalCall)
                         {

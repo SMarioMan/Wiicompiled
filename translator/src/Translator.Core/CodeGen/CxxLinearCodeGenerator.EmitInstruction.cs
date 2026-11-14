@@ -247,6 +247,7 @@ public sealed partial class CxxLinearCodeGenerator
                 break;
             case IrResolvedLoadPair pair:
                 {
+                    sb.AppendLine($"{pad}MKW_LAYOUT_AUDIT_SITE(0u); // fused accesses have no single guest PC");
                     bool IsFloat(string destination) =>
                         (types.Get(destination) is ValueRepresentation primitive && primitive.IsFloat) || IsFloatRegister(destination);
                     var firstFloat = IsFloat(pair.FirstDestination);
@@ -278,6 +279,7 @@ public sealed partial class CxxLinearCodeGenerator
                 break;
             case IrResolvedStorePair pair:
                 {
+                    sb.AppendLine($"{pad}MKW_LAYOUT_AUDIT_SITE(0u); // fused accesses have no single guest PC");
                     bool IsFloat(IrValue source) => source.RegisterName is { } name && IsFloatRegister(name);
                     string Source(IrValue source)
                     {
@@ -542,6 +544,7 @@ public sealed partial class CxxLinearCodeGenerator
                 break;
             case IrTracePpc trace:
                 {
+                    // Provenance is emitted before this instruction group, not at its trailing trace.
                 }
                 break;
             case IrUndefined undef:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "guest_abi/exec_guard.h"
+#include "guest_abi/layout_access_audit.h"
 #include "guest_abi/flat_memory.h"
 #include "guest_abi/memory.h"
 
@@ -275,6 +276,10 @@ inline T MaybeByteSwap(T value) {
 
 template <typename T>
 MKW_MEMORY_FORCE_INLINE bool ReadResolvedScalar(uint8_t* host, uint32_t rangeOffset, T& outValue) {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    // Route through the scalar fallback, which retains an effective guest address.
+    if (::LayoutAccessAudit::enabled.load(std::memory_order_relaxed)) return false;
+#endif
     if (!host) return false;
     if constexpr (sizeof(T) == 1) {
         outValue = host[rangeOffset];
@@ -308,6 +313,10 @@ MKW_MEMORY_FORCE_INLINE ResolvedLoadPair ReadResolvedPair32(uint8_t* host, uint3
 template <typename Packed>
 MKW_MEMORY_FORCE_INLINE bool WriteResolvedPairFast(
     uint8_t* host, uint32_t rangeOffset, Packed packed) {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    // Route through the scalar fallback, which retains an effective guest address.
+    if (::LayoutAccessAudit::enabled.load(std::memory_order_relaxed)) return false;
+#endif
     if (!host) return false;
     const Packed swapped = MaybeByteSwap(packed);
     std::memcpy(host + rangeOffset, &swapped, sizeof(swapped));
@@ -326,6 +335,10 @@ MKW_MEMORY_FORCE_INLINE bool WriteResolvedPair32(
 
 template <typename T>
 MKW_MEMORY_FORCE_INLINE bool WriteResolvedScalar(uint8_t* host, uint32_t rangeOffset, T value) {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    // Route through the scalar fallback, which retains an effective guest address.
+    if (::LayoutAccessAudit::enabled.load(std::memory_order_relaxed)) return false;
+#endif
     if (!host) return false;
     if constexpr (sizeof(T) == 1) {
         host[rangeOffset] = static_cast<uint8_t>(value);
@@ -340,6 +353,7 @@ template <typename T>
 inline bool TryReadMappedScalar(uint32_t address, T& outValue) {
     uint8_t* ptr = nullptr;
     if (TryGetPointerFast(address, sizeof(T), ptr)) {
+        MKW_LAYOUT_AUDIT_READ(address, sizeof(T));
         if constexpr (sizeof(T) == 1) {
             outValue = *ptr;
         } else {
@@ -358,6 +372,7 @@ MKW_MEMORY_FORCE_INLINE bool TryReadGuestScalar(uint32_t address, T& outValue) {
     if (encodedBias == 0) [[unlikely]]
         return false;
     auto* ptr = reinterpret_cast<uint8_t*>((encodedBias - 1u) + address);
+    MKW_LAYOUT_AUDIT_READ(address, sizeof(T));
     if constexpr (sizeof(T) == 1) {
         outValue = *ptr;
     } else {
@@ -388,6 +403,7 @@ MKW_MEMORY_FORCE_INLINE bool TryWriteGuestScalar(uint32_t address, T value) {
     } else if (!TryGetWritablePointerFast(address, sizeof(T), ptr)) [[unlikely]] {
         return false;
     }
+    MKW_LAYOUT_AUDIT_WRITE(address, sizeof(T));
     if constexpr (sizeof(T) == 1) {
         *ptr = static_cast<uint8_t>(value);
     } else {
@@ -401,6 +417,7 @@ template <typename T>
 inline bool WriteStackScalarFast(uint32_t address, T value) {
     uint8_t* ptr = nullptr;
     if (TryGetPointerFast(address, sizeof(T), ptr)) {
+        MKW_LAYOUT_AUDIT_WRITE(address, sizeof(T));
         if constexpr (sizeof(T) == 1) {
             *ptr = static_cast<uint8_t>(value);
         } else {
@@ -539,6 +556,7 @@ MKW_MEMORY_FORCE_INLINE void WriteResolvedFloat64(uint8_t* r, uint32_t o, uint32
 
 template <typename T>
 MKW_MEMORY_FORCE_INLINE T FlatLoad(uint32_t address) {
+    MKW_LAYOUT_AUDIT_READ(address, sizeof(T));
     T value{};
     std::memcpy(&value, MKW_FLAT_GUEST_BASE + address, sizeof(T));
     return MaybeByteSwap(value);
@@ -546,6 +564,7 @@ MKW_MEMORY_FORCE_INLINE T FlatLoad(uint32_t address) {
 
 template <typename T>
 MKW_MEMORY_FORCE_INLINE void FlatStore(uint32_t address, T value) {
+    MKW_LAYOUT_AUDIT_WRITE(address, sizeof(T));
     const T swapped = MaybeByteSwap(value);
     std::memcpy(MKW_FLAT_GUEST_BASE + address, &swapped, sizeof(T));
 }

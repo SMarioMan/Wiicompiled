@@ -413,9 +413,9 @@ static struct pending_reservation {
 } pending_reservations[BROADCAST_TRACK_MAX];
 static unsigned reservation_cursor;
 
-/* The SDK's six-second reservation wait predates larger serialized queues.
- * Give additional live peers a bounded admission allowance, without changing
- * the original timer origin, retry count or behavior for fields up to twelve. */
+/* Every contender can wait behind a serialized reservation, including while
+ * an expanded room is still growing through its first twelve members. Keep
+ * stock builds unchanged; never reset SDK timer origins or retry counts. */
 static void update_reservation_budget(struct dwc_gamedata *gamedata) {
     if (!gamedata || gamedata->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV ||
         gamedata->reservation_timeout_ms < 6000) return;
@@ -427,7 +427,10 @@ static void update_reservation_budget(struct dwc_gamedata *gamedata) {
     if (participants < gamedata->player_count) participants = gamedata->player_count;
     if (participants > MKW_LAN_CAPACITY) participants = MKW_LAN_CAPACITY;
     if (participants > 32) participants = 32;
-    const unsigned budget = 6000 + (participants > 12 ? (participants - 12) * 2000 : 0);
+    unsigned budget = 6000;
+    if (MKW_LAN_CAPACITY > 12) budget += (participants - 1) * 2000;
+    /* Stay below the existing 65-second friend-room join watchdog. */
+    if (budget > 60000) budget = 60000;
     if (gamedata->reservation_timeout_ms < budget)
         gamedata->reservation_timeout_ms = budget;
 }

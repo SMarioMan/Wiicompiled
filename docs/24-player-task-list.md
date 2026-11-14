@@ -132,8 +132,10 @@ See [the measured LAN checkpoint](lan-expanded-validation.md) for normal-timing
 two-/twelve-console race passes and the unresolved 24-console reservation failures.
 
 The larger-room reservation policy now widens the SDK's six-second wait only
-when discovery reports more than twelve recent peers, with a bounded allowance
-and unchanged timer origins/retry counts. Native policy tests pass; repeat live
+in expanded builds for each other recently discovered or SDK-known peer, including
+early growth through twelve members. Stock twelve-capacity builds retain the
+original deadline. The allowance is bounded below the join watchdog, with
+unchanged timer origins/retry counts. Native policy tests pass; repeat live
 24-console joins before marking the timeout problem resolved.
 
 The latest clock-scaled run reached all 24 SDK links at 187.45 seconds, then

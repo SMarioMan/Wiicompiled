@@ -134,3 +134,14 @@ the disconnect cause. The executable SHA-256 was
 Sequential startup now rejects an error dialog from any established peer, not
 only the client currently joining. Normal-timing 24-console admission remains
 unqualified.
+
+The failed thirteen-console admission includes a client waiting 11.115 SDK
+seconds while the host queued its request behind the current SYN barrier. The
+old allowance counted only peers beyond twelve, giving that field just eight
+seconds. Expanded builds now budget for every other live or SDK-known peer,
+including early growth: six seconds plus two per contender, capped at sixty
+seconds below the existing friend-room join watchdog. Stock twelve-capacity
+builds retain six seconds. Policy tests cover the cap, discovery expiry,
+SDK-known peers, special timers, other states and unchanged origin/retry fields.
+Live comparison with this revised allowance remains pending; it does not
+establish a speed improvement or resolve the observed large-room stalls.

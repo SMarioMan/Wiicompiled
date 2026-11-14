@@ -109,6 +109,124 @@ class Archive:
         for index, node in enumerate(nodes): struct.pack_into('>III', output, root+index*12, *node)
         return compress(bytes(output))
 
+# Compact entries use a two-line retail-font card, measured in layout units.
+COMPACT_RESULT_WIDTH = 272
+COMPACT_RESULT_HEIGHT = 76
+RESULT_WINDOW_WIDTH = 608
+RESULT_WINDOW_HEIGHT = 374
+
+def results_grid(players, team=False):
+    """Maximize readable uniform card scale; never hide participants off-screen."""
+    if not 1 <= players <= 128: raise ValueError('Results grid supports 1..128 participants')
+    width, height = (304,225) if team else (RESULT_WINDOW_WIDTH,RESULT_WINDOW_HEIGHT)
+    card_height = 44 if team else COMPACT_RESULT_HEIGHT
+    flash_scale = 1.03 if team else 1.0
+    count = math.ceil(players/2) if team else players
+    choices = []
+    for columns in range(1, count+1):
+        rows = math.ceil(count/columns)
+        scale = min((width/columns-4)/COMPACT_RESULT_WIDTH,
+                    (height/rows-2)/card_height)
+        choices.append((scale/flash_scale, -rows*columns, -columns, columns, rows))
+    scale, _, _, columns, rows = max(choices)
+    return columns, rows, scale
+
+def result_layout_panes(data):
+    if data[:8] != b'RLYT\xfe\xff\x00\x0a': raise ValueError('Unsupported results layout')
+    output = bytearray(data); cursor = u16(data, 12); panes = {}
+    for _ in range(u16(data, 14)):
+        size = u32(data, cursor+4)
+        if size < 8 or cursor+size > len(data): raise ValueError('Invalid results layout section')
+        if data[cursor:cursor+4] in (b'pan1', b'pic1', b'txt1'):
+            name = data[cursor+12:cursor+28].split(b'\0')[0].decode('ascii')
+            if name in panes: raise ValueError('Duplicate results pane')
+            panes[name] = cursor
+        cursor += size
+    if cursor != len(data): raise ValueError('Invalid results layout length')
+    return output, panes
+
+def compact_results_layout(data):
+    """Rearrange existing named panes; retain retail fonts, materials and animations."""
+    output, panes = result_layout_panes(data)
+    required = {'ranking_null','line','hight_light','select_gold_01','select_gold_02',
+                'select_base','team_color_c','grade','chara_icon_null','chara_icon_sha',
+                'chara_icon','get_point','total_score','total_point','position',
+                'handle_text','time','player_name'}
+    if not required <= panes.keys(): raise ValueError('Unexpected results panes')
+    def pane(name, x, y, width, height, sx=1., sy=1.):
+        at = panes[name]
+        struct.pack_into('>ff', output, at+36, x, y)
+        struct.pack_into('>4f', output, at+60, sx, sy, width, height)
+    def text(name, x, y, width, font_width, font_height):
+        pane(name, x, y, width, 36)
+        struct.pack_into('>ff', output, panes[name]+100, font_width, font_height)
+    pane('ranking_null', 0, 0, COMPACT_RESULT_WIDTH, COMPACT_RESULT_HEIGHT)
+    # Keep the authored selection and team-color materials on the compact card.
+    for name in ('select_gold_01','select_gold_02','select_base','team_color_c','grade'):
+        pane(name, 0, 0, COMPACT_RESULT_WIDTH, COMPACT_RESULT_HEIGHT)
+    pane('line', -COMPACT_RESULT_WIDTH/2, -COMPACT_RESULT_HEIGHT/2, COMPACT_RESULT_WIDTH, 2)
+    pane('hight_light', 0, COMPACT_RESULT_HEIGHT/2, COMPACT_RESULT_WIDTH, 1)
+    # Ranks and names remain prominent; the second line retains points/time.
+    # Text panes keep their original alignment and localized BMG contents.
+    text('position', -132, 18, 64, 20, 36)
+    text('player_name', -64, 18, 196, 28, 36)
+    text('time', -88, -20, 220, 24, 32)
+    text('get_point', -12, -20, 72, 24, 32)
+    text('total_score', 4, -20, 80, 24, 32)
+    text('total_point', 86, -20, 46, 16, 22)
+    pane('chara_icon_null', -116, -20, 32, 32)
+    pane('chara_icon_sha', 0, 0, 30, 30)
+    pane('chara_icon', 0, 0, 30, 30)
+    # Steering-wheel decoration is optional information at this density.
+    # Zero scale survives retail color/alpha animations without deleting a pane.
+    pane('handle_text', 0, 0, 0, 0, 0, 0)
+    return bytes(output)
+
+def compact_team_layout(data):
+    output, panes = result_layout_panes(data)
+    required = {'mii_name_null','null_all','black_base','gold_parts','black_parts_t',
+                'blue_null','red_null','black_parts_b_r','black_parts_b_l',
+                'black_parts_r_r','black_parts_r_l','line_t','line_t_00','bou_t',
+                'bou_t_00','shadow_t','pikapika','Null_00','pts','point',
+                'mii_name','chara_icon_null','chara_icon_sha','chara_icon'}
+    if not required <= panes.keys(): raise ValueError('Unexpected team results panes')
+    def pane(name, x, y, width, height, sx=1., sy=1.):
+        at = panes[name]
+        struct.pack_into('>ff', output, at+36, x, y)
+        struct.pack_into('>4f', output, at+60, sx, sy, width, height)
+    for name in ('mii_name_null','null_all','Null_00','blue_null','red_null'):
+        pane(name, 0, 0, 272, 44)
+    for name in ('black_base','gold_parts','black_parts_t','pikapika'):
+        pane(name, 0, 0, 272, 44)
+    for name in ('black_parts_b_r','black_parts_r_r'):
+        pane(name, 136, 0, 136, 40)
+    for name in ('black_parts_b_l','black_parts_r_l'):
+        pane(name, -136, 0, 136, 40)
+    pane('bou_t', 0, 22, 272, 2); pane('bou_t_00', 0, -22, 272, 2)
+    pane('line_t', 136, 0, 136, 42); pane('line_t_00', -136, 0, 136, 42)
+    pane('shadow_t', 0, -22, 272, 4)
+    pane('mii_name', -16, 0, 176, 40)
+    pane('point', 104, 0, 60, 40)
+    for name, font_width in (('mii_name',26),('point',20)):
+        struct.pack_into('>ff', output, panes[name]+100, font_width, 36)
+    pane('pts', 0, 0, 0, 0, 0, 0)
+    pane('chara_icon_null', -120, 0, 28, 28)
+    pane('chara_icon_sha', 0, 0, 26, 26); pane('chara_icon', 0, 0, 26, 26)
+    return bytes(output)
+
+def compact_team_parents(data):
+    if data[:8] != b'bctr\x00\x02\x00\x01': raise ValueError('Unsupported team parent control')
+    output = bytearray(data); variants, strings = u16(data,14), u16(data,16)
+    table, count = u16(data,variants), u16(data,variants+2)
+    if count != 3: raise ValueError('Unexpected team parent variants')
+    for index in range(3):
+        at = variants+table+index*60; name_at = strings+u16(data,at)
+        expected = 'ResultVSTeamNULL'+(str(index-1) if index else '')
+        if data[name_at:data.index(0,name_at)] != expected.encode(): raise ValueError('Unexpected team parent name')
+        if index:
+            for offset in (12,32): struct.pack_into('>f', output, at+offset, (-152,152)[index-1])
+    return bytes(output)
+
 def expand_results(data, players):
     if data[:8] != b'bctr\x00\x02\x00\x01': raise ValueError('Unsupported BRCTR version')
     variants, strings = u16(data, 14), u16(data, 16)
@@ -122,8 +240,9 @@ def expand_results(data, players):
         if data[name_at:data.index(0, name_at)] != f'rank{index+1}'.encode() or record[52:] != bytes(8):
             raise ValueError('Unexpected results variant data')
     if players == 12: return data
-    if not 12 < players <= 100: raise ValueError('Results presentation currently supports 12..100 participants')
+    if not 12 < players <= 128: raise ValueError('Results presentation supports 12..128 participants')
     names = bytearray(data[strings:]); records = bytearray(); columns = math.ceil(players/12)
+    if players > 24: columns, rows, scale = results_grid(players)
     for index in range(players):
         record = bytearray(originals[index % 12])
         if index >= 12:
@@ -131,7 +250,17 @@ def expand_results(data, players):
         # The authored variants carry separate 4:3 and 16:9 translations/scales.
         # Keep their twelve y positions and animation delays within each column.
         column = index//12; x = (column-(columns-1)/2)*(620/columns)
+        if players > 24:
+            column, row = divmod(index, rows)
+            x = (column-(columns-1)/2)*RESULT_WINDOW_WIDTH/columns
+            y = (rows-1-2*row)*RESULT_WINDOW_HEIGHT/(2*rows)
+            # Avoid a twelve-row repeating entrance delay for dense grids.
+            struct.pack_into('>f', record, 8, row)
         for offset in (12, 32):
+            if players > 24:
+                struct.pack_into('>ff', record, offset, x, y)
+                struct.pack_into('>ff', record, offset+12, scale, scale)
+                continue
             struct.pack_into('>f', record, offset, x)
             struct.pack_into('>ff', record, offset+12, 1/columns, 1/columns)
         records.extend(record)
@@ -155,7 +284,7 @@ def expand_selection_cards(data, players, prefix):
             raise ValueError('Unexpected selection variant data')
         originals[name] = record
     if players == 12: return data
-    if not 12 < players <= 100: raise ValueError('Selection presentation supports 12..100 participants')
+    if not 12 < players <= 128: raise ValueError('Selection presentation supports 12..128 participants')
     names = bytearray(data[strings:]); records = bytearray()
     columns = max(2, math.ceil(players/8)); rows = math.ceil(players/columns)
     scale = min(1, 2/columns, 5/(rows-1))
@@ -192,6 +321,7 @@ def expand_team_results(data, players):
             raise ValueError('Unexpected team results variant data')
     if players == 12: return data
     count = math.ceil(players/2); names = bytearray(data[strings:]); records = bytearray()
+    if players > 24: columns, rows, scale = results_grid(players, team=True)
     top = struct.unpack_from('>f', originals[0], 16)[0]; bottom = struct.unpack_from('>f', originals[-1], 16)[0]
     for index in range(count):
         record = bytearray(originals[index % 6])
@@ -199,6 +329,13 @@ def expand_team_results(data, players):
             struct.pack_into('>H', record, 0, len(names)); names.extend(f'BlueRed{index}\0'.encode())
         struct.pack_into('>f', record, 8, 14*index/(count-1))
         for offset in (12, 32):
+            if players > 24:
+                column, row = divmod(index, rows)
+                x = (column-(columns-1)/2)*304/columns
+                y = 70-(row+.5)*225/rows
+                struct.pack_into('>ff', record, offset, x, y)
+                struct.pack_into('>ff', record, offset+12, scale, scale)
+                continue
             struct.pack_into('>f', record, offset+4, top+(bottom-top)*index/(count-1))
             struct.pack_into('>ff', record, offset+12, 6/count, 6/count)
         records.extend(record)
@@ -437,7 +574,7 @@ def write_atomic(path, data):
     finally: temporary.unlink(missing_ok=True)
 
 def build(root, players):
-    if not 12 <= players <= 100: raise ValueError('Results assets currently support 12..100 capacity')
+    if not 12 <= players <= 128: raise ValueError('Results assets support 12..128 capacity')
     folder = root/'files/Scene/UI'
     if players == 12: return []
     changes = []; pending = []
@@ -446,6 +583,17 @@ def build(root, players):
         for name in ('ResultVS', 'ResultGP', 'ResultTA'):
             key = f'result/ctrl/{name}.brctr'
             if key in archive.files: archive.files[key] = expand_results(archive.files[key], players); modified.append(key)
+        if players > 24:
+            for name in ('position_12players', 'position_12players_time_attack'):
+                key = f'result/blyt/{name}.brlyt'
+                if key in archive.files:
+                    archive.files[key] = compact_results_layout(archive.files[key]); modified.append(key)
+            key = 'result/blyt/common_w051_team_blue_red_chara_point.brlyt'
+            if key in archive.files:
+                archive.files[key] = compact_team_layout(archive.files[key]); modified.append(key)
+            key = 'result/ctrl/ResultVSTeamNULL.brctr'
+            if key in archive.files:
+                archive.files[key] = compact_team_parents(archive.files[key]); modified.append(key)
         team = 'result/ctrl/ResultVSTeam.brctr'
         if team in archive.files: archive.files[team] = expand_team_results(archive.files[team], players); modified.append(team)
         for animation in ('game_image_position_texture_pattern.brlan', 'game_image_position_multi_texture_pattern.brlan'):

@@ -77,7 +77,11 @@ Video subtitles are observations and design references, not build instructions.
   100; normal-menu vehicle assignment and rendered races still need validation.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
   keep every racer visible together on one screen. Implement a compact 128-entry
-  grid without pagination, scrolling, tabs or rotating subsets. At 24, generated individual controls now use
+  grid without pagination, scrolling, tabs or rotating subsets. The asset generator
+  now supplies a 16-row, 8-column layout at 128, choosing readable card scale for
+  smaller capacities and retaining original retail fonts/materials/digit artwork.
+  Qualify its individual and team presentation in actual 16:9 and 4:3 rendering.
+  At 24, generated individual controls now use
   two columns, team controls have twelve rows per team, and reserved localized
   message IDs avoid unrelated strings. Original-loader checks and an actual
   24-player individual results screen confirm distinct, readable ranks through

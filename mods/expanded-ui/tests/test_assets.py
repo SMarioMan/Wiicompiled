@@ -40,6 +40,54 @@ class ExpandedResultsTests(unittest.TestCase):
         self.assertEqual(len(positions),24)
         with self.assertRaises(ValueError): UI.expand_results(expanded,24)
 
+    def test_compact_grid_keeps_every_card_in_one_screen_at_capacity_boundaries(self):
+        for players in (25,26,48,52,64,100,116,118,127,128):
+            with self.subTest(players=players):
+                columns, rows, scale = UI.results_grid(players)
+                self.assertGreaterEqual(columns*rows, players)
+                if players == 128:
+                    self.assertEqual((rows, columns), (16,8))
+                    self.assertGreaterEqual(36*scale, 9)  # rank/name cap height in layout units
+                rectangles = []
+                for index in range(players):
+                    column, row = divmod(index, rows)
+                    x = (column-(columns-1)/2)*608/columns
+                    y = (rows-1-2*row)*374/(2*rows)
+                    half_width, half_height = 272*scale/2, 76*scale/2
+                    self.assertLessEqual(abs(x)+half_width,304.0001)
+                    self.assertLessEqual(abs(y)+half_height,187.0001)
+                    rectangle = x-half_width,y-half_height,x+half_width,y+half_height
+                    for old in rectangles:
+                        self.assertTrue(rectangle[2] <= old[0] or old[2] <= rectangle[0] or
+                                        rectangle[3] <= old[1] or old[3] <= rectangle[1])
+                    rectangles.append(rectangle)
+                self.assertEqual(len(set(rectangles)),players)
+        for invalid in (0,129):
+            with self.assertRaises(ValueError): UI.results_grid(invalid)
+
+    def test_team_grid_fits_both_teams_including_retail_flash_scaling(self):
+        for players in (25,26,48,52,64,100,116,118,127,128):
+            with self.subTest(players=players):
+                columns, rows, scale = UI.results_grid(players, team=True)
+                if players == 128: self.assertEqual((rows,2*columns),(16,8))
+                rectangles = []
+                for team_x in (-152,152):
+                    for index in range((players+1)//2):
+                        column, row = divmod(index,rows)
+                        x = team_x+(column-(columns-1)/2)*304/columns
+                        y = 70-(row+.5)*225/rows
+                        # Original selection flash reaches 1.03 on both axes.
+                        half_width, half_height = 272*scale*1.03/2, 44*scale*1.03/2
+                        self.assertLessEqual(abs(x)+half_width,304.0001)
+                        self.assertLessEqual(y+half_height,70.0001)
+                        self.assertGreaterEqual(y-half_height,-155.0001)
+                        rectangle = x-half_width,y-half_height,x+half_width,y+half_height
+                        for old in rectangles:
+                            self.assertTrue(rectangle[2] <= old[0] or old[2] <= rectangle[0] or
+                                            rectangle[3] <= old[1] or old[3] <= rectangle[1])
+                        rectangles.append(rectangle)
+                self.assertEqual(len(set(rectangles)),2*((players+1)//2))
+
     def test_selection_grids_keep_retail_styles_and_unique_named_slots(self):
         for prefix in ('Vote', 'Member'):
             names = bytearray(b'\0'); records = bytearray()

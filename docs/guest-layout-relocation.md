@@ -1821,3 +1821,18 @@ guards, teardown and preserved registers. The original BRCTR name/transform
 loaders also read all 24 generated vote/member variants from both menu archives
 in both aspect ratios. These isolate storage and asset loading; they are not a
 substitute for the live network transition test.
+
+The first live two-peer transition with those pages exposed additional external
+accesses after their runtime type checks. The vote animation read the old hidden
+selection count (zero), selected an invalid card and crashed; replacing the menu
+assets with retail copies reproduced the failure. The cross-page count and Mii
+group references are now explicit checked relocations. Native vote-submission
+coverage executes the real voting routine and checks each voter index, appended
+card count, Mii-group pointer, duplicate rejection and capacity bounds. A separate
+partial-lobby case checks two active players in a larger build. The vote page’s
+unrolled two-player team scan grows in pairs, and the rating page initializes the
+hidden flag for every additional card.
+
+All six full-capacity vote-submission fixtures (12/13/24/32/48/100), the 24-capacity
+partial-lobby regression and the complete consumer audit pass. The pre-fix
+13-capacity fixture fails at the stale Mii-group pointer, as expected.

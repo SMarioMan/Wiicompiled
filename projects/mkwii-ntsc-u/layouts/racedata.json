@@ -3034,8 +3034,21 @@
     },
     {
       "Name": "MenuVRControl",
-      "Size": 372,
-      "Alignment": 4
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "MenuVRControlPrefix"
+        },
+        {
+          "Name": "hidden",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "tail",
+          "Type": "MenuVRControlTail"
+        }
+      ]
     },
     {
       "Name": "MenuVRPage",
@@ -3090,6 +3103,28 @@
       "Name": "SectionMgrPrefixRest",
       "Size": 148,
       "Alignment": 4
+    },
+    {
+      "Name": "MenuVoteScan",
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "pairs",
+          "Type": "InputByte",
+          "PerPlayer": true,
+          "PlayersPerElement": 2
+        }
+      ]
+    },
+    {
+      "Name": "MenuVRControlPrefix",
+      "Size": 128,
+      "Alignment": 1
+    },
+    {
+      "Name": "MenuVRControlTail",
+      "Size": 243,
+      "Alignment": 1
     }
   ],
   "References": [
@@ -63277,6 +63312,114 @@
       "Symbol": "players",
       "Addend": 0,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8061259C",
+      "ExpectedWord": "0x807E0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612600",
+      "ExpectedWord": "0x807E0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612C04",
+      "ExpectedWord": "0x801E0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612E74",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806130C0",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E100",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E1B0",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612D88",
+      "ExpectedWord": "0x38DE0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E364",
+      "ExpectedWord": "0x38B90290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E37C",
+      "ExpectedWord": "0x38B90290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E394",
+      "ExpectedWord": "0x38790290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612570",
+      "ExpectedWord": "0x38600006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVoteScan.pairs.count",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -76677,6 +76820,23 @@
           "Count": "MenuVotePage.voterIds.count",
           "Width": 4,
           "StartIndex": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x8064E0F0",
+      "ExpectedWords": [
+        "0x9B781834"
+      ],
+      "BaseRegister": "r24",
+      "ValueRegister": "r27",
+      "Arrays": [
+        {
+          "Array": "MenuVRPage.controls.offset+MenuVRControl.hidden.offset",
+          "Stride": "MenuVRPage.controls.stride",
+          "Count": "MenuVRPage.controls.count",
+          "Width": 1,
+          "StartIndex": 11
         }
       ]
     }

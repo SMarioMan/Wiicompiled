@@ -3218,6 +3218,88 @@
           "Type": "OnlineVSTail"
         }
       ]
+    },
+    {
+      "Name": "ArchiveManagerHeader",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "ArchiveRacerHolder",
+      "Alignment": 4,
+      "Size": 28
+    },
+    {
+      "Name": "ArchiveContent",
+      "Alignment": 4,
+      "Size": 36
+    },
+    {
+      "Name": "ArchiveLoadRequest",
+      "Alignment": 4,
+      "Size": 84
+    },
+    {
+      "Name": "ArchiveCourseLoader",
+      "Alignment": 4,
+      "Size": 36
+    },
+    {
+      "Name": "ArchiveKartLoader",
+      "Alignment": 4,
+      "Size": 24
+    },
+    {
+      "Name": "ArchiveManagerState",
+      "Alignment": 4,
+      "Size": 16
+    },
+    {
+      "Name": "ArchiveManager",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "ArchiveManagerHeader"
+        },
+        {
+          "Name": "kartModelsHolders",
+          "Type": "ArchiveRacerHolder",
+          "PerPlayer": true
+        },
+        {
+          "Name": "kartModelsHolders2",
+          "Type": "ArchiveRacerHolder",
+          "PerPlayer": true
+        },
+        {
+          "Name": "contentArchives",
+          "Type": "ArchiveContent",
+          "Count": 4
+        },
+        {
+          "Name": "loadRequests",
+          "Type": "ArchiveLoadRequest",
+          "Count": 7
+        },
+        {
+          "Name": "taskThread",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "courseLoader",
+          "Type": "ArchiveCourseLoader"
+        },
+        {
+          "Name": "kartLoaders",
+          "Type": "ArchiveKartLoader",
+          "Count": 4
+        },
+        {
+          "Name": "state",
+          "Type": "ArchiveManagerState"
+        }
+      ]
     }
   ],
   "References": [
@@ -65066,6 +65148,1334 @@
       "Symbol": "Scenario.settings.offset",
       "Addend": 36,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8053A7F8",
+      "ExpectedWord": "0x387F0158",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartModelsHolders2.offset"
+    },
+    {
+      "Instruction": "0x8053A818",
+      "ExpectedWord": "0x387F02A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053A830",
+      "ExpectedWord": "0x3BBF0588",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8053A874",
+      "ExpectedWord": "0x387F05AC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartLoaders.offset"
+    },
+    {
+      "Instruction": "0x8053A890",
+      "ExpectedWord": "0x981F0618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053A89C",
+      "ExpectedWord": "0x981F0619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053A8BC",
+      "ExpectedWord": "0x907F0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053A904",
+      "ExpectedWord": "0x901F0614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053A90C",
+      "ExpectedWord": "0x981F060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053AA14",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AA24",
+      "ExpectedWord": "0x901D0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AA28",
+      "ExpectedWord": "0x387D05AC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartLoaders.offset"
+    },
+    {
+      "Instruction": "0x8053AA3C",
+      "ExpectedWord": "0x37FD0588",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8053AA3C",
+      "ExpectedWord": "0x37FD0588",
+      "Node": 1,
+      "Operand": "argument:1",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8053AA8C",
+      "ExpectedWord": "0x387D02A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053AAA4",
+      "ExpectedWord": "0x387D0158",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartModelsHolders2.offset"
+    },
+    {
+      "Instruction": "0x8053ABDC",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AC00",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AC8C",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053ACFC",
+      "ExpectedWord": "0x90A30338",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset"
+    },
+    {
+      "Instruction": "0x8053AD00",
+      "ExpectedWord": "0x38630344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AD14",
+      "ExpectedWord": "0x93C30384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053AD24",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053ADB4",
+      "ExpectedWord": "0x90A3033C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053ADB8",
+      "ExpectedWord": "0x38630344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053ADCC",
+      "ExpectedWord": "0x93C30384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053ADDC",
+      "ExpectedWord": "0x93A30340",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053ADE0",
+      "ExpectedWord": "0x807A0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AE88",
+      "ExpectedWord": "0x90A30338",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset"
+    },
+    {
+      "Instruction": "0x8053AE8C",
+      "ExpectedWord": "0x38630344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AEA0",
+      "ExpectedWord": "0x93A30384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053AEB0",
+      "ExpectedWord": "0x93C30388",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8053AEB4",
+      "ExpectedWord": "0x807A0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053AF80",
+      "ExpectedWord": "0x387F0344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AF8C",
+      "ExpectedWord": "0x93DF0338",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset"
+    },
+    {
+      "Instruction": "0x8053AF98",
+      "ExpectedWord": "0x939F0384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053AF9C",
+      "ExpectedWord": "0x807F0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B044",
+      "ExpectedWord": "0x801C02C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B050",
+      "ExpectedWord": "0x801C02C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B098",
+      "ExpectedWord": "0x380502A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053B09C",
+      "ExpectedWord": "0x901E0534",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053B0A0",
+      "ExpectedWord": "0x387E053C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B0B0",
+      "ExpectedWord": "0x937E057C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B0B4",
+      "ExpectedWord": "0x807E0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B0BC",
+      "ExpectedWord": "0x93BE0538",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053B0D4",
+      "ExpectedWord": "0x801C02C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B0E4",
+      "ExpectedWord": "0x801C02C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B134",
+      "ExpectedWord": "0x386302A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053B18C",
+      "ExpectedWord": "0x387D0398",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B198",
+      "ExpectedWord": "0x93FD038C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B1A4",
+      "ExpectedWord": "0x93DD03D8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B1A8",
+      "ExpectedWord": "0x807D0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B284",
+      "ExpectedWord": "0x801F05A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8053B290",
+      "ExpectedWord": "0x801F05A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8053B2A8",
+      "ExpectedWord": "0x809F05A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B33C",
+      "ExpectedWord": "0x387F03EC",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B34C",
+      "ExpectedWord": "0x93DF03E0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B358",
+      "ExpectedWord": "0x93BF042C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B35C",
+      "ExpectedWord": "0x807F0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B488",
+      "ExpectedWord": "0x801C05A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8053B494",
+      "ExpectedWord": "0x801C05A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 24
+    },
+    {
+      "Instruction": "0x8053B4AC",
+      "ExpectedWord": "0x809C05A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.courseLoader.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053B544",
+      "ExpectedWord": "0x387C0440",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B554",
+      "ExpectedWord": "0x93BC0434",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B560",
+      "ExpectedWord": "0x93DC0480",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B564",
+      "ExpectedWord": "0x807C0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B72C",
+      "ExpectedWord": "0x38770494",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B73C",
+      "ExpectedWord": "0x92B70488",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B748",
+      "ExpectedWord": "0x937704D4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B74C",
+      "ExpectedWord": "0x80770584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B864",
+      "ExpectedWord": "0x93FC04DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B868",
+      "ExpectedWord": "0x387C04E8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B87C",
+      "ExpectedWord": "0x93BC0528",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B880",
+      "ExpectedWord": "0x807C0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B888",
+      "ExpectedWord": "0x93DC052C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8053B9BC",
+      "ExpectedWord": "0x93FE04DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053B9C0",
+      "ExpectedWord": "0x387E04E8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053B9D4",
+      "ExpectedWord": "0x937E0528",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053B9D8",
+      "ExpectedWord": "0x807E0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053B9E0",
+      "ExpectedWord": "0x939E052C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8053BA74",
+      "ExpectedWord": "0x3BE30158",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartModelsHolders2.offset"
+    },
+    {
+      "Instruction": "0x8053BB10",
+      "ExpectedWord": "0x93FE04DC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride"
+    },
+    {
+      "Instruction": "0x8053BB14",
+      "ExpectedWord": "0x387E04E8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053BB28",
+      "ExpectedWord": "0x937E0528",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053BB2C",
+      "ExpectedWord": "0x807E0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053BB34",
+      "ExpectedWord": "0x939E052C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride+ArchiveManager.loadRequests.stride",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8053BCB8",
+      "ExpectedWord": "0x386302A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053BF18",
+      "ExpectedWord": "0x3BE30158",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartModelsHolders2.offset"
+    },
+    {
+      "Instruction": "0x8053C02C",
+      "ExpectedWord": "0x800402C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053C038",
+      "ExpectedWord": "0x800402C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053C068",
+      "ExpectedWord": "0x386302A8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.contentArchives.offset"
+    },
+    {
+      "Instruction": "0x8053C0A0",
+      "ExpectedWord": "0x38630158",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.kartModelsHolders2.offset"
+    },
+    {
+      "Instruction": "0x8053C0B4",
+      "ExpectedWord": "0x800302C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053C0C0",
+      "ExpectedWord": "0x800302C8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.contentArchives.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8053C468",
+      "ExpectedWord": "0x38630588",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8053C474",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C724",
+      "ExpectedWord": "0x88030619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053C734",
+      "ExpectedWord": "0x98030618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C73C",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C780",
+      "ExpectedWord": "0x88030619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053C790",
+      "ExpectedWord": "0x98030618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C794",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C7CC",
+      "ExpectedWord": "0x98030619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053C824",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C848",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C8D4",
+      "ExpectedWord": "0x807B0584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053C8E8",
+      "ExpectedWord": "0x981B0619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053C8F0",
+      "ExpectedWord": "0x981B0618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C958",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C95C",
+      "ExpectedWord": "0x807F05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053C968",
+      "ExpectedWord": "0x80DF05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C9A8",
+      "ExpectedWord": "0x806305B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053C9B4",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053C9C4",
+      "ExpectedWord": "0x83A405B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053C9C8",
+      "ExpectedWord": "0x839F05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053C9D0",
+      "ExpectedWord": "0x836405C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x8053C9D4",
+      "ExpectedWord": "0x834405BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8053CAD0",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CADC",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CB40",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CB44",
+      "ExpectedWord": "0x807F05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CB50",
+      "ExpectedWord": "0x80DF05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CB90",
+      "ExpectedWord": "0x806305B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CB9C",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CBA8",
+      "ExpectedWord": "0x834405B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CBAC",
+      "ExpectedWord": "0x837F05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CBB0",
+      "ExpectedWord": "0x838405C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x8053CBB4",
+      "ExpectedWord": "0x83A405BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8053CCB0",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CCBC",
+      "ExpectedWord": "0x901F05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CCF0",
+      "ExpectedWord": "0x800405B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CCFC",
+      "ExpectedWord": "0x810405B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CD44",
+      "ExpectedWord": "0x90A705BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8053CD48",
+      "ExpectedWord": "0x90C705C0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 20
+    },
+    {
+      "Instruction": "0x8053CD4C",
+      "ExpectedWord": "0x908705B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CD50",
+      "ExpectedWord": "0x88030619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053CD5C",
+      "ExpectedWord": "0x98830618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CD68",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053CDCC",
+      "ExpectedWord": "0x907C0610",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE10",
+      "ExpectedWord": "0x800405B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE1C",
+      "ExpectedWord": "0x906405B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE20",
+      "ExpectedWord": "0x800405B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CE24",
+      "ExpectedWord": "0x807C0610",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE30",
+      "ExpectedWord": "0x906405B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CE40",
+      "ExpectedWord": "0x800305B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE4C",
+      "ExpectedWord": "0x936305B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CE50",
+      "ExpectedWord": "0x800305B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CE5C",
+      "ExpectedWord": "0x936305B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CEAC",
+      "ExpectedWord": "0x83DC05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CEEC",
+      "ExpectedWord": "0x801C05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CEF8",
+      "ExpectedWord": "0x93FC05B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CEFC",
+      "ExpectedWord": "0x93FC05B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053CF00",
+      "ExpectedWord": "0x93FC05B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053CF10",
+      "ExpectedWord": "0x807A0610",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CF28",
+      "ExpectedWord": "0x901A0610",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053CF48",
+      "ExpectedWord": "0x806305B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053D02C",
+      "ExpectedWord": "0x907E0614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053D060",
+      "ExpectedWord": "0x807F0614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053D078",
+      "ExpectedWord": "0x901F0614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053D07C",
+      "ExpectedWord": "0x981F060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053D0C8",
+      "ExpectedWord": "0x83DD0614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053D134",
+      "ExpectedWord": "0x9BFD060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053D184",
+      "ExpectedWord": "0x83C30614",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053D1F4",
+      "ExpectedWord": "0x9BFC060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053D228",
+      "ExpectedWord": "0x8803060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053D240",
+      "ExpectedWord": "0x9883060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8053D244",
+      "ExpectedWord": "0x88030619",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 13
+    },
+    {
+      "Instruction": "0x8053D250",
+      "ExpectedWord": "0x98830618",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053D25C",
+      "ExpectedWord": "0x80630584",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.taskThread.offset"
+    },
+    {
+      "Instruction": "0x8053A72C",
+      "ExpectedWord": "0x3860061C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ArchiveManager.size"
+    },
+    {
+      "Instruction": "0x8053A7C8",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ArchiveManager.kartModelsHolders.count"
+    },
+    {
+      "Instruction": "0x8053A808",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ArchiveManager.kartModelsHolders2.count"
+    },
+    {
+      "Instruction": "0x8053AAB0",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ArchiveManager.kartModelsHolders2.count"
+    },
+    {
+      "Instruction": "0x8053AAC4",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ArchiveManager.kartModelsHolders.count"
     }
   ],
   "GlobalPointers": {
@@ -65089,7 +66499,8 @@
     "0x809BD958": "RKNetUserHandler",
     "0x809BD930": "RKNetSelectHandler",
     "0x809BD928": "RKNetEventHandler",
-    "0x809BD950": "RKNetItemHandler"
+    "0x809BD950": "RKNetItemHandler",
+    "0x809B8F78": "ArchiveManager"
   },
   "ArrayCopies": [
     {

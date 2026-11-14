@@ -44,13 +44,14 @@ int main(void){
     uint32_t peer[12]={0};peer[0]=0x7f000002;game.my_pid=0x7f000001;game.dwc_match_state=1;
     for(unsigned count=1;count<=33;count++){
         game.player_count=count;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
-        if(count<=12 || count>32)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
+        if(MKW_LAN_CAPACITY<=12 || count<=2 || count>32)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
         else CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],0)) && !originals && clocks==1);
     }
     game.player_count=24;
     for(unsigned attempt=0;attempt<8;attempt++){
         peer[6]=attempt;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
-        CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],attempt)) && !originals && clocks==1);
+        if(MKW_LAN_CAPACITY<=12)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
+        else CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],attempt)) && !originals && clocks==1);
     }
     for(unsigned state=0;state<=18;state++)if(state!=1){game.dwc_match_state=state;originals=0;CHECK(LANMeshNextTick(peer)==0x123456789abcdef0ULL && originals==1);}
     game.dwc_match_state=1;peer[0]=game.my_pid;CHECK(LANMeshNextTick(peer)==0x123456789abcdef0ULL);
@@ -59,12 +60,14 @@ int main(void){
 }
 '''
         with tempfile.TemporaryDirectory(prefix='lan-mesh-schedule-') as temporary:
-            path=Path(temporary);(path/'test.c').write_text(harness)
-            compile = subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Werror','-I',str(module),
-                str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
-            self.assertEqual(compile.returncode,0,compile.stderr)
-            run = subprocess.run([str(path/'test')],capture_output=True,text=True)
-            self.assertEqual(run.returncode,0,run.stderr)
+            path=Path(temporary)
+            for capacity in (12,24):
+                (path/'test.c').write_text(harness)
+                compile = subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Werror',f'-DMKW_LAN_CAPACITY={capacity}','-I',str(module),
+                    str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
+                self.assertEqual(compile.returncode,0,compile.stderr)
+                run = subprocess.run([str(path/'test')],capture_output=True,text=True)
+                self.assertEqual(run.returncode,0,run.stderr)
 
 
 if __name__=='__main__':

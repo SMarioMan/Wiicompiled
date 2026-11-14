@@ -339,11 +339,12 @@ failure. Normal race-progress checks also require every peer's mode to match.
 Larger fields also use a constant-work mesh deadline calculation. The retail
 `DWCi_GetNextMeshMakeTryTick` repeatedly scans the SDK connection list and adds
 multi-second delays based on existing connections and node position. Two scoped
-call-site shims pass their candidate node from r31 to the LAN scheduler. Fields
-through twelve and unsupported states retain the original SDK routine.
+call-site shims pass their candidate node from r31 to the LAN scheduler. Stock
+twelve-capacity builds and unsupported states retain the original SDK routine.
 
-For larger fields, stable PID ordering chooses a preferred initiator for each
-pair. Pair-specific jitter spreads attempts; the opposite endpoint has a grace
+Expanded builds use this policy from three participants onward, so legacy
+deadlines cannot accumulate during the initial lobby growth. Stable PID ordering
+chooses a preferred initiator for each pair. Pair-specific jitter spreads attempts; the opposite endpoint has a grace
 period before it can initiate. Retry backoff is bounded, and the SDK keeps its
 own connection checks, attempt limits and teardown. The mesh still has 276 links
 at 24 consoles. The shims preserve LR and use symbolic linker/patch targets;

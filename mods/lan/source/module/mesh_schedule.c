@@ -16,7 +16,7 @@ __asm__(".section .text.LANMeshTryTick,\"ax\"\n"
 
 uint64_t LANMeshNextTick(const uint32_t *peer) {
     struct dwc_gamedata *game = get_dwc_gamedata();
-    if (!game || !peer || game->player_count <= 12 || game->player_count > 32 ||
+    if (!game || !peer || MKW_LAN_CAPACITY <= 12 || game->player_count <= 2 || game->player_count > 32 ||
         game->dwc_match_state != DWC_MATCH_STATE_CL_WAITING ||
         !peer[0] || peer[0] == game->my_pid)
         return DWCi_GetNextMeshMakeTryTick();

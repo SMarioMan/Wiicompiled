@@ -62,3 +62,10 @@ They voted and entered the race scene, where telemetry and RAM snapshots showed
 only twelve active race/menu participants. The run was stopped as failed;
 controller AID-map copies, subsequently fixed in `b2fd63f`, had left the last
 twelve entries inactive. No 24-player race/finish pass is claimed from this run.
+
+Source `392fee8` passed normal-timing complete-connectivity checks with three
+consoles (sparse IDs 1/13/24, 24.12 seconds) and thirteen consoles (33.93 seconds).
+Its simultaneous 24-console attempt failed during admission below thirteen
+members. The expanded-build scheduler now applies from three participants, so
+it also covers that initial growth; stock twelve-capacity builds retain the
+original scheduler. This adjustment still requires live revalidation.

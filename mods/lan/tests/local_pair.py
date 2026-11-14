@@ -97,6 +97,7 @@ def run(args):
     processes, logs, pads = [], [], []
     log_positions, log_pending, finished = {}, {}, {}
     next_finish_check = 0
+    finish_since = None
     status, race, network, last_input = {}, {}, {}, {}
     room_reported = False
     room_confirmed = race_since = None
@@ -169,11 +170,16 @@ def run(args):
                             record = finished_progress(line, count)
                             if record is not None:
                                 finished[instance] = record
-                    if len(finished) == count and len({r['course'] for r in finished.values()}) == 1:
-                        print(json.dumps(dict(result='passed', check=f'all {count} racers finished on every peer',
-                            elapsed=round(time.monotonic()-started, 2), test_clock_divisor=test_clock,
-                            simulation=finished)), flush=True)
-                        return 0
+                    if len(finished) == count and len({(r['course'], r['mode']) for r in finished.values()}) == 1:
+                        finish_since = finish_since or time.monotonic()
+                        if time.monotonic()-finish_since >= 2:
+                            for instance, process in zip(ids, processes):
+                                if process.poll() is not None:
+                                    raise RuntimeError(f'Instance {instance} exited with {process.returncode} after finishing')
+                            print(json.dumps(dict(result='passed', check=f'all {count} racers finished on every peer',
+                                elapsed=round(time.monotonic()-started, 2), test_clock_divisor=test_clock,
+                                simulation=finished)), flush=True)
+                            return 0
                 for instance, process in zip(ids, processes):
                     if process.poll() is not None:
                         raise RuntimeError(f'Instance {instance} exited with {process.returncode}')
@@ -224,7 +230,8 @@ def run(args):
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, race=record)), flush=True)
                     running = all(i in race and now-race[i][1] < args.telemetry_timeout and
                         race[i][0]['stage'] == 2 and race[i][0]['players'] == count for i in ids)
-                    if running and all(race[i][0]['course'] == race[ids[0]][0]['course'] for i in ids):
+                    if running and all((race[i][0]['course'], race[i][0]['mode']) ==
+                            (race[ids[0]][0]['course'], race[ids[0]][0]['mode']) for i in ids):
                         if race_since is None:
                             race_since = now
                             race_start_frames = {i: race[i][0]['frames'] for i in ids}
@@ -240,6 +247,8 @@ def run(args):
                 if status.get(instance, (None,))[0] != record:
                     print(json.dumps(dict(elapsed=round(now-started, 2), instance=instance, **record)), flush=True)
                 status[instance] = record, now
+                if page == 0x4d and transition == 4:
+                    raise RuntimeError(f'Instance {instance} reached an error dialog; inspect its game log')
                 joined = all(i in status and now-status[i][1] < args.telemetry_timeout and
                     status[i][0]['state'] == (3 if i == args.host_id else 4) and
                     status[i][0]['players'] == count and status[i][0]['page'] == 0x9d and

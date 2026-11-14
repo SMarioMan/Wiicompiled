@@ -330,3 +330,8 @@ allowance is retained. Disabled/short SDK timers, other states, the original
 timer origin and retry count are preserved. Native policy checks pass at
 12/13/24/32 capacity. Live comparison is required before attributing improved
 joining reliability or speed to this allowance.
+
+The driver fails immediately on a game's error dialog during the main join/race
+loop. Finish checks require matching course and mode, retain two seconds of
+process liveness after complete finish evidence, and report any child exit as a
+failure. Normal race-progress checks also require every peer's mode to match.

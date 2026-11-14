@@ -399,6 +399,24 @@ static struct pending_reservation {
 } pending_reservations[BROADCAST_TRACK_MAX];
 static unsigned reservation_cursor;
 
+/* The SDK's six-second reservation wait predates larger serialized queues.
+ * Give additional live peers a bounded admission allowance, without changing
+ * the original timer origin, retry count or behavior for fields up to twelve. */
+static void update_reservation_budget(struct dwc_gamedata *gamedata) {
+    if (!gamedata || gamedata->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV ||
+        gamedata->reservation_timeout_ms < 6000) return;
+    unsigned participants = 1;
+    for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++)
+        if (tracked_peers[i].info.status &&
+            timestamp - tracked_peers[i].last_update <= BROADCAST_TIMEOUT)
+            participants++;
+    if (participants > MKW_LAN_CAPACITY) participants = MKW_LAN_CAPACITY;
+    if (participants > 32) participants = 32;
+    const unsigned budget = 6000 + (participants > 12 ? (participants - 12) * 2000 : 0);
+    if (gamedata->reservation_timeout_ms < budget)
+        gamedata->reservation_timeout_ms = budget;
+}
+
 static void dispatch_status(struct dwc_gamedata *gamedata, uint32_t *buffer,
                             const so_addr_t raddr) {
     gamedata->public_ip = MKW_ADVERTISED_IP;
@@ -484,6 +502,7 @@ static void check_for_status_or_broadcast(void) {
     receive_packets(broadcast_socket, true);
     receive_packets(multicast_socket, false);
     struct dwc_gamedata *gamedata = get_dwc_gamedata();
+    update_reservation_budget(gamedata);
     /* Clients also accept peer links while the SDK builds the mesh. They
      * return to CL_WAITING after accepting a link, rather than SV_WAITING. */
     if (gamedata && (gamedata->dwc_match_state == DWC_MATCH_STATE_SV_WAITING ||

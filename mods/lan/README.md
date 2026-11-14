@@ -319,3 +319,14 @@ advancing menus after racing begins. This checks finishing, not results/menu
 return. Increase `--timeout` to cover a full race. A prototype of this check
 completed a normal-timing three-lap two-console LAN race in 207.10 seconds; each
 console observed both racers finished.
+
+The reservation queue also uses a bounded allowance for larger discovered fields.
+The USA SDK initializes its reservation deadline to 6,000 ms at `800DEE14`;
+`DWCi_MatchProcess` reads that field at `800D6428` and `800D6470`. While waiting
+for a reservation, the LAN poll retains six seconds through twelve live peers
+and allows two seconds per additional recently discovered peer, capped by build
+capacity and the 32-console SDK limit (46 seconds maximum). An existing longer
+allowance is retained. Disabled/short SDK timers, other states, the original
+timer origin and retry count are preserved. Native policy checks pass at
+12/13/24/32 capacity. Live comparison is required before attributing improved
+joining reliability or speed to this allowance.

@@ -130,3 +130,8 @@ network milestone.
 
 See [the measured LAN checkpoint](lan-expanded-validation.md) for normal-timing
 two-/twelve-console race passes and the unresolved 24-console reservation failures.
+
+The larger-room reservation policy now widens the SDK's six-second wait only
+when discovery reports more than twelve recent peers, with a bounded allowance
+and unchanged timer origins/retry counts. Native policy tests pass; repeat live
+24-console joins before marking the timeout problem resolved.

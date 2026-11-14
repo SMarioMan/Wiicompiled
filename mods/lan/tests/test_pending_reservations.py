@@ -20,6 +20,7 @@ class PendingReservations(unittest.TestCase):
 #include <stdlib.h>
 #include <stdio.h>
 #define BROADCAST_TRACK_MAX 4
+#define MKW_LAN_CAPACITY 32
 #define STATUS_SIZE_MAX 512
 #define STATUS_MAGIC 0xbb49cc4d
 #define BROADCAST_TIMEOUT 120
@@ -28,7 +29,7 @@ class PendingReservations(unittest.TestCase):
 typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
 '''
         harness += states + r'''
-static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;} game;
+static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;} game;
 static bool have_game=true;
 static struct dwc_gamedata *get_dwc_gamedata(void){return have_game?&game:NULL;}
 static uint64_t timestamp=100;

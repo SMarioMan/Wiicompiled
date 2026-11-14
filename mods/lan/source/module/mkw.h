@@ -74,7 +74,9 @@ struct dwc_gamedata /* size 0x10f8 */ {
 	enum dwc_match_state dwc_match_state; /* +0x71c (0xc means joinable, goes 0xd -> 0x12 during joining see {{CodeRef|RMCP|80279694}}) */
 	uint8_t _unk720[0x730 - 0x720];
 	uint32_t resv_check_value; /* +0x730 used for room entry message */
-	uint8_t _unk734[0x778 - 0x734];
+	uint8_t _unk734[0x740 - 0x734];
+    uint32_t reservation_timeout_ms; /* +0x740; DWCi_SendResvCommand initializes 6000 ms */
+    uint8_t _unk744[0x778 - 0x744];
 	uint32_t my_pid; /* +0x778 */
 	uint32_t host_pid; /* +0x77c */
 	uint8_t _unk780[0x7d8 - 0x780];
@@ -96,6 +98,7 @@ struct dwc_gamedata /* size 0x10f8 */ {
 /* These are SDK storage limits, independent of the game's participant arrays. */
 typedef char mkw_dwc_peer_offset_check[__builtin_offsetof(struct dwc_gamedata, peers) == 0x38 ? 1 : -1];
 typedef char mkw_dwc_port_offset_check[__builtin_offsetof(struct dwc_gamedata, public_port) == 0x6d0 ? 1 : -1];
+typedef char mkw_dwc_reservation_timeout_check[__builtin_offsetof(struct dwc_gamedata, reservation_timeout_ms) == 0x740 ? 1 : -1];
 typedef char mkw_dwc_size_check[sizeof(struct dwc_gamedata) == 0x10f8 ? 1 : -1];
 
 struct dwc_gamedata2 /* size 0x1458 */ {

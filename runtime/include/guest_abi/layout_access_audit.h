@@ -2,7 +2,7 @@
 
 #include <atomic>
 #include <cstdint>
-#include <span>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -19,10 +19,22 @@ struct Field {
     uint32_t newOffset, newSize, newCount, newStride;
     bool perRacer = false;
 };
+// This header is part of the C++17 guest ABI even though the native auditor
+// implementation is compiled as C++20. Metadata borrows static generated arrays.
+class FieldRange {
+    const Field* data_;
+    std::size_t size_;
+public:
+    constexpr FieldRange(const Field* data, std::size_t size) : data_(data), size_(size) {}
+    template<std::size_t N>
+    constexpr FieldRange(const Field (&fields)[N]) : data_(fields), size_(N) {}
+    constexpr const Field* begin() const { return data_; }
+    constexpr const Field* end() const { return data_ + size_; }
+};
 struct Type {
     std::string_view name;
     uint32_t oldSize, newSize;
-    std::span<const Field> fields;
+    FieldRange fields;
 };
 struct Site {
     uint32_t pc = 0;

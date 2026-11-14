@@ -6,7 +6,11 @@ static consumer audit; it does not establish complete high-capacity support.
 
 Configure a source runtime build with `MKW_ENABLE_LAYOUT_ACCESS_AUDIT=ON` and
 `MKW_USE_PREBUILT_RUNTIME=OFF`. Regenerate translated sources and native layout
-constants with the same manifest/capacity. Launch with:
+constants with the same manifest/capacity. The public metadata header supports
+the translated-code C++17 ABI; the native implementation uses the runtime
+C++20 build. `LayoutAuditHeaderTests` checks both instrumented and ordinary
+guest-ABI headers, and the lifetime wrapper tests exercise borrowed field arrays.
+Launch with:
 
 ```
 --layout-audit=log --layout-audit-report=layout-access-audit.json

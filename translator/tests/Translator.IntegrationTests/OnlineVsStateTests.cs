@@ -30,7 +30,7 @@ public class OnlineVsStateTests
             var header=Path.Combine(temp,"layout.h");File.WriteAllText(header,plan.EmitNativeConstants());
             var glue=Path.Combine(temp,"glue.cpp");
             File.WriteAllText(glue,$"#define MKW_TRANSLATED_PLAYER_CAPACITY {players}\n#define MKW_TRANSLATED_GUEST_LAYOUT_HEADER \"{header}\"\n#include \"{root}/runtime/game/guest_layout_values.cpp\"\n");
-            var entries=new uint[]{0x8052d640,0x8052d780,0x8052d940,0x8052d964,0x80538e34,0x80020494,0x8002058c,0x80529b20,0x80529c28};
+            var entries=new uint[]{0x8052d640,0x8052d780,0x8052d940,0x8052d964,0x80538e34,0x80020494,0x8002058c,0x80529b20,0x80529c28,0x8052990c,0x8052a698};
             var sources=new List<string>{glue,Path.Combine(root,"runtime/src/hle/scenario_scores.cpp"),Path.Combine(root,"runtime/src/guest_region.cpp")};
             foreach(var pc in entries)
             {
@@ -47,9 +47,12 @@ public class OnlineVsStateTests
                 #include <cstdlib>
                 #include <cstring>
                 #include <cstdio>
+                #include <array>
+                #include <vector>
                 {{declarations}}
                 extern "C" void Scenario_ResetExpandedScores(CpuContext*);
                 extern "C" void Scenario_AdvanceExpandedScores(CpuContext*);
+                extern "C" void Scenario_ReindexExpandedPreviousRanks(CpuContext*);
                 constexpr uint32_t scenario=0x81000000,info=0x81100000,gm=0x81200000,sp=0x81f00000,n={{players}},
                     gmSize={{layout.Symbol("OnlineVSData.size")}},tail={{layout.Symbol("OnlineVSData.tail.offset")}};
                 uint32_t allocationSize=0;
@@ -67,8 +70,44 @@ public class OnlineVsStateTests
                     register_entry(0x80229a48,allocate);register_entry(0x8064f8f0,ignore);
                     // Native identities are PAL; their base functions here are real USA translations.
                     register_entry(0x8052e668,func_80529B20);register_entry(0x8052e770,func_80529C28);
+                    register_entry(0x8052f1e0,func_8052A698);
                     const auto& l=MkwGuestLayout::kLayout;
                     CpuContext c{};CpuContextScope scope(&c);c.gpr[1]=sp;c.gpr[2]=0x8038ac20;c.gpr[13]=0x80388880;
+                    constexpr uint32_t data=0x81400000;
+                    std::memset(Memory::GetPointer(data,l.racedataSize),0x55,l.racedataSize);
+                    for(uint32_t i=0;i<16;i++){Memory::Write8(data-16+i,0x77);Memory::Write8(data+l.racedataSize+i,0x77);}
+                    c.gpr[3]=data;func_8052990C(&c);
+                    for(auto scenarioOffset:{l.racedataMenu,l.racedataAwards})for(uint32_t i=0;i<n;i++){
+                        const auto p=data+scenarioOffset+l.scenarioPlayers+i*l.playerStride;
+                        if(Memory::Read16(p+0xd8)||Memory::Read16(p+0xde)||Memory::Read8(p+0xe0)!=i+1||Memory::Read8(p+0xe1)!=i+1)return 15;
+                    }
+                    for(uint32_t i=0;i<l.scenarioSize;i++)if(Memory::Read8(data+l.racedataRace+i)!=0x55)return 16;
+                    for(uint32_t i=0;i<16;i++)if(Memory::Read8(data-16+i)!=0x77||Memory::Read8(data+l.racedataSize+i)!=0x77)return 17;
+                    const auto menu=data+l.racedataMenu;
+                    for(auto mode:{7u,10u})for(uint32_t pattern=0;pattern<3;pattern++){
+                        Memory::Write32(menu+l.scenarioSettings+8,mode);
+                        std::array<uint32_t,n> ranks{},types{},expected{};
+                        for(uint32_t i=0;i<n;i++){
+                            const auto p=menu+l.scenarioPlayers+i*l.playerStride;
+                            ranks[i]=pattern==0?0:pattern==1?n-i:i==n-1?254:i%4;
+                            types[i]=pattern==2&&i%3==1?5:4;expected[i]=i+1;
+                            Memory::Write32(p+0x10,types[i]);Memory::Write8(p+0xe1,ranks[i]);
+                        }
+                        uint32_t next=1;
+                        for(uint32_t old=1;old<=n;old++)for(uint32_t i=0;i<n;i++)if(types[i]!=5&&ranks[i]==old)expected[i]=next++;
+                        for(uint32_t i=0;i<n;i++)if(types[i]!=5&&!ranks[i])expected[i]=next++;
+                        std::vector<uint8_t> before(l.scenarioSize);std::memcpy(before.data(),Memory::GetPointer(menu,l.scenarioSize),l.scenarioSize);
+                        c.gpr[3]=menu;Scenario_ReindexExpandedPreviousRanks(&c);
+                        for(uint32_t i=0;i<n;i++)if(Memory::Read8(menu+l.scenarioPlayers+i*l.playerStride+0xe1)!=expected[i])return 18;
+                        for(uint32_t o=0;o<l.scenarioSize;o++){
+                            const bool rank=o>=l.scenarioPlayers&&o<l.scenarioPlayers+n*l.playerStride&&(o-l.scenarioPlayers)%l.playerStride==0xe1;
+                            if(!rank&&Memory::Read8(menu+o)!=before[o])return 19;
+                        }
+                        Memory::Write32(menu+l.scenarioSettings+8,6);
+                        std::memcpy(before.data(),Memory::GetPointer(menu,l.scenarioSize),l.scenarioSize);
+                        c.gpr[3]=menu;Scenario_ReindexExpandedPreviousRanks(&c);
+                        if(std::memcmp(before.data(),Memory::GetPointer(menu,l.scenarioSize),l.scenarioSize))return 20;
+                    }
                     for(uint32_t locals:{1u,2u}){
                         std::memset(Memory::GetPointer(scenario,l.scenarioSize),0x55,l.scenarioSize);
                         for(uint32_t i=0;i<16;i++){Memory::Write8(scenario-16+i,0x77);Memory::Write8(scenario+l.scenarioSize+i,0x77);

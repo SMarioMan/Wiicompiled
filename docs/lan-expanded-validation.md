@@ -167,3 +167,28 @@ it does not guarantee ordering of datagrams still in flight. Native ordering
 fixtures cover cancellation present/absent, re-entry and all guard conditions;
 linked-module checks pin the actual SDK entry and retained trampoline. Live
 revalidation remains required.
+
+With `cce0293`, thirteen consoles completed room membership and full SDK
+connectivity at 45.91 seconds under normal timing with RAM capture on every
+console. The race transition still failed at 269.17 seconds. Console 8's RAM
+identified the damaged heap link: player thirteen had previous rank zero, so
+the race-info constructor's order-array write at `8052DDFC` targeted `ids[-1]`.
+Its player ID byte changed the allocator's next-block pointer immediately
+before that array. Later heap accounting in `GameScene::enter` followed the
+broken list. Binary SHA-256:
+`174ef8501882241f8e558826f5526b1fd51c09c0bb5265f7eeb9530eb921849d`.
+A selection-phase sample had valid used-block lists on all thirteen consoles.
+This is a connectivity pass and a failed race qualification.
+
+The isolated reset regression confirms `Racedata::ResetScenarios` already
+initializes expanded menu/award ranks correctly. The later online compactor,
+`RacedataScenario::UpdateFromPrevRace` (`8052A698`), still used a twelve-byte
+scratch array and twelve-slot scans/writeback. A native thirteen-player fixture
+with cleared previous ranks reproduces its unchanged zero in slot thirteen.
+The expanded wrapper now snapshots the original ranks, retains the retail
+helper's register/unrelated effects, and produces its stable ranking order over
+the full capacity: positive eligible ranks first, then zero ranks in slot order.
+Inactive and out-of-range ranks retain the retail identity fallback. Modes
+outside the original online range and stock capacity retain the original path.
+Native cases also cover reversed/tied ranks, sparse inactive slots, unrelated
+bytes, and the independent menu/award reset before live revalidation.

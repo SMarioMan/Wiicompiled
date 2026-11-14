@@ -346,5 +346,23 @@ The running test was navigated back to the room and into Start using ordinary
 controller input, with the original Start-description/callback confirming the
 selection. Only the input driver was paused during this correction; game RAM
 was not modified. All 24 consoles subsequently entered course selection and
-race loading. Race qualification was still in progress at this checkpoint, so
-this record does not claim an advancing or completed 24-player race.
+race loading. The run failed at 1334.03 seconds when console 23 crashed while
+building its results rows. It had lost remote connections during loading and
+finished its remaining single-player field at frame 241 without completing a
+lap. This is a connectivity pass followed by a race failure, not a completed
+24-player race or an unattended race-start timing benchmark.
+
+The results crash used HUD slot `-1` for local player 13. The real screen
+initializer still scanned twelve players and retained five accesses to the old
+HUD-map location. A native thirteen-player fixture reproduces the fault; the
+expanded initializer, relocated map and bounded spectator fallback now pass
+12/13/24/32/48/100 fixtures. An independent outgoing RACEDATA fixture also
+reproduces a high-slot buffer underrun: its separate twelve-player ordinal
+search leaves `-1`, copying a 64-byte packet before the packet-manager object.
+Correcting that checked count requires live revalidation before attributing the
+loading disconnects to the underrun.
+
+A same-binary, normal-timing two-console control completed three laps and
+finished both racers on both peers at 211.98 seconds. The CPU-driving hook did
+not cause an immediate finish in that baseline. This does not qualify the
+24-player race path.

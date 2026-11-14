@@ -31,7 +31,7 @@ public class PacketManagerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-packet-manager-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8064f634,0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84,0x806512c4,0x80651018,0x80650678,0x8064f780,0x8064f88c,0x8064f8f0};
+            var entries=new uint[]{0x8064f4d8,0x80652a78,0x80005f34,0x8064f634,0x8064ed80,0x8064f96c,0x8064ee50,0x80650020,0x80650398,0x806558d0,0x80006038,0x80005f84,0x806512c4,0x80651018,0x80650678,0x8064f780,0x8064f88c,0x8064f8f0};
             var fixtures=new HashSet<uint>{0x80229a48,0x80656ecc,0x8065cd74,0x80652ab8,0x80008e44,0x80517a5c,0x805316e8,0x80655ec4,0x80655e84};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -112,6 +112,30 @@ public class PacketManagerStorageTests
                     }
                     if(clears!=4)return 9;
                     constexpr uint32_t peerCount=capacity<32?capacity:32;
+                    // The exporter has its own ordinal search. A missing high
+                    // local player must not produce ordinal -1 and write before
+                    // the two authored 64-byte send records.
+                    for(uint32_t current=0;current<2;current++)for(uint32_t locals : {1u,2u}){
+                        std::memset(Memory::GetPointer(root-64,size+128),0x55,size+128);expected.fill(0x55);
+                        Memory::Write32(controller+currentSub,current);
+                        auto sub=controller+subs+current*subStride;const uint32_t localAid=peerCount-1;
+                        Memory::Write32(sub+8,peerCount);Memory::Write32(sub+16,1u<<localAid);Memory::Write8(sub+33,localAid);
+                        std::memset(Memory::GetPointer(controller+aidMap,capacity),255,capacity);
+                        Memory::Write8(controller+aidMap+capacity-1,localAid);
+                        if(locals==2)Memory::Write8(controller+aidMap,localAid);
+                        for(uint32_t ordinal=0;ordinal<locals;ordinal++){
+                            const uint32_t player=locals==2&&ordinal==0?0:capacity-1;
+                            for(uint32_t b=0;b<64;b++){
+                                const uint8_t value=static_cast<uint8_t>(player+b+1);
+                                Memory::Write8(0x81400000+b,value);expected[20+ordinal*64+b]=value;
+                            }
+                            ctx.gpr[3]=root;ctx.gpr[4]=0x81400000;ctx.gpr[5]=64;ctx.gpr[6]=player;func_8064F4D8(&ctx);
+                            if(!equal()){
+                                std::fprintf(stderr,"RACEDATA export current=%u locals=%u player=%u ordinal=%u n=%u\n",
+                                    current,locals,player,ordinal,capacity);return 27;}
+                            for(uint32_t b=0;b<64;b++)if(Memory::Read8(root-64+b)!=0x55 || Memory::Read8(root+size+b)!=0x55)return 28;
+                        }
+                    }
                     // Execute the real RACEDATA getter, including its unrolled
                     // player-to-console ordinal search beyond the twelfth slot.
                     for(uint32_t buffer=0;buffer<2;buffer++)for(uint32_t pattern=0;pattern<3;pattern++){

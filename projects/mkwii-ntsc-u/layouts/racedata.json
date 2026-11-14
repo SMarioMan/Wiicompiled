@@ -3222,6 +3222,13 @@
   ],
   "References": [
     {
+      "Instruction": "0x8064F510",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)"
+    },
+    {
       "Instruction": "0x8052AA58",
       "ExpectedWord": "0x88030B64",
       "Node": 0,

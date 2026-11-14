@@ -1776,6 +1776,17 @@ thirteenth header before the change and pass at 12, 13, 24, 32, 48 and 100,
 including no-valid-header cases with poisoned trailing groups, unchanged objects
 and neighboring bytes. The full consumer audit passes.
 
+The outgoing RACEDATA exporter has a separate player-to-local-buffer ordinal
+search. Its twelve-entry limit could leave a high local player's ordinal at
+`-1` and copy the 64-byte record to `PacketMgr - 44`, before the send area.
+The checked group count now uses `ceil(players/4)`. Native regression coverage
+exercises the highest participant as the only local player and as the second
+local player, in both controller subrecords, checking complete object contents
+and guards before and after it through 100-slot storage capacity. The authored
+two local-player send records retain their original sizes. This fixes a proven
+buffer underrun; a new live run must establish whether it explains the earlier
+24-console loading disconnects.
+
 The race scenario's screen initializer now scans every participant when assigning
 local controllers and HUD slots. Its fallback spectator search grows in groups
 of three and rejects partial-group padding as inactive. The five HUD-map

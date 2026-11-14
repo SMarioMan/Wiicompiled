@@ -77,12 +77,12 @@ struct OSThread_t {
   uint32_t srr1; /* 0x19c from OSLoadContext */
   char _unknown1a0[0x1a2 - 0x1a0];
   struct {
-    unsigned : 1; /* 15 */
-    unsigned restore_volatile_gpr : 1; /* 14 from OSCreateThread; whether or not to restore volatile gprs */
-    unsigned : 14; /* 0-13 */
+    uint16_t : 1; /* 15 */
+    uint16_t restore_volatile_gpr : 1; /* 14 from OSCreateThread; whether or not to restore volatile gprs */
+    uint16_t : 14; /* 0-13 */
   } ctx_flags; /* 0x1a2 from OSLoadContext */
   uint32_t gqr[8]; /* 0x1a4 from OSLoadContext */
-  char _unknown1c4[0x2ca - 0x1c4];
+  char _unknown1c4[0x2c8 - 0x1c4];
   short state; /* 0x2c8 from OSIsThreadTerminated */
   short param_r9; /* 0x2ca from OSCreateThread */
   int param_stack_size; /* 0x2cc from OSCreateThread */

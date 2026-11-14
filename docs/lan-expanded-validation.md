@@ -43,3 +43,12 @@ Clock-scaled runs must be reported separately as functional tests. They cannot
 qualify normal-timing connection reliability or real-time performance. Tests
 through 100 slots establish individual storage/algorithm behavior; the current
 LAN protocol still limits console masks to 32.
+
+With source `10a1357`, opt-in local CPU driving and a prototype finish driver,
+both real LAN racers completed all three Luigi Circuit laps at normal timing.
+Both consoles reported `observed=2 finished=2 stage=4` at 207.10 seconds. The
+executable SHA-256 was
+`8bd4914e77092ae9ca96b130f724958991b1d264fd76d02fb8e3e5bf99b71d47`.
+The CPU driver preserves network player ownership and race RNG. The reusable
+`--finish` driver checks this simulation evidence; results and a second race
+remain separate requirements.

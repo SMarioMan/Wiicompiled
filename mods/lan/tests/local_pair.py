@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import socket
 import struct
@@ -32,6 +33,20 @@ def decode_observation(packet, peer, ids):
         raise RuntimeError(f'Instance {instance} used unexpected source address {peer}')
     return words
 
+
+
+def finished_progress(line, count):
+    """Accept actual simulation finish evidence, never menu text or room counts."""
+    if b'[race-progress]' not in line:
+        return None
+    record = {key.decode(): int(value) for key, value in re.findall(rb'(\w+)=(\d+)', line)}
+    required = {'stage', 'frames', 'players', 'capacity', 'observed', 'course', 'mode', 'finished'}
+    if not required <= record.keys():
+        return None
+    if (record['stage'] < 3 or record['frames'] < 120 or record['players'] != count or
+            record['observed'] != count or record['finished'] != count or record['capacity'] < count):
+        return None
+    return record
 
 
 def sdk_ready(network, ids, host_id, count, now, timeout):
@@ -80,6 +95,8 @@ def run(args):
     if len(set(directories)) != len(directories):
         raise ValueError('Every instance requires a different portable directory')
     processes, logs, pads = [], [], []
+    log_positions, log_pending, finished = {}, {}, {}
+    next_finish_check = 0
     status, race, network, last_input = {}, {}, {}, {}
     room_reported = False
     room_confirmed = race_since = None
@@ -104,6 +121,8 @@ def run(args):
                 log = (directory / 'lan-test-game.log').open('w')
                 logs.append(log)
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
+                if args.finish:
+                    environment['MKW_TEST_LAN_CPU'] = '1'
                 processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role], cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
                 if args.sequential_join or (args.host_first and index == 0):
@@ -137,6 +156,24 @@ def run(args):
                     else:
                         raise TimeoutError(f'Instance {instance} did not finish sequential room startup')
             while time.monotonic() - started < args.timeout:
+                if args.finish and time.monotonic() >= next_finish_check:
+                    next_finish_check = time.monotonic()+1
+                    for instance, directory in zip(ids, directories):
+                        with (directory/'lan-test-game.log').open('rb') as stream:
+                            stream.seek(log_positions.get(instance, 0))
+                            chunk = stream.read(1024*1024)
+                            log_positions[instance] = stream.tell()
+                        lines = (log_pending.get(instance, b'')+chunk).split(b'\n')
+                        log_pending[instance] = lines.pop()
+                        for line in lines:
+                            record = finished_progress(line, count)
+                            if record is not None:
+                                finished[instance] = record
+                    if len(finished) == count and len({r['course'] for r in finished.values()}) == 1:
+                        print(json.dumps(dict(result='passed', check=f'all {count} racers finished on every peer',
+                            elapsed=round(time.monotonic()-started, 2), test_clock_divisor=test_clock,
+                            simulation=finished)), flush=True)
+                        return 0
                 for instance, process in zip(ids, processes):
                     if process.poll() is not None:
                         raise RuntimeError(f'Instance {instance} exited with {process.returncode}')
@@ -158,6 +195,8 @@ def run(args):
                             x = -80 if instance == args.host_id and elapsed < args.menu_pulse else 0
                         elif page == 0x42:
                             buttons = 0x100  # accelerate after countdown
+                        elif args.finish and race_start_frames:
+                            buttons = 0
                         elif not (instance != args.host_id and page == 0x9d):
                             period = max(3, args.menu_pulse * 2)
                             buttons = 0x100 if elapsed % period < max(0.35, args.menu_pulse) else 0
@@ -190,7 +229,7 @@ def run(args):
                             race_since = now
                             race_start_frames = {i: race[i][0]['frames'] for i in ids}
                         if room_confirmed is not None and now-race_since >= 5 and all(
-                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids):
+                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids) and not args.finish:
                             print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
                             return 0
                     else:
@@ -258,7 +297,9 @@ if __name__ == '__main__':
     parser.add_argument('--client-id', type=int, choices=range(1, 33), action='append', help='Optional IDs in client-directory order')
     parser.add_argument('--mesh', action='store_true', help='Require complete SDK connections without starting a race')
     parser.add_argument('--race', action='store_true', help='Also navigate menus and require every race simulation to advance')
+    parser.add_argument('--finish', action='store_true', help='Drive local racers with the CPU and require every peer to observe all race finishes')
     options = parser.parse_args()
+    options.race = options.race or options.finish
     try:
         raise SystemExit(run(options))
     except (OSError, ValueError, RuntimeError, TimeoutError) as error:

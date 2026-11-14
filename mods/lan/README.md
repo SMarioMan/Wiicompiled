@@ -310,3 +310,12 @@ control, preserves race RNG/settings and keeps a controller for menu input.
 Native layout fixtures cover local/remote selection, channel assignment and RNG
 at 12/24/48 capacity. This opt-in test facility does not establish a completed
 24-console race; finish and results must be observed from the simulation.
+
+`local_pair.py --finish` includes the race transition check, enables local CPU
+driving in each child and waits for every peer's native simulation log to report
+all active racers finished. It checks the actual field size, observed racers,
+finish flags, stage and frame count; menu state alone cannot pass it. Inputs stop
+advancing menus after racing begins. This checks finishing, not results/menu
+return. Increase `--timeout` to cover a full race. A prototype of this check
+completed a normal-timing three-lap two-console LAN race in 207.10 seconds; each
+console observed both racers finished.

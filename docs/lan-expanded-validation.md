@@ -212,3 +212,21 @@ covering a five-second stall, a slow callback, phase preservation, early/repeate
 polls and disabled/uninitialized polling. Its effect on actual 24-console lobby
 progress still requires a live comparison; the trace alone does not establish
 that the VI backlog caused every connection failure.
+
+The first normal-timing traced comparison with VI coalescing (`a2c447b`)
+reached eight members but failed admission on console 15's error dialog at
+89.72 seconds. The longest host advertisement gap was still 32.01 seconds.
+This remains a failed qualification, not a lobby speed/reliability pass.
+
+Discovery previously advertised once per sixty network-thread polls and aged
+peers/requests by that same poll count. That equates to one second only when
+the thread actually runs at sixty polls per second. Discovery now derives its
+sixtieth-second timestamp from `OSGetTime`, sends at most one advertisement
+when due, and schedules the next one relative to that send. A stalled poll
+does not generate a catch-up burst. Discovery retains a five-second lifetime;
+queued expanded-room reservations instead retain the existing maximum SDK wait
+allowance of sixty seconds, so a request waiting behind other reservations is
+not discarded merely because its discovery advertisement expired. Stock
+capacity retains the five-second request lifetime. Native tests cover slow/fast
+polls, tick rollover, independent queue/discovery expiry and queue ordering.
+Live admission and race validation remain pending.

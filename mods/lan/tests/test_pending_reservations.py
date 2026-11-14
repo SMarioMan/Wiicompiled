@@ -24,6 +24,7 @@ class PendingReservations(unittest.TestCase):
 #define STATUS_SIZE_MAX 512
 #define STATUS_MAGIC 0xbb49cc4d
 #define BROADCAST_TIMEOUT 120
+#define RESERVATION_TIMEOUT 1440
 #define MKW_ADVERTISED_IP 0x08080808
 #define LOG_INFO(...) ((void)0)
 typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
@@ -65,7 +66,8 @@ int main(void){
         game.dwc_match_state=role?DWC_MATCH_STATE_SV_WAITING:DWC_MATCH_STATE_CL_WAITING;
         check_for_status_or_broadcast();CHECK(delivered==2 && seen==6 && !pending_reservations[1].length);
         game.dwc_match_state=DWC_MATCH_STATE_SV_OWN_GT2;request(1);request(3);
-        pending_reservations[0].received_at=0;timestamp=BROADCAST_TIMEOUT+1;
+        pending_reservations[0].received_at=0;timestamp=RESERVATION_TIMEOUT+1;
+        pending_reservations[2].received_at=timestamp;
         game.dwc_match_state=role?DWC_MATCH_STATE_SV_WAITING:DWC_MATCH_STATE_CL_WAITING;
         check_for_status_or_broadcast();CHECK(delivered==3 && seen==14 && !pending_reservations[0].length && !pending_reservations[2].length);
         CHECK(polls>0 && polls%2==0);
@@ -87,6 +89,13 @@ int main(void){
         game.dwc_match_state=role?DWC_MATCH_STATE_SV_WAITING:DWC_MATCH_STATE_CL_WAITING;
         check_for_status_or_broadcast();CHECK(delivered==4 && last==4);
     }
+    /* A request outlives discovery while waiting behind SDK reservations. */
+    for(unsigned i=0;i<4;i++)pending_reservations[i].length=0;
+    timestamp=100;game.dwc_match_state=DWC_MATCH_STATE_SV_OWN_GT2;
+    request(1);timestamp+=BROADCAST_TIMEOUT+1;
+    unsigned queued_before=delivered;
+    game.dwc_match_state=DWC_MATCH_STATE_SV_WAITING;
+    check_for_status_or_broadcast();CHECK(delivered==queued_before+1 && last==1);
     for(unsigned i=0;i<4;i++)pending_reservations[i].length=0;
     delivered=0;
     /* Preserve the SDK's handling of crossed client negotiations; deferring

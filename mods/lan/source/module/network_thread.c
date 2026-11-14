@@ -20,6 +20,9 @@
 #define DISCOVERY_GROUP 0xefff4d4b /* 239.255.77.75 */
 #define BROADCAST_INTERVAL 60
 #define BROADCAST_TIMEOUT (BROADCAST_INTERVAL * 5)
+/* A queued reservation remains valid for the expanded SDK wait allowance,
+ * independently of the shorter discovery advertisement lifetime. */
+#define RESERVATION_TIMEOUT (BROADCAST_INTERVAL * (MKW_LAN_CAPACITY > 12 ? 60 : 5))
 // Version 3 uses capacity-sized SELECT sections and packed team words.
 #define DISCOVERY_PROTOCOL 3
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
@@ -40,7 +43,7 @@ bool network_thread_running;
 static uint64_t timestamp;
 static so_fd_t broadcast_socket = -1;
 static so_fd_t multicast_socket = -1;
-static int broadcast_timer;
+static uint64_t broadcast_timer;
 static int8_t game_state; // 1 is idling
 static uint16_t communication_port;
 static const uint8_t *my_mii;
@@ -103,6 +106,9 @@ static bool initialise(void) {
 	if (game_state != 0)
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
+	/* Discovery deadlines use the SDK clock, not the rate this thread runs. */
+	timestamp = OSGetTime() / (secs_to_ticks(1) / BROADCAST_INTERVAL);
+	broadcast_timer = timestamp;
 	local_ip = MKW_LOCAL_IP;
 	if (local_ip == 0) {
 		LOG_ERROR("SOGetHostID returned 0");
@@ -221,6 +227,13 @@ static void update_game_state(struct dwc_gamedata *gamedata) {
 extern const uint8_t *MKWRaceInfo;
 extern const uint8_t *MKWRaceData;
 extern const uint8_t *MKWNetController;
+
+static bool broadcast_due(void) {
+    timestamp = OSGetTime() / (secs_to_ticks(1) / BROADCAST_INTERVAL);
+    if (timestamp < broadcast_timer) return false;
+    broadcast_timer = timestamp + BROADCAST_INTERVAL;
+    return true;
+}
 
 static bool compute_and_broadcast_status(so_fd_t fd) {
 	struct dwc_gamedata *gamedata = get_dwc_gamedata();
@@ -459,7 +472,7 @@ static void process_status(uint32_t *buffer, int32_t length, const so_addr_t rad
         const int peer = find_peer_by_pid(__builtin_bswap32(buffer[4]));
         if (peer >= 0) {
             struct pending_reservation *pending = &pending_reservations[peer];
-            if (!pending->length || timestamp - pending->received_at > BROADCAST_TIMEOUT)
+            if (!pending->length || timestamp - pending->received_at > RESERVATION_TIMEOUT)
                 pending->enqueued_at = timestamp;
             pending->received_at = timestamp;
             pending->address = raddr;
@@ -534,7 +547,7 @@ static void check_for_status_or_broadcast(void) {
             const unsigned i = (reservation_cursor + step) % BROADCAST_TRACK_MAX;
             struct pending_reservation *pending = &pending_reservations[i];
             if (!pending->length) continue;
-            if (timestamp - pending->received_at > BROADCAST_TIMEOUT) {
+            if (timestamp - pending->received_at > RESERVATION_TIMEOUT) {
                 pending->length = 0;
                 continue;
             }
@@ -574,8 +587,7 @@ void* network_thread_main(void *arg) {
     if (MKW_AUTOMATION == 2) {
         for (unsigned frame = 0; frame < 600; frame++) {
             bool found = false;
-            timestamp++;
-            if (frame % 60 == 0) compute_and_broadcast_status(broadcast_socket);
+            if (broadcast_due()) compute_and_broadcast_status(broadcast_socket);
             check_for_status_or_broadcast();
             for (unsigned peer = 0; peer < BROADCAST_TRACK_MAX; peer++) {
                 if (tracked_peers[peer].info.status == 4) {
@@ -594,10 +606,7 @@ void* network_thread_main(void *arg) {
     }
 	mkw_net_state->connection_state = 5;
 	while (1) {
-		timestamp++;
-		broadcast_timer++;
-		if (broadcast_timer >= BROADCAST_INTERVAL) {
-			broadcast_timer = 0;
+		if (broadcast_due()) {
 			if (!compute_and_broadcast_status(broadcast_socket))
 				break;
 		}

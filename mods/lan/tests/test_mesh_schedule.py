@@ -32,9 +32,9 @@ int main(void){
         uint32_t before_low=0,before_high=0;
         for(uint32_t attempt=0;attempt<8;attempt++){
             const uint32_t owner=lan_mesh_delay_ms(low,high,attempt),fallback=lan_mesh_delay_ms(high,low,attempt);
-            CHECK(owner<fallback && owner>=125 && fallback<=4124);
+            CHECK(owner<fallback && owner>=125 && fallback<=60124);
             CHECK(owner>=before_low && fallback>=before_high);before_low=owner;before_high=fallback;
-            if(!attempt)CHECK(owner<=249 && fallback>=625 && fallback<=749);
+            if(!attempt)CHECK(owner<=249 && fallback>=30000 && fallback<=30124);
         }
         CHECK(lan_mesh_delay_ms(low,high,0xffffffffu)<=2124);
     }

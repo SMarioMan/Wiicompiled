@@ -20,11 +20,11 @@ class ReservationBudget(unittest.TestCase):
 #define DWC_MATCH_STATE_CL_WAIT_RESV 3
 static uint64_t timestamp=1000;
 static struct {uint64_t last_update;struct {unsigned status;} info;} tracked_peers[32];
-struct dwc_gamedata {unsigned dwc_match_state,reservation_timeout_ms;uint64_t origin;unsigned retries;};
+struct dwc_gamedata {unsigned dwc_match_state,reservation_timeout_ms;uint64_t origin;unsigned retries,player_count;};
 '''+policy+r'''
 #define CHECK(x) do{if(!(x)){fprintf(stderr,"budget capacity=%u line=%u: %s\n",MKW_LAN_CAPACITY,__LINE__,#x);abort();}}while(0)
 int main(void){
-    struct dwc_gamedata g={3,6000,0x123456789abcdef0ULL,4};
+    struct dwc_gamedata g={3,6000,0x123456789abcdef0ULL,4,0};
     for(unsigned live=1;live<=33;live++){
         for(unsigned i=0;i<32;i++){tracked_peers[i].info.status=i<live-1;tracked_peers[i].last_update=timestamp;}
         g.reservation_timeout_ms=6000;update_reservation_budget(&g);
@@ -43,6 +43,10 @@ int main(void){
     g.dwc_match_state=3;
     for(unsigned special=0;special<6000;special+=1000){g.reservation_timeout_ms=special;update_reservation_budget(&g);CHECK(g.reservation_timeout_ms==special);}
     g.reservation_timeout_ms=90000;update_reservation_budget(&g);CHECK(g.reservation_timeout_ms==90000);
+    for(unsigned i=0;i<32;i++)tracked_peers[i].info.status=0;
+    g.player_count=24;g.reservation_timeout_ms=6000;update_reservation_budget(&g);
+    unsigned known=24<MKW_LAN_CAPACITY?24:MKW_LAN_CAPACITY;
+    CHECK(g.reservation_timeout_ms==6000+(known>12?(known-12)*2000:0));
     update_reservation_budget(NULL);
 }
 '''

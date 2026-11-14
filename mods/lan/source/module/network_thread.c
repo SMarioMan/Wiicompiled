@@ -387,6 +387,20 @@ static void process_broadcast(const struct broadcast_packet buffer, const so_add
 	_CPU_ISR_Restore(isr);
 }
 
+/* Status handshakes can arrive before multicast discovery. Learn the actual
+ * control-channel sender without inventing lobby/Mii presence. */
+static void learn_status_peer(const uint32_t *buffer, const so_addr_t raddr) {
+    const uint32_t pid = __builtin_bswap32(buffer[4]);
+    if (find_peer_by_pid(pid) >= 0 || buffer[1] != __builtin_bswap32(90) ||
+        !(buffer[2] & 0xffff) || !raddr.sa_addr || (raddr.sa_addr >> 28) >= 14 ||
+        pid != (0x40000000u | (raddr.sa_addr & 0x3fffffffu))) return;
+    const int peer = find_or_alloc_peer(&raddr);
+    if (peer < 0) return;
+    tracked_peers[peer].real_pid = pid;
+    tracked_peers[peer].info.communication_port = buffer[2] & 0xffff;
+    tracked_peers[peer].last_update = timestamp;
+}
+
 /* The SDK accepts one server reservation at a time. Keep one request per
  * discovered peer and preserve its first arrival across retries. Queue idle
  * arrivals too, so a new datagram cannot jump ahead of waiting peers. */
@@ -410,6 +424,7 @@ static void update_reservation_budget(struct dwc_gamedata *gamedata) {
         if (tracked_peers[i].info.status &&
             timestamp - tracked_peers[i].last_update <= BROADCAST_TIMEOUT)
             participants++;
+    if (participants < gamedata->player_count) participants = gamedata->player_count;
     if (participants > MKW_LAN_CAPACITY) participants = MKW_LAN_CAPACITY;
     if (participants > 32) participants = 32;
     const unsigned budget = 6000 + (participants > 12 ? (participants - 12) * 2000 : 0);
@@ -433,6 +448,7 @@ static void process_status(uint32_t *buffer, int32_t length, const so_addr_t rad
     LOG_INFO("receive status message %u from %x:%u", (unsigned)(buffer[2] >> 24), (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
     struct dwc_gamedata *gamedata = get_dwc_gamedata();
     if (!gamedata) return;
+    learn_status_peer(buffer, raddr);
     const enum dwc_match_state state = gamedata->dwc_match_state;
     if ((buffer[2] >> 24) == 1 &&
         (state == DWC_MATCH_STATE_CL_WAITING || state == DWC_MATCH_STATE_SV_WAITING ||
@@ -656,15 +672,22 @@ bool network_thread_send_status_record(int type, uint32_t pid, uint32_t ip, uint
 	}
 
 	int peer = find_peer_by_pid(pid);
-	if (peer == -1) {
-		LOG_ERROR("network_thread_send_status_record to unknown peer %u", (unsigned)pid);
-		return false;
-	}
-	if (tracked_peers[peer].info.ip == 0) {
-		LOG_ERROR("network_thread_send_status_record to peer with no ip");
-		return false;
-	}
-	LOG_INFO("network_thread_send_status_record %d to %x:%u", type, (unsigned)tracked_peers[peer].info.ip, (unsigned)tracked_peers[peer].info.communication_port);
+    uint32_t destination = peer >= 0 ? tracked_peers[peer].info.ip : 0;
+    /* The public SDK address is intentionally a NAT placeholder. Prefer the
+     * private endpoint in its roster when discovery has not learned this PID. */
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    const unsigned count = game && game->player_count < 32 ? game->player_count : game ? 32 : 0;
+    for (unsigned i = 0; !destination && i < count; i++)
+        if (game->peers[i].player_id == pid && game->peers[i].local_ip &&
+            game->peers[i].local_ip != MKW_ADVERTISED_IP && (game->peers[i].local_ip >> 28) < 14)
+            destination = game->peers[i].local_ip;
+    if (!destination && ip && ip != MKW_ADVERTISED_IP && (ip >> 28) < 14)
+        destination = ip;
+    if (!destination) {
+        LOG_ERROR("network_thread_send_status_record has no route pid=%x sdk=%x:%u", (unsigned)pid, (unsigned)ip, (unsigned)port);
+        return false;
+    }
+	LOG_INFO("network_thread_send_status_record %d to %x:%u", type, (unsigned)destination, (unsigned)port);
 
 	uint32_t full_packet[packet_len_in_words + 5];
 	for (int i = 0; i < packet_len_in_words; i++)
@@ -679,7 +702,7 @@ bool network_thread_send_status_record(int type, uint32_t pid, uint32_t ip, uint
 		.sa_len = sizeof(so_addr_t),
 		.sa_family = AF_INET,
 		.sa_port = BROADCAST_PORT,
-		.sa_addr = tracked_peers[peer].info.ip
+		.sa_addr = destination
 	};
 	so_ret_t r = SOSendTo(broadcast_socket, &full_packet, sizeof(full_packet), 0, &daddr);
 	if (r < 0) {

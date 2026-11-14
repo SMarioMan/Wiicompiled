@@ -69,3 +69,14 @@ Its simultaneous 24-console attempt failed during admission below thirteen
 members. The expanded-build scheduler now applies from three participants, so
 it also covers that initial growth; stock twelve-capacity builds retain the
 original scheduler. This adjustment still requires live revalidation.
+
+The early-growth scheduler initially exposed crossed reservation waits and then
+status replies to SDK-introduced peers absent from multicast discovery. The
+corrected candidate learns validated incoming endpoints, uses SDK private
+addresses instead of the shared public placeholder, and gives the preferred
+pair initiator a longer grace period. Its normal-timing thirteen-console run
+held room membership at 35.17 seconds and completed all peer links at 37.40
+seconds. Binary SHA-256:
+`26991633eefefb4bf7a3d78087653f0350ce6073ce18d74e59adbb07d42c978a`.
+This is a connectivity pass, with no race/finish claim. Earlier failed candidates
+remain failed evidence; timings do not establish an isolated statistical speedup.

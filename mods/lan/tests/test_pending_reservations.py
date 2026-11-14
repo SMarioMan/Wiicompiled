@@ -29,7 +29,7 @@ class PendingReservations(unittest.TestCase):
 typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
 '''
         harness += states + r'''
-static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;} game;
+static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;uint32_t player_count;} game;
 static bool have_game=true;
 static struct dwc_gamedata *get_dwc_gamedata(void){return have_game?&game:NULL;}
 static uint64_t timestamp=100;
@@ -41,6 +41,7 @@ static void dwc_process_status_record(unsigned type,uint32_t pid,uint32_t ip,uin
     if((type!=1 && type!=2) || pid<1 || pid>4 || ip!=0x7f000001+pid || port!=27900 || size>1 || (size && data[0]!=0x12345678))abort();
     ++delivered;last=pid;last_type=type;seen|=1u<<pid;game.dwc_match_state=DWC_MATCH_STATE_SV_OWN_NN;
 }
+static void learn_status_peer(const uint32_t *buffer,const so_addr_t addr){(void)buffer;(void)addr;}
 static void receive_packets(int fd,bool status){if(fd!=(status?1:2))abort();++polls;}
 '''
         harness += declaration + poll + r'''

@@ -352,3 +352,18 @@ the original no-argument SDK function remains available to other callers.
 Native tests cover ordering, jitter, bounded backoff and stock fallback. Linked
 PowerPC checks verify both scoped sites, the candidate register and SDK import.
 Live timing and reliability comparisons remain required.
+
+Fast mesh attempts require routes before multicast discovery finishes. Incoming
+status packets now teach the control sender's actual endpoint after checking its
+version, game port and PID/address relationship. This does not advertise a lobby
+or invent Mii data. Outgoing status traffic can use a matching SDK roster entry's
+private address when the discovery cache is late. The shared SDK public address
+is a NAT placeholder and is never used as a fallback route. Reservation allowances
+also account for the SDK's known participant count while discovery catches up.
+
+The non-preferred endpoint gives the preferred initiator thirty seconds before
+starting a fallback attempt, with subsequent backoff capped at sixty seconds.
+This avoids the crossed reservation waits seen with the earlier short grace.
+The preferred endpoint retains its short, jittered deadline. A corrected
+normal-timing thirteen-console candidate reached full connectivity at 37.40 s;
+normal-timing 24-console joining and race completion still require validation.

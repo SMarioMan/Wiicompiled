@@ -69,9 +69,9 @@ int main(void){
     reset(3);cancel_pending=true;syn(packet);
     if(MKW_LAN_CAPACITY<=12){CHECK(!polls&&!acks&&cancel_pending);return 0;}
     CHECK(polls==1&&acks==1&&!cancel_pending&&!deferred_syn.present);
-    for(unsigned state=0;state<=20;state++){
-        reset(state);
-        if(!negotiating_peer(state))continue;
+    const unsigned busy_states[]={3,4,5,6,13,14,15,16};
+    for(unsigned i=0;i<sizeof(busy_states)/sizeof(busy_states[0]);i++){
+        unsigned state=busy_states[i];reset(state);
         uint32_t owned[8]={0,11,12,13,14,15,16,17};
         CHECK(syn(owned)&&polls==1&&!acks&&game.dwc_match_state==state);
         memset(owned,0xee,sizeof(owned)); /* transport storage may be reused */
@@ -110,6 +110,12 @@ int main(void){
     }
     reset(3);game.peers[0].peer_index=32;CHECK(!network_thread_prepare_syn(32,1,packet)&&!polls);
     reset(3);game.peers[0].player_id=0;CHECK(!network_thread_prepare_syn(0,1,packet)&&!polls);
+    for(unsigned state=0;state<=20;state++){
+        bool busy=false;
+        for(unsigned i=0;i<sizeof(busy_states)/sizeof(busy_states[0]);i++)if(state==busy_states[i])busy=true;
+        if(busy)continue;
+        reset(state);CHECK(!network_thread_prepare_syn(0,1,packet)&&!polls&&!deferred_syn.present);
+    }
     reset(1);CHECK(!syn(packet)&&acks==1&&!polls);
     reset(3);current=NULL;CHECK(!network_thread_prepare_syn(0,1,packet)&&!polls);
 }

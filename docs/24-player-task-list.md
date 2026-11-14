@@ -21,8 +21,11 @@ mask widths separate.
   gameplay coverage remains separate from the tested stack/storage paths.
 - [x] Add ownership-safe light sharing on expanded-race pool exhaustion; original
   acquire/release/list tests pass every required count and repeated lifetimes.
-- [ ] Resolve balloon byte counters/object ordinals and effect backing lists;
-  qualify light visuals/resource loading and 128-racer heap ownership.
+- [x] Verify original EGG/NW4R backing allocation and all 528 activity records at
+  128, plus all 132 creator registrations. Nonempty particle/effect pools, live
+  high-ID draws/destruction and scene ownership remain open.
+- [ ] Resolve balloon byte counters/object ordinals; qualify live effects, light
+  visuals/resource loading and 128-racer heap ownership.
 - [ ] Qualify the capacity boundary set and complete 128-entry single-screen
   results in 16:9 and 4:3, including teardown and another race.
 

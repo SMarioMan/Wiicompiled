@@ -16,6 +16,8 @@ public class EffectCreatorStorageTests
     [InlineData(24)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(127)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealEffectManagerAllocatesAndInitializesTheWholeExpandedCreatorNamespace(int players)
     {

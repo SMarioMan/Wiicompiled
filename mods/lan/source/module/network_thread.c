@@ -387,38 +387,52 @@ static void process_broadcast(const struct broadcast_packet buffer, const so_add
 	_CPU_ISR_Restore(isr);
 }
 
-/* The SDK handles one server reservation at a time. Defer concurrent
- * requests until the active handshake finishes; keep other commands flowing. */
+/* The SDK accepts one server reservation at a time. Keep one request per
+ * discovered peer and preserve its first arrival across retries. Queue idle
+ * arrivals too, so a new datagram cannot jump ahead of waiting peers. */
 static struct pending_reservation {
+    uint64_t enqueued_at;
     uint64_t received_at;
     uint32_t length;
     so_addr_t address;
     uint32_t packet[STATUS_SIZE_MAX / 4];
 } pending_reservations[BROADCAST_TRACK_MAX];
+static unsigned reservation_cursor;
+
+static void dispatch_status(struct dwc_gamedata *gamedata, uint32_t *buffer,
+                            const so_addr_t raddr) {
+    gamedata->public_ip = MKW_ADVERTISED_IP;
+    dwc_process_status_record(buffer[2] >> 24, __builtin_bswap32(buffer[4]),
+        raddr.sa_addr, raddr.sa_port, buffer + 5, (buffer[2] >> 18) & 0x3f);
+}
 
 static void process_status(uint32_t *buffer, int32_t length, const so_addr_t raddr) {
-	LOG_INFO("receive size %u from %x:%u", (unsigned)length, (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
-	if (length < 0x14) return;
-	if (length < 0x14 + ((buffer[2] >> 16) & 0xff)) return;
-	if (buffer[0] != STATUS_MAGIC) return;
-	LOG_INFO("receive status message %u from %x:%u", (unsigned)(buffer[2] >> 24), (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
-	struct dwc_gamedata *gamedata = get_dwc_gamedata();
+    LOG_INFO("receive size %u from %x:%u", (unsigned)length, (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
+    if (length < 0x14 || length > STATUS_SIZE_MAX) return;
+    const unsigned payload = (buffer[2] >> 16) & 0xff;
+    if (payload % 4 || (unsigned)length < 0x14 + payload) return;
+    if (buffer[0] != STATUS_MAGIC) return;
+    LOG_INFO("receive status message %u from %x:%u", (unsigned)(buffer[2] >> 24), (unsigned)raddr.sa_addr, (unsigned)raddr.sa_port);
+    struct dwc_gamedata *gamedata = get_dwc_gamedata();
+    if (!gamedata) return;
+    const enum dwc_match_state state = gamedata->dwc_match_state;
     if ((buffer[2] >> 24) == 1 &&
-        gamedata->dwc_match_state >= DWC_MATCH_STATE_SV_OWN_NN &&
-        gamedata->dwc_match_state <= DWC_MATCH_STATE_SV_SYN_WAIT) {
+        (state == DWC_MATCH_STATE_CL_WAITING || state == DWC_MATCH_STATE_SV_WAITING ||
+         (state >= DWC_MATCH_STATE_SV_OWN_NN && state <= DWC_MATCH_STATE_SV_SYN_WAIT))) {
         const int peer = find_peer_by_pid(__builtin_bswap32(buffer[4]));
         if (peer >= 0) {
             struct pending_reservation *pending = &pending_reservations[peer];
+            if (!pending->length || timestamp - pending->received_at > BROADCAST_TIMEOUT)
+                pending->enqueued_at = timestamp;
             pending->received_at = timestamp;
             pending->address = raddr;
-            pending->length = length;
-            for (unsigned i = 0; i < (unsigned)length / 4; i++) pending->packet[i] = buffer[i];
-            LOG_INFO("queued concurrent reservation from %x", (unsigned)raddr.sa_addr);
+            pending->length = 0x14 + payload;
+            for (unsigned i = 0; i < pending->length / 4; i++) pending->packet[i] = buffer[i];
+            LOG_INFO("queued reservation from %x", (unsigned)raddr.sa_addr);
             return;
         }
     }
-	gamedata->public_ip = MKW_ADVERTISED_IP;
-	dwc_process_status_record(buffer[2] >> 24, __builtin_bswap32(buffer[4]), raddr.sa_addr, raddr.sa_port, buffer + 5, (buffer[2] >> 18) & 0x3f);
+    dispatch_status(gamedata, buffer, raddr);
 }
 
 bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status) {
@@ -474,15 +488,30 @@ static void check_for_status_or_broadcast(void) {
      * return to CL_WAITING after accepting a link, rather than SV_WAITING. */
     if (gamedata && (gamedata->dwc_match_state == DWC_MATCH_STATE_SV_WAITING ||
                      gamedata->dwc_match_state == DWC_MATCH_STATE_CL_WAITING)) {
-        for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++) {
+        struct pending_reservation *oldest = NULL;
+        uint64_t oldest_age = 0;
+        unsigned selected = 0;
+        /* Round-robin ties avoid slot bias when requests share one VI tick. */
+        for (unsigned step = 0; step < BROADCAST_TRACK_MAX; step++) {
+            const unsigned i = (reservation_cursor + step) % BROADCAST_TRACK_MAX;
             struct pending_reservation *pending = &pending_reservations[i];
             if (!pending->length) continue;
-            const uint32_t length = pending->length;
-            pending->length = 0;
-            if (timestamp - pending->received_at > BROADCAST_TIMEOUT) continue;
-            LOG_INFO("resuming queued reservation from %x", (unsigned)pending->address.sa_addr);
-            process_status(pending->packet, length, pending->address);
-            break;
+            if (timestamp - pending->received_at > BROADCAST_TIMEOUT) {
+                pending->length = 0;
+                continue;
+            }
+            const uint64_t age = timestamp - pending->enqueued_at;
+            if (!oldest || age > oldest_age) {
+                oldest = pending;
+                oldest_age = age;
+                selected = i;
+            }
+        }
+        if (oldest) {
+            oldest->length = 0;
+            reservation_cursor = (selected + 1) % BROADCAST_TRACK_MAX;
+            LOG_INFO("resuming oldest reservation from %x", (unsigned)oldest->address.sa_addr);
+            dispatch_status(gamedata, oldest->packet, oldest->address);
         }
     }
 	for (int i = 0; i < BROADCAST_TRACK_MAX; i++) {
@@ -539,6 +568,7 @@ void* network_thread_main(void *arg) {
 	}
 	LOG_INFO("network_thread exit");
     close_discovery();
+    reservation_cursor = 0;
 	my_mii = 0;
 	for (int i = 0; i < BROADCAST_TRACK_MAX; i++)
 		{

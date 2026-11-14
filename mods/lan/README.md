@@ -224,6 +224,9 @@ occur between individual peer negotiations. The room's displayed player count ca
 reach the final count while those connections are still being negotiated;
 starting then can leave clients unable to request suspension. SDK states and
 observation ages are included in the periodic progress records.
+Use `--mesh` to stop after every peer has complete SDK connections, keeping
+lobby benchmarks independent of character/course menus and race loading.
+`--race` includes the same connection barrier before starting the race.
 
 Room and advancing-race pass records include elapsed wall time from driver
 startup; the complete-mesh checkpoint has its own elapsed time. Compare these
@@ -238,6 +241,14 @@ host and `CL_WAITING` for clients that also accept mesh links. Draining only in
 the host state leaves requests queued indefinitely on clients. The native
 `test_pending_reservations.py` fixture executes the actual queuing and polling
 code, including busy states, expiry, and one resumed request per poll.
+Requests now keep their original queue age across duplicate retries. Idle
+arrivals enter the same queue, so new datagrams cannot bypass waiting peers;
+the oldest queued tick wins, with round-robin selection for ties. Storage is
+bounded to one request per discovered peer, stale requests expire, and dispatch
+remains limited to one reservation per poll. Other status commands and crossed
+outgoing client negotiations retain their immediate SDK handling. The native
+fixture also checks slot bias, retry ordering, idle-arrival bypass, malformed
+records and shutdown. Live timings must establish the performance impact.
 
 The race check uses separate `MKWR` telemetry
 packets; the original `MKWL` room-status packet stays compatible. This test passed

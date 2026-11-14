@@ -24,7 +24,10 @@ Video subtitles are observations and design references, not build instructions.
   deterministic connection schedule and direct LAN transport. Bound retries and
   concurrent work, avoid reservation deadlocks, and verify late joins,
   disconnects, rejoining and race-start barriers. Benchmark repeated 12/24-player
-  joins at normal timing; label clock-scaled functional results separately.
+  joins at normal timing; label clock-scaled functional results separately. The
+  reservation queue now preserves age across retries, selects oldest requests
+  with fair ties and prevents idle arrivals from bypassing queued peers. Native
+  regressions cover these cases; repeated live comparisons remain pending.
 - [ ] Test larger capacities (including 100) separately from the 24-player target.
   Larger storage fixtures do not establish larger playable or network capacity.
 

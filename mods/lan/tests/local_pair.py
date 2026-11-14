@@ -210,12 +210,16 @@ def run(args):
                     if not room_reported:
                         print(json.dumps(dict(result='passed', check=f'all {count} peers in one room for five seconds', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
                         room_reported = True
-                    if not args.race:
+                    if not args.race and not args.mesh:
                         return 0
                     if not sdk_ready(network, ids, args.host_id, count, now, args.telemetry_timeout):
                         continue
                     if room_confirmed is None:
                         print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='all SDK mesh joins complete')), flush=True)
+                        if not args.race:
+                            print(json.dumps(dict(result='passed', check=f'all {count} peers have complete SDK connections',
+                                test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
+                            return 0
                         room_confirmed = now
                         # Start the first pulse immediately: waiting for the
                         # next socket iteration can consume the whole pulse.
@@ -252,6 +256,7 @@ if __name__ == '__main__':
     parser.add_argument('--capacity', type=int, choices=range(1, 33), default=12, help='Capacity of the matched guest/module build')
     parser.add_argument('--host-id', type=int, choices=range(1, 33), default=1)
     parser.add_argument('--client-id', type=int, choices=range(1, 33), action='append', help='Optional IDs in client-directory order')
+    parser.add_argument('--mesh', action='store_true', help='Require complete SDK connections without starting a race')
     parser.add_argument('--race', action='store_true', help='Also navigate menus and require every race simulation to advance')
     options = parser.parse_args()
     try:

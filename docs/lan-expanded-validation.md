@@ -192,3 +192,23 @@ Inactive and out-of-range ranks retain the retail identity fallback. Modes
 outside the original online range and stock capacity retain the original path.
 Native cases also cover reversed/tied ranks, sparse inactive slots, unrelated
 bytes, and the independent menu/award reset before live revalidation.
+
+At `5e453ca`, a normal-timing 24-console attempt failed admission after
+105.87 seconds, with the host reaching twelve members. Its remaining queued
+reservations were still within the discovery lifetime; extending queue expiry
+would not address that capture. A later traced repeat failed on an error dialog
+at 176.96 seconds. Native UDP tracing measured a 47.28-second gap between host
+advertisements and up to 33,280 bytes waiting in the host's control socket,
+without any new UDP receive-buffer errors or drops. A traced two-console control
+completed room membership and SDK connectivity at 24.43 seconds.
+
+The VI poll previously replayed old video boundaries after a host stall, retaining
+the remaining backlog for subsequent polls. It now coalesces a pending interrupt
+at the latest due boundary, preserving the display phase and returning after one
+callback. This avoids replaying an unbounded history of missed video interrupts
+and repeatedly waking higher-priority threads before lower-priority network work.
+The production-poll regression fails before this change and passes afterward,
+covering a five-second stall, a slow callback, phase preservation, early/repeated
+polls and disabled/uninitialized polling. Its effect on actual 24-console lobby
+progress still requires a live comparison; the trace alone does not establish
+that the VI backlog caused every connection failure.

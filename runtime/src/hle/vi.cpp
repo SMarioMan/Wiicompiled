@@ -381,28 +381,22 @@ void AdvanceRetrace(CpuContext* ctx, Clock::time_point retraceStamp, bool servic
 
 bool AdvanceDueRetraces(CpuContext* ctx, int maxToProcess, bool serviceAurora)
 {
-    bool advancedAny = false;
-
-    for (int catchUpCount = 0; catchUpCount < maxToProcess; ++catchUpCount) {
-        Clock::time_point target;
-        auto now = Clock::now();
-        {
-            std::lock_guard<std::mutex> lock(g_viMutex);
-            if (!g_vi.initialized) {
-                return advancedAny;
-            }
-            target = g_vi.lastRetrace + g_vi.retraceInterval;
-            if (now < target) {
-                return advancedAny;
-            }
-        }
-
-
-        AdvanceRetrace(ctx, target, serviceAurora);
-        advancedAny = true;
+    if (maxToProcess <= 0) return false;
+    Clock::time_point target;
+    const auto now = Clock::now();
+    {
+        std::lock_guard<std::mutex> lock(g_viMutex);
+        if (!g_vi.initialized) return false;
+        target = g_vi.lastRetrace + g_vi.retraceInterval;
+        if (now < target) return false;
+        // VI's pending interrupt coalesces while the CPU cannot service it.
+        // Replaying every missed field leaves a slow host permanently behind
+        // and repeatedly wakes high-priority threads ahead of network work.
+        // Keep the display phase, but deliver just the latest pending edge.
+        target += ((now - target) / g_vi.retraceInterval) * g_vi.retraceInterval;
     }
-
-    return advancedAny;
+    AdvanceRetrace(ctx, target, serviceAurora);
+    return true;
 }
 
 } // namespace
@@ -424,8 +418,8 @@ bool VI_HLE_IsAdvancingRetrace() {
     return s_inAdvanceRetrace.load(std::memory_order_acquire);
 }
 
-// Advance every retrace whose interval has already elapsed. Safe to call from
-// busy loops (GX drawing, the scheduler's idle spin) to keep VBlank ticking.
+// Deliver the pending retrace interrupt. Safe to call from busy loops (GX
+// drawing, the scheduler's idle spin) to keep VBlank ticking after host stalls.
 void VI_HLE_PollRetrace(CpuContext* ctx) {
     AdvanceDueRetraces(ctx, 8, true);
 }

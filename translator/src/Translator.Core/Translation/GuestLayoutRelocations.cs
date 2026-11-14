@@ -41,7 +41,7 @@ public sealed partial class GuestLayoutRelocations
         IEnumerable<GuestHeapRoute>? heapRoutes = null,
         IEnumerable<GuestAuthoredCountIndex>? authoredCountIndices = null,
         IEnumerable<GuestBitsetLoad>? bitsetLoads = null, IEnumerable<GuestArrayTransfer>? arrayTransfers = null,
-        IEnumerable<GuestWordComparison>? wordComparisons = null, IEnumerable<GuestWordTable>? wordTables = null, IEnumerable<GuestCountConversion>? countConversions = null)
+        IEnumerable<GuestWordComparison>? wordComparisons = null, IEnumerable<GuestWordTable>? wordTables = null, IEnumerable<GuestCountConversion>? countConversions = null, IEnumerable<GuestByteOperation>? byteOperations = null)
     {
         var definitions = types.ToArray();
         _original = new GuestLayouts(definitions, originalPlayers);
@@ -89,12 +89,15 @@ public sealed partial class GuestLayoutRelocations
         _wordComparisons = (wordComparisons ?? Array.Empty<GuestWordComparison>()).ToArray();
         _wordTables = (wordTables ?? Array.Empty<GuestWordTable>()).ToArray();
         _countConversions = (countConversions ?? Array.Empty<GuestCountConversion>()).ToArray();
+        _byteOperations = (byteOperations ?? Array.Empty<GuestByteOperation>()).ToArray();
         ValidateWordArrays();
         ValidateCountConversions();
+        ValidateByteOperations();
     }
 
     public void ValidateImage(ProgramImage image)
     {
+        ValidateByteOperationImage(image);
         ValidateCountConversionImage(image);
         ValidateWordArrayImage(image);
         ValidateCopies(image);
@@ -141,6 +144,7 @@ public sealed partial class GuestLayoutRelocations
             site.LeftBase,site.LeftOffset,site.LeftValue,site.Count,site.Field,site.IsUnsigned,site.RightLoad,site.RightBase,site.RightOffset,site.RightValue}),
         WordTables = _wordTables.Select(table=>new {Address=$"0x{table.Address:X8}",table.ExpectedValues,table.Entries,table.Loads}),
         CountConversions = _countConversions,
+        ByteOperations = _byteOperations,
         GridTables = _gridTables.Select(table => new {
             Address = $"0x{table.Address:X8}", ExpectedHex = Convert.ToHexString(table.ExpectedValues), table.AdvanceRows,
             Policy = "repeat terminal lateral pattern; advance terminal row pattern", table.Lookups }),
@@ -198,6 +202,8 @@ public sealed partial class GuestLayoutRelocations
 
     public IReadOnlyList<IrInstruction> Apply(PpcInstruction origin, IReadOnlyList<IrInstruction> instructions)
     {
+        var byteReplacement = ApplyByteOperation(origin,instructions);
+        if(byteReplacement is not null)return byteReplacement;
         var wordArrayReplacement = ApplyWordArray(origin,instructions);
         if(wordArrayReplacement is not null)return wordArrayReplacement;
         var countIndexReplacement = ApplyAuthoredCountIndex(origin,instructions);
@@ -281,7 +287,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27 or 28 or 29 or 30)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27 or 28 or 29 or 30 or 31)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 31 && file.ByteOperations is {Length:>0})
+            throw new InvalidDataException("Checked byte-domain widening requires layout format version 31.");
         if (file.Version < 30 && file.ArrayFills?.Any(fill => fill.Arrays.Any(array => array.CountAddend != 0)) == true)
             throw new InvalidDataException("Adjusted array-fill counts require layout format version 30.");
         if (file.Version < 29 && file.CountConversions is {Length:>0})
@@ -392,7 +400,8 @@ public sealed partial class GuestLayoutRelocations
                 site.RightLoad is null ? null : Hex(site.RightLoad),site.RightBase,site.RightOffset,site.RightValue)),
             file.WordTables?.Select(table => new GuestWordTable(Hex(table.Address),table.ExpectedValues,table.Entries,
                 table.Loads.Select(site => new GuestWordTableLoad(Hex(site.Instruction),Hex(site.ExpectedWord),site.Base,site.Destination,site.Offset,site.Index)).ToArray())),
-            file.CountConversions?.Select(site => new GuestCountConversion(Hex(site.Instruction),Hex(site.ExpectedWord),site.Input,site.Count)))
+            file.CountConversions?.Select(site => new GuestCountConversion(Hex(site.Instruction),Hex(site.ExpectedWord),site.Input,site.Count)),
+            file.ByteOperations?.Select(site=>new GuestByteOperation(Hex(site.Instruction),Hex(site.ExpectedWord),site.Kind,site.Count,site.Field,site.Source,site.Factor,site.Elements,site.AvailableBytes)))
             { ManifestSha256 = ChecksumUtilities.Sha256Hex(bytes) };
     }
 
@@ -402,7 +411,9 @@ public sealed partial class GuestLayoutRelocations
         ReferenceFile[] References, bool Complete = false, ArrayCopyFile[]? ArrayCopies = null, RankTableFile[]? RankTables = null,
         BoundAccessFile[]? BoundedAccesses = null, ArrayFillFile[]? ArrayFills = null, ResampledCursorFile[]? ResampledCursors = null, TraversalMarkerFile[]? TraversalMarkers = null, CapacityTableFile[]? CapacityTables = null, GridTableFile[]? GridTables = null, NormalizedRankFile[]? NormalizedRanks = null, BitsetStoreFile[]? BitsetStores = null, HeapRouteFile[]? HeapRoutes = null, AuthoredCountIndexFile[]? AuthoredCountIndices = null,
         BitsetLoadFile[]? BitsetLoads = null, ArrayTransferFile[]? ArrayTransfers = null,
-        WordComparisonFile[]? WordComparisons=null,WordTableFile[]? WordTables=null, CountConversionFile[]? CountConversions=null);
+        WordComparisonFile[]? WordComparisons=null,WordTableFile[]? WordTables=null, CountConversionFile[]? CountConversions=null,ByteOperationFile[]? ByteOperations=null);
+    private sealed record ByteOperationFile(string Instruction,string ExpectedWord,string Kind,string Count,
+        string? Field=null,string? Source=null,int Factor=1,int Elements=0,int AvailableBytes=0);
     private sealed record CountConversionFile(string Instruction,string ExpectedWord,string Input,string Count);
     private sealed record WordComparisonFile(string Begin,string[] ExpectedWords,string LeftBase,string LeftOffset,string LeftValue,string Count,
         int Field=0,bool IsUnsigned=true,string? RightLoad=null,string? RightBase=null,string? RightOffset=null,string? RightValue=null);

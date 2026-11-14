@@ -20,7 +20,8 @@ public sealed partial class GuestLayoutRelocations
                 };
             }).ToArray()
         }).ToArray(),
-        References = _references.Values.SelectMany(x => x).OrderBy(x => x.Instruction).ToArray()
+        References = _references.Values.SelectMany(x => x).OrderBy(x => x.Instruction).ToArray(),
+        ByteOperations = _byteOperations
     };
 
     private string EmitRetiredAccessRegistration()

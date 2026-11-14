@@ -1907,3 +1907,35 @@ entry, adjacent controller fields, object guards and saved registers. The
 pre-fix thirteen-slot regression fails at the uncopied thirteenth byte. The
 complete consumer proof/original-emission/expanded-compilation audit also passes.
 A new live 24-player race is still required; the earlier run is not a race pass.
+
+## Checked byte-domain operations (format 31)
+
+`ByteOperations` describes specific byte-domain instructions that become unsafe
+when a declared layout count exceeds 255. Each rule pins the original instruction
+word and exact lifted IR shape; overlapping semantic rewrites are rejected. The
+original instruction is retained when the resolved count still fits in a byte.
+These are translated guest-code patches applied before SSA/register analysis,
+not replacement manager storage or a shadow-window architecture.
+
+`derived-count` replaces one byte load of a legacy count field with a byte load
+from a declared source offset followed by a full-width multiplication. This is
+appropriate only after proving that the field is an invariant multiple of that
+source, such as balloon totals `5*N` and `10*N`. The guest header layout remains
+unchanged; every consumer of the obsolete byte field must be inventoried.
+
+`index32` removes a checked unsigned eight-bit index mask. `offset32` replaces a
+checked byte-index rotate/mask-by-eight with an unsigned left shift. These rules
+must be restricted to proven pool indexes; they do not globally change racer ID,
+slot, flag or sentinel semantics.
+
+`scratch-store16` / `scratch-load16` replace checked indexed byte operations with
+halfword operations and double the local element index. The manifest must declare
+the maximum element count and available scratch bytes, and the planner rejects
+insufficient storage or a pool count above the 16-bit ordinal range. Existing
+stack padding can be used only after verifying the actual frame/save locations;
+these declarations do not themselves discover or prove a function's stack bounds.
+
+Unit regressions cover the byte boundary at 25/26 racers for a ten-per-racer pool,
+full-width indexes, scaled offsets, halfword scratch addressing, wrong words/IR,
+conflicting rules and insufficient scratch/index range. Actual consumer and
+lifecycle fixtures are still required before enabling rules in a game profile.

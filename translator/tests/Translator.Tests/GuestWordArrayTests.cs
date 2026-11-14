@@ -77,7 +77,7 @@ public class GuestWordArrayTests
         var path=Path.GetTempFileName();
         try{foreach(var version in new[]{27,28}){
             File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types=types,References=Array.Empty<object>()}));
-            if(version is 28 or 29 or 30)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 28 or 29 or 30 or 31)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }
 
@@ -85,10 +85,10 @@ public class GuestWordArrayTests
     public void NewFeaturesRequireVersionTwentyEight()
     {
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[]{27,28,29,30,31}){
+        try{foreach(var version in new[]{27,28,29,30,31,32}){
             File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 WordComparisons=new[]{new{Begin="0x80001000",ExpectedWords=new[]{"0x80830050","0x2c040000"},LeftBase="r3",LeftOffset="Words.items.offset",LeftValue="r4",Count="Words.items.count",IsUnsigned=false}}}));
-            if(version is 28 or 29 or 30)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+            if(version is 28 or 29 or 30 or 31)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
             else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }

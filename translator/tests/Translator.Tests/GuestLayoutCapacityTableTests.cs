@@ -59,12 +59,12 @@ public class GuestLayoutCapacityTableTests
     public void HalfwordTablesAndFormulasRequireVersionTwentySeven()
     {
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[]{26,27,28,29,30,31})foreach(var halfwords in new[]{false,true}){
+        try{foreach(var version in new[]{26,27,28,29,30,31,32})foreach(var halfwords in new[]{false,true}){
             File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 CapacityTables=new[]{new{Address="0x80003000",ExpectedValues=Overtakes,SignedHalfwords=halfwords,
                     Formula=new{Bias=-1,Divisor=2},Lookups=new[]{new{Instruction="0x80001000",ExpectedWord=halfwords?"0x7ca402ae":"0x7ca4002e",
                         Base="r4",Index="r0",Destination="r5",Count="r6"}}}}}));
-            if(version is 27 or 28 or 29 or 30)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
+            if(version is 27 or 28 or 29 or 30 or 31)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);
             else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }

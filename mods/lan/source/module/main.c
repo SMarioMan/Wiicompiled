@@ -173,6 +173,16 @@ static void setup_friends(void) {
 	}
 }
 
+static int lan_control_priority(void) {
+    if (MKW_LAN_CAPACITY <= 12) return 0x18;
+    OSThread_t *owner = OSGetCurrentThread();
+    const int priority = owner ? OSGetThreadPriority(owner) : -1;
+    /* Share the SDK caller's priority without becoming more urgent than it.
+     * The stock low-priority service can otherwise wait behind matching/UI
+     * work while control replies and SDK deadlines continue to accumulate. */
+    return priority >= 0 && priority < 0x18 ? priority : 0x18;
+}
+
 static int MyDWC_LoginAsync(void *r3, int r4, void (*r5)(int, int, void *), void *r6) {
 #ifdef MKW_LAN_DIAGNOSTICS
     /* Keep SDK handshake failures visible alongside the module's diagnostics. */
@@ -188,7 +198,7 @@ static int MyDWC_LoginAsync(void *r3, int r4, void (*r5)(int, int, void *), void
     MKWDebugReport("LAN login caller thread=%x priority=%d\n", (unsigned)login_thread,
         login_thread ? OSGetThreadPriority(login_thread) : -1);
 #endif
-	OSCreateThread(&network_thread, network_thread_main, 0, network_thread_stack + NETWORK_THREAD_SIZE, NETWORK_THREAD_SIZE, 0x18, false);
+	OSCreateThread(&network_thread, network_thread_main, 0, network_thread_stack + NETWORK_THREAD_SIZE, NETWORK_THREAD_SIZE, lan_control_priority(), false);
 	OSResumeThread(&network_thread);
 	return 0;
 }

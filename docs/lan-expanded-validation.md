@@ -230,3 +230,24 @@ not discarded merely because its discovery advertisement expired. Stock
 capacity retains the five-second request lifetime. Native tests cover slow/fast
 polls, tick rollover, independent queue/discovery expiry and queue ordering.
 Live admission and race validation remain pending.
+
+The SDK-clock build (`d0d90a1`) still failed its 24-console attempt during
+admission at 98.79 seconds. In native traces, console 8 sent its reservation
+ACK at monotonic time 114621.007, but the host did not read it until
+114653.792. The host had already cancelled that reservation. This identifies
+delayed control-socket service even after advertising is based on SDK time.
+
+A subsequent thirteen-console capture identifies the login/matching caller
+at priority 17 and the LAN service at priority 24, frequently ready on the run
+queue. Read these priorities from the SDK thread offsets in captured RAM:
+the initial new diagnostic printed zero because the imported `OSThread`
+declaration used a four-byte context-flags bitfield and incorrect padding.
+Those declarations now match the SDK, with PowerPC compile-time checks for
+context/thread fields and the complete `0x318`-byte allocation.
+
+Expanded builds now create the LAN service at its SDK login caller's priority
+when that priority is valid and more urgent than the old service priority.
+It shares the observed matching caller's priority 17 without preempting that
+caller on priority alone. Stock capacity, a missing caller and unsupported
+priorities retain priority 24. Policy regressions pass; repeated live admission
+and race checks are still required to qualify this scheduling change.

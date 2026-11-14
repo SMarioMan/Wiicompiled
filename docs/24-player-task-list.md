@@ -185,6 +185,14 @@ claiming a 24-participant race.
 
 These follow completion of the base increased-player-cap multiplayer LAN work.
 
+- [ ] **Visible automated LAN races for recording:** allow `MKW_TEST_LAN_CPU=1`
+  without `--headless` in `runtime/src/main.cpp`, and add an optional `--visible`
+  flag to `mods/lan/tests/local_pair.py` that omits `--headless` when launching
+  instances. Keep the changes minimal, preserve default headless behavior and
+  existing CPU-driving logic, and verify that both visible players drive
+  autonomously and the race completes. This convenience feature remains below
+  the 128-racer development work in priority.
+
 - [ ] **Optional course-vote abstention patch, selected at build time:** add a
   WiiCompiled build argument that enables abstention in multiplayer course
   voting. Make abstention the default selection instead of Random. Select among

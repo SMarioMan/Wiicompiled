@@ -89,6 +89,7 @@ int dwc_qr2_init(uint32_t pid);
 int DWCi_SBUpdateAsync(uint32_t pid);
 int dwc_init_gt2_socket(void);
 void dwc_think(int);
+void DWCi_ProcessMatchSynPacket(uint32_t aid, uint32_t type, const uint32_t *packet);
 uint64_t DWCi_GetNextMeshMakeTryTick(void);
 
 #endif /* _RVL_DWC_H_ */

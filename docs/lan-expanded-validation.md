@@ -145,3 +145,25 @@ builds retain six seconds. Policy tests cover the cap, discovery expiry,
 SDK-known peers, special timers, other states and unchanged origin/retry fields.
 Live comparison with this revised allowance remains pending; it does not
 establish a speed improvement or resolve the observed large-room stalls.
+
+The revised deadline was observed in a subsequent `9a5f5ed` thirteen-console
+attempt: failed clients waited about thirty seconds, but admission still failed
+at 65.72 seconds. All thirteen guest RAM regions were captured for diagnosis.
+The host was in `SV_SYN` with seven members, waiting for AID 3 (console 3).
+That client logged SYN-0 while in `CL_WAIT_RESV`, followed by the host's
+stop-mesh control message returning it to `CL_WAITING`, with no SYN-1 ACK.
+The original SYN handler (`800D96B4`) accepts SYN-0 only in `CL_WAITING`; the
+host's original SYN timeout scales as five seconds times its member count.
+This ordering race explains the observed missing ACK and long barrier stall.
+Binary SHA-256: `2659795c8f98577bbcf6694339aad9b39292a420df4be43db8802505aa4aede5`.
+
+Expanded builds now drain an already-queued control-socket batch before the
+original SYN handler checks its state, scoped to a host SYN-0 received by a
+client waiting on a reservation. Original SDK handlers retain state changes,
+validation, payload lifetime and ACK generation. A re-entry guard bounds nested
+callbacks; stock capacity and other packets/states keep their original path.
+This addresses a queued cancellation arriving through the other receive loop;
+it does not guarantee ordering of datagrams still in flight. Native ordering
+fixtures cover cancellation present/absent, re-entry and all guard conditions;
+linked-module checks pin the actual SDK entry and retained trampoline. Live
+revalidation remains required.

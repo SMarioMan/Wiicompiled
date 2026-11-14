@@ -73,6 +73,12 @@ class LinkedAbiTests(unittest.TestCase):
                 linked=json.loads((path.parent/'Code.pul.json').read_text())
                 self.assertEqual(linked['ResolvedImports']['DWCi_GetNextMeshMakeTryTick'],0x800e7ef8)
                 self.assertIn('LANMeshNextTick',linked['SymbolOffsets'])
+                self.assertEqual(linked['ResolvedImports']['DWCi_ProcessMatchSynPacket'],0x800d9648)
+                syn=[h for h in linked['Hooks'] if h['Name']=='DWCi_ProcessMatchSynPacket']
+                self.assertEqual(len(syn),1)
+                self.assertEqual(syn[0]['OriginalAddress'],0x800d9648)
+                self.assertGreater(syn[0]['OriginalTrampolineOffset'],0)
+                self.assertIn('network_thread_prepare_syn',linked['SymbolOffsets'])
                 self.assertFalse(any(h['Name']=='DWCi_GetNextMeshMakeTryTick' for h in linked['Hooks']))
                 patches=json.loads((path.parent/'static-patches.json').read_text())
                 sites=[p for p in patches if p['Value']=='module:LANMeshTryTick']

@@ -92,4 +92,10 @@
             80E50030 3B800000 2C070002 54C5D1BE
         </data>
     </symbol>
+    <symbol name="DWCi_ProcessMatchSynPacket" size="0xfd0" offset="0x68" >
+        <data>
+            8005071C 2C000001 40820F48 809A0000
+            5483C21E 5480400E
+        </data>
+    </symbol>
 </symbols>

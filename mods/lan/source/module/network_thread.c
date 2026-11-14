@@ -742,3 +742,21 @@ struct peer_info network_get_peer_info(unsigned int index) {
 	if (index >= BROADCAST_TRACK_MAX) return (struct peer_info) { };
 	return tracked_peers[index].info;
 }
+
+/* The host sends mesh cancellation on the control socket before its reliable
+ * SYN on the game socket. Different receive loops can reverse that order. The
+ * retail SYN handler ignores SYN-0 unless the client is already CL_WAITING;
+ * drain queued control messages before it checks that state. Leave SDK state,
+ * packet ownership, validation and ACK construction to the original handlers. */
+void network_thread_prepare_syn(uint32_t aid, uint32_t type) {
+    static bool polling;
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    if (MKW_LAN_CAPACITY <= 12 || type != 1 || !network_thread_running ||
+        broadcast_socket < 0 || polling || !game || game->dwc_host_state != 1 ||
+        game->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV ||
+        game->player_count < 2 || game->player_count > 32 ||
+        aid != game->peers[0].peer_index) return;
+    polling = true;
+    receive_packets(broadcast_socket, true);
+    polling = false;
+}

@@ -1,4 +1,5 @@
 #include "fiber_manager.h"
+#include "guest_abi/layout_access_audit.h"
 #include "memory.h"
 #include "abi_bridge.h"
 #include "hle_stubs.h"
@@ -202,6 +203,9 @@ void GuestFiberManager::Shutdown() {
     std::lock_guard<std::mutex> lock(s_mutex);
 
     for (auto& [addr, fiber] : s_fibers) {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+        LayoutAccessAudit::RetireExecutionContext(addr);
+#endif
         if (fiber.fiber && !fiber.isSchedulerFiber) {
             HostContext::Destroy(fiber.fiber);
             fiber.fiber = nullptr;
@@ -233,6 +237,9 @@ bool GuestFiberManager::CreateGuestFiber(uint32_t guestThreadAddr, uint32_t entr
     // Check if fiber already exists for this thread - if so, reset it
     auto existingIt = s_fibers.find(guestThreadAddr);
     if (existingIt != s_fibers.end()) {
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+        LayoutAccessAudit::RetireExecutionContext(guestThreadAddr);
+#endif
         // Delete the old fiber if it exists and is not the scheduler fiber
         if (existingIt->second.fiber && !existingIt->second.isSchedulerFiber) {
             HostContext::Destroy(existingIt->second.fiber);
@@ -316,6 +323,10 @@ void GuestFiberManager::ExitGuestThread(uint32_t guestThreadAddr, ThreadState fi
         return;
     }
     
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    // Destroying a suspended host stack does not unwind C++ scope guards.
+    LayoutAccessAudit::RetireExecutionContext(guestThreadAddr);
+#endif
     it->second.state = finalState;
     it->second.terminated = true;
     if (s_currentGuestThread == guestThreadAddr) {

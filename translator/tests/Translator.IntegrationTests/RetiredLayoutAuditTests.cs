@@ -125,6 +125,13 @@ public class RetiredLayoutAuditTests
                     // The invocation watch must have expired; identical RAM
                     // reused after return is no longer a retired stack field.
                     SetGuestPc(0x80007004);Memory::Read32(sp-108+56);
+                    // Canceling a suspended guest thread can destroy its host
+                    // stack without running the translated scope destructor.
+                    fiber=3;
+                    {FunctionScope suspended(0x80007000);SetGuestPc(0x80007000);
+                        Memory::Write32(0x800d0000,sp);
+                        RetireExecutionContext(3);fiber=1;
+                        SetGuestPc(0x80007004);Memory::Read32(0x800d0038);}
                     WriteReport();
                 }
                 """);

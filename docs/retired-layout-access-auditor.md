@@ -38,8 +38,9 @@ Checked `stwu r1,-Frame.size(r1)` references automatically create frame watches
 at their effective write address. Each translated function invocation owns its
 watch, which retires on return or exception. Invocation identity and provenance
 are isolated by guest execution context, rather than host thread or CpuContext
-address: cooperative guest fibers share those. A canceled context can retire its
-watches with `RetireExecutionContext`.
+address: cooperative guest fibers share those. The guest fiber manager calls `RetireExecutionContext` when a thread exits,
+when a guest-thread address is reused, and during shutdown. This also retires
+watches when a suspended host stack is destroyed without unwinding C++ scopes.
 
 Heap-object constructor/destructor and heap-reset integration must be added for
 each audited family using verified lifetime boundaries. Merely enabling the

@@ -27,8 +27,9 @@ that overlap former storage, and checked relocation references. Generated C++
 registers the same descriptors and simple declared load/store field intent.
 Composite expressions and arithmetic references are retained in JSON but are not
 guessed into field-intent bindings. At 128 racers the current manifest supplies
-83 compound types, 3,135 simple access sites and 16 stack-lifetime sites after
-the ArchiveMgr migration.
+84 compound types and 16 stack-lifetime sites after the balloon header migration;
+checked access-site counts grow with the consumer inventory. The native generated
+map and report state the actual binding count.
 
 ## Ownership and provenance
 
@@ -131,3 +132,15 @@ both compiled instrumentation modes (15 cases). The wrapper fixture confirms
 that original non-deleting/deleting teardown, construction failure and missing
 type descriptors retain their intended behavior; release observes no remaining
 allocation watch before memory becomes reusable.
+
+### First instrumented game discovery
+
+The first full 128-capacity startup probe had one live ArchiveMgr watch and
+reported the old `GameScene::enter` state write at USA `8051670C` as an
+`unattributed-overlap-lead` when ambiguous reporting was enabled. This is a lead,
+not an automatic strict violation: that old byte overlaps expanded current
+holder storage. Static singleton/field analysis then confirmed the stale operand
+and eighteen related misses, including the asynchronous request dispatcher.
+See [the field inventory and startup evidence](128-racer-archive-migration.md).
+Ordinary holder construction also touches overlapping old regions legitimately;
+those ambiguous leads must not be counted as confirmed stale accesses.

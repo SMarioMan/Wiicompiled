@@ -32,7 +32,7 @@ public class ArchiveManagerStorageTests
             if(!uint.TryParse(text,NumberStyles.HexNumber,CultureInfo.InvariantCulture,out var entry)||entry<0x8053a710||entry>=0x8053d38c||
                 entry is >=0x8053a92c and <0x8053a9e0 or >=0x8053c4d4 and <0x8053c70c)continue;
             var discovery=translator.Discover(entry,new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet()));
-            foreach(var candidate in auditor.Analyze(discovery,"ArchiveManager").Candidates){
+            foreach(var candidate in auditor.Analyze(discovery,entry==0x8053aafc?null:"ArchiveManager").Candidates){
                 var site=candidate.Reference;
                 Assert.True(refs.TryGetValue((site.Instruction,site.Node,site.Operand),out var known),$"Unreviewed archive operand at 0x{site.Instruction:X8}");
                 var expected=layout.Symbol(known.GetProperty("Symbol").GetString()!)*(known.TryGetProperty("Scale",out var scale)?scale.GetInt32():1)+
@@ -40,8 +40,8 @@ public class ArchiveManagerStorageTests
                 Assert.Equal(expected,candidate.After);count++;covered.Add(site.Instruction);
             }
         }
-        Assert.True(count>=169,$"Expected the reviewed archive inventory; found {count} operands");
-        foreach(var site in new uint[]{0x8053b564,0x8053cb40,0x8053bf18,0x8053c0b4,0x8053aa3c})Assert.Contains(site,covered);
+        Assert.True(count>=180,$"Expected the reviewed archive inventory; found {count} operands");
+        foreach(var site in new uint[]{0x8053b564,0x8053cb40,0x8053bf18,0x8053c0b4,0x8053aa3c,0x8053ab20,0x8053ab54})Assert.Contains(site,covered);
     }
 
     [Theory]
@@ -67,10 +67,11 @@ public class ArchiveManagerStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-archive-manager-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try{
             var entries=new uint[]{0x8053a710,0x8053a760,0x8053a7b0,0x8053a9e0,0x80020494,0x8002058c,
-                0x8053c088,0x8053c098,0x8053be8c,0x8053befc,0x8053c0a8};
+                0x8053c088,0x8053c098,0x8053be8c,0x8053befc,0x8053c0a8,0x8053aafc,0x8053d4dc};
             var fixtures=new HashSet<uint>{0x80229a48,0x80229a6c,0x80229a90,0x8053a9d8,0x80526268,
                 0x8051484c,0x80514880,0x8053a92c,0x8053a998,0x8021a050,0x8021a0a4,
-                0x80525d54,0x80525c24,0x80241a2c,0x80241cec,0x805267cc,0x8052638c,0x805262ec};
+                0x80525d54,0x80525c24,0x80241a2c,0x80241cec,0x805267cc,0x8052638c,0x805262ec,
+                0x80514b30,0x805264e0,0x80009b80,0x8053c534};
             var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp"),
                 Path.Combine(root,"runtime/src/hle/layout_audit_lifetimes.cpp"),Path.Combine(root,"runtime/src/guest_region.cpp")};
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -96,6 +97,7 @@ public class ArchiveManagerStorageTests
                     course={{layout.Symbol("ArchiveManager.courseLoader.offset")}},
                     loaders={{layout.Symbol("ArchiveManager.kartLoaders.offset")}},
                     state={{layout.Symbol("ArchiveManager.state.offset")}},
+                    requests={{layout.Symbol("ArchiveManager.loadRequests.offset")}},
                     root=0x81010000,extra=0x81100000,stack=0x81f00000,global=0x809b8f78;
                 std::array<bool,capacity*2> live{};uint32_t made=0,destroyed=0,contents=0,workers=0,frees=0;
                 void entry(uint32_t pc,void(*fn)(CpuContext*)){
@@ -121,6 +123,15 @@ public class ArchiveManagerStorageTests
                 void course_ctor(CpuContext* c){if(c->gpr[3]!=root+course)std::abort();std::memset(Memory::GetPointer(c->gpr[3],36),0,36);}
                 void task(CpuContext* c){c->gpr[3]=extra+0x200;}
                 void factory(CpuContext* c){c->gpr[3]=extra+0x300;}
+                uint32_t expectedRequest=0,loadedRequests=0,initializedCourses=0;
+                void initialize_course(CpuContext* c){if(c->gpr[3]!=root+course)std::abort();++initializedCourses;}
+                void load_request(CpuContext* c){
+                    auto request=root+requests+expectedRequest*84;
+                    if(c->gpr[3]!=Memory::Read32(request+(expectedRequest==6?4:0)) || c->gpr[4]!=request+12 ||
+                       c->gpr[5]!=Memory::Read32(request+(expectedRequest==6?8:76)) ||
+                       c->gpr[6]!=(expectedRequest==6?Memory::Read32(request+76):expectedRequest==5?Memory::Read32(request+80):0))std::abort();
+                    if(expectedRequest!=6&&c->gpr[7])std::abort();++loadedRequests;
+                }
                 void no_op(CpuContext*){}
                 void has(CpuContext* c){auto n=slot(c->gpr[3]);if(!live[n])std::abort();c->gpr[3]=Memory::Read32(c->gpr[3]+4);}
                 void get(CpuContext* c){auto n=slot(c->gpr[3]);if(!live[n])std::abort();c->gpr[3]=0x10000+n;}
@@ -135,6 +146,8 @@ public class ArchiveManagerStorageTests
                     entry(0x8053a92c,worker_ctor);entry(0x8053a998,no_op);entry(0x8021a050,course_ctor);entry(0x8021a0a4,no_op);
                     entry(0x80525d54,no_op);entry(0x805267cc,no_op);entry(0x80525c24,factory);entry(0x80241a2c,task);entry(0x80241cec,no_op);
                     entry(0x8052638c,has);entry(0x805262ec,get);
+                    entry(0x80514b30,load_request);entry(0x805264e0,load_request);
+                    entry(0x80009b80,no_op);entry(0x8053c534,initialize_course);
                     CpuContext c{};CpuContextScope scope(&c);c.gpr[1]=stack;c.gpr[2]=0x8038ac20;c.gpr[13]=0x80388880;
                     Memory::Write32(global,0);Memory::Write32(0x809b8f80,extra+0x400);Memory::Write32(extra+0x430,extra+0x500);
                     for(unsigned race=0;race<2;race++){
@@ -142,6 +155,17 @@ public class ArchiveManagerStorageTests
                         std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);
                         func_8053A710(&c);if(c.gpr[3]!=root||Memory::Read32(global)!=root||made!=capacity*2||contents!=4||workers!=4||!guards())return 4;
                         if(Memory::Read32(root+{{layout.Symbol("ArchiveManager.taskThread.offset")}})!=extra+0x200||Memory::Read8(root+state+13)!=1)return 5;
+                        // This static loader receives an archive enum in r3,
+                        // not an ArchiveMgr receiver; exercise all seven branches.
+                        loadedRequests=initializedCourses=0;
+                        for(expectedRequest=0;expectedRequest<7;expectedRequest++){
+                            auto request=root+requests+expectedRequest*84;
+                            for(auto offset:{0u,4u,8u,76u,80u})Memory::Write32(request+offset,0x30000000+expectedRequest*256+offset);
+                            c.gpr[3]=expectedRequest;func_8053AAFC(&c);
+                        }
+                        if(loadedRequests!=7||!guards())return 15;
+                        c.gpr[3]=extra+0x600;c.gpr[4]=1;func_8053D4DC(&c);
+                        if(initializedCourses!=1||!guards())return 16;
                         for(uint32_t i=0;i<capacity;i++){
                             c.gpr[3]=root;c.gpr[4]=i;func_8053C088(&c);if(c.gpr[3]!=0x10000+i)return 6;
                             c.gpr[3]=root;c.gpr[4]=i;func_8053C098(&c);if(c.gpr[3]!=0x10000+capacity+i)return 7;

@@ -66493,6 +66493,153 @@
       "Node": 0,
       "Operand": "value",
       "Symbol": "ArchiveManager.kartModelsHolders.count"
+    },
+    {
+      "Instruction": "0x8051670C",
+      "ExpectedWord": "0x98C5060D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80516AF8",
+      "ExpectedWord": "0x9803060D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80516E40",
+      "ExpectedWord": "0x9803060D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x8053AB20",
+      "ExpectedWord": "0x8066033C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8053AB24",
+      "ExpectedWord": "0x38860344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AB28",
+      "ExpectedWord": "0x80A60340",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8053AB2C",
+      "ExpectedWord": "0x80C60384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053AB34",
+      "ExpectedWord": "0x80660338",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset"
+    },
+    {
+      "Instruction": "0x8053AB38",
+      "ExpectedWord": "0x38860344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AB3C",
+      "ExpectedWord": "0x80A60384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053AB44",
+      "ExpectedWord": "0x80C60388",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8053AB4C",
+      "ExpectedWord": "0x80660338",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset"
+    },
+    {
+      "Instruction": "0x8053AB50",
+      "ExpectedWord": "0x38860344",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x8053AB54",
+      "ExpectedWord": "0x80A60384",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.loadRequests.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8053D518",
+      "ExpectedWord": "0x38630588",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8053D85C",
+      "ExpectedWord": "0x38630588",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "ArchiveManager.courseLoader.offset"
+    },
+    {
+      "Instruction": "0x8074AE60",
+      "ExpectedWord": "0x8803060C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.state.offset"
+    },
+    {
+      "Instruction": "0x8084FA78",
+      "ExpectedWord": "0x800305B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8084FA84",
+      "ExpectedWord": "0x800305B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "ArchiveManager.kartLoaders.offset",
+      "Addend": 12
     }
   ],
   "GlobalPointers": {
@@ -74093,6 +74240,36 @@
       "Entry": "0x80529C28",
       "Receiver": "Scenario",
       "Name": ""
+    },
+    {
+      "Entry": "0x80516DDC",
+      "Receiver": null,
+      "Name": "GameScene::exit"
+    },
+    {
+      "Entry": "0x8053AAFC",
+      "Receiver": null,
+      "Name": "ArchiveMgr::LoadArchiveAsync"
+    },
+    {
+      "Entry": "0x8053D4DC",
+      "Receiver": null,
+      "Name": "RootScene::CreateArchiveMgr"
+    },
+    {
+      "Entry": "0x8053D810",
+      "Receiver": null,
+      "Name": "RootScene::CreateInstances"
+    },
+    {
+      "Entry": "0x8074AE04",
+      "Receiver": null,
+      "Name": "GlobeMgr::Update"
+    },
+    {
+      "Entry": "0x8084F9D8",
+      "Receiver": null,
+      "Name": "MenuKartModelMgr::Load"
     }
   ],
   "BoundedAccesses": [

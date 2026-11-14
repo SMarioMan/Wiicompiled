@@ -1945,3 +1945,14 @@ field accesses whose offsets/strides do not move. This is useful for independent
 counter-width audits: a byte count can overflow even when its field remains at
 the correct address. These entries are review candidates, not instructions to
 relocate unchanged fields. The default changed-field audit is unchanged.
+
+### 128-capacity object and root-heap boundary regression
+
+`ObjectPoolCapacityTests` and `RootHeapBudgetTests` now retain their earlier cases
+and cover the full required set: 12, 13, 24, 25, 26, 48, 52, 64, 100, 116, 118,
+127 and 128. All 26 cases pass. The original ObjectsMgr routines allocate,
+initialize, register and destroy the complete `80 + 10*N` budget (1,360 entries
+at 128), including interaction-vector construction and allocation guards. The
+root initializer preserves aligned, non-overlapping backing-heap ownership for
+both retail-sized and expanded arenas. Resource construction/heap creation are
+fixture callbacks; these checks do not qualify live scene-resource budgets.

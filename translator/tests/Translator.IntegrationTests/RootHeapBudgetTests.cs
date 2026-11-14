@@ -12,8 +12,16 @@ public class RootHeapBudgetTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(48)]
+    [InlineData(52)]
+    [InlineData(64)]
     [InlineData(100)]
+    [InlineData(116)]
+    [InlineData(118)]
+    [InlineData(127)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealRootHeapSetupPartitionsMappedMemoryWithoutOverlappingOwnership(int players)
     {

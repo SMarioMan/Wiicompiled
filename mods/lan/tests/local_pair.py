@@ -37,6 +37,9 @@ def decode_observation(packet, peer, ids):
 
 def finished_progress(line, count):
     """Accept actual simulation finish evidence, never menu text or room counts."""
+    if any(marker in line for marker in (b'FATAL', b'[runtime] fatal log',
+            b'scheduler could not switch away', b'WARNING unmapped guest touch')):
+        raise RuntimeError(f'Guest fault during race: {line.decode(errors="replace").strip()}')
     if b'[race-progress]' not in line:
         return None
     record = {key.decode(): int(value) for key, value in re.findall(rb'(\w+)=(\d+)', line)}
@@ -157,7 +160,7 @@ def run(args):
                     else:
                         raise TimeoutError(f'Instance {instance} did not finish sequential room startup')
             while time.monotonic() - started < args.timeout:
-                if args.finish and time.monotonic() >= next_finish_check:
+                if args.race and time.monotonic() >= next_finish_check:
                     next_finish_check = time.monotonic()+1
                     for instance, directory in zip(ids, directories):
                         with (directory/'lan-test-game.log').open('rb') as stream:
@@ -170,7 +173,7 @@ def run(args):
                             record = finished_progress(line, count)
                             if record is not None:
                                 finished[instance] = record
-                    if len(finished) == count and len({(r['course'], r['mode']) for r in finished.values()}) == 1:
+                    if args.finish and len(finished) == count and len({(r['course'], r['mode']) for r in finished.values()}) == 1:
                         finish_since = finish_since or time.monotonic()
                         if time.monotonic()-finish_since >= 2:
                             for instance, process in zip(ids, processes):

@@ -4,6 +4,13 @@ from local_pair import finished_progress
 
 
 class FinishedProgress(unittest.TestCase):
+    def test_guest_faults_fail_even_when_the_process_survives(self):
+        for line in [b'[memory] WARNING unmapped guest touch: no mapped region for 0x3F74DEBC (write)',
+                     b'[runtime] fatal log', b'FATAL guest exception',
+                     b'scheduler could not switch away']:
+            with self.subTest(line=line), self.assertRaises(RuntimeError):
+                finished_progress(line, 13)
+
     def test_complete_network_field_finishes_in_larger_capacity(self):
         line = b'[race-progress] stage=4 frames=8284 players=2 capacity=24 observed=2 course=8 mode=7 finished=2 min_lap=3 max_lap=4'
         self.assertEqual(finished_progress(line, 2)['finished'], 2)

@@ -1776,6 +1776,15 @@ thirteenth header before the change and pass at 12, 13, 24, 32, 48 and 100,
 including no-valid-header cases with poisoned trailing groups, unchanged objects
 and neighboring bytes. The full consumer audit passes.
 
+The remaining RH1 readiness query and Update's duplicate readiness scan also
+search the complete cache, rejecting trailing partial-group records before
+reading their course/timer state. A high thirteenth header reproduced a false
+readiness result. Native fixtures execute both original paths at
+12/13/24/32/48/100 with selected high headers and poisoned padding, retaining
+the separate SDK mask/lifecycle boundaries as fixtures. All six cases and the
+consumer audit pass. This finishes the pending readiness regression; it does
+not extend or qualify 128-console networking.
+
 The packet-manager countdown and both standalone countdown helpers now scan
 `ceil(players/2)` peer pairs. The extra lane in an odd-capacity build reads an
 empty membership mask before chasing any receive pointers. Native execution of

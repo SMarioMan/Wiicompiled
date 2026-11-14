@@ -31,13 +31,13 @@ public class RaceHeaderStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-race-header-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8065bc08,0x8065bfec,0x8065c0e4,0x8065c1dc,0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98,0x8065bd70,0x8065c2d4,0x8065c5a8,0x8065c6a0,0x8065c444};
-            var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x801aacbc,0x80020aa4,0x806609d8,0x8065ca70,0x8065cb28};
+            var entries=new uint[]{0x8065b858,0x8065b47c,0x80652a78,0x8065bc08,0x8065bfec,0x8065c0e4,0x8065c1dc,0x8065b14c,0x8065b330,0x8065b7b4,0x8065ba68,0x8065ba80,0x8065bbf4,0x8065be78,0x8065c714,0x8065ba98,0x8065bd70,0x8065c2d4,0x8065c5a8,0x8065c6a0,0x8065c444};
+            var fixtures=new HashSet<uint>{0x80229a48,0x80652ab8,0x801aacbc,0x80020aa4,0x806609d8,0x8065ca70,0x8065cb28,0x8065c714,0x8065c85c,0x80652604,0x80660ba4};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
             var declarations=string.Join("\n",entries.Select(pc=>$"extern \"C\" void func_{pc:X8}(CpuContext*);"));
-            var registrations=string.Join("\n",entries.Select(pc=>$"register_entry(0x{pc:X8},func_{pc:X8});"));
+            var registrations=string.Join("\n",entries.Where(pc=>pc!=0x8065c714).Select(pc=>$"register_entry(0x{pc:X8},func_{pc:X8});"));
             var binary=Path.Combine(temp,"image.bin");File.WriteAllBytes(binary,image.Memory);
             var harness=Path.Combine(temp,"harness.cpp");var exe=Path.Combine(temp,"test");
             File.WriteAllText(harness,$$"""
@@ -56,7 +56,11 @@ public class RaceHeaderStorageTests
                 uint32_t allocations=0,clears=0;
                 void allocate(CpuContext* c){if(c->gpr[3]!=size || allocations++)std::abort();c->gpr[3]=root;}
                 void clear_split(CpuContext* c){if(c->gpr[3]!=controller)std::abort();clears++;}
-                uint32_t sent=0,last=255,tick=1000;
+                uint32_t sent=0,last=255,tick=1000,readyChecks=0,scheduled=0,receivedUpdates=0;
+                void schedule_boundary(CpuContext* c){if(c->gpr[3]!=root)std::abort();scheduled++;}
+                void receive_boundary(CpuContext* c){if(c->gpr[3]!=root)std::abort();receivedUpdates++;}
+                void network_type(CpuContext* c){c->gpr[3]=0;}
+                void ready_check(CpuContext* c){readyChecks++;c->gpr[3]=1;}
                 void clock(CpuContext* c){c->gpr[3]=0;c->gpr[4]=tick++;}
                 void elapsed(CpuContext* c){c->gpr[3]=0;c->gpr[4]=170;}
                 void user_data(CpuContext*){}
@@ -72,6 +76,10 @@ public class RaceHeaderStorageTests
                     register_entry(0x80229a48,allocate);register_entry(0x80652ab8,clear_split);Memory::Write32(0x809bd918,controller);
                     register_entry(0x801aacbc,clock);register_entry(0x80020aa4,elapsed);register_entry(0x806609d8,user_data);
                     register_entry(0x8065ca70,send);register_entry(0x8065cb28,send);
+                    // Only Update's scheduling/receive boundaries are fixtures;
+                    // the round-robin cases below call func_8065C714 directly.
+                    register_entry(0x8065c714,schedule_boundary);register_entry(0x8065c85c,receive_boundary);
+                    register_entry(0x80652604,network_type);register_entry(0x80660ba4,ready_check);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
                     std::array<uint8_t,size> expected{};
@@ -90,6 +98,11 @@ public class RaceHeaderStorageTests
                             Memory::Write32(base,1);Memory::Write32(base+20,8);
                             Memory::Write32(base+28,0x12345678);Memory::Write8(base+tail,2);};
                         if(selected<capacity)populate(selected);
+                        Memory::Write32(controller+{{layout.Symbol("RKNetController.currentSub.offset")}},0);
+                        auto sub=controller+{{layout.Symbol("RKNetController.subs.offset")}};
+                        Memory::Write32(sub+8,2);Memory::Write32(sub+12,0);Memory::Write32(sub+16,3);Memory::Write8(sub+33,0);
+                        Memory::Write8(controller+{{layout.Symbol("RKNetController.subs.offset+RKNetSub.tail.offset")}}+3,0);
+                        Memory::Write32(root+8,2);
                         for(uint32_t p=capacity;p<(capacity+3)/4*4;p++)populate(p);
                         std::memcpy(expected.data(),Memory::GetPointer(root,size),size);
                         std::array<uint8_t,4*stride> padding{};
@@ -103,6 +116,12 @@ public class RaceHeaderStorageTests
                         if(ctx.gpr[3]!=(selected<capacity?2u:0u))return 29;
                         ctx.gpr[3]=root;func_8065C1DC(&ctx);
                         if(ctx.gpr[3]!=(selected<capacity?root+records+selected*stride+ids:0u))return 30;
+                        ctx.gpr[3]=root;func_8065B858(&ctx);
+                        if(ctx.gpr[3]!=(selected<capacity?1u:0u)){
+                            std::fprintf(stderr,"RH1 readiness selected=%u n=%u got=%u\n",selected,capacity,ctx.gpr[3]);return 32;}
+                        readyChecks=scheduled=receivedUpdates=0;ctx.gpr[3]=root;func_8065B47C(&ctx);
+                        if(readyChecks!=(selected<capacity?1u:0u) || scheduled!=1 || receivedUpdates!=1){
+                            std::fprintf(stderr,"RH1 update selected=%u n=%u ready=%u scheduled=%u receives=%u\n",selected,capacity,readyChecks,scheduled,receivedUpdates);return 33;}
                         if(!equal() || std::memcmp(padding.data(),Memory::GetPointer(root+size,padding.size()),padding.size()))return 31;
                     }
                     for(uint32_t kind=0;kind<3;kind++){

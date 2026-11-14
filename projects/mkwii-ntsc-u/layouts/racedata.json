@@ -3222,6 +3222,20 @@
   ],
   "References": [
     {
+      "Instruction": "0x8065B5B8",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)"
+    },
+    {
+      "Instruction": "0x8065B8DC",
+      "ExpectedWord": "0x38000003",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/4)"
+    },
+    {
       "Instruction": "0x8064FD64",
       "ExpectedWord": "0x38000006",
       "Node": 0,
@@ -72654,6 +72668,70 @@
     }
   ],
   "BoundedAccesses": [
+    {
+      "Instruction": "0x8065B5D0",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B624",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B678",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B6CC",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B8F4",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B948",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B99C",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
+    {
+      "Instruction": "0x8065B9F0",
+      "ExpectedWord": "0x80A40034",
+      "Node": 0,
+      "Index": "r3",
+      "GroupWidth": 4,
+      "Fallback": 67
+    },
     {
       "Instruction": "0x8064FD90",
       "ExpectedWord": "0x80050048",

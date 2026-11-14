@@ -1,5 +1,20 @@
 # Expanded-player migration task list
 
+The active target is now **128 racers in vanilla Mario Kart Wii, primarily
+offline**. Keep the existing architecture and WIP. The LAN milestones and
+extended goals below remain recorded; 128-player networking and mod-pack data
+are outside the current investigation. See [the reference comparison and active
+implementation plan](128-racer-comparison.md).
+
+- [ ] Implement the metadata-driven retired-layout read/write auditor with live
+  instance tracking, overlap-aware classification, log/strict modes and JSON.
+- [ ] Migrate ArchiveMgr holders and audit all direct/computed consumers.
+- [ ] Resolve balloon byte counters/object ordinals and effect backing lists;
+  verify light exhaustion, 128-racer heap ownership and large coin stack offsets.
+- [ ] Qualify the capacity boundary set and complete 128-entry single-screen
+  results in 16:9 and 4:3, including teardown and another race.
+
+
 Continue from branch `work`; preserve its existing checked guest-layout and LAN
 implementation. The repository and verified game instructions define behavior.
 Video subtitles are observations and design references, not build instructions.
@@ -43,7 +58,8 @@ Video subtitles are observations and design references, not build instructions.
   exhaust eligible characters before balanced repeats. Native checks pass through
   100; normal-menu vehicle assignment and rendered races still need validation.
 - [ ] **Results:** give every participant a distinct row and valid rank text;
-  paginate or scroll as necessary. At 24, generated individual controls now use
+  keep every racer visible together on one screen. Implement a compact 128-entry
+  grid without pagination, scrolling, tabs or rotating subsets. At 24, generated individual controls now use
   two columns, team controls have twelve rows per team, and reserved localized
   message IDs avoid unrelated strings. Original-loader checks and an actual
   24-player individual results screen confirm distinct, readable ranks through

@@ -1776,6 +1776,16 @@ thirteenth header before the change and pass at 12, 13, 24, 32, 48 and 100,
 including no-valid-header cases with poisoned trailing groups, unchanged objects
 and neighboring bytes. The full consumer audit passes.
 
+The race scenario's screen initializer now scans every participant when assigning
+local controllers and HUD slots. Its fallback spectator search grows in groups
+of three and rejects partial-group padding as inactive. The five HUD-map
+read/write instructions also follow the relocated settings block; relocating
+only the initial four-byte reset left the real map empty. A live 24-console
+results crash exposed a local player with HUD slot `-1`. Native execution of the
+original initializer and HUD getter covers one, two and four local views, a
+highest-slot remote spectator, and inactive fields with poisoned padding at
+12/13/24/32/48/100 capacity. The four physical views retain their original limit.
+
 The controller destructor also needs the moved full-packet pointer array and the
 expanded strides between its two send/receive rows. Checking only its peer-loop
 bound was insufficient. `NetworkControllerDestructionTests` executes the original

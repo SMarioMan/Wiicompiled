@@ -3222,6 +3222,62 @@
   ],
   "References": [
     {
+      "Instruction": "0x8052AA58",
+      "ExpectedWord": "0x88030B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052AA68",
+      "ExpectedWord": "0x9B430B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052AB84",
+      "ExpectedWord": "0x98A30B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052ABD0",
+      "ExpectedWord": "0x98A30B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052AC1C",
+      "ExpectedWord": "0x98A30B64",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
+      "Instruction": "0x8052AB24",
+      "ExpectedWord": "0x281A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x8052AB38",
+      "ExpectedWord": "0x38000004",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/3)",
+      "Addend": 0
+    },
+    {
       "Instruction": "0x8065BC08",
       "ExpectedWord": "0x38000003",
       "Node": 0,
@@ -72570,6 +72626,30 @@
     }
   ],
   "BoundedAccesses": [
+    {
+      "Instruction": "0x8052AB50",
+      "ExpectedWord": "0x80040018",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 3,
+      "Fallback": 5
+    },
+    {
+      "Instruction": "0x8052AB9C",
+      "ExpectedWord": "0x80040018",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 3,
+      "Fallback": 5
+    },
+    {
+      "Instruction": "0x8052ABE8",
+      "ExpectedWord": "0x80040018",
+      "Node": 0,
+      "Index": "r5",
+      "GroupWidth": 3,
+      "Fallback": 5
+    },
     {
       "Instruction": "0x8065BC20",
       "ExpectedWord": "0x80A40034",

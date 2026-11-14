@@ -4,13 +4,25 @@ The active target is now **128 racers in vanilla Mario Kart Wii, primarily
 offline**. Keep the existing architecture and WIP. The LAN milestones and
 extended goals below remain recorded; 128-player networking and mod-pack data
 are outside the current investigation. See [the reference comparison and active
-implementation plan](128-racer-comparison.md).
+implementation plan](128-racer-comparison.md). The ultimate goal remains up to
+**128 console multiplayer**; keep racer capacity, console capacity and network
+mask widths separate.
 
-- [ ] Implement the metadata-driven retired-layout read/write auditor with live
-  instance tracking, overlap-aware classification, log/strict modes and JSON.
-- [ ] Migrate ArchiveMgr holders and audit all direct/computed consumers.
+- [x] Implement the auditor foundation: metadata-driven scalar read/write watches,
+  object generations, overlap classification, log/strict JSON and controlled stale
+  translated accesses. Stack lifetimes include canceled fibers; ArchiveMgr has
+  automatic constructor/destructor/release watches.
+- [ ] Integrate remaining object/heap lifetimes and bulk paths, link an instrumented
+  game and run the iterative gameplay discovery loop. No zero-hit qualification yet.
+- [x] Relocate both ArchiveMgr racer arrays and retained state; all required storage
+  capacities and 169 reviewed consumer operands pass. Mixed-resource loading and
+  external/indirect consumer gameplay qualification remain open.
+- [x] Verify existing Coin Runners frame lowering at 116/118/127/128; active-racer
+  gameplay coverage remains separate from the tested stack/storage paths.
+- [x] Add ownership-safe light sharing on expanded-race pool exhaustion; original
+  acquire/release/list tests pass every required count and repeated lifetimes.
 - [ ] Resolve balloon byte counters/object ordinals and effect backing lists;
-  verify light exhaustion, 128-racer heap ownership and large coin stack offsets.
+  qualify light visuals/resource loading and 128-racer heap ownership.
 - [ ] Qualify the capacity boundary set and complete 128-entry single-screen
   results in 16:9 and 4:3, including teardown and another race.
 

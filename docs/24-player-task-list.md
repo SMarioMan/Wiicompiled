@@ -127,3 +127,6 @@ vote/member variants from their original retail cards; 24 cards use a three-by-e
 grid. Consumer proofs and asset layout tests pass. Retest actual voting, rating
 presentation and the transition into racing with all 24 peers before closing the
 network milestone.
+
+See [the measured LAN checkpoint](lan-expanded-validation.md) for normal-timing
+two-/twelve-console race passes and the unresolved 24-console reservation failures.

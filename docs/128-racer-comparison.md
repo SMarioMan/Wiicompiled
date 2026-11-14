@@ -4,6 +4,9 @@ The active target is vanilla RMCE01, primarily offline, at 128 racers. Preserve
 capacity-aware layouts, checked operand relocations, translated guest patches
 and narrow native wrappers. Existing LAN work remains WIP; 128-player networking,
 Retro Rewind, Item Fever and other mod-pack data are outside this investigation.
+The ultimate target remains up to **128 console multiplayer**. Keep racer capacity,
+console capacity and network-mask width separate; offline qualification is the
+current milestone and does not qualify the later console-networking work.
 
 Reference: [MKW100](https://github.com/vinichenzo279-wq/mkw100), inspected commit
 `b96f094e7850c9d672daf6b82f9d0c46af6f6d59`. Its PAL addresses identify discovery

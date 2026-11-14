@@ -15,7 +15,16 @@ public class BattleBalloonStorageTests
     [InlineData(48)]
     [InlineData(100)]
     [Trait("Requires", "USA game assets and Clang")]
-    public void RealBattleBalloonManagerSeparatesObjectsPlayerRecordsAndTrailingState(int players)
+    public void RealBattleBalloonManagerSeparatesObjectsPlayerRecordsAndTrailingState(int players) => Run(players,false);
+
+    [Theory]
+    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(25)] [InlineData(26)]
+    [InlineData(48)] [InlineData(52)] [InlineData(64)] [InlineData(100)]
+    [InlineData(116)] [InlineData(118)] [InlineData(127)] [InlineData(128)]
+    [Trait("Requires", "USA game assets and Clang")]
+    public void RealWideBalloonCountersAndSelectedOrdinalsSupportTheFullActiveField(int players) => Run(players,true);
+
+    private static void Run(int players,bool fullField)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);
         while(directory is not null && !File.Exists(Path.Combine(directory.FullName,"translator/Translator.sln")))directory=directory.Parent;
@@ -30,7 +39,11 @@ public class BattleBalloonStorageTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-battle-balloons-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entries=new uint[]{0x8086538c,0x80865454,0x808655a8,0x80865414,0x80865818,0x808659c4,0x80865ba0,0x80865cac};
+            // Retain the original kart cleanup loop and its frame/save/restore;
+            // skip surrounding unrelated kart/scene work at checked seams.
+            foreach(var (pc,target) in new[]{(0x80591bfcu,0x80591d14u),(0x80591d9cu,0x80591df4u)})
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(pc,4),4),0x48000000u|((target-pc)&0x03fffffcu));
+            var entries=new uint[]{0x80591be8,0x80020a3c,0x80020a88,0x8086538c,0x80865454,0x808655a8,0x80865414,0x80865818,0x808659c4,0x80865ba0,0x80865cac};
             var fixtures=new HashSet<uint>{0x80229a48,0x8087a59c,0x80010000,0x80010004,0x80010008,0x8001000c,0x80229a90,0x8087afd4,0x8087b394,0x8087b1c8};
             var sources=new List<string>();
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
@@ -46,11 +59,12 @@ public class BattleBalloonStorageTests
                 #include <cstdio>
                 #include <cstring>
                 {{declarations}}
-                constexpr uint32_t capacity={{players}},maxActive=capacity<24?capacity:24,
+                constexpr uint32_t capacity={{players}},fullField={{(fullField?1:0)}},minActive=fullField?capacity:1,maxActive=fullField?capacity:capacity<24?capacity:24,
                     size={{layout.Symbol("BattleBalloonManager.size")}},playerOffset={{layout.Symbol("BattleBalloonManager.players.offset")}},
                     tick={{layout.Symbol("BattleBalloonManager.tick.offset")}},duration={{layout.Symbol("BattleBalloonManager.duration.offset")}},
                     changed={{layout.Symbol("BattleBalloonManager.changed.offset")}},
-                    root=0x81010000,racedata=0x81020000,karts=0x81030000,vtable=0x81040000,objects=0x81100000,stack=0x81f00000;
+                    root=0x81010000,racedata=0x81200000,karts=0x81030000,vtable=0x81040000,objects=0x81100000,stack=0x81f00000;
+                uint32_t readyAnimation=1;
                 uint32_t active=0,allocations=0,constructed=0,started=0,initialized=0,freed=0,updated=0,models=0;
                 void allocate(CpuContext* ctx){
                     auto expected=allocations?484:size;if(ctx->gpr[3]!=expected || allocations>active*10)std::abort();
@@ -62,7 +76,9 @@ public class BattleBalloonStorageTests
                     // Ready animation-state fixture used by the real free-balloon
                     // selection path before it falls back to any unowned entry.
                     auto object=ctx->gpr[3];Memory::Write32(object+376,object+416);Memory::Write32(object+380,0);
-                    Memory::Write32(object+384,0);Memory::Write8(object+389,1);Memory::Write32(object+416,0);}
+                    Memory::Write32(object+384,0);Memory::Write8(object+389,readyAnimation);Memory::Write32(object+416,0);
+                    auto cleanup=0x81400000+i*16;Memory::Write32(object+472,cleanup);Memory::Write32(cleanup,0);
+                    Memory::Write8(cleanup+12,1);Memory::Write8(object+480,0);}
                 void start(CpuContext* ctx){if(id(ctx->gpr[3])!=started++)std::abort();}
                 void init(CpuContext* ctx){if(id(ctx->gpr[3])!=initialized++%(active*10))std::abort();}
                 void update(CpuContext* ctx){if(id(ctx->gpr[3])!=updated++%(active*10))std::abort();}
@@ -74,7 +90,7 @@ public class BattleBalloonStorageTests
                     info.rawCpuInvoker=entry;info.entryPoint=reinterpret_cast<void*>(entry);TranslatedFunctionRegistry::Register(info);}
                 bool guards(){for(uint32_t i=0;i<16;i++)if(Memory::Read8(root-16+i)!=0x55 || Memory::Read8(root+size+i)!=0x55)return false;return true;}
                 bool records(){
-                    std::array<bool,240> held{};uint32_t sum=0;
+                    std::array<bool,capacity*10> held{};uint32_t sum=0;
                     for(uint32_t p=0;p<active;p++){
                         uint32_t base=root+playerOffset+p*24,count=Memory::Read8(base);if(count>5)return false;sum+=count;
                         for(uint32_t slot=0;slot<5;slot++){
@@ -109,15 +125,16 @@ public class BattleBalloonStorageTests
                     Memory::Write32(racedata+{{layout.Symbol("Racedata.race.offset+Scenario.settings.offset")}}+16,0);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
-                    // The original manager's byte counters represent at most 25 active
-                    // players. Larger storage capacities are checked with <=24 active;
-                    // promoting its counters/object IDs is a separate future migration.
-                    for(active=1;active<=maxActive;active++)for(uint32_t ctor=0;ctor<2;ctor++){
+                    // Legacy cases retain every original active count through
+                    // 24. Full-field cases also exercise both preferred and
+                    // fallback selection with high pool ordinals.
+                    for(active=minActive;active<=maxActive;active++)for(uint32_t ctor=0;ctor<2;ctor++){
+                        readyAnimation=fullField&&ctor?0:1;
                         allocations=constructed=started=initialized=freed=0;std::memset(Memory::GetPointer(root-16,size+32),0x55,size+32);
                         Memory::Write8(karts+36,active);Memory::Write32(0x809bff98,0);
                         ctx.gpr[3]=root;if(ctor){allocations=1;func_80865454(&ctx);}else func_8086538C(&ctx);
                         if(allocations!=active*10+1 || constructed!=active*10 || started!=active*10 || !guards())return 4;
-                        if(Memory::Read8(root)!=active || Memory::Read8(root+1)!=active*5 || Memory::Read8(root+2)!=active*10)return 5;
+                        if(Memory::Read8(root)!=active || Memory::Read8(root+1)!=static_cast<uint8_t>(active*5) || Memory::Read8(root+2)!=static_cast<uint8_t>(active*10))return 5;
                         for(uint32_t i=0;i<active*10;i++)if(Memory::Read32(root+4+i*8)!=objects+i*512 || Memory::Read8(root+8+i*8)!=i/(active*5))return 6;
                         for(uint32_t repeat=0;repeat<2;repeat++){
                             ctx.gpr[3]=root;func_808655A8(&ctx);if(initialized!=(repeat+1)*active*10 || !guards())return 7;
@@ -161,7 +178,9 @@ public class BattleBalloonStorageTests
                             for(uint32_t i=0;i<capacity;i++)if(Memory::Read8(root+changed+i)!=(i<active?0:1))return 17;
                             for(uint32_t i=0;i<active*10;i++)if(Memory::Read32(root+4+i*8)!=objects+i*512)return 18;
                         }
-                        Memory::Write32(0x809bff98,root);func_80865414(&ctx);if(freed!=1 || Memory::Read32(0x809bff98)!=0 || !guards())return 12;
+                        Memory::Write32(0x809bff98,root);func_80591BE8(&ctx);
+                        for(uint32_t i=0;i<active*10;i++)if(Memory::Read8(objects+i*512+480)!=1 || Memory::Read8(0x81400000+i*16+12)!=0)return 23;
+                        func_80865414(&ctx);if(freed!=1 || Memory::Read32(0x809bff98)!=0 || !guards())return 12;
                     }
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 13;
                     if(ctx.gpr[1]!=stack)return 14;
@@ -175,7 +194,7 @@ public class BattleBalloonStorageTests
                 if(!done)compile.Kill(entireProcessTree:true);Assert.True(done,"Battle balloon compilation timed out");Assert.True(compile.ExitCode==0,errors.GetAwaiter().GetResult());
             }
             using var run=Process.Start(new ProcessStartInfo(exe,binary){UseShellExecute=false,RedirectStandardError=true})!;
-            var output=run.StandardError.ReadToEndAsync();var finished=run.WaitForExit(10000);
+            var output=run.StandardError.ReadToEndAsync();var finished=run.WaitForExit(30000);
             if(!finished)run.Kill(entireProcessTree:true);Assert.True(finished,"Battle balloon execution timed out");
             Assert.True(run.ExitCode==0,$"Battle balloon returned {run.ExitCode}: {output.GetAwaiter().GetResult()}");
         }

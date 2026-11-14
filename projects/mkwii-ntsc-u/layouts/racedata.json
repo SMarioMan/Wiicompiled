@@ -1,5 +1,5 @@
 {
-  "Version": 30,
+  "Version": 31,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -985,7 +985,24 @@
     {
       "Name": "BattleBalloonHeader",
       "Alignment": 4,
-      "Size": 4
+      "Fields": [
+        {
+          "Name": "playerCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "halfCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "objectCount",
+          "Type": "InputByte"
+        },
+        {
+          "Name": "reserved",
+          "Type": "InputByte"
+        }
+      ]
     },
     {
       "Name": "BattleBalloonEntry",
@@ -80966,6 +80983,233 @@
       "ExpectedWord": "0x7FA903A6",
       "Input": "r29",
       "Count": "ceil(players/6)"
+    }
+  ],
+  "ByteOperations": [
+    {
+      "Instruction": "0x80591D34",
+      "ExpectedWord": "0x57801D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80591D8C",
+      "ExpectedWord": "0x881A0002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80591D90",
+      "ExpectedWord": "0x5783063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x808654E4",
+      "ExpectedWord": "0x881F0001",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.halfCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 5
+    },
+    {
+      "Instruction": "0x808654E8",
+      "ExpectedWord": "0x57A4063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865508",
+      "ExpectedWord": "0x57A4063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865510",
+      "ExpectedWord": "0x57A01D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865534",
+      "ExpectedWord": "0x881F0002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865538",
+      "ExpectedWord": "0x57A3063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865614",
+      "ExpectedWord": "0x57A31D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865640",
+      "ExpectedWord": "0x881F0002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865644",
+      "ExpectedWord": "0x57A3063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865838",
+      "ExpectedWord": "0x57C01D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865858",
+      "ExpectedWord": "0x881F0002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x8086585C",
+      "ExpectedWord": "0x57C3063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865870",
+      "ExpectedWord": "0x57C01D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865890",
+      "ExpectedWord": "0x881F0002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865894",
+      "ExpectedWord": "0x57C3063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865A14",
+      "ExpectedWord": "0x88830002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865A28",
+      "ExpectedWord": "0x54EB1D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865A98",
+      "ExpectedWord": "0x7CEA49AE",
+      "Kind": "scratch-store16",
+      "Count": "BattleBalloonManager.objects.count",
+      "Elements": 5,
+      "AvailableBytes": 16
+    },
+    {
+      "Instruction": "0x80865AA0",
+      "ExpectedWord": "0x54E9063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865AC4",
+      "ExpectedWord": "0x558A1D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865AF0",
+      "ExpectedWord": "0x7D8939AE",
+      "Kind": "scratch-store16",
+      "Count": "BattleBalloonManager.objects.count",
+      "Elements": 5,
+      "AvailableBytes": 16
+    },
+    {
+      "Instruction": "0x80865AF8",
+      "ExpectedWord": "0x5587063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865B30",
+      "ExpectedWord": "0x7C7F18AE",
+      "Kind": "scratch-load16",
+      "Count": "BattleBalloonManager.objects.count",
+      "Elements": 5,
+      "AvailableBytes": 16
+    },
+    {
+      "Instruction": "0x80865C04",
+      "ExpectedWord": "0x88940002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865C14",
+      "ExpectedWord": "0x54A01D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865C7C",
+      "ExpectedWord": "0x54A0063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865D2C",
+      "ExpectedWord": "0x88930002",
+      "Kind": "derived-count",
+      "Count": "BattleBalloonManager.objects.count",
+      "Field": "BattleBalloonManager.header.offset+BattleBalloonHeader.objectCount.offset",
+      "Source": "BattleBalloonManager.header.offset+BattleBalloonHeader.playerCount.offset",
+      "Factor": 10
+    },
+    {
+      "Instruction": "0x80865D3C",
+      "ExpectedWord": "0x54A01D78",
+      "Kind": "offset32",
+      "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x80865DF4",
+      "ExpectedWord": "0x54A0063E",
+      "Kind": "index32",
+      "Count": "BattleBalloonManager.objects.count"
     }
   ]
 }

@@ -744,11 +744,11 @@ At capacity 24 the manager grows from 0x4F8 to 0x9E4 bytes.
 destroy paths for every active count from 1 through 24 (or the storage capacity
 when smaller), with repeated resets, entry identity checks and memory/register
 guards. Allocations and rendered balloon objects are fixtures. Five storage
-capacities (12, 13, 24, 48 and 100) and the 891-consumer proof audit pass. The
-larger storage cases still use at most 24 active participants: the original
-manager and balloon-object byte counters require a separate width migration
-before supporting more than 25 active players. Those cases are storage-layout
-checks, not claims of playable 48/100-player battles.
+capacities (12, 13, 24, 48 and 100) and the 891-consumer proof audit pass. Those earlier
+larger storage cases use at most 24 active participants. The later format-31
+[balloon width migration](128-racer-balloon-widths.md) adds full-field fixtures
+through 128 active racers while preserving these earlier cases. Rendered object
+resources and complete live battles still require qualification.
 
 Format version 14 adds checked `HeapRoutes`. A complete five-instruction span
 must load two backing heaps, initialize its existing zero register, and store

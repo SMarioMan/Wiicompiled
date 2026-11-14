@@ -24,8 +24,11 @@ mask widths separate.
 - [x] Verify original EGG/NW4R backing allocation and all 528 activity records at
   128, plus all 132 creator registrations. Nonempty particle/effect pools, live
   high-ID draws/destruction and scene ownership remain open.
-- [ ] Resolve balloon byte counters/object ordinals; qualify live effects, light
-  visuals/resource loading and 128-racer heap ownership.
+- [x] Widen known balloon pool count/index consumers and selected ordinals through
+  128 active racers, retaining relocated storage and the four-byte header ABI.
+- [ ] Qualify balloon object resources/legacy-byte consumers and live battle
+  state/scoring/lifecycle; live effects, light visuals and 128-racer heap ownership
+  also remain open.
 - [ ] Qualify the capacity boundary set and complete 128-entry single-screen
   results in 16:9 and 4:3, including teardown and another race.
 

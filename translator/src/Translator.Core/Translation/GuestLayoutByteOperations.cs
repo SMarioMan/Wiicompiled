@@ -84,7 +84,7 @@ public sealed partial class GuestLayoutRelocations
         if (word >> 26 != 31 || (word >> 1 & 1023) != (write ? 215u : 87u) || ra == "r0" ||
             nodes.Count != 2 || nodes[0] is not IrBinary { Op: "add" } address ||
             address.Left.RegisterName != ra || address.Right.RegisterName != rb) throw Invalid();
-        var scaled = $"wide_byte_index_{instruction.Address:X8}";
+        var scaled = $"addr_layout_byte_index_{instruction.Address:X8}_loc";
         var result = new List<IrInstruction> {
             new IrBinary(scaled, IrValue.Register(rb), IrValue.Imm(1), "shl"),
             address with { Right = IrValue.Register(scaled) }

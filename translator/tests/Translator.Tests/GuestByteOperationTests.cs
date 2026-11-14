@@ -41,6 +41,16 @@ public class GuestByteOperationTests
     }
 
     [Fact]
+    public void ConditionalScratchWideningUsesBlockLocalTemporariesInSsa(){
+        var image=TranslatorCppTestHarness.CreateImage((0x80001000u,0x2c060000u),(0x80001004u,0x41820010u),
+            (0x80001008u,0x7cea49aeu),(0x8000100cu,0x38c6ffffu),(0x80001010u,0x4bfffff0u),(0x80001014u,0x4e800020u));
+        var plan=new GuestLayoutRelocations(Types,12,128,Array.Empty<GuestLayoutReference>(),byteOperations:new[]{
+            new GuestByteOperation(0x80001008,0x7cea49ae,"scratch-store16","Pool.objects.count",Elements:5,AvailableBytes:16)});
+        var result=new FunctionTranslator(image,layoutRelocations:plan).Translate(0x80001000,TranslationOptions.Default);
+        Assert.Contains("Write16",result.CxxCode);
+    }
+
+    [Fact]
     public void ByteOperationsRequireFormatThirtyOneAndRejectFutureFormats(){
         var path=Path.GetTempFileName();
         try{foreach(var version in new[]{30,31,32}){

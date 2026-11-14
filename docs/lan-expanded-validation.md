@@ -121,3 +121,16 @@ relocate their settings writes. Native lifecycle tests pass at 12, 13, 24, 32,
 48 and 100 capacity, checking allocation size, every timer construction,
 one-/two-local-player initialization, next-race rank/point transfer, race-number
 wrap, untouched player fields and object/scenario guards.
+
+With `2c63ebe`, another simultaneous thirteen-console attempt failed admission
+at 43.26 seconds; it did not reach race validation. A separate normal-timing
+sequential 24-console attempt admitted twenty members at 447.06 seconds, then
+failed at 699.04 seconds during client 21 startup as established members lost
+connections. A five-second thread CPU sample across 21 processes totaled about
+372.5% CPU on a four-CPU host; cgroup memory use was about 11 GiB of 32 GiB with
+no OOM kills. These observations show substantial CPU load, but do not isolate
+the disconnect cause. The executable SHA-256 was
+`bbeb85f024b039c73d3c04f7bb4dbe5325f40b10e7e88174f33eaa32b5e67512`.
+Sequential startup now rejects an error dialog from any established peer, not
+only the client currently joining. Normal-timing 24-console admission remains
+unqualified.

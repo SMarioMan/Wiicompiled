@@ -155,8 +155,8 @@ def run(args):
                             print(json.dumps(dict(elapsed=round(now-started, 2), checkpoint='sequential-join',
                                                   joined=len(launched), requested=count)), flush=True)
                             break
-                        if observed == instance and page == 0x4d and transition == 4:
-                            raise RuntimeError(f'Instance {instance} reached an error dialog while joining; inspect its game log')
+                        if page == 0x4d and transition == 4:
+                            raise RuntimeError(f'Instance {observed} reached an error dialog while joining; inspect its game log')
                     else:
                         raise TimeoutError(f'Instance {instance} did not finish sequential room startup')
             while time.monotonic() - started < args.timeout:

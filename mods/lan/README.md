@@ -345,9 +345,10 @@ call-site shims pass their candidate node from r31 to the LAN scheduler. Stock
 twelve-capacity builds and unsupported states retain the original SDK routine.
 
 Expanded builds use this policy from three participants onward, so legacy
-deadlines cannot accumulate during the initial lobby growth. Stable PID ordering
-chooses a preferred initiator for each pair. Pair-specific jitter spreads attempts; the opposite endpoint has a grace
-period before it can initiate. Retry backoff is bounded, and the SDK keeps its
+deadlines cannot accumulate during the initial lobby growth. Only the lower PID
+initiates each peer link. Outstanding reservations point toward higher PIDs,
+preventing cyclic waits; the highest remaining endpoint can accept requests.
+Pair-specific jitter spreads attempts. Retry backoff is bounded, and the SDK keeps its
 own connection checks, attempt limits and teardown. The mesh still has 276 links
 at 24 consoles. The shims preserve LR and use symbolic linker/patch targets;
 the original no-argument SDK function remains available to other callers.
@@ -363,9 +364,11 @@ private address when the discovery cache is late. The shared SDK public address
 is a NAT placeholder and is never used as a fallback route. Reservation allowances
 also account for the SDK's known participant count while discovery catches up.
 
-The non-preferred endpoint gives the preferred initiator thirty seconds before
-starting a fallback attempt, with subsequent backoff capped at sixty seconds.
-This avoids the crossed reservation waits seen with the earlier short grace.
-The preferred endpoint retains its short, jittered deadline. A corrected
-normal-timing thirteen-console candidate reached full connectivity at 37.40 s;
-normal-timing 24-console joining and race completion still require validation.
+An earlier thirty-second reverse-initiation fallback reproduced cyclic waits in
+an actual 24-console room. Passive endpoints now retain a positive signed-64-bit
+future deadline instead of reversing ownership after a grace period. The active
+endpoint retains its short, jittered deadline and the SDK's retry limit. Native
+tests verify single ownership across all PID pairs and retry counts. The latest
+normal-timing run held all 24 room members for five seconds at 102.07 s, but full
+SDK connectivity and racing were not qualified. Repeat those live checks with
+the strict ownership policy before treating lobby reliability as resolved.

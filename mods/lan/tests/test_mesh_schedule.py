@@ -7,12 +7,13 @@ import unittest
 
 
 class MeshSchedule(unittest.TestCase):
-    def test_pair_ownership_stagger_backoff_and_stock_fallback(self):
+    def test_acyclic_pair_ownership_stagger_backoff_and_stock_fallback(self):
         module = Path(__file__).parents[1]/'source/module'
         source = (module/'mesh_schedule.c').read_text()
         helper = source[source.index('uint64_t LANMeshNextTick('):]
         harness = r'''
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "mesh_schedule.h"
@@ -32,9 +33,9 @@ int main(void){
         uint32_t before_low=0,before_high=0;
         for(uint32_t attempt=0;attempt<8;attempt++){
             const uint32_t owner=lan_mesh_delay_ms(low,high,attempt),fallback=lan_mesh_delay_ms(high,low,attempt);
-            CHECK(owner<fallback && owner>=125 && fallback<=60124);
+            CHECK(owner>=125 && owner<=2124 && fallback==LAN_MESH_PASSIVE_DELAY);
             CHECK(owner>=before_low && fallback>=before_high);before_low=owner;before_high=fallback;
-            if(!attempt)CHECK(owner<=249 && fallback>=30000 && fallback<=30124);
+            if(!attempt)CHECK(owner<=249);
         }
         CHECK(lan_mesh_delay_ms(low,high,0xffffffffu)<=2124);
     }
@@ -52,6 +53,22 @@ int main(void){
         peer[6]=attempt;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
         if(MKW_LAN_CAPACITY<=12)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
         else CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],attempt)) && !originals && clocks==1);
+    }
+    // Passive endpoints never acquire a finite outgoing retry, even after
+    // the old 30/60-second fallback windows or exhausted retry counters.
+    game.my_pid=0x7f000018;peer[0]=0x7f000002;
+    for(unsigned attempt=0;attempt<8;attempt++){
+        peer[6]=attempt;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
+        if(MKW_LAN_CAPACITY<=12)CHECK(next==0x123456789abcdef0ULL && originals==1);
+        else CHECK(next==INT64_MAX && !originals && !clocks && (int64_t)next>0);
+    }
+    // Any reservation chain strictly increases its PID; there is always a
+    // passive sink instead of the observed 7<->12 and 16<->24 wait cycles.
+    for(uint32_t a=1;a<=24;a++)for(uint32_t b=1;b<=24;b++)if(a!=b){
+        bool forward=lan_mesh_delay_ms(a,b,0)!=LAN_MESH_PASSIVE_DELAY;
+        bool backward=lan_mesh_delay_ms(b,a,0xffffffffu)!=LAN_MESH_PASSIVE_DELAY;
+        CHECK(forward!=backward);
+        if(forward)CHECK(a<b);
     }
     for(unsigned state=0;state<=18;state++)if(state!=1){game.dwc_match_state=state;originals=0;CHECK(LANMeshNextTick(peer)==0x123456789abcdef0ULL && originals==1);}
     game.dwc_match_state=1;peer[0]=game.my_pid;CHECK(LANMeshNextTick(peer)==0x123456789abcdef0ULL);

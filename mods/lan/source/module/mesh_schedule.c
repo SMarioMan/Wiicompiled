@@ -23,5 +23,8 @@ uint64_t LANMeshNextTick(const uint32_t *peer) {
     /* SDK node +0x18 is the attempt counter tested at USA 800D80EC.
      * The existing SDK retains connection checks, retry limits and teardown. */
     const uint32_t delay = lan_mesh_delay_ms(game->my_pid, peer[0], peer[0x18/4]);
+    /* The SDK compares this deadline as signed 64-bit time. Keep a passive
+     * endpoint in the future without using the negative UINT64_MAX sentinel. */
+    if (delay == LAN_MESH_PASSIVE_DELAY) return INT64_MAX;
     return OSGetTime() + (uint64_t)millisecs_to_ticks(delay);
 }

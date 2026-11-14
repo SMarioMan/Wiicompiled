@@ -292,3 +292,22 @@ Native regressions cover every supported negotiation state, both payload forms,
 payload reuse, re-entry, queued/in-flight cancellation, expiry and host/context
 changes. Stock builds retain the original handler path. Live revalidation remains
 required.
+
+With `e24ceaa`, all 24 consoles held room membership for five seconds at
+102.07 seconds under normal timing. The original SDK processed deferred SYNs
+after cancellation on consoles 11 and 22. Full peer connectivity still grew
+slowly: summed connection-mask bits reached 174 at 180 seconds and remained at
+174 through 270 seconds. Captured reservation targets show explicit cycles
+16-to-24-to-16 and 7-to-12-to-7. At the final observation (510.91 seconds),
+255 of the required 576 per-console connection bits were set. The owned
+diagnostic driver was then interrupted; it did not qualify complete SDK
+connectivity or reach a race.
+
+The thirty-second reverse-initiation fallback allowed those cycles to form.
+Peer scheduling now assigns each link solely to its lower-PID endpoint, so
+outgoing reservations strictly increase PID and cannot form a cycle. The
+passive endpoint receives a positive `INT64_MAX` deadline, consistent with the
+SDK's signed time comparison, rather than an expiring grace period or negative
+sentinel. Active retries keep their bounded jitter/backoff and original SDK
+attempt/connection/teardown handling. Stock capacity and unsupported states keep
+the original scheduler. Native pair/ABI checks pass; live comparison is pending.

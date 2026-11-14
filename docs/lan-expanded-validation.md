@@ -407,3 +407,14 @@ stock builds retain their behavior. Native policy coverage checks the exact
 caller guard, repeated calls, absent owners and stock behavior. This scheduling
 candidate still requires live race/connection validation; the snapshot alone
 does not establish it as the cause or complete fix for the disconnects.
+
+With `698297f`, thirteen normal-timing consoles completed SDK connectivity at
+32.02 seconds and reached race completion on every peer at 775.39 seconds.
+All thirteen peers reported thirteen finished racers, with minimum lap 3 and
+maximum lap 4, on Luigi Circuit in online VS mode. All 169 connection bits
+remained present; no server-loss or guest-fault reports occurred. The original
+HUD getter assigns slot zero to every peer's own local player, including player
+ID 12. This is one CPU-driven thirteen-console finish pass in the 24-capacity
+build, not a completed 24-player race, repeated-join benchmark, results-screen
+qualification or reconnection pass. The exact per-peer observations are retained
+in [the validation record](validation/lan-race-rmce01-13.json).

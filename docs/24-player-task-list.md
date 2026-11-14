@@ -18,6 +18,9 @@ Video subtitles are observations and design references, not build instructions.
 - [ ] Complete network wire layouts, packed teams, rating-sort scratch storage,
   participant masks and SDK limits; exercise 24 active LAN participants through
   joining, voting, racing, results, disconnects and a second race.
+  The `be5eb75` normal-timing candidate now completes all 24 room memberships
+  and SDK connections at 63.09 seconds. Race/results/reconnection qualification
+  and repeated admission comparisons remain open.
 - [ ] **Lobby connection speed and reliability:** improve the connection algorithm
   for large rooms. Measure discovery, membership and complete peer connectivity
   separately; compare the original full mesh (276 links at 24 consoles) with a

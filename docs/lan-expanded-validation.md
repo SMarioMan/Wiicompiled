@@ -332,3 +332,19 @@ service path. A native scheduling fixture yields after publishing idle and
 checks that the old resume precedes the next stop, with initialization, shutdown
 and re-entry guards. Live comparison and the rebuilt hook's linked ABI still
 require validation.
+
+With the SDK-thread serialization build (`be5eb75`), a normal-timing 24-console
+attempt reached all room members and complete SDK connectivity at 63.09 seconds.
+The 60.15-second snapshot already has all 576 connection-mask bits set, every
+client in `CL_WAITING`, the host in `SV_WAITING`, and no suspension. All 25 LAN
+tests, including the linked thirteen-hook ABI, passed before this run. This is
+one full-connectivity pass; repeated joins, racing, results and reconnection
+remain separate qualifications.
+
+The input driver missed its short initial left pulse and opened the chat menu.
+The running test was navigated back to the room and into Start using ordinary
+controller input, with the original Start-description/callback confirming the
+selection. Only the input driver was paused during this correction; game RAM
+was not modified. All 24 consoles subsequently entered course selection and
+race loading. Race qualification was still in progress at this checkpoint, so
+this record does not claim an advancing or completed 24-player race.

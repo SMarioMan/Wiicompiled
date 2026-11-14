@@ -103,6 +103,7 @@ def run(args):
     finish_since = None
     status, race, network, last_input = {}, {}, {}, {}
     room_reported = False
+    race_reported = False
     room_confirmed = race_since = None
     race_start_frames = {}
     started = time.monotonic()
@@ -239,9 +240,15 @@ def run(args):
                             race_since = now
                             race_start_frames = {i: race[i][0]['frames'] for i in ids}
                         if room_confirmed is not None and now-race_since >= 5 and all(
-                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids) and not args.finish:
-                            print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
-                            return 0
+                                race[i][0]['frames']-race_start_frames[i] >= 120 for i in ids):
+                            if args.finish:
+                                if not race_reported:
+                                    print(json.dumps(dict(checkpoint=f'all {count} peers advancing in the same race',
+                                        test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
+                                    race_reported = True
+                            else:
+                                print(json.dumps(dict(result='passed', check=f'all {count} peers advancing in the same race', test_clock_divisor=test_clock, elapsed=round(now-started, 2))), flush=True)
+                                return 0
                     else:
                         race_since = None
                     continue

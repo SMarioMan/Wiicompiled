@@ -3184,6 +3184,40 @@
           "Type": "SavedGprs19"
         }
       ]
+    },
+    {
+      "Name": "OnlineVSHeader",
+      "Size": 8,
+      "Alignment": 4
+    },
+    {
+      "Name": "OnlineVSPlayer",
+      "Size": 20,
+      "Alignment": 4
+    },
+    {
+      "Name": "OnlineVSTail",
+      "Size": 124,
+      "Alignment": 4
+    },
+    {
+      "Name": "OnlineVSData",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "OnlineVSHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "OnlineVSPlayer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "OnlineVSTail"
+        }
+      ]
     }
   ],
   "References": [
@@ -63299,6 +63333,1601 @@
       "Operand": "offset",
       "Symbol": "OnlinePositionTrackingFrame.conversion.offset",
       "Addend": 8
+    },
+    {
+      "Instruction": "0x80538E44",
+      "ExpectedWord": "0x98030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E54",
+      "ExpectedWord": "0xB1030116",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 30,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E5C",
+      "ExpectedWord": "0xB103011A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 34,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E60",
+      "ExpectedWord": "0xD0030120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E64",
+      "ExpectedWord": "0xB1030128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E68",
+      "ExpectedWord": "0x98030109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E6C",
+      "ExpectedWord": "0xB1030118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E70",
+      "ExpectedWord": "0xB103011C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E74",
+      "ExpectedWord": "0xD0030124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E78",
+      "ExpectedWord": "0xB103012A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 50,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538E7C",
+      "ExpectedWord": "0x9903010A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 18,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538EBC",
+      "ExpectedWord": "0x88E3010A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 18,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538ED0",
+      "ExpectedWord": "0x9883010A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 18,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538EFC",
+      "ExpectedWord": "0x9923010B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 19,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538F04",
+      "ExpectedWord": "0x9003010C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538F08",
+      "ExpectedWord": "0x98030114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538F34",
+      "ExpectedWord": "0x90030110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053974C",
+      "ExpectedWord": "0x8083010C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053975C",
+      "ExpectedWord": "0x9003010C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805397B8",
+      "ExpectedWord": "0x801E0110",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805399AC",
+      "ExpectedWord": "0x881E0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539A44",
+      "ExpectedWord": "0x9BBE0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B2C",
+      "ExpectedWord": "0x881E0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B40",
+      "ExpectedWord": "0x881E0108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B5C",
+      "ExpectedWord": "0xC01E0120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B74",
+      "ExpectedWord": "0xA07E0128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B7C",
+      "ExpectedWord": "0xB01E0128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B8C",
+      "ExpectedWord": "0x98BE0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539B98",
+      "ExpectedWord": "0xB09E0128",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 48,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BA0",
+      "ExpectedWord": "0x881E0108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BB4",
+      "ExpectedWord": "0xD01E0120",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BB8",
+      "ExpectedWord": "0x881E0109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BCC",
+      "ExpectedWord": "0xC01E0124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BE4",
+      "ExpectedWord": "0xA07E012A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 50,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BEC",
+      "ExpectedWord": "0xB01E012A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 50,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539BFC",
+      "ExpectedWord": "0x98BE0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539C08",
+      "ExpectedWord": "0xB09E012A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 50,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539C10",
+      "ExpectedWord": "0x881E0109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539C24",
+      "ExpectedWord": "0xD01E0124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 44,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539CB0",
+      "ExpectedWord": "0x881E0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539D38",
+      "ExpectedWord": "0x981E0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539DBC",
+      "ExpectedWord": "0x881F010B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 19,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539DDC",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539F20",
+      "ExpectedWord": "0x881F0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539F44",
+      "ExpectedWord": "0x981F0114",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538F80",
+      "ExpectedWord": "0x819C014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 84,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538F88",
+      "ExpectedWord": "0x387C014C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 84,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FA0",
+      "ExpectedWord": "0x819C0154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FA8",
+      "ExpectedWord": "0x387C0154",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FBC",
+      "ExpectedWord": "0x819C015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FC4",
+      "ExpectedWord": "0x387C015C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FD8",
+      "ExpectedWord": "0x819C0164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FE0",
+      "ExpectedWord": "0x387C0164",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80538FF8",
+      "ExpectedWord": "0xA01C0150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 88,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539014",
+      "ExpectedWord": "0xA01C0158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 96,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053901C",
+      "ExpectedWord": "0xA01C0160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 104,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053902C",
+      "ExpectedWord": "0x819C012C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539030",
+      "ExpectedWord": "0x387C012C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539044",
+      "ExpectedWord": "0x819C0134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053904C",
+      "ExpectedWord": "0x387C0134",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539060",
+      "ExpectedWord": "0x819C013C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539068",
+      "ExpectedWord": "0x387C013C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053907C",
+      "ExpectedWord": "0x819C0144",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539084",
+      "ExpectedWord": "0x387C0144",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539098",
+      "ExpectedWord": "0x881C0130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 56,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390A8",
+      "ExpectedWord": "0x889C0138",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390B4",
+      "ExpectedWord": "0x881C0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390C0",
+      "ExpectedWord": "0xA01C0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390D4",
+      "ExpectedWord": "0xA07C0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390D8",
+      "ExpectedWord": "0x881C0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390EC",
+      "ExpectedWord": "0x819C016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805390F0",
+      "ExpectedWord": "0x387C016C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539104",
+      "ExpectedWord": "0x881C0130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 56,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539114",
+      "ExpectedWord": "0xA01C0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 120,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539120",
+      "ExpectedWord": "0x881C0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 112,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805391F8",
+      "ExpectedWord": "0x881D010B",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 19,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805392E4",
+      "ExpectedWord": "0x8B430108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805392F4",
+      "ExpectedWord": "0x8B430109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805393CC",
+      "ExpectedWord": "0xB1030150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 88,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805393D4",
+      "ExpectedWord": "0xB1230158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 96,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805393D8",
+      "ExpectedWord": "0xB1430160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 104,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805393DC",
+      "ExpectedWord": "0x88030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805393EC",
+      "ExpectedWord": "0x88030109",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 17,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539400",
+      "ExpectedWord": "0x9B630168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 112,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539404",
+      "ExpectedWord": "0x388300F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053940C",
+      "ExpectedWord": "0x8583014C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 84,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053941C",
+      "ExpectedWord": "0x819F0154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539424",
+      "ExpectedWord": "0x387F0154",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539428",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539438",
+      "ExpectedWord": "0x819F015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539440",
+      "ExpectedWord": "0x387F015C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539444",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539454",
+      "ExpectedWord": "0x819F0164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053945C",
+      "ExpectedWord": "0x387F0164",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539460",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805394D0",
+      "ExpectedWord": "0x981F0130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 56,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805394D8",
+      "ExpectedWord": "0x981F0138",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805394E0",
+      "ExpectedWord": "0x981F0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805394E8",
+      "ExpectedWord": "0xB01F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539544",
+      "ExpectedWord": "0x981F0138",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053954C",
+      "ExpectedWord": "0x981F0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539554",
+      "ExpectedWord": "0xB01F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539570",
+      "ExpectedWord": "0x987F0138",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 64,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053958C",
+      "ExpectedWord": "0x987F0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395A4",
+      "ExpectedWord": "0xB01F0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395AC",
+      "ExpectedWord": "0x387F012C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395B4",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395C8",
+      "ExpectedWord": "0xB01F0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 120,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395CC",
+      "ExpectedWord": "0x819F012C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395DC",
+      "ExpectedWord": "0x819F0134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395E4",
+      "ExpectedWord": "0x387F0134",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395E8",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805395F8",
+      "ExpectedWord": "0x819F013C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539600",
+      "ExpectedWord": "0x387F013C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539604",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539614",
+      "ExpectedWord": "0x819F0144",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053961C",
+      "ExpectedWord": "0x387F0144",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539620",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539630",
+      "ExpectedWord": "0x819F016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80539638",
+      "ExpectedWord": "0x387F016C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8053963C",
+      "ExpectedWord": "0x389F00F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8052D780",
+      "ExpectedWord": "0x38600174",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "OnlineVSData.size"
+    },
+    {
+      "Instruction": "0x8052D7B8",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "OnlineVSData.players.count"
+    },
+    {
+      "Instruction": "0x8052D7D0",
+      "ExpectedWord": "0x913E012C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x8052D7E4",
+      "ExpectedWord": "0x981E0130",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 56
+    },
+    {
+      "Instruction": "0x8052D7F4",
+      "ExpectedWord": "0x907E012C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 52
+    },
+    {
+      "Instruction": "0x8052D804",
+      "ExpectedWord": "0x913E0134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60
+    },
+    {
+      "Instruction": "0x8052D81C",
+      "ExpectedWord": "0x981E0138",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 64
+    },
+    {
+      "Instruction": "0x8052D820",
+      "ExpectedWord": "0x911E0134",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 60
+    },
+    {
+      "Instruction": "0x8052D824",
+      "ExpectedWord": "0x913E013C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68
+    },
+    {
+      "Instruction": "0x8052D82C",
+      "ExpectedWord": "0x981E0140",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 72
+    },
+    {
+      "Instruction": "0x8052D830",
+      "ExpectedWord": "0x90FE013C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 68
+    },
+    {
+      "Instruction": "0x8052D834",
+      "ExpectedWord": "0x90DE0144",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8052D83C",
+      "ExpectedWord": "0xB01E0148",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 80
+    },
+    {
+      "Instruction": "0x8052D840",
+      "ExpectedWord": "0x90BE0144",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 76
+    },
+    {
+      "Instruction": "0x8052D844",
+      "ExpectedWord": "0x90DE014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 84
+    },
+    {
+      "Instruction": "0x8052D84C",
+      "ExpectedWord": "0xB01E0150",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 88
+    },
+    {
+      "Instruction": "0x8052D850",
+      "ExpectedWord": "0x909E014C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 84
+    },
+    {
+      "Instruction": "0x8052D854",
+      "ExpectedWord": "0x90DE0154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92
+    },
+    {
+      "Instruction": "0x8052D85C",
+      "ExpectedWord": "0xB01E0158",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 96
+    },
+    {
+      "Instruction": "0x8052D860",
+      "ExpectedWord": "0x909E0154",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 92
+    },
+    {
+      "Instruction": "0x8052D864",
+      "ExpectedWord": "0x90DE015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100
+    },
+    {
+      "Instruction": "0x8052D86C",
+      "ExpectedWord": "0xB01E0160",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 104
+    },
+    {
+      "Instruction": "0x8052D870",
+      "ExpectedWord": "0x909E015C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 100
+    },
+    {
+      "Instruction": "0x8052D874",
+      "ExpectedWord": "0x913E0164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108
+    },
+    {
+      "Instruction": "0x8052D87C",
+      "ExpectedWord": "0x981E0168",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 112
+    },
+    {
+      "Instruction": "0x8052D880",
+      "ExpectedWord": "0x907E0164",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 108
+    },
+    {
+      "Instruction": "0x8052D884",
+      "ExpectedWord": "0x90DE016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116
+    },
+    {
+      "Instruction": "0x8052D88C",
+      "ExpectedWord": "0xB01E0170",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 120
+    },
+    {
+      "Instruction": "0x8052D890",
+      "ExpectedWord": "0x909E016C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 116
+    },
+    {
+      "Instruction": "0x80538EB0",
+      "ExpectedWord": "0x99440108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8053949C",
+      "ExpectedWord": "0x88040108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805394A8",
+      "ExpectedWord": "0x88040108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805394EC",
+      "ExpectedWord": "0x88040108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80539550",
+      "ExpectedWord": "0x88040108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805395B0",
+      "ExpectedWord": "0x88040108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805396A8",
+      "ExpectedWord": "0x88030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805397CC",
+      "ExpectedWord": "0x88030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805398B4",
+      "ExpectedWord": "0x88030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x805399E0",
+      "ExpectedWord": "0x88830108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80539A04",
+      "ExpectedWord": "0xA07A0116",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x80539A14",
+      "ExpectedWord": "0xB01A0116",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x80539A1C",
+      "ExpectedWord": "0xB39A0116",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x80539A20",
+      "ExpectedWord": "0xA01A0116",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 30
+    },
+    {
+      "Instruction": "0x80539A2C",
+      "ExpectedWord": "0xA07A011A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 34
+    },
+    {
+      "Instruction": "0x80539A34",
+      "ExpectedWord": "0xB01A011A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 34
+    },
+    {
+      "Instruction": "0x80539A50",
+      "ExpectedWord": "0xA07A011A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 34
+    },
+    {
+      "Instruction": "0x80539A60",
+      "ExpectedWord": "0xB01A011A",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 34
+    },
+    {
+      "Instruction": "0x80539CD0",
+      "ExpectedWord": "0x881B0108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80539D18",
+      "ExpectedWord": "0x881B0108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80539EC8",
+      "ExpectedWord": "0x88030108",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "OnlineVSData.tail.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x80529B20",
+      "ExpectedWord": "0x80830B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529B38",
+      "ExpectedWord": "0x91630B60",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529B40",
+      "ExpectedWord": "0x90C30B5C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529B44",
+      "ExpectedWord": "0x98A30B6D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 37,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529B48",
+      "ExpectedWord": "0x90C30B4C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529B4C",
+      "ExpectedWord": "0x90830B70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 40,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529C10",
+      "ExpectedWord": "0x98830B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529C14",
+      "ExpectedWord": "0x98030B6D",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 37,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529C28",
+      "ExpectedWord": "0x88830B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529C38",
+      "ExpectedWord": "0x98030B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529C44",
+      "ExpectedWord": "0x98030B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80529D20",
+      "ExpectedWord": "0x88630B6C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Scenario.settings.offset",
+      "Addend": 36,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -63996,37 +65625,37 @@
     },
     {
       "Entry": "0x80538E34",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": "GMDataOnlineVS::Init"
     },
     {
       "Entry": "0x80539704",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": ""
     },
     {
       "Entry": "0x8053982C",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": ""
     },
     {
       "Entry": "0x80539914",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": ""
     },
     {
       "Entry": "0x80539A98",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": ""
     },
     {
       "Entry": "0x80539C48",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": ""
     },
     {
       "Entry": "0x80539D68",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": "GMDataOnlineVS::Update"
     },
     {
@@ -70851,8 +72480,53 @@
     },
     {
       "Entry": "0x80539F64",
-      "Receiver": null,
+      "Receiver": "OnlineVSData",
       "Name": "GMDataOnlineVS::HandlePositionTracking"
+    },
+    {
+      "Entry": "0x80538F40",
+      "Receiver": "OnlineVSData",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80539144",
+      "Receiver": "OnlineVSData",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80539270",
+      "Receiver": "OnlineVSData",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80539680",
+      "Receiver": "OnlineVSData",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8053A4D4",
+      "Receiver": "OnlineVSData",
+      "Name": "GMDataOnlineVS::CanRaceEnd"
+    },
+    {
+      "Entry": "0x8053A5FC",
+      "Receiver": "OnlineVSData",
+      "Name": "GMDataOnlineVS::vf_0x24"
+    },
+    {
+      "Entry": "0x8053A65C",
+      "Receiver": "OnlineVSData",
+      "Name": "GMDataOnlineVS::UpdateLocalPlayers"
+    },
+    {
+      "Entry": "0x80529B20",
+      "Receiver": "Scenario",
+      "Name": ""
+    },
+    {
+      "Entry": "0x80529C28",
+      "Receiver": "Scenario",
+      "Name": ""
     }
   ],
   "BoundedAccesses": [

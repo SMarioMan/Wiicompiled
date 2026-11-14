@@ -101,3 +101,23 @@ They check final order, rank uniqueness, saved registers and frame/output guards
 Before the migration, the new thirteen-player online test terminated with a
 memory fault; the original offline test already passed. Live race revalidation
 is still required.
+
+The subsequent `9603cfa` live attempt still faulted and was stopped at 209.60
+seconds. RAM showed slot thirteen's previous finish rank was zero in both
+scenarios before sorting. Two unrolled scenario helpers (`80529B20`, reset;
+`80529C28`, advance) had neither expanded their twelve records nor relocated
+their settings writes. The online VS factory also allocated/constructed only
+twelve records, with later racers overlapping its fixed tail. These are
+additional migration gaps; the scratch-frame fix alone does not qualify racing.
+The same source's separate normal-timing 24-console lobby attempt failed during
+admission at 74.20 seconds. Binary SHA-256:
+`f95f3a7b68e17e202f19aae7366515cbecb5e8812774a3bf8b33d05a7697bd65`.
+
+The online VS object now grows its twenty-byte participant records and moves
+its fixed tail, including embedded timer/range objects and local-player IDs.
+The scenario reset/advance helpers retain their original twelve records and
+register behavior, extend the same score/rank operations to later slots, and
+relocate their settings writes. Native lifecycle tests pass at 12, 13, 24, 32,
+48 and 100 capacity, checking allocation size, every timer construction,
+one-/two-local-player initialization, next-race rank/point transfer, race-number
+wrap, untouched player fields and object/scenario guards.

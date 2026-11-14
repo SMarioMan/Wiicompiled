@@ -11,7 +11,8 @@ class DiscoveryClockTests(unittest.TestCase):
         source = (Path(__file__).parents[1] / 'source/module/network_thread.c').read_text()
         begin = source.index('static bool broadcast_due(')
         end = source.index('static bool compute_and_broadcast_status(', begin)
-        harness = r'''
+        clock_header = (Path(__file__).parents[1] / 'source/module/discovery_clock.h').read_text()
+        harness = clock_header + r'''
 #include <stdbool.h>
 #include <stdint.h>
 #define BROADCAST_INTERVAL 60
@@ -20,6 +21,13 @@ static uint64_t clock_ticks, timestamp, broadcast_timer;
 static uint64_t OSGetTime(void) { return clock_ticks; }
 '''+source[begin:end]+r'''
 int main(void) {
+    // Check the freestanding conversion against a native 64-bit reference.
+    uint64_t random=0x123456789abcdef0ULL;
+    for(unsigned i=0;i<100000;i++) {
+        random^=random<<13;random^=random>>7;random^=random<<17;
+        if(lan_discovery_time(random)!=random/LAN_DISCOVERY_TICKS_PER_UNIT) return 9;
+    }
+    if(lan_discovery_time(UINT64_MAX)!=UINT64_MAX/LAN_DISCOVERY_TICKS_PER_UNIT) return 10;
     // Match initialise(): the first advertisement is immediately due.
     clock_ticks=secs_to_ticks(100ULL);
     timestamp=clock_ticks/(secs_to_ticks(1)/BROADCAST_INTERVAL);

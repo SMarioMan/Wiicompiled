@@ -13,12 +13,15 @@
 #include "mkw.h"
 #include "port_addresses.h"
 #include "processor.h"
+#include "discovery_clock.h"
 
 // port to do udp advertisement on
 #define BROADCAST_PORT 27900
 #define DISCOVERY_PORT 27909
 #define DISCOVERY_GROUP 0xefff4d4b /* 239.255.77.75 */
 #define BROADCAST_INTERVAL 60
+_Static_assert(LAN_DISCOVERY_TICKS_PER_UNIT * BROADCAST_INTERVAL == secs_to_ticks(1),
+               "Discovery clock must match the Wii timebase");
 #define BROADCAST_TIMEOUT (BROADCAST_INTERVAL * 5)
 /* A queued reservation remains valid for the expanded SDK wait allowance,
  * independently of the shorter discovery advertisement lifetime. */
@@ -107,7 +110,7 @@ static bool initialise(void) {
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
 	/* Discovery deadlines use the SDK clock, not the rate this thread runs. */
-	timestamp = OSGetTime() / (secs_to_ticks(1) / BROADCAST_INTERVAL);
+	timestamp = lan_discovery_time(OSGetTime());
 	broadcast_timer = timestamp;
 	local_ip = MKW_LOCAL_IP;
 	if (local_ip == 0) {
@@ -229,7 +232,7 @@ extern const uint8_t *MKWRaceData;
 extern const uint8_t *MKWNetController;
 
 static bool broadcast_due(void) {
-    timestamp = OSGetTime() / (secs_to_ticks(1) / BROADCAST_INTERVAL);
+    timestamp = lan_discovery_time(OSGetTime());
     if (timestamp < broadcast_timer) return false;
     broadcast_timer = timestamp + BROADCAST_INTERVAL;
     return true;

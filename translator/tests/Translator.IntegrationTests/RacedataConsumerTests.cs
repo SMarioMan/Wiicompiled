@@ -36,6 +36,15 @@ public class RacedataConsumerTests
         var fills = definition.GetProperty("ArrayFills").EnumerateArray().Select(fill => (
             Begin: Hex(fill.GetProperty("Begin").GetString()!),
             End: checked(Hex(fill.GetProperty("Begin").GetString()!)+(uint)fill.GetProperty("ExpectedWords").GetArrayLength()*4))).ToArray();
+        var transfers = definition.GetProperty("ArrayTransfers").EnumerateArray().SelectMany(transfer => {
+            var begin=Hex(transfer.GetProperty("Begin").GetString()!);
+            var end=checked(begin+(uint)transfer.GetProperty("ExpectedWords").GetArrayLength()*4);
+            // Unrolled transfers prove the whole span. Scalar transfers prove
+            // their endpoints; intervening address setup still needs its audit.
+            return transfer.TryGetProperty("OriginalElements",out var elements) && elements.GetInt32()>1
+                ? new[]{(Begin:begin,End:end)}
+                : new[]{(Begin:begin,End:begin+4),(Begin:end-4,End:end)};
+        }).ToArray();
         var map = FunctionMap.Load(Path.Combine(root, "projects/mkwii-ntsc-u/MAP.txt"));
         var options = new TranslationOptions(EnableLeafInlining: false, KnownFunctionEntryPoints: map.Addresses.ToHashSet());
         var original = new FunctionTranslator(image);
@@ -64,7 +73,7 @@ public class RacedataConsumerTests
                     foreach (var candidate in proof.Candidates)
                     {
                         var reference = candidate.Reference;
-                        if (copies.Concat(fills).Any(span => reference.Instruction >= span.Begin && reference.Instruction < span.End)) continue;
+                        if (copies.Concat(fills).Concat(transfers).Any(span => reference.Instruction >= span.Begin && reference.Instruction < span.End)) continue;
                         Assert.True(sites.TryGetValue((reference.Instruction, reference.Node, reference.Operand), out var declared),
                             $"Missing proven reference at {reference.Instruction:X8} in {entry:X8} {name}");
                         var symbol = declared.GetProperty("Symbol").GetString()!;

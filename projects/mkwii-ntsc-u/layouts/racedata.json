@@ -3125,6 +3125,17 @@
       "Name": "MenuVRControlTail",
       "Size": 243,
       "Alignment": 1
+    },
+    {
+      "Name": "PlayerAidMap",
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "aids",
+          "Type": "InputByte",
+          "PerPlayer": true
+        }
+      ]
     }
   ],
   "References": [
@@ -43923,438 +43934,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x80655774",
-      "ExpectedWord": "0x981F2920",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065577C",
-      "ExpectedWord": "0x981F2921",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655784",
-      "ExpectedWord": "0x981F2922",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065578C",
-      "ExpectedWord": "0x981F2923",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655794",
-      "ExpectedWord": "0x981F2924",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065579C",
-      "ExpectedWord": "0x981F2925",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557A4",
-      "ExpectedWord": "0x981F2926",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557AC",
-      "ExpectedWord": "0x981F2927",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557B4",
-      "ExpectedWord": "0x981F2928",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557BC",
-      "ExpectedWord": "0x981F2929",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557C4",
-      "ExpectedWord": "0x981F292A",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557CC",
-      "ExpectedWord": "0x981F292B",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557F0",
-      "ExpectedWord": "0x981F2920",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806557F8",
-      "ExpectedWord": "0x981F2921",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655800",
-      "ExpectedWord": "0x981F2922",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655808",
-      "ExpectedWord": "0x981F2923",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655810",
-      "ExpectedWord": "0x981F2924",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655818",
-      "ExpectedWord": "0x981F2925",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655820",
-      "ExpectedWord": "0x981F2926",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655828",
-      "ExpectedWord": "0x981F2927",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655830",
-      "ExpectedWord": "0x981F2928",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655838",
-      "ExpectedWord": "0x981F2929",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655840",
-      "ExpectedWord": "0x981F292A",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655848",
-      "ExpectedWord": "0x981F292B",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655854",
-      "ExpectedWord": "0x98032920",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655858",
-      "ExpectedWord": "0x98032921",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065585C",
-      "ExpectedWord": "0x98032922",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655860",
-      "ExpectedWord": "0x98032923",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655864",
-      "ExpectedWord": "0x98032924",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655868",
-      "ExpectedWord": "0x98032925",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065586C",
-      "ExpectedWord": "0x98032926",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655870",
-      "ExpectedWord": "0x98032927",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655874",
-      "ExpectedWord": "0x98032928",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655878",
-      "ExpectedWord": "0x98032929",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065587C",
-      "ExpectedWord": "0x9803292A",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655880",
-      "ExpectedWord": "0x9803292B",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065589C",
-      "ExpectedWord": "0x98032920",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558A0",
-      "ExpectedWord": "0x98032921",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558A4",
-      "ExpectedWord": "0x98032922",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558A8",
-      "ExpectedWord": "0x98032923",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558AC",
-      "ExpectedWord": "0x98032924",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558B0",
-      "ExpectedWord": "0x98032925",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558B4",
-      "ExpectedWord": "0x98032926",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558B8",
-      "ExpectedWord": "0x98032927",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558BC",
-      "ExpectedWord": "0x98032928",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558C0",
-      "ExpectedWord": "0x98032929",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558C4",
-      "ExpectedWord": "0x9803292A",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806558C8",
-      "ExpectedWord": "0x9803292B",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.playerAids.offset+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride+RKNetController.playerAids.stride",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x806559F8",
       "ExpectedWord": "0x8003291C",
       "Node": 0,
@@ -76839,6 +76418,62 @@
           "StartIndex": 11
         }
       ]
+    },
+    {
+      "Begin": "0x80655854",
+      "ExpectedWords": [
+        "0x98032920",
+        "0x98032921",
+        "0x98032922",
+        "0x98032923",
+        "0x98032924",
+        "0x98032925",
+        "0x98032926",
+        "0x98032927",
+        "0x98032928",
+        "0x98032929",
+        "0x9803292A",
+        "0x9803292B"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.playerAids.offset",
+          "Stride": "RKNetController.playerAids.stride",
+          "Count": "RKNetController.playerAids.count",
+          "Width": 1,
+          "StartIndex": 0
+        }
+      ]
+    },
+    {
+      "Begin": "0x8065589C",
+      "ExpectedWords": [
+        "0x98032920",
+        "0x98032921",
+        "0x98032922",
+        "0x98032923",
+        "0x98032924",
+        "0x98032925",
+        "0x98032926",
+        "0x98032927",
+        "0x98032928",
+        "0x98032929",
+        "0x9803292A",
+        "0x9803292B"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.playerAids.offset",
+          "Stride": "RKNetController.playerAids.stride",
+          "Count": "RKNetController.playerAids.count",
+          "Width": 1,
+          "StartIndex": 0
+        }
+      ]
     }
   ],
   "ResampledCursors": [
@@ -77309,6 +76944,84 @@
       "Width": 4,
       "AllowObjectSource": true,
       "OriginalElements": 1
+    },
+    {
+      "Begin": "0x80655770",
+      "ExpectedWords": [
+        "0x88030000",
+        "0x981F2920",
+        "0x88030001",
+        "0x981F2921",
+        "0x88030002",
+        "0x981F2922",
+        "0x88030003",
+        "0x981F2923",
+        "0x88030004",
+        "0x981F2924",
+        "0x88030005",
+        "0x981F2925",
+        "0x88030006",
+        "0x981F2926",
+        "0x88030007",
+        "0x981F2927",
+        "0x88030008",
+        "0x981F2928",
+        "0x88030009",
+        "0x981F2929",
+        "0x8803000A",
+        "0x981F292A",
+        "0x8803000B",
+        "0x981F292B"
+      ],
+      "SourceBase": "r3",
+      "SourceOffset": "PlayerAidMap.aids.offset",
+      "DestinationBase": "r31",
+      "DestinationOffset": "RKNetController.playerAids.offset",
+      "Value": "r0",
+      "Stride": "RKNetController.playerAids.stride",
+      "Count": "RKNetController.playerAids.count",
+      "Width": 1,
+      "AllowObjectSource": true,
+      "OriginalElements": 12
+    },
+    {
+      "Begin": "0x806557EC",
+      "ExpectedWords": [
+        "0x88030000",
+        "0x981F2920",
+        "0x88030001",
+        "0x981F2921",
+        "0x88030002",
+        "0x981F2922",
+        "0x88030003",
+        "0x981F2923",
+        "0x88030004",
+        "0x981F2924",
+        "0x88030005",
+        "0x981F2925",
+        "0x88030006",
+        "0x981F2926",
+        "0x88030007",
+        "0x981F2927",
+        "0x88030008",
+        "0x981F2928",
+        "0x88030009",
+        "0x981F2929",
+        "0x8803000A",
+        "0x981F292A",
+        "0x8803000B",
+        "0x981F292B"
+      ],
+      "SourceBase": "r3",
+      "SourceOffset": "PlayerAidMap.aids.offset",
+      "DestinationBase": "r31",
+      "DestinationOffset": "RKNetController.playerAids.offset",
+      "Value": "r0",
+      "Stride": "RKNetController.playerAids.stride",
+      "Count": "RKNetController.playerAids.count",
+      "Width": 1,
+      "AllowObjectSource": true,
+      "OriginalElements": 12
     }
   ],
   "WordTables": [

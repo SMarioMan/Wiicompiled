@@ -1836,3 +1836,25 @@ hidden flag for every additional card.
 All six full-capacity vote-submission fixtures (12/13/24/32/48/100), the 24-capacity
 partial-lobby regression and the complete consumer audit pass. The pre-fix
 13-capacity fixture fails at the stale Mii-group pointer, as expected.
+
+### Controller participant-map imports
+
+A 24-console clock-scaled run reached complete connectivity and voting, but then
+created twelve-player race/menu scenarios. RAM snapshots showed that the
+controller's capacity-sized player-to-AID map contained AIDs 0..11 followed by
+`0xFF`. `UpdateAidsBelongingToPlayerIds` still used twelve unrolled byte copies
+in both its RH1 and SELECT branches. Moving the destination offsets alone did
+not increase the number of copied elements.
+
+Both imports now use checked whole-array transfers. The no-source branch and
+standalone reset fill the entire map. The original twelve-element instruction
+spans are verified before expanding; the stock-capacity code remains unchanged.
+Consumer auditing exempts operations already proved by those transfer spans,
+while still auditing intervening address setup in scalar transfers.
+
+Native execution passes at 12/13/24/32/48/100 capacity for both source branches,
+RH1 priority, partial fields, missing sources and reset. Checks cover every map
+entry, adjacent controller fields, object guards and saved registers. The
+pre-fix thirteen-slot regression fails at the uncopied thirteenth byte. The
+complete consumer proof/original-emission/expanded-compilation audit also passes.
+A new live 24-player race is still required; the earlier run is not a race pass.

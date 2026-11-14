@@ -135,3 +135,9 @@ The larger-room reservation policy now widens the SDK's six-second wait only
 when discovery reports more than twelve recent peers, with a bounded allowance
 and unchanged timer origins/retry counts. Native policy tests pass; repeat live
 24-console joins before marking the timeout problem resolved.
+
+The latest clock-scaled run reached all 24 SDK links at 187.45 seconds, then
+exposed twelve-byte controller participant-map imports that left slots 13..24
+inactive at race creation. Both RH1/SELECT copies and reset paths now operate on
+the full map, with native checks through 100. Repeat the live transition before
+claiming a 24-participant race.

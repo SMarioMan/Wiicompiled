@@ -1786,3 +1786,38 @@ unrolled groups. The storage fixture executes these additional original entry
 points through 100 slots, including every single-record reset and high-console
 time selection. Two further moving-subrecord strides in SELECT course choice
 are explicitly relocated. Live voting and round trips remain separate checks.
+
+### Online vote, rating and selection-page storage
+
+The USA vote page (`0x92`) owns twelve 376-byte vote controls, twelve voter
+indices and a state tail. The rating page (`0x91`) owns twelve 372-byte member
+controls followed by its movie pointer. The hidden selection manager (`0x90`)
+owns twelve 12-byte player records, state and a Mii group. Each array now grows
+with capacity; the following fields and factory allocation sizes move with it.
+The section-manager pointer schema also describes these three page pointers so
+external callers participate in the field audit. This is a partial section view,
+not the size of the complete section allocation.
+
+Constructor/destructor counts, card-loading loops and group sizes use the
+capacity. Voter-index resets initialize the complete array without overwriting
+the moved state. Animation-name scratch data, string-buffer lengths and fixed
+license/cup iteration counts retain their original meanings. The checked
+consumer proof, original-capacity emission and expanded C++ compilation audit
+passes with these page consumers included.
+
+The asset generator adds `Vote00` and `Member00` variants through the configured
+capacity to both retail menu archives. It retains their original card resources
+and styles, arranging 24 participants in three columns of eight cards. It
+preserves the separate aspect-ratio transforms and keeps the stock twelve-player
+resources byte-identical. Tests exercise distinct variant names and positions
+through 100; that does not establish readable 100-player menus or playable
+100-player networking. Live voting-to-race validation remains required.
+
+Native execution of the original vote-page constructor, vote-control lifecycle,
+array constructor/destructor and state getter passes at 12/13/24/32/48/100.
+Separate native rating-page and selection-manager lifecycle fixtures pass at the
+same capacities, checking every card, Mii-group location, moved tail, allocation
+guards, teardown and preserved registers. The original BRCTR name/transform
+loaders also read all 24 generated vote/member variants from both menu archives
+in both aspect ratios. These isolate storage and asset loading; they are not a
+substitute for the live network transition test.

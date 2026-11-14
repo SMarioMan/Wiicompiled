@@ -2131,8 +2131,18 @@
     },
     {
       "Name": "SectionMgrPrefix",
-      "Size": 152,
-      "Alignment": 4
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "section",
+          "Type": "Pointer",
+          "PointerTo": "MenuSectionSelectionView"
+        },
+        {
+          "Name": "rest",
+          "Type": "SectionMgrPrefixRest"
+        }
+      ]
     },
     {
       "Name": "SectionMgr",
@@ -2939,6 +2949,147 @@
       "Name": "RKNetRH1MapCountStep",
       "Size": 5,
       "Alignment": 1
+    },
+    {
+      "Name": "MenuVoteHeader",
+      "Size": 1224,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuVoteControl",
+      "Size": 376,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuVoteTail",
+      "Size": 40,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuVotePage",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "MenuVoteHeader"
+        },
+        {
+          "Name": "controls",
+          "Type": "MenuVoteControl",
+          "PerPlayer": true
+        },
+        {
+          "Name": "voterIds",
+          "Type": "Pointer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "tail",
+          "Type": "MenuVoteTail"
+        }
+      ]
+    },
+    {
+      "Name": "MenuSelectHeader",
+      "Size": 500,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuSelectPlayer",
+      "Size": 12,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuSelectState",
+      "Size": 12,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuSelectStage",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "MenuSelectHeader"
+        },
+        {
+          "Name": "players",
+          "Type": "MenuSelectPlayer",
+          "PerPlayer": true
+        },
+        {
+          "Name": "state",
+          "Type": "MenuSelectState"
+        },
+        {
+          "Name": "miis",
+          "Type": "MenuMiiGroup"
+        }
+      ]
+    },
+    {
+      "Name": "MenuVRHeader",
+      "Size": 1976,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuVRControl",
+      "Size": 372,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuVRPage",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "MenuVRHeader"
+        },
+        {
+          "Name": "controls",
+          "Type": "MenuVRControl",
+          "PerPlayer": true
+        },
+        {
+          "Name": "movie",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "MenuSectionSelectionPrefix",
+      "Size": 584,
+      "Alignment": 4
+    },
+    {
+      "Name": "MenuSectionSelectionView",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "prefix",
+          "Type": "MenuSectionSelectionPrefix"
+        },
+        {
+          "Name": "selectStage",
+          "Type": "Pointer",
+          "PointerTo": "MenuSelectStage"
+        },
+        {
+          "Name": "vr",
+          "Type": "Pointer",
+          "PointerTo": "MenuVRPage"
+        },
+        {
+          "Name": "vote",
+          "Type": "Pointer",
+          "PointerTo": "MenuVotePage"
+        }
+      ]
+    },
+    {
+      "Name": "SectionMgrPrefixRest",
+      "Size": 148,
+      "Alignment": 4
     }
   ],
   "References": [
@@ -62091,6 +62242,1041 @@
       "Operand": "value",
       "Symbol": "ceil(players/6)",
       "Addend": 0
+    },
+    {
+      "Instruction": "0x8061DCD4",
+      "ExpectedWord": "0x800F0288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DDC4",
+      "ExpectedWord": "0x800F028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DF2C",
+      "ExpectedWord": "0x800F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612470",
+      "ExpectedWord": "0x801C16A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806126BC",
+      "ExpectedWord": "0x901C16A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806126C0",
+      "ExpectedWord": "0x801C16A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612748",
+      "ExpectedWord": "0xC05C16B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061274C",
+      "ExpectedWord": "0xC03C16B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612758",
+      "ExpectedWord": "0x807C1698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612764",
+      "ExpectedWord": "0x80BC16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612770",
+      "ExpectedWord": "0xD05C16B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612788",
+      "ExpectedWord": "0x901C16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612798",
+      "ExpectedWord": "0x801C16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061279C",
+      "ExpectedWord": "0xD07C16B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806127C8",
+      "ExpectedWord": "0x801C16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612800",
+      "ExpectedWord": "0xC03C16B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612810",
+      "ExpectedWord": "0x807C16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612814",
+      "ExpectedWord": "0x801C16AC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612824",
+      "ExpectedWord": "0x809C16B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612864",
+      "ExpectedWord": "0x809C169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612870",
+      "ExpectedWord": "0x907C16BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612878",
+      "ExpectedWord": "0x901C16A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806128B4",
+      "ExpectedWord": "0x807C16BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806128BC",
+      "ExpectedWord": "0x901C16BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612C2C",
+      "ExpectedWord": "0x801F1668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612C84",
+      "ExpectedWord": "0x8018169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612D48",
+      "ExpectedWord": "0x80181698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612D9C",
+      "ExpectedWord": "0x80181698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612DA4",
+      "ExpectedWord": "0x901F1668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612DA8",
+      "ExpectedWord": "0x80981698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612DB0",
+      "ExpectedWord": "0x90181698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612EFC",
+      "ExpectedWord": "0x801B169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612F24",
+      "ExpectedWord": "0x901B16B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612F40",
+      "ExpectedWord": "0x901B16B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612F84",
+      "ExpectedWord": "0x80841668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612F98",
+      "ExpectedWord": "0x909B16AC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612FA4",
+      "ExpectedWord": "0xD03B16B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612FA8",
+      "ExpectedWord": "0xD01B16B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612FAC",
+      "ExpectedWord": "0x90BB16A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612FD4",
+      "ExpectedWord": "0x901B16A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D1B8",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D318",
+      "ExpectedWord": "0x387F0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D33C",
+      "ExpectedWord": "0x801F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E594",
+      "ExpectedWord": "0x906F0288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E5A8",
+      "ExpectedWord": "0x906F028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E5C4",
+      "ExpectedWord": "0x90030288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E5D8",
+      "ExpectedWord": "0x906F0288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E5F0",
+      "ExpectedWord": "0x9003028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E5FC",
+      "ExpectedWord": "0x9003028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E82C",
+      "ExpectedWord": "0x386F0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E84C",
+      "ExpectedWord": "0x386F0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E87C",
+      "ExpectedWord": "0x924F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611C44",
+      "ExpectedWord": "0x901C1698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611DA8",
+      "ExpectedWord": "0x900316A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611DB4",
+      "ExpectedWord": "0x900316A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611DF0",
+      "ExpectedWord": "0x9003169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611DFC",
+      "ExpectedWord": "0x9003169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611E50",
+      "ExpectedWord": "0x801F169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611FC4",
+      "ExpectedWord": "0x910316A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611FD0",
+      "ExpectedWord": "0x90E31668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611FE0",
+      "ExpectedWord": "0x90E3166C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset+MenuVotePage.voterIds.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611FF0",
+      "ExpectedWord": "0x90E31670",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset+MenuVotePage.voterIds.stride+MenuVotePage.voterIds.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612000",
+      "ExpectedWord": "0x90E31674",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset+MenuVotePage.voterIds.stride+MenuVotePage.voterIds.stride+MenuVotePage.voterIds.stride",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061202C",
+      "ExpectedWord": "0x91031698",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612030",
+      "ExpectedWord": "0x90E316A8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 16,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612034",
+      "ExpectedWord": "0x910316AC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 20,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612038",
+      "ExpectedWord": "0x910316B0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 24,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061203C",
+      "ExpectedWord": "0xD02316B4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 28,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612040",
+      "ExpectedWord": "0xD00316B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 32,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612044",
+      "ExpectedWord": "0x910316BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 36,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612288",
+      "ExpectedWord": "0x801D16A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806122E4",
+      "ExpectedWord": "0x801D169C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612340",
+      "ExpectedWord": "0x801D16A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612394",
+      "ExpectedWord": "0x801D16A4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 12,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612AF8",
+      "ExpectedWord": "0x800316A0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.tail.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C93C",
+      "ExpectedWord": "0x387F0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061C984",
+      "ExpectedWord": "0x38630290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CAE0",
+      "ExpectedWord": "0x387F0290",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MenuSelectStage.miis.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CAFC",
+      "ExpectedWord": "0x907F0284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CB00",
+      "ExpectedWord": "0x907F0288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CB04",
+      "ExpectedWord": "0x901F028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D86C",
+      "ExpectedWord": "0x80630288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D8BC",
+      "ExpectedWord": "0x8063028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D930",
+      "ExpectedWord": "0x80030288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061D9A0",
+      "ExpectedWord": "0x8003028C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 8,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DA00",
+      "ExpectedWord": "0x80030288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DA70",
+      "ExpectedWord": "0x80030288",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 4,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061DAC8",
+      "ExpectedWord": "0x80030284",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuSelectStage.state.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064DC44",
+      "ExpectedWord": "0x901D1928",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVRPage.movie.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E258",
+      "ExpectedWord": "0x80A31928",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVRPage.movie.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805F3240",
+      "ExpectedWord": "0x386016C0",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVotePage.size",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805F3228",
+      "ExpectedWord": "0x3860192C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVRPage.size",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x805F3210",
+      "ExpectedWord": "0x38600328",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuSelectStage.size",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611C38",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVotePage.controls.count",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611CCC",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVotePage.controls.count",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064DC38",
+      "ExpectedWord": "0x38E0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVRPage.controls.count",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064DC98",
+      "ExpectedWord": "0x38C0000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "MenuVRPage.controls.count",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611E28",
+      "ExpectedWord": "0x3880000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611E38",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611E94",
+      "ExpectedWord": "0x3880000D",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 1,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611EB0",
+      "ExpectedWord": "0x3880000E",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 2,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80611F8C",
+      "ExpectedWord": "0x2C1A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061272C",
+      "ExpectedWord": "0x2C1D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612AD4",
+      "ExpectedWord": "0x2C1D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612EE4",
+      "ExpectedWord": "0x2C1C000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80613144",
+      "ExpectedWord": "0x2C1A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x80612EB0",
+      "ExpectedWord": "0x801D1668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x806130D8",
+      "ExpectedWord": "0x801E1668",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVotePage.voterIds.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CCD0",
+      "ExpectedWord": "0x901D1928",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "MenuVRPage.movie.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061CAE4",
+      "ExpectedWord": "0x3880000C",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8061E874",
+      "ExpectedWord": "0x2811000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064DDA0",
+      "ExpectedWord": "0x3880000F",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "players",
+      "Addend": 3,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064DFA8",
+      "ExpectedWord": "0x2C1D000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E184",
+      "ExpectedWord": "0x2C1A000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
+      "Instruction": "0x8064E214",
+      "ExpectedWord": "0x2C19000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "players",
+      "Addend": 0,
+      "Scale": 1
     }
   ],
   "GlobalPointers": {
@@ -63413,7 +64599,7 @@
     },
     {
       "Entry": "0x8061DB10",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace"
     },
     {
@@ -63423,27 +64609,27 @@
     },
     {
       "Entry": "0x8061DCA4",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace_2case58"
     },
     {
       "Entry": "0x8061DD68",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace_2case59"
     },
     {
       "Entry": "0x8061DDE0",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace_2case62"
     },
     {
       "Entry": "0x8061DE0C",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace_2case63"
     },
     {
       "Entry": "0x8061DE38",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::PrepareRace_2case5a"
     },
     {
@@ -67268,22 +68454,22 @@
     },
     {
       "Entry": "0x806123C8",
-      "Receiver": null,
+      "Receiver": "MenuVotePage",
       "Name": "Pages::Vote::BeforeControlUpdate"
     },
     {
       "Entry": "0x80612B6C",
-      "Receiver": null,
+      "Receiver": "MenuVotePage",
       "Name": "Pages::Vote::FillVoteControl"
     },
     {
       "Entry": "0x80612DC8",
-      "Receiver": null,
+      "Receiver": "MenuVotePage",
       "Name": "Pages::Vote::StartRoulette"
     },
     {
       "Entry": "0x80613010",
-      "Receiver": null,
+      "Receiver": "MenuVotePage",
       "Name": "Pages::Vote::FillVotesCounter"
     },
     {
@@ -67318,17 +68504,17 @@
     },
     {
       "Entry": "0x8061CF60",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::AfterControlUpdate"
     },
     {
       "Entry": "0x8061E2B8",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::UpdateOnlineParams"
     },
     {
       "Entry": "0x8061E540",
-      "Receiver": null,
+      "Receiver": "MenuSelectStage",
       "Name": "Pages::SELECTStageMgr::SetModeTypes"
     },
     {
@@ -67398,7 +68584,7 @@
     },
     {
       "Entry": "0x8064DFD4",
-      "Receiver": null,
+      "Receiver": "MenuVRPage",
       "Name": "Pages::VR::OnActivate"
     },
     {
@@ -69090,6 +70276,556 @@
       "Entry": "0x8065C6A0",
       "Receiver": "RKNetRH1Handler",
       "Name": ""
+    },
+    {
+      "Entry": "0x80611B70",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::__ct"
+    },
+    {
+      "Entry": "0x80611C9C",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::__dt"
+    },
+    {
+      "Entry": "0x80611D48",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::OnInit"
+    },
+    {
+      "Entry": "0x80611DE8",
+      "Receiver": null,
+      "Name": "Pages::Vote::OnInit_switch"
+    },
+    {
+      "Entry": "0x80611DEC",
+      "Receiver": null,
+      "Name": "Pages::Vote::OnInit_case58"
+    },
+    {
+      "Entry": "0x80611DF8",
+      "Receiver": null,
+      "Name": "Pages::Vote::OnInit_case59"
+    },
+    {
+      "Entry": "0x80611E00",
+      "Receiver": null,
+      "Name": "Pages::Vote::OnInit_case5a"
+    },
+    {
+      "Entry": "0x80611FA8",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::OnDispose"
+    },
+    {
+      "Entry": "0x80611FAC",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::BeforeEntranceAnimations"
+    },
+    {
+      "Entry": "0x80612904",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_switch"
+    },
+    {
+      "Entry": "0x80612908",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case58"
+    },
+    {
+      "Entry": "0x80612910",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case59"
+    },
+    {
+      "Entry": "0x80612918",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case5e"
+    },
+    {
+      "Entry": "0x80612920",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case5f"
+    },
+    {
+      "Entry": "0x80612928",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case60"
+    },
+    {
+      "Entry": "0x80612930",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case61"
+    },
+    {
+      "Entry": "0x80612938",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case62"
+    },
+    {
+      "Entry": "0x80612940",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case63"
+    },
+    {
+      "Entry": "0x80612948",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case64"
+    },
+    {
+      "Entry": "0x80612950",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case65"
+    },
+    {
+      "Entry": "0x80612958",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case66"
+    },
+    {
+      "Entry": "0x80612960",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_case67"
+    },
+    {
+      "Entry": "0x80612964",
+      "Receiver": null,
+      "Name": "Pages::Vote::BeforeControlUpdate_caseDefault"
+    },
+    {
+      "Entry": "0x80612A78",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::BeforeExitAnimations"
+    },
+    {
+      "Entry": "0x80612AF8",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::GetNextPage"
+    },
+    {
+      "Entry": "0x80612B28",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::SetVotedCourseId"
+    },
+    {
+      "Entry": "0x80612B58",
+      "Receiver": null,
+      "Name": "Pages::Vote::SetCourseButtonId_switch"
+    },
+    {
+      "Entry": "0x80612B5C",
+      "Receiver": null,
+      "Name": "Pages::Vote::SetCourseButtonId_case58"
+    },
+    {
+      "Entry": "0x80612B64",
+      "Receiver": null,
+      "Name": "Pages::Vote::SetCourseButtonId_case59"
+    },
+    {
+      "Entry": "0x80612B68",
+      "Receiver": null,
+      "Name": "Pages::Vote::SetCourseButtonId_case5a"
+    },
+    {
+      "Entry": "0x80613188",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::OnMessageBoxClick"
+    },
+    {
+      "Entry": "0x8061322C",
+      "Receiver": "MenuVotePage",
+      "Name": "Pages::Vote::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x8061C8C8",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::__ct"
+    },
+    {
+      "Entry": "0x8061C95C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::__dt"
+    },
+    {
+      "Entry": "0x8061C9E8",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnInit"
+    },
+    {
+      "Entry": "0x8061CA40",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_switch"
+    },
+    {
+      "Entry": "0x8061CA44",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_case58"
+    },
+    {
+      "Entry": "0x8061CA50",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_case60"
+    },
+    {
+      "Entry": "0x8061CA5C",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_case59"
+    },
+    {
+      "Entry": "0x8061CA68",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_case62"
+    },
+    {
+      "Entry": "0x8061CA70",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnInit_case5a"
+    },
+    {
+      "Entry": "0x8061CB1C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnDispose"
+    },
+    {
+      "Entry": "0x8061CB20",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnActivate"
+    },
+    {
+      "Entry": "0x8061CBF4",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnActivate_Pages::SELECTStageMgr::OnActivate_switch"
+    },
+    {
+      "Entry": "0x8061CBF8",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnActivate_case58"
+    },
+    {
+      "Entry": "0x8061CC18",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnActivate_case59"
+    },
+    {
+      "Entry": "0x8061CC34",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnActivate_case5a"
+    },
+    {
+      "Entry": "0x8061CD04",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnActivate_switch2"
+    },
+    {
+      "Entry": "0x8061CD08",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnActivate_2case58"
+    },
+    {
+      "Entry": "0x8061CEC4",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnActivate_2case59"
+    },
+    {
+      "Entry": "0x8061CEE4",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnActivate_2case5a"
+    },
+    {
+      "Entry": "0x8061CF00",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnDeactivate"
+    },
+    {
+      "Entry": "0x8061CF04",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::BeforeControlUpdate"
+    },
+    {
+      "Entry": "0x8061D48C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnResume"
+    },
+    {
+      "Entry": "0x8061D698",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnResume_Pages::SELECTStageMgr::OnResume_switch"
+    },
+    {
+      "Entry": "0x8061D69C",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnResume_case58"
+    },
+    {
+      "Entry": "0x8061D6A4",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnResume_case59"
+    },
+    {
+      "Entry": "0x8061D6A8",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::OnResume_case5a"
+    },
+    {
+      "Entry": "0x8061D7E0",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::IsPublicBattle"
+    },
+    {
+      "Entry": "0x8061D810",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::IsPublicBattle_switch"
+    },
+    {
+      "Entry": "0x8061D814",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::IsPublicBattle_case58"
+    },
+    {
+      "Entry": "0x8061D81C",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::IsPublicBattle_case59"
+    },
+    {
+      "Entry": "0x8061D824",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::IsPublicBattle_case5a"
+    },
+    {
+      "Entry": "0x8061D82C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::GetEngineClass"
+    },
+    {
+      "Entry": "0x8061D87C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::GetBattleType"
+    },
+    {
+      "Entry": "0x8061D8CC",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId"
+    },
+    {
+      "Entry": "0x8061D8FC",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_switch"
+    },
+    {
+      "Entry": "0x8061D900",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case58"
+    },
+    {
+      "Entry": "0x8061D970",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case59"
+    },
+    {
+      "Entry": "0x8061D9D0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case60"
+    },
+    {
+      "Entry": "0x8061DA40",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case61"
+    },
+    {
+      "Entry": "0x8061DAB0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case62"
+    },
+    {
+      "Entry": "0x8061DAB8",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case63"
+    },
+    {
+      "Entry": "0x8061DAC0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::GetInstructionBmgId_case5a"
+    },
+    {
+      "Entry": "0x8061DAC8",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::GetPlayerId"
+    },
+    {
+      "Entry": "0x8061DBD0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_switch"
+    },
+    {
+      "Entry": "0x8061DBD4",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case58"
+    },
+    {
+      "Entry": "0x8061DBF4",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case60"
+    },
+    {
+      "Entry": "0x8061DC14",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case61"
+    },
+    {
+      "Entry": "0x8061DC34",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case59"
+    },
+    {
+      "Entry": "0x8061DC70",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case5a"
+    },
+    {
+      "Entry": "0x8061DCA0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::PrepareRace_case5a_switch"
+    },
+    {
+      "Entry": "0x8061E49C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::OnDisconnect"
+    },
+    {
+      "Entry": "0x8061E584",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_switch"
+    },
+    {
+      "Entry": "0x8061E588",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_case58"
+    },
+    {
+      "Entry": "0x8061E59C",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_case59"
+    },
+    {
+      "Entry": "0x8061E5B0",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_case60"
+    },
+    {
+      "Entry": "0x8061E5EC",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_case62"
+    },
+    {
+      "Entry": "0x8061E5F8",
+      "Receiver": null,
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_case63"
+    },
+    {
+      "Entry": "0x8061E600",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::SetModeTypes_loop"
+    },
+    {
+      "Entry": "0x8061E770",
+      "Receiver": "MenuSelectStage",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8061E77C",
+      "Receiver": "MenuSelectStage",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8061E7BC",
+      "Receiver": "MenuSelectStage",
+      "Name": ""
+    },
+    {
+      "Entry": "0x8061E894",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::IsHomeMenuWorking"
+    },
+    {
+      "Entry": "0x8061E89C",
+      "Receiver": "MenuSelectStage",
+      "Name": "Pages::SELECTStageMgr::GetRuntimeTypeInfo"
+    },
+    {
+      "Entry": "0x8064DB7C",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::__ct"
+    },
+    {
+      "Entry": "0x8064DC68",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::__dt"
+    },
+    {
+      "Entry": "0x8064DD14",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::OnInit"
+    },
+    {
+      "Entry": "0x8064DDF8",
+      "Receiver": null,
+      "Name": "Pages::VR::OnInit_switch"
+    },
+    {
+      "Entry": "0x8064DDFC",
+      "Receiver": null,
+      "Name": "Pages::VR::OnInit_case58"
+    },
+    {
+      "Entry": "0x8064DE10",
+      "Receiver": null,
+      "Name": "Pages::VR::OnInit_case59"
+    },
+    {
+      "Entry": "0x8064DE20",
+      "Receiver": null,
+      "Name": "Pages::VR::OnInit_case5a"
+    },
+    {
+      "Entry": "0x8064E090",
+      "Receiver": null,
+      "Name": "Pages::VR::OnActivate_switch"
+    },
+    {
+      "Entry": "0x8064E094",
+      "Receiver": null,
+      "Name": "Pages::VR::OnActivate_case58"
+    },
+    {
+      "Entry": "0x8064E09C",
+      "Receiver": null,
+      "Name": "Pages::VR::OnActivate_case59"
+    },
+    {
+      "Entry": "0x8064E0A0",
+      "Receiver": null,
+      "Name": "Pages::VR::OnActivate_case5a"
+    },
+    {
+      "Entry": "0x8064E24C",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::AfterControlUpdate"
+    },
+    {
+      "Entry": "0x8064E290",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::FillVRControl"
+    },
+    {
+      "Entry": "0x8064E5F4",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::OnButtonClick"
+    },
+    {
+      "Entry": "0x8064E630",
+      "Receiver": "MenuVRPage",
+      "Name": "Pages::VR::GetRuntimeTypeInfo"
     }
   ],
   "BoundedAccesses": [
@@ -74889,6 +76625,58 @@
           "Stride": "RKNetRH1Data.playerAids.stride",
           "Count": "RKNetRH1Data.playerAids.count",
           "Width": 1
+        }
+      ]
+    },
+    {
+      "Begin": "0x80611C4C",
+      "ExpectedWords": [
+        "0x93FC1668",
+        "0x93FC166C",
+        "0x93FC1670",
+        "0x93FC1674",
+        "0x93FC1678",
+        "0x93FC167C",
+        "0x93FC1680",
+        "0x93FC1684",
+        "0x93FC1688",
+        "0x93FC168C",
+        "0x93FC1690",
+        "0x93FC1694"
+      ],
+      "BaseRegister": "r28",
+      "ValueRegister": "r31",
+      "Arrays": [
+        {
+          "Array": "MenuVotePage.voterIds.offset",
+          "Stride": "Pointer.size",
+          "Count": "MenuVotePage.voterIds.count",
+          "Width": 4,
+          "StartIndex": 0
+        }
+      ]
+    },
+    {
+      "Begin": "0x8061200C",
+      "ExpectedWords": [
+        "0x90E31678",
+        "0x90E3167C",
+        "0x90E31680",
+        "0x90E31684",
+        "0x90E31688",
+        "0x90E3168C",
+        "0x90E31690",
+        "0x90E31694"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r7",
+      "Arrays": [
+        {
+          "Array": "MenuVotePage.voterIds.offset",
+          "Stride": "Pointer.size",
+          "Count": "MenuVotePage.voterIds.count",
+          "Width": 4,
+          "StartIndex": 4
         }
       ]
     }

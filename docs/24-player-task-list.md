@@ -117,3 +117,13 @@ the additional console far enough to expose the friend-room manager's fixed
 active-player map, reset arrays and referencing callbacks are now migrated.
 Native lifecycle checks pass through 100; the 24-player room uses the original
 widgets in two rows. Live admission/rendering/voting retesting is pending.
+
+## Online selection-page checkpoint
+
+The vote, rating and hidden selection-manager pages now have capacity-sized
+player/card storage, moved state and movie fields, checked allocation sizes and
+expanded initialization/destruction paths. Both menu archives derive additional
+vote/member variants from their original retail cards; 24 cards use a three-by-eight
+grid. Consumer proofs and asset layout tests pass. Retest actual voting, rating
+presentation and the transition into racing with all 24 peers before closing the
+network milestone.

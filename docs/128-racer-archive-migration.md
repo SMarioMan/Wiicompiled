@@ -47,3 +47,11 @@ and indirect consumers, pointer-to-holder provenance, heap/resource ownership,
 scene teardown and subsequent race startup under the instrumented game. No
 complete 128-racer gameplay or 128-console networking claim follows from these
 storage tests.
+
+The diagnostic runtime now wraps the verified constructor/destructor and scalar
+delete entries. These hooks activate the ArchiveMgr watch before construction
+and retire it at destruction/release. The storage fixture uses those same native
+wrappers and original NTSC-U translations, rather than registering its allocation
+watch itself. A separate wrapper fixture covers deleting/non-deleting teardown,
+construction failure, absent layout descriptors, disabled auditing and both
+compiled instrumentation modes.

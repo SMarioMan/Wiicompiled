@@ -44,6 +44,7 @@ public:
 extern std::atomic<bool> enabled;
 void Configure(Options options);
 void RegisterType(const Type& type);
+bool HasType(std::string_view type);
 void BindSite(const Site& site);
 void BindStackSite(uint32_t pc, std::string_view type);
 uint64_t RegisterInstance(std::string_view type, uint32_t base, uint32_t allocatedBytes = 0,

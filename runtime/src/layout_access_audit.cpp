@@ -120,6 +120,7 @@ void RegisterType(const Type& type){
     if(s.types.contains(type.name))throw std::invalid_argument("Duplicate retired-layout type registration");
     s.types.emplace(type.name,std::move(copy));
 }
+bool HasType(std::string_view type){auto& s=state();std::lock_guard lock(s.mutex);return s.types.contains(type);}
 void BindSite(const Site& site){
     if(!site.pc||site.type.empty()||site.field.empty())throw std::invalid_argument("Retired-layout site needs field intent");
     auto& s=state();std::lock_guard lock(s.mutex);

@@ -23,7 +23,8 @@ that overlap former storage, and checked relocation references. Generated C++
 registers the same descriptors and simple declared load/store field intent.
 Composite expressions and arithmetic references are retained in JSON but are not
 guessed into field-intent bindings. At 128 racers the current manifest supplies
-82 compound types, 3,015 simple access sites and 16 stack-lifetime sites.
+83 compound types, 3,135 simple access sites and 16 stack-lifetime sites after
+the ArchiveMgr migration.
 
 ## Ownership and provenance
 
@@ -42,9 +43,17 @@ address: cooperative guest fibers share those. The guest fiber manager calls `Re
 when a guest-thread address is reused, and during shutdown. This also retires
 watches when a suspended host stack is destroyed without unwinding C++ scopes.
 
-Heap-object constructor/destructor and heap-reset integration must be added for
-each audited family using verified lifetime boundaries. Merely enabling the
-launch flag does **not** activate every heap type. An empty report with no live
+ArchiveMgr now has automatic constructor/destructor watches through targeted
+native wrappers. They delegate to the winning guest translation, register before
+its constructor stores and retire after destruction, including non-deleting
+destructors and construction failures. The scalar guest delete entry retires
+allocation watches before the allocator can reuse an address. Function identities
+use the existing region mapping; verified USA entries are `8053A7B0`, `8053A9E0`
+and `80229A90`. A missing type descriptor or disabled diagnostics leaves original
+construction behavior intact.
+
+Other heap-object families and heap-reset paths still require verified lifetime
+integrations. Merely enabling the launch flag does **not** activate every heap type. An empty report with no live
 instances is not evidence of coverage. The report includes registered type,
 binding, stack-site and currently live-instance counts.
 
@@ -98,4 +107,11 @@ Runners storage cases passed in a 12-case integration run. The generated real
 runtime configured with diagnostics enabled; the engine, memory implementation
 and main entry compiled through syntax checks with that build's actual flags.
 A complete instrumented game link and gameplay discovery run remain pending,
-along with automatic heap-object lifetime integrations and bulk-access coverage.
+along with the remaining heap-object lifetime integrations and bulk-access coverage.
+
+The automatic ArchiveMgr lifetime integration passed all 13 capacity fixtures
+with the real USA constructor/destructor/array helpers, plus wrapper tests in
+both compiled instrumentation modes (15 cases). The wrapper fixture confirms
+that original non-deleting/deleting teardown, construction failure and missing
+type descriptors retain their intended behavior; release observes no remaining
+allocation watch before memory becomes reusable.

@@ -71,7 +71,8 @@ public class ArchiveManagerStorageTests
             var fixtures=new HashSet<uint>{0x80229a48,0x80229a6c,0x80229a90,0x8053a9d8,0x80526268,
                 0x8051484c,0x80514880,0x8053a92c,0x8053a998,0x8021a050,0x8021a0a4,
                 0x80525d54,0x80525c24,0x80241a2c,0x80241cec,0x805267cc,0x8052638c,0x805262ec};
-            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp")};
+            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp"),
+                Path.Combine(root,"runtime/src/hle/layout_audit_lifetimes.cpp"),Path.Combine(root,"runtime/src/guest_region.cpp")};
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
                 File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(EnableLeafInlining:false,
                     KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
@@ -105,11 +106,11 @@ public class ArchiveManagerStorageTests
                     if(p>=root+second&&p<root+second+capacity*28&&(p-root-second)%28==0)return capacity+(p-root-second)/28;
                     std::abort();}
                 void alloc(CpuContext* c){if(c->gpr[3]==size){
-                    LayoutAccessAudit::RegisterInstance("ArchiveManager",root,size,"archive allocation");c->gpr[3]=root;
+                    c->gpr[3]=root;
                 }else if(c->gpr[3]==28)c->gpr[3]=extra;else std::abort();}
                 void array_alloc(CpuContext* c){if(c->gpr[3]!=36)std::abort();c->gpr[3]=extra+0x100;}
                 void release(CpuContext* c){if(c->gpr[3]!=root)std::abort();
-                    LayoutAccessAudit::RetireAllocation(root);++frees;}
+                    if(LayoutAccessAudit::ReportJson().find("\"activeInstances\":0")==std::string::npos)std::abort();++frees;}
                 void holder_ctor(CpuContext* c){auto n=slot(c->gpr[3]);if(live[n])std::abort();live[n]=true;++made;
                     std::memset(Memory::GetPointer(c->gpr[3],28),0,28);Memory::Write32(c->gpr[3]+4,0x10000+n);}
                 void holder_dtor(CpuContext* c){auto n=slot(c->gpr[3]);if(!live[n])std::abort();live[n]=false;++destroyed;}
@@ -156,6 +157,8 @@ public class ArchiveManagerStorageTests
                 }
                 """);
             var args=TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1";
+            var support=Path.Combine(temp,"translator_test_support.cpp");
+            File.WriteAllText(support,File.ReadAllText(support).Replace("const uint8_t kMkwGuestRegion = 0;","const uint8_t kMkwGuestRegion = 1;",StringComparison.Ordinal));
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",args){RedirectStandardError=true})!){
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(60000);if(!done)compile.Kill(entireProcessTree:true);
                 Assert.True(done,"Archive fixture compilation timed out");Assert.True(compile.ExitCode==0,errors.GetAwaiter().GetResult());}

@@ -2,6 +2,7 @@
 
 #include "abi_bridge.h"
 #include "guest_abi/guest_region.h"
+#include "guest_abi/layout_access_audit.h"
 #include "guest_function_imports.h"
 #include "memory.h"
 #include "mkw_guest_layout.h"
@@ -391,6 +392,12 @@ extern "C" void Raceinfo_Update_805331b4(CpuContext* ctx) {
             progress->stage, progress->frames, progress->players, progress->capacity,
             progress->observedPlayers, progress->minPlayerFrames, progress->course, progress->mode,
             progress->finishedPlayers, progress->minLap, progress->maxLap);
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+        if (LayoutAccessAudit::enabled.load(std::memory_order_relaxed)) {
+            LayoutAccessAudit::SetPhase("last observed race stage " + std::to_string(progress->stage));
+            LayoutAccessAudit::WriteReport();
+        }
+#endif
         previous = raceinfo;
         lastStage = progress->stage;
     }

@@ -693,6 +693,9 @@ std::string FormatHostStackTrace(unsigned framesToSkip) {
 
 void WriteFatalLogImpl(std::string_view reason, std::string_view extraDetails = {},
                        const uint32_t* missingGuestTarget = nullptr) {
+    // Crash-dump reads are diagnostic, not guest execution. A signal can also
+    // interrupt Observe while it owns the auditor mutex; never re-enter it.
+    LayoutAccessAudit::enabled.store(false, std::memory_order_relaxed);
     const std::filesystem::path runDirectory = GetRunLogDirectory();
     std::string fileName = "crash_";
     fileName.append(reason);
@@ -1375,6 +1378,7 @@ int RuntimeMain(int argc, char** argv) {
             }
         }
         LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
+        LayoutAccessAudit::SetPhase("startup");
         LanRuntime::Validate();
         if (const auto value=std::getenv("MKW_TEST_LAN_CPU")) {
             if (std::string_view(value)!="1" || !g_headless || BootRace::Requested() || RuntimeProduct::Active().kind!=RuntimeProduct::Kind::Lan)

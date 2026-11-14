@@ -144,3 +144,41 @@ and eighteen related misses, including the asynchronous request dispatcher.
 See [the field inventory and startup evidence](128-racer-archive-migration.md).
 Ordinary holder construction also touches overlapping old regions legitimately;
 those ambiguous leads must not be counted as confirmed stale accesses.
+
+### Runtime cost, checkpoints and crash diagnostics
+
+The first instrumented race setup spent its time scanning layout maps during
+sound processing, including accesses far outside every watched object. A
+lifetime-driven 4 KiB address index now excludes such accesses before the mutex
+and field scan. Pages have reference counts so retiring one object cannot remove
+another object's watch on the same page. The index is host diagnostic metadata;
+it neither protects nor changes guest pages. Its storage is allocated only when
+auditing or explicit instance registration needs it.
+
+A conservative instruction filter lets checked stack-prologue writes bypass the
+address filter even when no stack watch exists yet. Scope return, canceled guest
+threads, allocation/owner retirement and reset release their page references.
+Context caching is keyed by the current guest thread and invalidated when that
+context retires or resets. Explicit native field intent is cleared on entry to
+translated instructions and restored on scope exit. Disabled auditing skips
+provenance tracking in an instrumented executable.
+
+Reports add `filteredAccesses` alongside total `observedAccesses`. Host-thread
+counter shards avoid a shared hot counter cache line; reports aggregate their
+atomic totals. Native regressions retain stale read/write, strict pre-write,
+overlap, indexed, resolved-access, stack and lifetime cases, and add shared-page
+retirement and 20,000 concurrent observations with exact aggregate counts.
+
+CPU-driven boot/LAN test progress checkpoints also flush the JSON report and
+record the last observed race stage, including when there are no hits. This
+allows a test to preserve coverage evidence before terminating its own process.
+Ordinary runs still export at normal exit and on hit milestones. Crash-dump reads
+disable auditing before memory inspection: a signal may interrupt `Observe`
+while it holds the audit mutex, so diagnostic reads must not re-enter it.
+
+The filtered twelve-active-racer probe at build capacity 128 advances through
+countdown into VS gameplay. Its checkpoints exceeded four billion observed
+accesses, with over 99.98% excluded from field scanning and no reported hits in
+the exercised watches. This is coverage of the active ArchiveMgr and generated
+stack watches, not proof that every heap family or gameplay path is covered.
+Complete higher-capacity gameplay and resource qualification remain pending.

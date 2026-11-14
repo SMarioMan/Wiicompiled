@@ -81,6 +81,7 @@ public class RetiredLayoutAuditTests
                 #include "layout.h"
                 #include <cstdlib>
                 #include <string>
+                #include <thread>
                 extern "C" void func_80001000(CpuContext*);
                 extern "C" void func_80001100(CpuContext*);
                 extern "C" void func_80002000(CpuContext*);
@@ -90,6 +91,11 @@ public class RetiredLayoutAuditTests
                 extern "C" void func_8000A100(CpuContext*);
                 static uint32_t fiber=1;
                 uint32_t current_fiber(){return fiber;}
+                uint64_t counter(const char* name){
+                    auto report=LayoutAccessAudit::ReportJson();auto key=std::string("\"")+name+"\":";
+                    auto at=report.find(key);if(at==std::string::npos)std::abort();
+                    return std::strtoull(report.c_str()+at+key.size(),nullptr,10);
+                }
                 int main(int argc,char** argv){
                     if(argc!=2)return 1;
                     using namespace LayoutAccessAudit;
@@ -158,7 +164,23 @@ public class RetiredLayoutAuditTests
                     c.gpr[3]=wideBase+23*4;func_8000A000(&c);if(c.gpr[3]!=0x11111111)return 10;
                     {ScopedSite valid({.pc=0x8000a200,.type="AuditWideArray",.field="pool",.index=143,.objectBase=wideBase,.native=true});
                         Memory::Read32(wideOld);} // the same bytes are legitimate pool storage
-                    RetireInstance(wide);WriteReport();
+                    RetireInstance(wide);
+                    // Two unrelated allocations share one indexed page. Retiring
+                    // either must leave the other's watch active, then release it.
+                    auto sharedA=RegisterInstance("AuditObject",0x800b1000);
+                    auto sharedB=RegisterInstance("AuditObject",0x800b1100);
+                    RetireInstance(sharedA);const auto watched=counter("watchedAccesses");
+                    {ScopedSite valid({.pc=0x8000b000,.type="AuditObject",.field="tail",.objectBase=0x800b1100,.native=true});
+                        Memory::Read32(0x800b1168);}
+                    if(counter("watchedAccesses")!=watched+1)return 11;
+                    RetireAllInstances();const auto filtered=counter("filteredAccesses");
+                    Memory::Read32(0x800b1138); // retired allocation, ordinary reuse
+                    if(counter("filteredAccesses")!=filtered+1)return 12;
+                    const auto observedBefore=counter("observedAccesses"),filteredBefore=counter("filteredAccesses");
+                    auto observe=[](){for(unsigned i=0;i<10000;i++)Observe(0x800b0000,4,Operation::Read);};
+                    std::thread workerA(observe),workerB(observe);workerA.join();workerB.join();
+                    if(counter("observedAccesses")!=observedBefore+20000 || counter("filteredAccesses")!=filteredBefore+20000)return 13;
+                    WriteReport();
                 }
                 """);
             var args=TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1";
@@ -171,6 +193,8 @@ public class RetiredLayoutAuditTests
                 if(!done)run.Kill(entireProcessTree:true);Assert.True(done,"Auditor execution timed out");Assert.True(run.ExitCode==0,$"exit {run.ExitCode}: {errors.GetAwaiter().GetResult()}");
             }
             using var output=JsonDocument.Parse(File.ReadAllText(report));
+            Assert.True(output.RootElement.GetProperty("filteredAccesses").GetUInt64()>0);
+            Assert.True(output.RootElement.GetProperty("observedAccesses").GetUInt64()>output.RootElement.GetProperty("filteredAccesses").GetUInt64());
             var hits=output.RootElement.GetProperty("hits").EnumerateArray().ToArray();
             var read=Assert.Single(hits.Where(h=>h.GetProperty("guestPc").GetString()=="0x80001000"));
             Assert.Equal(2,read.GetProperty("count").GetInt32());

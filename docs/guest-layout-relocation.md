@@ -1776,6 +1776,16 @@ thirteenth header before the change and pass at 12, 13, 24, 32, 48 and 100,
 including no-valid-header cases with poisoned trailing groups, unchanged objects
 and neighboring bytes. The full consumer audit passes.
 
+The packet-manager countdown and both standalone countdown helpers now scan
+`ceil(players/2)` peer pairs. The extra lane in an odd-capacity build reads an
+empty membership mask before chasing any receive pointers. Native execution of
+all three original paths checks the lowest/highest local AID, a high remote
+countdown of zero, shorter/longer countdowns, both controller subrecords and
+receive buffers, complete object contents and guards. The thirteen-slot case
+first reproduced an ignored high peer (99 instead of zero). Cases at
+12/13/24/32 and the full consumer audit pass. These peer-mask paths are qualified
+only through the SDK's 32-console limit, separately from wider participant storage.
+
 The outgoing RACEDATA exporter has a separate player-to-local-buffer ordinal
 search. Its twelve-entry limit could leave a high local player's ordinal at
 `-1` and copy the 64-byte record to `PacketMgr - 44`, before the send area.

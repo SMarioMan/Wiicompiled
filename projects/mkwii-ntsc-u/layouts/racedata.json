@@ -3222,6 +3222,27 @@
   ],
   "References": [
     {
+      "Instruction": "0x8064FD64",
+      "ExpectedWord": "0x38000006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/2)"
+    },
+    {
+      "Instruction": "0x8065143C",
+      "ExpectedWord": "0x38000006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/2)"
+    },
+    {
+      "Instruction": "0x80651568",
+      "ExpectedWord": "0x38000006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "ceil(players/2)"
+    },
+    {
       "Instruction": "0x8064F510",
       "ExpectedWord": "0x38000003",
       "Node": 0,
@@ -72633,6 +72654,54 @@
     }
   ],
   "BoundedAccesses": [
+    {
+      "Instruction": "0x8064FD90",
+      "ExpectedWord": "0x80050048",
+      "Node": 0,
+      "Index": "r7",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x8064FE14",
+      "ExpectedWord": "0x80050048",
+      "Node": 0,
+      "Index": "r7",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80651468",
+      "ExpectedWord": "0x80060048",
+      "Node": 0,
+      "Index": "r8",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x806514EC",
+      "ExpectedWord": "0x80060048",
+      "Node": 0,
+      "Index": "r8",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80651594",
+      "ExpectedWord": "0x80060048",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
+    {
+      "Instruction": "0x80651618",
+      "ExpectedWord": "0x80060048",
+      "Node": 0,
+      "Index": "r9",
+      "GroupWidth": 2,
+      "Fallback": 0
+    },
     {
       "Instruction": "0x8052AB50",
       "ExpectedWord": "0x80040018",

@@ -141,3 +141,26 @@ exposed twelve-byte controller participant-map imports that left slots 13..24
 inactive at race creation. Both RH1/SELECT copies and reset paths now operate on
 the full map, with native checks through 100. Repeat the live transition before
 claiming a 24-participant race.
+
+## Low-priority extended goals
+
+These follow completion of the base increased-player-cap multiplayer LAN work.
+
+- [ ] **Optional course-vote abstention patch, selected at build time:** add a
+  WiiCompiled build argument that enables abstention in multiplayer course
+  voting. Make abstention the default selection instead of Random. Select among
+  actual votes when any player votes; use Random only when every player abstains.
+  Preserve host/client agreement, UI styling and the unpatched build behavior.
+- [ ] **Automatic joining of an ongoing hosted session, selected at launch:** add
+  a launch argument so a freshly started auto-launch session finds and joins the
+  hosted game seamlessly, including when a race is already in progress. Handle
+  membership admission, current race/state synchronization, appropriate spawning
+  and reconnection before qualifying mid-race joining.
+- [ ] **Shared-speaker audio mixing across local instances, selected at launch:**
+  add a launch setting that coordinates the mix across sessions on one machine.
+  Reduce sound-effect loudness, play music only on the host, and have each
+  player's own instance play their character, engine and other player-owned
+  sounds so those sounds are not duplicated by other sessions. Match the balance
+  and behavior of the game's native four-player split-screen mix across a much
+  larger collection of local sessions. Validate host changes, joins/leaves,
+  independent controls and the combined audible result.

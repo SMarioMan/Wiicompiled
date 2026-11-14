@@ -703,6 +703,13 @@ bool network_thread_send_status_record(int type, uint32_t pid, uint32_t ip, uint
         return false;
     }
 	LOG_INFO("network_thread_send_status_record %d to %x:%u", type, (unsigned)destination, (unsigned)port);
+#ifdef MKW_LAN_DIAGNOSTICS
+    /* Observe which SDK callers share matching state before changing the
+     * control thread's scheduling relationship with those callers. */
+    OSThread_t *caller = OSGetCurrentThread();
+    LOG_INFO("status caller thread=%x priority=%d type=%d", (unsigned)caller,
+        caller ? OSGetThreadPriority(caller) : -1, type);
+#endif
 
 	uint32_t full_packet[packet_len_in_words + 5];
 	for (int i = 0; i < packet_len_in_words; i++)

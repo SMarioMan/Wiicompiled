@@ -183,6 +183,11 @@ static int MyDWC_LoginAsync(void *r3, int r4, void (*r5)(int, int, void *), void
 	get_mii();
 	setup_friends();
 	mkw_net_state = r6;
+#ifdef MKW_LAN_DIAGNOSTICS
+    OSThread_t *login_thread = OSGetCurrentThread();
+    MKWDebugReport("LAN login caller thread=%x priority=%d\n", (unsigned)login_thread,
+        login_thread ? OSGetThreadPriority(login_thread) : -1);
+#endif
 	OSCreateThread(&network_thread, network_thread_main, 0, network_thread_stack + NETWORK_THREAD_SIZE, NETWORK_THREAD_SIZE, 0x18, false);
 	OSResumeThread(&network_thread);
 	return 0;

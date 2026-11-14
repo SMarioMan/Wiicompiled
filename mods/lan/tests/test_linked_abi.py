@@ -84,6 +84,8 @@ class LinkedAbiTests(unittest.TestCase):
                 self.assertEqual(owner[0]['OriginalAddress'],0x800d6384)
                 self.assertGreater(owner[0]['OriginalTrampolineOffset'],0)
                 self.assertIn('network_thread_poll_sdk',linked['SymbolOffsets'])
+                if int(capacity)>12:
+                    self.assertEqual(linked['ResolvedImports']['OSSetThreadPriority'],0x801aaaf8)
                 self.assertFalse(any(h['Name']=='DWCi_GetNextMeshMakeTryTick' for h in linked['Hooks']))
                 patches=json.loads((path.parent/'static-patches.json').read_text())
                 sites=[p for p in patches if p['Value']=='module:LANMeshTryTick']

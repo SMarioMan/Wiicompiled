@@ -173,6 +173,18 @@ static void setup_friends(void) {
 	}
 }
 
+/* The observed SDK owner runs below the main/render thread (17 versus 16).
+ * Expanded loading can leave that ready owner behind long UI work while GT2
+ * deadlines use real time. Keep its existing timed sleep, but let each wake
+ * service matching/transport before main work continues. Other callers and
+ * stock builds retain their priorities. */
+static void prioritize_lan_sdk_owner(void) {
+    if (MKW_LAN_CAPACITY <= 12) return;
+    OSThread_t *owner = OSGetCurrentThread();
+    if (owner && OSGetThreadPriority(owner) == 17)
+        OSSetThreadPriority(owner, 15);
+}
+
 static int lan_control_priority(void) {
     if (MKW_LAN_CAPACITY <= 12) return 0x18;
     OSThread_t *owner = OSGetCurrentThread();
@@ -193,6 +205,7 @@ static int MyDWC_LoginAsync(void *r3, int r4, void (*r5)(int, int, void *), void
 	get_mii();
 	setup_friends();
 	mkw_net_state = r6;
+    prioritize_lan_sdk_owner();
 #ifdef MKW_LAN_DIAGNOSTICS
     OSThread_t *login_thread = OSGetCurrentThread();
     MKWDebugReport("LAN login caller thread=%x priority=%d\n", (unsigned)login_thread,

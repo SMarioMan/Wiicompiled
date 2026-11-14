@@ -384,3 +384,26 @@ state changes and ACK generation. Native regressions reproduce the overwritten
 stop before correction, then cover buffer reuse, callback order, stale contexts,
 expiry, unrelated callbacks, stock builds and malformed lengths. This requires
 another live admission/race qualification.
+
+The next normal-timing run (`264857b`) completed all 24 SDK connections at
+226.10 seconds. The first 23 consoles already had all 529 connection bits;
+console 14 was still advancing through startup pages until 184.45 seconds.
+All 576 bits then remained present through course voting. The longer one-second
+menu pulse selected Start without manual intervention. Production logs show the
+new retained-node replay being exercised on eleven consoles.
+
+Race qualification failed at 1350.25 seconds on console 18's error dialog.
+Several consoles had lost the host during loading and elected themselves as
+one-member servers. The previous HUD animation crash did not recur, and the
+captured console-18 heap lists validate. This separates the proven screen and
+export-buffer fixes from the still unresolved loading disconnects.
+
+A loading snapshot shows SDK owners ready at priority 17 behind main/render
+work at priority 16; the owner is at the LAN shim's timed sleep return. The
+expanded login path now raises only that observed priority-17 caller to 15.
+Its existing 16.666-millisecond timed sleep remains in place, and the discovery
+service continues to share its caller's priority. Other caller priorities and
+stock builds retain their behavior. Native policy coverage checks the exact
+caller guard, repeated calls, absent owners and stock behavior. This scheduling
+candidate still requires live race/connection validation; the snapshot alone
+does not establish it as the cause or complete fix for the disconnects.

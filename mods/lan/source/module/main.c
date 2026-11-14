@@ -249,7 +249,7 @@ static int Mydwc_send_status_record(int type, uint32_t pid, uint32_t ip, uint16_
 }
 
 static void MyDWCi_ProcessMatchSynPacket(uint32_t aid, uint32_t type, const uint32_t *packet) {
-    network_thread_prepare_syn(aid, type);
+    if (network_thread_prepare_syn(aid, type, packet)) return;
     DWCi_ProcessMatchSynPacket(aid, type, packet);
 }
 

@@ -271,3 +271,24 @@ capacity, covering both receive buffers, unique/shared console mappings and
 sparse high-index players. The complete layout-consumer audit also passes.
 These fixtures validate storage/getter behavior, not playable networking above
 the SDK console/local-player limits. Live race revalidation remains pending.
+
+The first combined `8168076` 24-console attempt reached eleven visible members
+at 45.95 seconds, then failed on a reservation error at 90.32 seconds. It did
+not reach a race. The host's final SYN barrier lacked ACKs from AIDs 9 and 10.
+Console 21 (AID 10) received the host SYN while in `CL_GT2`; console 22 (AID 9)
+received it while accepting a peer in `SV_OWN_NN`. Both later returned to
+`CL_WAITING`, but the original handler had already ignored the SYN. This shows
+why draining queued controls only in `CL_WAIT_RESV` is insufficient.
+
+Expanded clients now retain one owned host SYN during the observed client/peer
+negotiation states. A bounded queued-control drain remains the fast path. If
+cancellation is still in flight, the original SDK handler receives the retained
+payload only after the real state transition to `CL_WAITING`. No state or ACK is
+invented. Retention is scoped to the same SDK instance, host PID and AID, expires
+within the SDK's member-scaled SYN wait, and clears on room lifecycle changes or
+barrier completion. The pinned parser reads eight bytes for flag one and 32 bytes
+otherwise; only that payload is copied, never its transport-owned pointer.
+Native regressions cover every supported negotiation state, both payload forms,
+payload reuse, re-entry, queued/in-flight cancellation, expiry and host/context
+changes. Stock builds retain the original handler path. Live revalidation remains
+required.

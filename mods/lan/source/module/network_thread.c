@@ -55,6 +55,8 @@ static uint16_t my_latitude;
 static uint8_t my_country;
 static uint8_t my_state;
 static uint64_t time_in_state_1;
+static void clear_deferred_syn(void);
+static void replay_deferred_syn(struct dwc_gamedata *game);
 
 static so_ret_t set_nonblock(so_fd_t fd) {
 	int fcntl = SOFcntl(fd, F_GETFL, 0);
@@ -109,6 +111,7 @@ static bool initialise(void) {
 	if (game_state != 0)
 		LOG_INFO("game_state %d -> 0", (int)game_state);
 	game_state = 0;
+	clear_deferred_syn();
 	/* Discovery deadlines use the SDK clock, not the rate this thread runs. */
 	timestamp = lan_discovery_time(OSGetTime());
 	broadcast_timer = timestamp;
@@ -456,6 +459,7 @@ static void dispatch_status(struct dwc_gamedata *gamedata, uint32_t *buffer,
     gamedata->public_ip = MKW_ADVERTISED_IP;
     dwc_process_status_record(buffer[2] >> 24, __builtin_bswap32(buffer[4]),
         raddr.sa_addr, raddr.sa_port, buffer + 5, (buffer[2] >> 18) & 0x3f);
+    replay_deferred_syn(gamedata);
 }
 
 static void process_status(uint32_t *buffer, int32_t length, const so_addr_t raddr) {
@@ -537,6 +541,7 @@ static void check_for_status_or_broadcast(void) {
     receive_packets(broadcast_socket, true);
     receive_packets(multicast_socket, false);
     struct dwc_gamedata *gamedata = get_dwc_gamedata();
+    replay_deferred_syn(gamedata);
     update_reservation_budget(gamedata);
     /* Clients also accept peer links while the SDK builds the mesh. They
      * return to CL_WAITING after accepting a link, rather than SV_WAITING. */
@@ -617,6 +622,7 @@ void* network_thread_main(void *arg) {
 		VIWaitForRetrace();
 	}
 	LOG_INFO("network_thread exit");
+    clear_deferred_syn();
     close_discovery();
     reservation_cursor = 0;
 	my_mii = 0;
@@ -654,6 +660,7 @@ void network_thread_after_server_setup(struct dwc_gamedata *gamedata) {
 }
 
 void network_thread_on_server_join(struct dwc_gamedata *gamedata) {
+	clear_deferred_syn();
 	LOG_INFO("network_thread_on_server_join()");
 	fill_in_peer_0(gamedata);
 	gamedata->peers[0].peer_index = 0xff;
@@ -762,20 +769,85 @@ struct peer_info network_get_peer_info(unsigned int index) {
 	return tracked_peers[index].info;
 }
 
-/* The host sends mesh cancellation on the control socket before its reliable
- * SYN on the game socket. Different receive loops can reverse that order. The
- * retail SYN handler ignores SYN-0 unless the client is already CL_WAITING;
- * drain queued control messages before it checks that state. Leave SDK state,
- * packet ownership, validation and ACK construction to the original handlers. */
-void network_thread_prepare_syn(uint32_t aid, uint32_t type) {
+/* The two sockets can deliver the host's reliable SYN before its stop-mesh
+ * control, including while this client is accepting another peer. Retain one
+ * owned SYN payload until the original SDK cancellation returns to CL_WAITING.
+ * The original handler still validates the SYN and constructs its ACK. */
+static struct {
+    bool present;
+    uint32_t aid, host_pid;
+    struct dwc_gamedata *game;
+    uint64_t received_at;
+    uint32_t packet[8];
+} deferred_syn;
+
+static void clear_deferred_syn(void) {
+    deferred_syn.present = false;
+}
+
+static bool negotiating_peer(enum dwc_match_state state) {
+    return (state >= DWC_MATCH_STATE_CL_WAIT_RESV && state <= DWC_MATCH_STATE_CL_CANCEL_SYN) ||
+        (state >= DWC_MATCH_STATE_SV_OWN_NN && state <= DWC_MATCH_STATE_SV_CANCEL_SYN_WAIT);
+}
+
+static bool syn_client(struct dwc_gamedata *game, uint32_t aid) {
+    return MKW_LAN_CAPACITY > 12 && network_thread_running && broadcast_socket >= 0 &&
+        game && game->dwc_host_state == 1 && game->player_count >= 2 &&
+        game->player_count <= 32 && aid < 32 && game->peers[0].player_id &&
+        aid == game->peers[0].peer_index;
+}
+
+static void replay_deferred_syn(struct dwc_gamedata *game) {
+    if (!deferred_syn.present) return;
+    const uint64_t now = lan_discovery_time(OSGetTime());
+    if (game != get_dwc_gamedata() || game != deferred_syn.game || !syn_client(game, deferred_syn.aid) ||
+        game->peers[0].player_id != deferred_syn.host_pid ||
+        now - deferred_syn.received_at > (uint64_t)BROADCAST_INTERVAL * 5 * game->player_count) {
+        clear_deferred_syn();
+        return;
+    }
+    if (game->dwc_match_state != DWC_MATCH_STATE_CL_WAITING) {
+        if (!negotiating_peer(game->dwc_match_state)) clear_deferred_syn();
+        return;
+    }
+    uint32_t packet[8];
+    const unsigned words = deferred_syn.packet[0] == __builtin_bswap32(1) ? 2 : 8;
+    for (unsigned i = 0; i < words; i++) packet[i] = deferred_syn.packet[i];
+    const uint32_t aid = deferred_syn.aid;
+    clear_deferred_syn(); /* Original callbacks may re-enter the receive path. */
+    LOG_INFO("replaying deferred host SYN from aid %u", (unsigned)aid);
+    DWCi_ProcessMatchSynPacket(aid, 1, packet);
+}
+
+bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *packet) {
     static bool polling;
     struct dwc_gamedata *game = get_dwc_gamedata();
-    if (MKW_LAN_CAPACITY <= 12 || type != 1 || !network_thread_running ||
-        broadcast_socket < 0 || polling || !game || game->dwc_host_state != 1 ||
-        game->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV ||
-        game->player_count < 2 || game->player_count > 32 ||
-        aid != game->peers[0].peer_index) return;
-    polling = true;
-    receive_packets(broadcast_socket, true);
-    polling = false;
+    if (!syn_client(game, aid)) return false;
+    if (type != 1) {
+        if (type == 2 || type == 3) clear_deferred_syn();
+        return false;
+    }
+    if (!packet) return false;
+    if (negotiating_peer(game->dwc_match_state) && !polling) {
+        polling = true;
+        receive_packets(broadcast_socket, true);
+        polling = false;
+        game = get_dwc_gamedata();
+        if (!syn_client(game, aid)) return false;
+    }
+    if (!negotiating_peer(game->dwc_match_state)) {
+        clear_deferred_syn();
+        return false;
+    }
+    /* The pinned SYN-0 parser reads two words for flag 1, eight otherwise
+     * (last load at 800D9844). Never retain the transport-owned pointer. */
+    const unsigned words = packet[0] == __builtin_bswap32(1) ? 2 : 8;
+    for (unsigned i = 0; i < words; i++) deferred_syn.packet[i] = packet[i];
+    deferred_syn.aid = aid;
+    deferred_syn.host_pid = game->peers[0].player_id;
+    deferred_syn.game = game;
+    deferred_syn.received_at = lan_discovery_time(OSGetTime());
+    deferred_syn.present = true;
+    LOG_INFO("deferring host SYN in matching state %u", (unsigned)game->dwc_match_state);
+    return true;
 }

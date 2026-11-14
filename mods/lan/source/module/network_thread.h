@@ -21,7 +21,7 @@ struct peer_info {
 };
 
 void* network_thread_main(void *arg);
-void network_thread_prepare_syn(uint32_t aid, uint32_t type);
+bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *packet);
 bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status);
 void network_thread_after_server_setup(struct dwc_gamedata *gamedata);
 void network_thread_on_server_join(struct dwc_gamedata *gamedata);

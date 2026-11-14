@@ -31,6 +31,7 @@ typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
 '''
         harness += states + r'''
 static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;uint32_t player_count;} game;
+static void replay_deferred_syn(struct dwc_gamedata *g){(void)g;}
 static bool have_game=true;
 static struct dwc_gamedata *get_dwc_gamedata(void){return have_game?&game:NULL;}
 static uint64_t timestamp=100;

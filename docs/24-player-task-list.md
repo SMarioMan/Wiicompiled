@@ -10,12 +10,14 @@ mask widths separate.
 
 - [x] Implement the auditor foundation: metadata-driven scalar read/write watches,
   object generations, overlap classification, log/strict JSON and controlled stale
-  translated accesses. Stack lifetimes include canceled fibers; ArchiveMgr has
+  translated accesses. Stack lifetimes include canceled fibers; ArchiveMgr and AIManager have
   automatic constructor/destructor/release watches.
-- [ ] Integrate remaining object/heap lifetimes and bulk paths, link an instrumented
-  game and run the iterative gameplay discovery loop. No zero-hit qualification yet.
+- [ ] Integrate remaining object/heap lifetimes and bulk paths and continue the
+  instrumented gameplay discovery loop. The 128-capacity executable completes
+  13/24/25-active VS probes with no hits in its exercised watches; this does not
+  qualify all heap families or 128-active gameplay.
 - [x] Relocate both ArchiveMgr racer arrays and retained state; all required storage
-  capacities and 169 reviewed consumer operands pass. Mixed-resource loading and
+  capacities and 188 reviewed field operands pass. Mixed-resource loading and
   external/indirect consumer gameplay qualification remain open.
 - [x] Verify existing Coin Runners frame lowering at 116/118/127/128; active-racer
   gameplay coverage remains separate from the tested stack/storage paths.

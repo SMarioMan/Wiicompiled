@@ -15,8 +15,16 @@ public class AiStorageLayoutTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(48)]
+    [InlineData(52)]
+    [InlineData(64)]
     [InlineData(100)]
+    [InlineData(116)]
+    [InlineData(118)]
+    [InlineData(127)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealAiStorageInitializationAndAccessorsUseUniformArrays(int players)
     {
@@ -28,7 +36,8 @@ public class AiStorageLayoutTests
         using var doc=JsonDocument.Parse(File.ReadAllText(path));
         var layouts=new GuestLayouts(doc.RootElement.GetProperty("Types").Deserialize<GuestLayoutType[]>()!,players);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
-        var translator=new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(path,players));
+        var plan=GuestLayoutRelocations.Read(path,players);
+        var translator=new FunctionTranslator(image,layoutRelocations:plan);
         var options=new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet());
         var discovery=translator.Discover(0x8072b8ac,options);
         // Real constructor region after the external disposer constructor, before
@@ -54,7 +63,8 @@ public class AiStorageLayoutTests
         var temp=Path.Combine(Path.GetTempPath(),"mkw-ai-storage-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var sources=new List<string>();
+            File.WriteAllText(Path.Combine(temp,"layout.h"),plan.EmitNativeConstants());
+            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp")};
             foreach(var entry in new uint[] {0x8072ec98,0x8072bcd8,0x8072bce8,0x8072c194})
             {
                 var source=Path.Combine(temp,$"{entry:X8}.cpp");File.WriteAllText(source,translator.Translate(entry,options).CxxCode);sources.Add(source);
@@ -64,6 +74,7 @@ public class AiStorageLayoutTests
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include "layout.h"
                 #include <cstring>
                 extern "C" void ai_init_region(CpuContext*);
                 extern "C" void func_8072EC98(CpuContext*);
@@ -82,6 +93,8 @@ public class AiStorageLayoutTests
                     Memory::Write32(racedata+{{layouts.Symbol("Racedata.race.offset+Scenario.settings.offset")}}+8,1);
                     for(uint32_t i=0;i<16;i++) {Memory::Write8(manager-16+i,0x55);Memory::Write8(manager+size+i,0x55);
                         Memory::Write8(routes-16+i,0x55);Memory::Write8(routes+routeSize+i,0x55);}
+                    RegisterGeneratedLayoutAccessAuditMap();LayoutAccessAudit::Configure({LayoutAccessAudit::Mode::Strict});
+                    auto watch=LayoutAccessAudit::RegisterInstance("AIManager",manager,size,"AI storage fixture");
                     CpuContext ctx{};ctx.gpr[31]=manager;ai_init_region(&ctx);
                     if(Memory::Read32(manager+0x14)!={{players}}) return 1;
                     for(uint32_t i=0;i<{{players}};i++)
@@ -109,11 +122,12 @@ public class AiStorageLayoutTests
                     for(uint32_t i=0;i<16;i++)
                         if(Memory::Read8(manager-16+i)!=0x55 || Memory::Read8(manager+size+i)!=0x55 ||
                            Memory::Read8(routes-16+i)!=0x55 || Memory::Read8(routes+routeSize+i)!=0x55) return 8;
+                    LayoutAccessAudit::RetireInstance(watch);
                     return 0;
                 }
                 """);
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",
-                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)) {RedirectStandardError=true})!)
+                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1") {RedirectStandardError=true})!)
             {
                 var errors=compile.StandardError.ReadToEndAsync();var exited=compile.WaitForExit(45000);
                 if(!exited) compile.Kill(entireProcessTree:true);

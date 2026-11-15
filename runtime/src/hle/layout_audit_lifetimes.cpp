@@ -3,8 +3,7 @@
 #include "guest_abi/layout_access_audit.h"
 
 namespace {
-template<uint32_t Entry>
-void WatchConstruction(CpuContext* ctx, const char* type, const char* lifetime) {
+void WatchConstruction(CpuContext* ctx, GuestFunctions::Entry next, const char* type, const char* lifetime) {
 #ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
     uint64_t generation = 0;
     if (LayoutAccessAudit::enabled.load(std::memory_order_relaxed) &&
@@ -16,7 +15,6 @@ void WatchConstruction(CpuContext* ctx, const char* type, const char* lifetime) 
         // Publish the watch before entering guest construction and refresh it
         // after success, while no auditor lock is held.
         if (generation) LayoutAccessAudit::WriteReport();
-        static const auto next = GuestFunctions::NextTranslation(GuestRegion::Address<Entry>());
         next(ctx);
         if (generation) LayoutAccessAudit::WriteReport();
     } catch (...) {
@@ -24,17 +22,14 @@ void WatchConstruction(CpuContext* ctx, const char* type, const char* lifetime) 
         throw;
     }
 #else
-    static const auto next = GuestFunctions::NextTranslation(GuestRegion::Address<Entry>());
     next(ctx);
 #endif
 }
 
-template<uint32_t Entry>
-void WatchDestruction(CpuContext* ctx) {
+void WatchDestruction(CpuContext* ctx, GuestFunctions::Entry next) {
 #ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
     const auto base = ctx->gpr[3];
     try {
-        static const auto next = GuestFunctions::NextTranslation(GuestRegion::Address<Entry>());
         next(ctx);
     } catch (...) {
         LayoutAccessAudit::RetireAllocation(base);
@@ -43,7 +38,6 @@ void WatchDestruction(CpuContext* ctx) {
     // Includes non-deleting destructors; release may already have retired it.
     LayoutAccessAudit::RetireAllocation(base);
 #else
-    static const auto next = GuestFunctions::NextTranslation(GuestRegion::Address<Entry>());
     next(ctx);
 #endif
 }
@@ -54,13 +48,14 @@ void WatchDestruction(CpuContext* ctx) {
 // state changes here: the winning guest translation still owns construction,
 // destruction, allocation and release.
 extern "C" void ArchiveManager_AuditConstruct(CpuContext* ctx) {
-    WatchConstruction<0x8053FCEC>(ctx, "ArchiveManager", "ArchiveMgr constructor/destructor");
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8053FCEC)(guest); },
+                      "ArchiveManager", "ArchiveMgr constructor/destructor");
 }
 REGISTER_NATIVE_WRAPPER_AS(0x8053FCEC, ArchiveManager_AuditConstruct,
                            "ArchiveManager_AuditConstruct");
 
 extern "C" void ArchiveManager_AuditDestroy(CpuContext* ctx) {
-    WatchDestruction<0x8053FF1C>(ctx);
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8053FF1C)(guest); });
 }
 REGISTER_NATIVE_WRAPPER_AS(0x8053FF1C, ArchiveManager_AuditDestroy,
                            "ArchiveManager_AuditDestroy");
@@ -69,13 +64,14 @@ REGISTER_NATIVE_WRAPPER_AS(0x8053FF1C, ArchiveManager_AuditDestroy,
 // The constructor initializes the two capacity-aware controller arrays and
 // trailing subordinate pointers. Watch before that work and through teardown.
 extern "C" void AIManager_AuditConstruct(CpuContext* ctx) {
-    WatchConstruction<0x80738ED4>(ctx, "AIManager", "AI::Manager constructor/destructor");
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(80738ED4)(guest); },
+                      "AIManager", "AI::Manager constructor/destructor");
 }
 REGISTER_NATIVE_WRAPPER_AS(0x80738ED4, AIManager_AuditConstruct,
                            "AIManager_AuditConstruct");
 
 extern "C" void AIManager_AuditDestroy(CpuContext* ctx) {
-    WatchDestruction<0x807390AC>(ctx);
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(807390AC)(guest); });
 }
 REGISTER_NATIVE_WRAPPER_AS(0x807390AC, AIManager_AuditDestroy,
                            "AIManager_AuditDestroy");
@@ -83,13 +79,14 @@ REGISTER_NATIVE_WRAPPER_AS(0x807390AC, AIManager_AuditDestroy,
 // Verified NTSC-U Item::Manager constructor/destructor: 807902CC / 80790664.
 // The singleton factory calls the constructor before publishing its pointer.
 extern "C" void ItemManager_AuditConstruct(CpuContext* ctx) {
-    WatchConstruction<0x807992D8>(ctx, "ItemManager", "Item::Manager constructor/destructor");
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(807992D8)(guest); },
+                      "ItemManager", "Item::Manager constructor/destructor");
 }
 REGISTER_NATIVE_WRAPPER_AS(0x807992D8, ItemManager_AuditConstruct,
                            "ItemManager_AuditConstruct");
 
 extern "C" void ItemManager_AuditDestroy(CpuContext* ctx) {
-    WatchDestruction<0x80799670>(ctx);
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(80799670)(guest); });
 }
 REGISTER_NATIVE_WRAPPER_AS(0x80799670, ItemManager_AuditDestroy,
                            "ItemManager_AuditDestroy");

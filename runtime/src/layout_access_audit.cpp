@@ -44,12 +44,14 @@ struct State {
     std::map<uint32_t,std::string> stackSites;
     std::map<uint32_t,uint64_t> unscopedStackSites;
     std::map<uint64_t,Instance> instances;
+    std::unordered_map<uint64_t,uint64_t> frameInstances;
     std::map<std::string,Hit> hits;
     uint64_t nextGeneration=1, nextFrame=1, watchedAccesses=0;
     std::array<AccessCounters,64> counters{};
     std::atomic<uint32_t> nextCounterSlot{0};
     // Diagnostic index only: no guest pages are protected or poisoned.
     std::unique_ptr<std::atomic<uint32_t>[]> watchedPages;
+    std::unordered_map<uint32_t,std::vector<uint64_t>> pageInstances;
     std::array<std::atomic<uint64_t>,1024> stackPcFilter{};
     std::string phase;
 };
@@ -70,12 +72,23 @@ void ensurePageIndex(State& s){
 }
 void changePages(State& s,const Instance& instance,bool add){
     ensurePageIndex(s);
+    if(instance.frame){
+        if(add)s.frameInstances.emplace(instance.frame,instance.generation);
+        else s.frameInstances.erase(instance.frame);
+    }
     const uint64_t bytes=std::max(instance.bytes,s.types.at(instance.type).oldSize);
     const uint64_t end=std::min(uint64_t(instance.base)+bytes,uint64_t(UINT32_MAX)+1);
     const uint64_t last=(end-1)>>12;
     for(uint64_t page=instance.base>>12;page<=last;page++){
-        if(add)s.watchedPages[page].fetch_add(1,std::memory_order_release);
-        else s.watchedPages[page].fetch_sub(1,std::memory_order_release);
+        if(add){
+            s.pageInstances[uint32_t(page)].push_back(instance.generation);
+            s.watchedPages[page].fetch_add(1,std::memory_order_release);
+        }else{
+            auto found=s.pageInstances.find(uint32_t(page));
+            std::erase(found->second,instance.generation);
+            if(found->second.empty())s.pageInstances.erase(found);
+            s.watchedPages[page].fetch_sub(1,std::memory_order_release);
+        }
     }
 }
 template<class Predicate> void retireMatching(State& s,Predicate predicate){
@@ -247,7 +260,11 @@ FunctionScope::FunctionScope(uint32_t entry):previous_{},context_(0),active_(ena
         contexts[context_].stack.push_back(entry);contexts[context_].frames.push_back(frame_);SetGuestPc(entry);}
 }
 FunctionScope::~FunctionScope(){if(active_){
-    auto& s=state();{std::lock_guard lock(s.mutex);retireMatching(s,[&](const Instance& x){return x.frame==frame_;});}
+    auto& s=state();{std::lock_guard lock(s.mutex);
+        if(const auto frame=s.frameInstances.find(frame_);frame!=s.frameInstances.end()){
+            const auto instance=s.instances.find(frame->second);
+            changePages(s,instance->second,false);s.instances.erase(instance);
+        }}
     auto& saved=contexts[context_];if(!saved.stack.empty())saved.stack.pop_back();
     if(!saved.frames.empty())saved.frames.pop_back();saved.site=previous_;saved.extendedSite=hasFieldIntent(previous_);
 }}
@@ -276,7 +293,7 @@ void Observe(uint32_t address,uint32_t width,Operation op){
                     changed|=(count&(count-1))==0;
                 }else{
                     const auto frame=context().frames.back();
-                    const bool live=std::any_of(s.instances.begin(),s.instances.end(),[&](const auto& x){return x.second.frame==frame;});
+                    const bool live=s.frameInstances.contains(frame);
                     if(!live){const auto id=s.nextGeneration++;
                         s.instances.emplace(id,Instance{id,binding->second,address,s.types.at(binding->second).newSize,0,"translated stack frame",frame,contextKey()});
                         changePages(s,s.instances.at(id),true);}
@@ -284,20 +301,41 @@ void Observe(uint32_t address,uint32_t width,Operation op){
             }
         }
         if(site.type.empty())if(const auto binding=s.sites.find(site.pc);binding!=s.sites.end())site=binding->second.view();
-        for(const auto& [id,instance]:s.instances){
+        // The atomic page filter handles negatives without the mutex. Once
+        // locked, inspect only live instances sharing this access's pages.
+        // Generation IDs survive map insertion and disappear on retirement.
+        std::vector<uint64_t> spanning;
+        const std::vector<uint64_t> empty;
+        const std::vector<uint64_t>* candidates=&empty;
+        const auto first=address>>12;
+        const auto end=std::min(uint64_t(address)+width,uint64_t(UINT32_MAX)+1);
+        const auto last=uint32_t((end-1)>>12);
+        if(first==last){
+            if(auto page=s.pageInstances.find(first);page!=s.pageInstances.end())candidates=&page->second;
+        }else{
+            for(auto page=s.pageInstances.begin();page!=s.pageInstances.end();++page)
+                if(page->first>=first && page->first<=last)
+                    spanning.insert(spanning.end(),page->second.begin(),page->second.end());
+            std::sort(spanning.begin(),spanning.end());
+            spanning.erase(std::unique(spanning.begin(),spanning.end()),spanning.end());
+            candidates=&spanning;
+        }
+        for(const auto id:*candidates){
+            const auto& instance=s.instances.at(id);
             if(site.objectBase&&site.objectBase!=instance.base)continue;
             if(!site.type.empty()&&site.type!=instance.type)continue;
             const auto& type=s.types.at(instance.type);
             if(!overlaps(instance.base,std::max(instance.bytes,type.oldSize),address,width))continue;
             if(!watched){++s.watchedAccesses;watched=true;}
+            // Field intent needs a unique owning instance. Compute this once,
+            // and only for attributed accesses; ambiguous leads stay non-fatal.
+            const bool unique=site.objectBase || site.type.empty() || std::count_if(candidates->begin(),candidates->end(),[&](uint64_t other){
+                const auto& x=s.instances.at(other);
+                return x.type==instance.type && overlaps(x.base,x.bytes,address,width);
+            })==1;
             for(const auto& field:type.fields){
                 if(field.oldOffset==field.newOffset && field.oldStride==field.newStride)continue;
                 const bool known=!site.type.empty()&&site.field==field.name;
-                // Without an explicit base, overlapping instances of the same
-                // type cannot establish which object this instruction targets.
-                const bool unique=site.objectBase || std::count_if(s.instances.begin(),s.instances.end(),[&](const auto& x){
-                    return x.second.type==instance.type && overlaps(x.second.base,x.second.bytes,address,width);
-                })==1;
                 if(!site.field.empty()&&!known)continue;
                 const uint64_t oldStart=uint64_t(instance.base)+field.oldOffset,newStart=uint64_t(instance.base)+field.newOffset;
                 bool stale=false,exact=false;uint32_t expected=0,index=UnknownIndex;

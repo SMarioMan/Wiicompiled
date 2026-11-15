@@ -372,3 +372,28 @@ missing RaceData, endpoint/order checks and register/stack preservation. Six
 original USA producer words are pinned. The fixture substitutes the final
 sequence-variable callee; audible mixing and DSP output remain unqualified.
 This fix does not implement the separately queued multi-instance mixing goal.
+
+## Auditor scaling with live per-racer watches
+
+The first-use selector hooks increase the live watch set from three managers to
+131 instances in the running 128-active Coin Runners test. The existing atomic
+page filter avoids most accesses, but every positive page previously scanned
+all instances and repeated an ownership scan for each relocated field. Every
+translated function return also scanned all instances for a possible stack watch.
+
+The diagnostic now indexes live generation IDs by guest page and stack frame.
+Positive accesses inspect only candidate instances on intersected pages;
+cross-page ranges deduplicate generations. Ownership is computed once per
+candidate and only where field intent needs it. Return-time cleanup looks up its
+own frame. Registration/retirement update both indexes under the existing lock;
+no guest pages, allocation ownership or hit classifications change.
+
+All four auditor/bulk foundation tests pass, retaining translated stale reads and
+writes, strict-before-write behavior, current-field overlaps, generation reuse,
+thread counters and suspended-stack retirement. Added cases keep 128 independent
+watches live while checking cross-page accesses, ambiguous overlapping instances,
+strict stale writes and final retirement. A private optimized native microbenchmark
+of 200,000 attributed current-field reads across 128 independently paged objects
+measured 0.577209 seconds before and 0.017504 seconds after page indexing. This is
+a synthetic lookup measurement, not a gameplay speed claim; rebuilt live timing
+and completed battle qualification remain open.

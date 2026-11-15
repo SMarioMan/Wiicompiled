@@ -189,6 +189,29 @@ public class RetiredLayoutAuditTests
                     // address space even when its original layout was larger.
                     auto edge=RegisterInstance("AuditObject",0xfffffff0,16);
                     SetGuestPc(0);Observe(0xfffffff8,8,Operation::Read);RetireInstance(edge);
+                    // Hundreds of independent watches, including a page-spanning
+                    // object/access, must retain strict ownership and retirement.
+                    std::vector<uint64_t> many;
+                    for(unsigned i=0;i<128;i++)many.push_back(RegisterInstance("AuditObject",0x81000000+i*0x2000));
+                    auto crossing=RegisterInstance("AuditObject",0x82000fc0);
+                    Configure({Mode::Strict,false,argv[1]});
+                    {ScopedSite valid({.pc=0x8000c000,.type="AuditObject",.field="slots",.objectBase=0x82000fc0});
+                        Observe(0x82000ffc,8,Operation::Read);}
+                    const auto overlap=RegisterInstance("AuditObject",0x82000fbc);
+                    // No object base: two live instances cannot prove intent.
+                    {ScopedSite ambiguous({.pc=0x8000c004,.type="AuditObject",.field="tail"});
+                        Observe(0x82000ff8,4,Operation::Read);}
+                    RetireInstance(overlap);
+                    bool crossStopped=false;
+                    try{ScopedSite stale({.pc=0x8000c008,.type="AuditObject",.field="tail"});
+                        Observe(0x82000ff8,16,Operation::Write);
+                    }catch(const StaleAccess&){crossStopped=true;}
+                    if(!crossStopped)return 65;
+                    RetireInstance(crossing);
+                    for(auto id:many)RetireInstance(id);
+                    const auto finalFiltered=counter("filteredAccesses");
+                    Observe(0x82000ff8,16,Operation::Read);
+                    if(counter("filteredAccesses")!=finalFiltered+1)return 66;
                     WriteReport();
                 }
                 """);

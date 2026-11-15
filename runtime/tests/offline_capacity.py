@@ -21,6 +21,40 @@ import time
 from forced_falls import Ram, racers
 
 
+def battle_timer_evidence(ram, info, players, mode, course):
+    """Read the verified USA KMG row independently of the constructor lookup."""
+    timers, holder = ram.u32(info + 0x14), ram.u32(info + 0x3C)
+    if not timers or not holder:
+        raise RuntimeError("Battle timer or KMG holder is unavailable")
+    table = ram.u32(holder + 4)
+    if not table or ram.u32(table) != 0x524B4D47:
+        raise RuntimeError("Battle KMG table is unavailable or invalid")
+    # Original KMGHolder::ConvertArenaIdToIdx (USA 805337FC).
+    arenas = [ram.u32(0x8088BDC8 + i * 4) for i in range(10)]
+    if course not in arenas:
+        raise RuntimeError(f"Battle course {course} is absent from the original arena map")
+    arena = arenas.index(course)
+    authored_count = min(12, max(2, players))
+    seconds = ram.u16(table + (0x10 if mode == "balloon" else 0x1DC) +
+                      arena * 22 + (authored_count - 2) * 2)
+
+    def milliseconds(offset):
+        return (ram.u16(timers + offset) * 60000 +
+                ram.u8(timers + offset + 2) * 1000 + ram.u16(timers + offset + 4))
+
+    return dict(limit_ms=ram.u32(timers + 0x44), initial_ms=milliseconds(0x20),
+                remaining_ms=milliseconds(0x14), authored_limit_ms=seconds * 1000,
+                authored_player_count=authored_count, arena_index=arena)
+
+
+def validate_battle_timer(evidence, completed=False):
+    expected = evidence["authored_limit_ms"]
+    if expected <= 0 or evidence["limit_ms"] != expected or evidence["initial_ms"] != expected:
+        raise RuntimeError(f"Battle duration does not match its authored KMG row: {evidence}")
+    if completed and evidence["remaining_ms"] > 1000:
+        raise RuntimeError(f"Battle ended before its countdown expired: {evidence}")
+
+
 def run(args):
     if sys.platform != "linux":
         raise ValueError("The shared RAM observer currently requires Linux")
@@ -109,7 +143,13 @@ def run(args):
                             sample = stage, frame // args.sample_frames
                             if sample != last_sample:
                                 last_sample = sample
-                                report["snapshots"].append(dict(stage=stage, frame=frame, racers=rows))
+                                snapshot = dict(stage=stage, frame=frame, racers=rows)
+                                if battle:
+                                    timer = battle_timer_evidence(ram, info, args.players, args.mode, progress["course"])
+                                    report.setdefault("battle_timer_at_first_sample", timer)
+                                    snapshot["battle_timer"] = timer
+                                    validate_battle_timer(timer)
+                                report["snapshots"].append(snapshot)
                                 if not report["slots"]:
                                     report["slots"] = [dict(slot=i, sampled_distance=0.0,
                                         respawn_samples=0, min_lap=row["lap"], max_lap=row["lap"],
@@ -132,6 +172,10 @@ def run(args):
                                                                  stationary_since=stationary_since)
                                 print(json.dumps(dict(stage=stage, frame=frame, players=len(rows))), flush=True)
                             if progress["stage"] == 4 and progress["finished"] == args.players:
+                                if battle:
+                                    timer = battle_timer_evidence(ram, info, args.players, args.mode, progress["course"])
+                                    report["battle_timer_at_completion"] = timer
+                                    validate_battle_timer(timer, completed=True)
                                 report.update(result="native-finish-flags", completion=progress)
                                 report["slots_without_sampled_movement"] = [r["slot"] for r in report["slots"]
                                                                             if r["sampled_distance"] < 200]

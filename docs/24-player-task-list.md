@@ -36,6 +36,10 @@ mask widths separate.
   high-ID draws/destruction and scene ownership remain open.
 - [x] Widen known balloon pool count/index consumers and selected ordinals through
   128 active racers, retaining relocated storage and the four-byte header ABI.
+- [x] Guard both inlined KMG battle-duration lookups in Raceinfo construction;
+  the existing standalone helper guards did not cover them. Original constructor
+  and helper checks pass all capacities, arenas and both modes. Full-duration live
+  battle reruns remain required.
 - [ ] Qualify balloon object resources/legacy-byte consumers and live battle
   state/scoring/lifecycle; live effects, light visuals and 128-racer heap ownership
   also remain open.

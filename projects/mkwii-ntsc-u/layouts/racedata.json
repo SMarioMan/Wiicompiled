@@ -82288,6 +82288,22 @@
       "Destination": "r0",
       "FirstCount": 2,
       "LastCount": 12
+    },
+    {
+      "Instruction": "0x8052E06C",
+      "ExpectedWord": "0x381DFFFE",
+      "Input": "r29",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
+    },
+    {
+      "Instruction": "0x8052E0A4",
+      "ExpectedWord": "0x381DFFFE",
+      "Input": "r29",
+      "Destination": "r0",
+      "FirstCount": 2,
+      "LastCount": 12
     }
   ],
   "BitsetLoads": [

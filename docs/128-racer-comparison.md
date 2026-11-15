@@ -22,6 +22,7 @@ expanded inline storage, moved trailing fields and checked original consumers.
 | ArchiveMgr: two `ArchivesHolder[12]` arrays, offsets `0x8`/`0x158`, stride `0x1C`; overflow reaches the other array and content archives. | **Partially covered after migration.** `ArchiveManager` now models both racer arrays and retained content, request, task, course-loader and worker fields. Five explicit allocation/count operands and 188 audited field operands relocate the USA factory, construction/destruction, static request dispatch and known external consumers. A live startup failure exposed nineteen missing operands; the external singleton inventory now guards them. | Retain this typed migration. Exercise real mixed-resource loading and audit external/indirect consumers with live heap instrumentation; fixture callbacks currently stand in for archive I/O and resource constructors. | Passed original USA factory, array constructor/destructor walks, both indexed holder/file lookup families and retained content state at all 13 required capacities, with strict auditing and two lifecycles. Derived 128 layout: second array `0xE08`, size `0x1F7C`. The rebuilt 128-capacity game completes one-lap Luigi Circuit VS probes at 13 and 24 active racers with native finish flags for every observed racer and no reported hits in the exercised watches. Full roster diversity, other modes and race-to-menu-to-race transitions remain unqualified. |
 | Balloon manager: `10*N` entries, `N` held-balloon records and change flags overwrite adjacent state. | **Already covered for tested storage paths through 128 active.** `BattleBalloonManager` retains its relocated pool and per-player records. Full-field fixtures now check 1,280 pool entries at 128, construction/reset, preferred/fallback assignment, release/transfer, calc/model loops and kart cleanup; rendered objects are callbacks. | Retain this relocated pool. Qualify actual rendered object resources, score/state update paths, battle completion and scene teardown separately. | Full active fields at 25/26/48/52/64/128, allocation guards, ownership and lifecycle. |
 | Balloon counts: byte fields `N`, `5*N`, `10*N`; pool totals wrap at 26/52 racers. | **Partially covered after checked width migration.** The four-byte header now names its byte fields without changing ABI. Nine known count reads derive full-width `5*N`/`10*N` values from the player byte, pool masks/scans widen, and the five selected pool ordinals use bounded halfwords. Full active-count fixtures pass all required boundaries. | The independent unchanged-field inventory checks all discovered literal-global/manager count reads, including kart cleanup, with expected words/factors. Continue live/indirect and balloon-object legacy-byte consumer audits; no shadow pool was introduced. | Passed 1,280 distinct pool pointers, both selection paths above index 255, release/transfer, resets, update/model and cleanup loops, manager destruction and register/memory guards. Actual object construction/rendering and complete battle lifecycle remain unqualified. |
+| KMG battle duration rows: eleven authored columns for 2..12 players, shared by constructor and helper. | **Confirmed missing inline consumers, now guarded.** The helper at USA `8052DBA4` already bounded its two lookups, but constructor `8052DC58` inlines independent count-minus-two expressions at `8052E06C`/`8052E0A4`. The rebuilt 128-player probes ended after 20/40 active seconds instead of qualifying the intended battle duration. | Apply the existing checked `AuthoredCountIndices` mechanism at the two constructor sites. Independently verify the actual timer against the original arena's authored row in the read-only observer. | Original lookup, arena conversion and timer stores across every required capacity and arena/battle mode; deliberately omit just these two fixes to reproduce the bad constructor while the helper remains correct. Live full-duration reruns remain required. |
 | Effect creator namespace and EGG group-slot table. | **Partially covered; allocation/registration now verified through 128.** Existing count/role relocations request `N+4` creators. Real EGG constructor/table, creator registration and reserved-role initialization fixtures pass at 127/128 (132 creators at 128). Our reserved-role model differs intentionally from MKW100's `N+2` racer-group minimum. | Verify at least 132 creators and 130 usable racer EGG groups at 128; retain larger reserved-role capacity where required by our model. Audit lookup/destruction and boot-to-race lifetime. | Original table allocation/initialization and high-ID effects at 127, including reserved roles and second race. |
 | NW4R activity lists: four per EGG group, record stride `0x1C`. | **Already covered for backing allocation/initialization.** New `EffectActivityStorageTests` executes USA `802246C8`, its actual internal allocator and pool-header constructors, NW4R `800270A0`, activity constructors and list initialization at all required counts. At 128 it initializes 528 activity entries from the existing 132-group model. | No allocation rewrite is needed. Qualify nonempty particle/effect pools, high-ID gameplay lookups/draws/destruction and actual scene heap ownership; the new backing fixture configures other resource pools empty. | Passed count propagation, computed arena allocation, actual record construction/iteration, both list link offsets, final-racer group bounds and allocation guards over two fresh initialization cycles. Racer 127 live effects/destruction remain unqualified. |
 | Light-set pool: two requests per kart plus items; signed-byte light IDs cap safe expansion. | **Partially covered after ownership fix.** Verified USA acquire `8055D018` returns null on an empty available list; `LoadBLIGHT` at `8055D608` narrows `index+8` through a signed byte. Narrow wrappers now share acquired lights on expanded-race exhaustion and defer the original release until the final owner. | Keep original pool/ID limits. Per-holder references survive other live holder construction and reset on that holder's lifetime. Qualify actual mixed-roster rendering and scene resource loading; shared light parameters reflect their last updater. | Passed real USA acquire/release and NW4R lists at every required active count, two concurrent holders, shuffled final-owner releases, discarded-owner teardown and second lifetime. Stock acquisition independently returns null after 120 slots; original 12-racer exhaustion remains unchanged. Live rendering/resources remain unqualified. |
@@ -490,3 +491,41 @@ full/partial fields, both roster choices across VS/team VS/GP/both battles/time
 trial, weight compatibility, unique coverage, parser rejection/reset, license
 fallbacks, CPU driving and scenario guards. Python compilation/help checks pass.
 Live mixed-roster resource loading, heap peaks and teardown remain unqualified.
+
+## Inlined battle-duration lookup discovered by short live races
+
+The clean `c7b2c18` probes now reach native finish flags for all 128 racers with
+no reported hits and movement for every slot. However, Balloon Battle ends at
+frame 1,440 and Coin Runners at 2,640: subtracting the 240-frame countdown gives
+only twenty and forty simulated active seconds. These are discovery results,
+not correct-duration battle qualification. The [record](validation/128-capacity-battle-duration-discovery.json)
+includes binary identity, sampled movement, counters, and the explicit pause
+used to finish CPU-bound fixture compilation; wall time is not a performance test.
+
+MKW100's battle-duration note predicts the twenty-second Block Plaza failure.
+Our existing `AuthoredCountIndices` protects both lookups in the standalone
+`Raceinfo::GetBattleDuration` at USA `8052DBA4`. Constructor `8052DC58` inlines its
+own copies at `8052E06C`/`8052E0A4`; neither was covered. They index an eleven-column
+KMG arena row using the unbounded active count minus two. These reads remain in
+valid resource memory, so a retired-layout watch cannot prove the arithmetic bug.
+
+Two pinned entries in the existing index mechanism bound only those resource
+columns to the authored 2..12 range. Actual racer counts, field layouts and timer
+conversion code are unchanged. A controlled negative keeps all layout migrations
+but omits just those two entries: the original constructor reproduces twenty
+seconds while the already guarded standalone helper returns the proper row.
+Positive original-code fixtures retain the constructor's stack/save/restore,
+actual arena conversion, both lookups and all initial/remaining timer stores.
+They use distinct valid rows for every arena and both battle modes, including
+all legal counts up to the compiled capacity. Twelve-player emission remains
+identical. All fourteen native cases pass: thirteen positive capacities and the
+omitted-fix 128 control. All 977 unit tests and the full declared-consumer proof,
+original-output equivalence and expanded-compilation check pass. Rebuilt live
+full-duration qualification remains open.
+
+The observer now independently reads the original USA arena map at `8088BDC8`,
+the live KMG holder/table, both timer representations and the countdown. It rejects
+an incorrect initial duration or a completion with over one second remaining.
+Three regression cases pass, including all required boundaries/arenas/modes,
+the twenty-second neighboring-row error, premature finish and missing metadata.
+It continues to open guest backing files read-only.

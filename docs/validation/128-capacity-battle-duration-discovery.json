@@ -1,0 +1,51 @@
+{
+  "classification": "unqualified-early-native-finish",
+  "source": "c7b2c18",
+  "binary_sha256": "96ed13454b13ea382512d05ba59fc2b716d0de32dcf1edff31d7ba7a9ea20e4d",
+  "capacity": 128,
+  "players": 128,
+  "course": 32,
+  "clock_divisor": 1,
+  "note": "Audio actor scratch crash is resolved, but unchecked constructor KMG indexes shorten these battles. Native finish flags do not qualify correct duration. Simulated active duration inferred from frame counter minus the 240-frame countdown; timer fields were not captured by this older observer.",
+  "pauses": [
+    {
+      "start_utc": "2026-11-15T11:08:33.376099+00:00",
+      "reason": "pause simulation to complete CPU-bound native fixture compiles; wall time is not a performance measurement",
+      "end_utc": "2026-11-15T11:11:29.734601+00:00"
+    }
+  ],
+  "modes": [
+    {
+      "mode": "balloon",
+      "result": "native-finish-flags",
+      "completion_frame": 1440,
+      "native_finish_flags": 128,
+      "simulated_active_seconds_inferred": 20.0,
+      "first_sample_timer_readback": null,
+      "minimum_sampled_distance": 31111.015058606084,
+      "slots_without_sampled_movement": [],
+      "respawn_samples": 0,
+      "observed_accesses": 15273312204,
+      "audit_hits": [],
+      "unscoped_stack_entries": [],
+      "registered_types": 90,
+      "wall_seconds": 977.8536578589992
+    },
+    {
+      "mode": "coin",
+      "result": "native-finish-flags",
+      "completion_frame": 2640,
+      "native_finish_flags": 128,
+      "simulated_active_seconds_inferred": 40.0,
+      "first_sample_timer_readback": null,
+      "minimum_sampled_distance": 68492.55887296845,
+      "slots_without_sampled_movement": [],
+      "respawn_samples": 0,
+      "observed_accesses": 20954036204,
+      "audit_hits": [],
+      "unscoped_stack_entries": [],
+      "registered_types": 90,
+      "wall_seconds": 1170.4339950589929
+    }
+  ]
+}

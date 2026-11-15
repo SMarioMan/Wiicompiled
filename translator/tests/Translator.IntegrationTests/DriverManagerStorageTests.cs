@@ -19,6 +19,8 @@ public class DriverManagerStorageTests
     [InlineData(24)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(25)] [InlineData(26)] [InlineData(52)] [InlineData(64)]
+    [InlineData(116)] [InlineData(118)] [InlineData(127)] [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealDriverLifecycleUpdatesAndAllFinishClassifiersUseUniformPlayerStorage(int players)
     {
@@ -38,7 +40,8 @@ public class DriverManagerStorageTests
         {
             var entries=new uint[] {0x80020494,0x8002058c,0x80596f78,0x8050f18c,0x80517f00,0x80517ec0,
                 0x807839dc,0x80783a50,0x80783e18,0x80783f40,0x80784818,0x80783f98,0x80784194,0x8078436c,0x80787e1c};
-            var sources=new List<string>();
+            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp")};
+            File.WriteAllText(Path.Combine(temp,"layout.h"),relocations.EmitNativeConstants());
             foreach(var pc in entries)
             {
                 var file=Path.Combine(temp,$"{pc:X8}.cpp");File.WriteAllText(file,translator.Translate(pc,options).CxxCode);sources.Add(file);
@@ -50,6 +53,7 @@ public class DriverManagerStorageTests
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include "layout.h"
                 #include <array>
                 #include <cstdlib>
                 #include <cstring>
@@ -69,7 +73,7 @@ public class DriverManagerStorageTests
                 std::array<bool,n> initialized{},destroyed{};
                 uint32_t allocations=0,constructed=0,destructed=0,timers=0,timerDestructed=0,modelDestructed=0;
                 uint32_t position_index(uint32_t p){if(p< data+position || p>=data+position+n*12 || (p-data-position)%12)std::abort();return (p-data-position)/12;}
-                void allocate(CpuContext* ctx){if(ctx->gpr[3]!=size)std::abort();allocations++;ctx->gpr[3]=data;}
+                void allocate(CpuContext* ctx){if(ctx->gpr[3]!=size)std::abort();allocations++;ctx->gpr[3]=data;LayoutAccessAudit::RegisterInstance("DriverManager",data,size,"guarded original lifecycle");}
                 void no_op(CpuContext*){}
                 void no_record(CpuContext* ctx){ctx->gpr[3]=0;}
                 void construct_position(CpuContext* ctx){auto i=position_index(ctx->gpr[3]);if(initialized[i])std::abort();
@@ -87,6 +91,7 @@ public class DriverManagerStorageTests
                     FILE* input=std::fopen(argv[1],"rb");if(!input)return 2;
                     auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
+                    RegisterGeneratedLayoutAccessAuditMap();LayoutAccessAudit::Configure({LayoutAccessAudit::Mode::Strict});
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x8021a050,no_op);register_entry(0x8021a0a4,no_op);
                     register_entry(0x807ae770,no_op);register_entry(0x807b8778,no_op);register_entry(0x805438f4,no_record);
@@ -141,11 +146,14 @@ public class DriverManagerStorageTests
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 13;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(data-16+i)!=0x55 || Memory::Read8(data+size+i)!=0x55 ||
                         Memory::Read8(sp-0x100-16+i)!=0x55 || Memory::Read8(sp+8+i)!=0x55)return 14;
+                    LayoutAccessAudit::RetireAllocation(data);
+                    const auto report=LayoutAccessAudit::ReportJson();
+                    if(report.find("\"hits\":[]")==std::string::npos||report.find("\"activeInstances\":0")==std::string::npos){std::fprintf(stderr,"%s",report.c_str());return 16;}
                     return 0;
                 }
                 """);
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",
-                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)){RedirectStandardError=true})!)
+                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1"){RedirectStandardError=true})!)
             {
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(45000);
                 if(!done)compile.Kill(entireProcessTree:true);Assert.True(done,"Driver manager compilation timed out");

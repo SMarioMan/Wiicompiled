@@ -116,3 +116,35 @@ extern "C" void AIBattleTargetSelector_AuditDestroy(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x8072C568,AIBattleTargetSelector_AuditDestroy,
                            "AIBattleTargetSelector_AuditDestroy");
+
+// Verified NTSC-U DriverMgr constructor/destructor: 80783A50 / 80783E18.
+// The factory calls construction before publishing the singleton; keep the
+// original model, timer, ranking and trailing-field lifetimes under observation.
+extern "C" void DriverManager_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8078CA5C)(guest); },
+                      "DriverManager", "DriverMgr constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8078CA5C,DriverManager_AuditConstruct,
+                           "DriverManager_AuditConstruct");
+
+extern "C" void DriverManager_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8078CE24)(guest); });
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8078CE24,DriverManager_AuditDestroy,
+                           "DriverManager_AuditDestroy");
+
+// Verified NTSC-U balloon manager constructor/destructor: 80865454 / 80865568.
+// The ordinary scene release can delete the singleton directly; the existing
+// global-delete hook retires that path before its storage can be reused.
+extern "C" void BattleBalloonManager_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(80869884)(guest); },
+                      "BattleBalloonManager", "balloon manager constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80869884,BattleBalloonManager_AuditConstruct,
+                           "BattleBalloonManager_AuditConstruct");
+
+extern "C" void BattleBalloonManager_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(80869998)(guest); });
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80869998,BattleBalloonManager_AuditDestroy,
+                           "BattleBalloonManager_AuditDestroy");

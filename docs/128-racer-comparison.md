@@ -35,7 +35,7 @@ expanded inline storage, moved trailing fields and checked original consumers.
 | Input virtual-controller holders, stride `0x180`. | **Partially covered.** `InputManager` already models per-racer holders and relocated following controllers; native boot/layout fixtures exercise this. | Check construction, pointer differences, attachment and teardown at 128, preserving four physical screen/controller roles. | High-ID CPU input and guarded lifecycle fixtures, with no physical-controller expansion. |
 | Item players/online partner pointers and retained object-holder tail. | **Partially covered.** `ItemManager` and nested item state have relocated per-racer arrays and following fields. Automatic constructor/destructor/release watches now cover the manager before singleton publication. Strict-audited original initialization, partner-cache indexing, all fifteen object holders, updates, reset and destruction pass all thirteen required capacities over two lifetimes; resource constructors remain callbacks. | Audit the vanilla reference sites and computed/indirect readers; keep network-only work parked. | High-ID vanilla item use, reset/destruction and native/guest access agreement at 128. |
 | Gesso/Blooper state, POW affected flags and Race HUD balloon positions. | **Partially covered.** `GessoManager`, `PowManager` and `RaceBalloons` distinguish participant arrays from four screen slots/severity roles. Original POW/Blooper construction, per-racer targeting, independent one-to-four screen slots, updates and cleanup fixtures now pass all thirteen required capacities, including the highest racer IDs at 127/128. Race HUD balloon presentation remains a separate qualification. | Extend active high-ID effects and all computed readers, rather than growing fixed screen/severity arrays. | Racer 127 targeting/effects, screen bounds and no unexplained retired-layout reports. |
-| Driver models, vectors, targeting, counters, rankings, finish records and tail. | **Partially covered.** `DriverManager` explicitly models these arrays, race positions and following scalars. | Compare every vanilla access-map site, including pointer subtraction and bulk copies; validate mixed resources and teardown. | High-ID model/item/finish accesses, mixed roster race and second race with lifetime-aware instrumentation. |
+| Driver models, vectors, targeting, counters, rankings, finish records and tail. | **Partially covered.** `DriverManager` explicitly models these arrays, race positions and following scalars. Strict-audited original lifecycle/finish-classifier fixtures now pass all thirteen required capacities; constructor/destructor/global-delete watches add live coverage. | Compare every vanilla access-map site, including pointer subtraction and bulk copies; validate mixed resources and teardown. | High-ID model/item/finish accesses, mixed roster race and second race with lifetime-aware instrumentation. |
 | Start and respawn tables indexed beyond twelve. | **Partially covered, using our own approach.** Checked grid tables and `StartingGrid::Pack` keep expanded starts within the authored footprint; the JGPT wrapper packs actual original rescue samples. MKW100 instead repeats course-aware blocks and reuses respawn slots. | Keep our packing architecture; validate real course geometry/checkpoints and all 128 positions. Existing private placeholder-coordinate probes are not course validation. | All vanilla courses/arenas, collision/checkpoint checks, racer 127, forced falls and resumed movement. |
 | Signed-byte counts/ranks and three-digit positions. | **Confirmed position-tracking hazard fixed; other consumers remain partially verified.** USA `8052EC08` sign-extended one-based position 128 to -128 before scratch indexing. Format-32 `rank8` preserves unsigned ranks and the `0xFF` none sentinel at this checked consumer. IDs 0..127 still fit a signed byte; physical HUD-slot `-1` remains a real sentinel. | Use the reference signed-byte site list as a typed discovery map. Widen only proven racer/count/rank semantics; retain unrelated sentinels. | 127/128 counts and ranks, invalid/none sentinels, localized original-style three-digit indicators. |
 | Results: every participant visible together. | **Partially covered after compact asset migration.** The generator now supplies 16 rows × 8 total columns at 128 for individual and team results, with retail fonts, portraits, team colors and three-digit rank artwork. Smaller capacities optimize card scale within the authored window. Twelve/24 layouts remain unchanged. | Qualify the compact cards in the actual results flow. Geometry and original-reader checks complement rendered readability; no pagination, scrolling, tabs or rotating subsets. | Team result allocation, control construction, unused-row clearing and destruction pass all thirteen required capacities. Still render all 128 entries together in 16:9 and 4:3, including individual/GP/team/battle results and menu return. |
@@ -430,6 +430,30 @@ exercise four invocation lifetimes, guards and register restoration. Twelve-play
 C++ output is byte-for-byte unchanged. All 977 unit tests and the complete
 declared-consumer proof/original-output/expanded-compilation test pass. The
 fixture now also executes the original guest heapsort and distance comparator;
-the strengthened 128-active case passes. Its full boundary rerun and rebuilt
-gameplay remain pending. List traversal, positions, item eligibility and toggle endpoints are
+all fourteen strengthened cases pass. Rebuilt 128-player Balloon Battle and Coin
+Runners have reached active gameplay with no reported hits; completion remains
+pending. List traversal, positions, item eligibility and toggle endpoints are
 controlled callbacks, so this remains separate from live sound qualification.
+
+## Driver and balloon manager lifetime coverage
+
+These managers already have relocated storage; this change adds independent
+runtime observation rather than classifying their layouts as missing.
+DriverMgr's original factory calls USA constructor `80783A50` before publishing
+its singleton, and its release path invokes destructor `80783E18`. Narrow wrappers
+watch the current allocation before construction and retain the watch through
+destruction. The balloon factory similarly calls `80865454`; its standalone
+destructor is `80865568`. Ordinary scene cleanup can delete the balloon singleton
+directly, which the existing global-delete retirement hook already covers.
+PAL wrapper identities are mapped using the repository's region table and the
+USA factory/callee instructions; no PAL patch addresses enter the manifest.
+
+All twelve lifetime-wrapper configurations pass (six manager types, auditing on
+and off), including constructor/read diagnostics, failed construction, destruction,
+release-before-reuse and fresh lifetimes. All eight native import/index tests pass.
+DriverManager's original initialization, model/position/timer walks, targeting,
+rank/counter updates, four rank-based modes and three finish classifiers now run
+with a strict manager watch at all thirteen capacities. The 24-racer fixture
+initially exceeded its unchanged compiler timeout under CPU contention; its
+isolated retry passes. Model resources remain callbacks. Rebuilt live coverage
+of these two new manager watches and complete scene lifetimes remains open.

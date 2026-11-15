@@ -134,6 +134,7 @@ std::string reportLocked(const State& s){
     std::ostringstream out;
     out<<"{\"format\":\"retired-layout-access-report-v1\",\"mode\":"
        <<quote(s.options.mode==Mode::Strict?"strict":s.options.mode==Mode::Log?"log":"off")
+       <<",\"phase\":"<<quote(s.phase)
        <<",\"registeredTypes\":"<<s.types.size()<<",\"boundSites\":"<<s.sites.size()<<",\"stackLifetimeSites\":"<<s.stackSites.size()<<",\"instancesRegistered\":"<<(s.nextGeneration-1)<<",\"observedAccesses\":"<<accessCount(s,false)<<",\"filteredAccesses\":"<<accessCount(s,true)<<",\"watchedAccesses\":"<<s.watchedAccesses<<",\"activeInstances\":"<<s.instances.size()<<",\"hits\":[";
     bool first=true;
     for(const auto& [key,h]:s.hits){

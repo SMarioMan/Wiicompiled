@@ -170,7 +170,9 @@ overlap, indexed, resolved-access, stack and lifetime cases, and add shared-page
 retirement and 20,000 concurrent observations with exact aggregate counts.
 
 CPU-driven boot/LAN test progress checkpoints also flush the JSON report and
-record the last observed race stage, including when there are no hits. This
+record the last observed race stage, including when there are no hits. The root
+`phase` property remains present in a zero-hit report; individual hits retain
+the phase in which they were first observed. This
 allows a test to preserve coverage evidence before terminating its own process.
 Ordinary runs still export at normal exit and on hit milestones. Crash-dump reads
 disable auditing before memory inspection: a signal may interrupt `Observe`

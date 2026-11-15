@@ -197,6 +197,7 @@ public class RetiredLayoutAuditTests
                 if(!done)run.Kill(entireProcessTree:true);Assert.True(done,"Auditor execution timed out");Assert.True(run.ExitCode==0,$"exit {run.ExitCode}: {errors.GetAwaiter().GetResult()}");
             }
             using var output=JsonDocument.Parse(File.ReadAllText(report));
+            Assert.Equal("race-start",output.RootElement.GetProperty("phase").GetString());
             Assert.True(output.RootElement.GetProperty("filteredAccesses").GetUInt64()>0);
             Assert.True(output.RootElement.GetProperty("observedAccesses").GetUInt64()>output.RootElement.GetProperty("filteredAccesses").GetUInt64());
             var hits=output.RootElement.GetProperty("hits").EnumerateArray().ToArray();

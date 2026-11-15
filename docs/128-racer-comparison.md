@@ -529,3 +529,28 @@ an incorrect initial duration or a completion with over one second remaining.
 Three regression cases pass, including all required boundaries/arenas/modes,
 the twenty-second neighboring-row error, premature finish and missing metadata.
 It continues to open guest backing files read-only.
+
+## Live roster verification and twelve-active control
+
+The observer now records each kart's actual vehicle and character from the
+verified USA `Kart::Values` fields (`+4`/`+8`, constructor `8058C79C`; vehicle
+getter `8058A258`). It checks requested diverse coverage against observed values,
+rather than assuming the launch option survived subsequent guest initialization.
+Five observer regression cases pass, including full/partial counts, a repeated
+Mario roster and invalid IDs. Shared forced-fall snapshots retain their previous
+fields and add these read-only properties.
+
+The clean `4a74439` [twelve-active VS control](validation/128-capacity-vs-observed-12.json)
+finishes its one-lap Luigi Circuit flow with twelve native flags, movement/lap
+advance for every slot and zero reported hits under the new DriverManager watch.
+Only slot zero was sampled beyond the final lap; native automatic CPU finishing
+remains an explicit limitation. This is twelve active racers in a 128-capacity
+build, not a fresh twelve-capacity executable or portable release qualification.
+
+The [mixed Grand Prix initialization record](validation/128-capacity-gp-diverse-roster-initialization.json)
+checks all 128 loaded kart values against their active RaceData slots and observes
+all 24 non-Mii characters and 36 vehicles in the same race. The supplemental
+reader opens only its owned backing files read-only and validates their sizes,
+game identity and active count. It observes stage two at frame 278, so this
+qualifies resource initialization and roster diversity, not completed GP scoring,
+teardown, later peaks or rendered effects.

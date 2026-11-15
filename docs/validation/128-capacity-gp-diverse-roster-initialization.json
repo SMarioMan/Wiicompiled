@@ -1,0 +1,657 @@
+{
+  "source": "4a74439",
+  "binary_sha256": "d99037419a84346da438a23967792dfacfe7697dcd19f8e35ee217d4b0d37ac6",
+  "players": 128,
+  "capacity": 128,
+  "mode": "grand-prix",
+  "roster": "diverse",
+  "read_only": true,
+  "utc": "2026-11-15T11:37:20.641418+00:00",
+  "race_stage": 2,
+  "race_frame": 278,
+  "unique_characters": 24,
+  "unique_vehicles": 36,
+  "roster_rows": [
+    {
+      "slot": 0,
+      "character": 1,
+      "vehicle": 0
+    },
+    {
+      "slot": 1,
+      "character": 0,
+      "vehicle": 1
+    },
+    {
+      "slot": 2,
+      "character": 2,
+      "vehicle": 2
+    },
+    {
+      "slot": 3,
+      "character": 4,
+      "vehicle": 3
+    },
+    {
+      "slot": 4,
+      "character": 7,
+      "vehicle": 4
+    },
+    {
+      "slot": 5,
+      "character": 3,
+      "vehicle": 5
+    },
+    {
+      "slot": 6,
+      "character": 5,
+      "vehicle": 6
+    },
+    {
+      "slot": 7,
+      "character": 16,
+      "vehicle": 7
+    },
+    {
+      "slot": 8,
+      "character": 9,
+      "vehicle": 8
+    },
+    {
+      "slot": 9,
+      "character": 6,
+      "vehicle": 9
+    },
+    {
+      "slot": 10,
+      "character": 15,
+      "vehicle": 10
+    },
+    {
+      "slot": 11,
+      "character": 11,
+      "vehicle": 11
+    },
+    {
+      "slot": 12,
+      "character": 8,
+      "vehicle": 12
+    },
+    {
+      "slot": 13,
+      "character": 10,
+      "vehicle": 13
+    },
+    {
+      "slot": 14,
+      "character": 19,
+      "vehicle": 14
+    },
+    {
+      "slot": 15,
+      "character": 12,
+      "vehicle": 15
+    },
+    {
+      "slot": 16,
+      "character": 17,
+      "vehicle": 16
+    },
+    {
+      "slot": 17,
+      "character": 21,
+      "vehicle": 17
+    },
+    {
+      "slot": 18,
+      "character": 13,
+      "vehicle": 18
+    },
+    {
+      "slot": 19,
+      "character": 18,
+      "vehicle": 19
+    },
+    {
+      "slot": 20,
+      "character": 22,
+      "vehicle": 20
+    },
+    {
+      "slot": 21,
+      "character": 14,
+      "vehicle": 21
+    },
+    {
+      "slot": 22,
+      "character": 20,
+      "vehicle": 22
+    },
+    {
+      "slot": 23,
+      "character": 23,
+      "vehicle": 23
+    },
+    {
+      "slot": 24,
+      "character": 1,
+      "vehicle": 24
+    },
+    {
+      "slot": 25,
+      "character": 0,
+      "vehicle": 25
+    },
+    {
+      "slot": 26,
+      "character": 2,
+      "vehicle": 26
+    },
+    {
+      "slot": 27,
+      "character": 4,
+      "vehicle": 27
+    },
+    {
+      "slot": 28,
+      "character": 7,
+      "vehicle": 28
+    },
+    {
+      "slot": 29,
+      "character": 3,
+      "vehicle": 29
+    },
+    {
+      "slot": 30,
+      "character": 5,
+      "vehicle": 30
+    },
+    {
+      "slot": 31,
+      "character": 16,
+      "vehicle": 31
+    },
+    {
+      "slot": 32,
+      "character": 9,
+      "vehicle": 32
+    },
+    {
+      "slot": 33,
+      "character": 6,
+      "vehicle": 33
+    },
+    {
+      "slot": 34,
+      "character": 15,
+      "vehicle": 34
+    },
+    {
+      "slot": 35,
+      "character": 11,
+      "vehicle": 35
+    },
+    {
+      "slot": 36,
+      "character": 8,
+      "vehicle": 0
+    },
+    {
+      "slot": 37,
+      "character": 10,
+      "vehicle": 1
+    },
+    {
+      "slot": 38,
+      "character": 19,
+      "vehicle": 2
+    },
+    {
+      "slot": 39,
+      "character": 12,
+      "vehicle": 3
+    },
+    {
+      "slot": 40,
+      "character": 17,
+      "vehicle": 4
+    },
+    {
+      "slot": 41,
+      "character": 21,
+      "vehicle": 5
+    },
+    {
+      "slot": 42,
+      "character": 13,
+      "vehicle": 6
+    },
+    {
+      "slot": 43,
+      "character": 18,
+      "vehicle": 7
+    },
+    {
+      "slot": 44,
+      "character": 22,
+      "vehicle": 8
+    },
+    {
+      "slot": 45,
+      "character": 14,
+      "vehicle": 9
+    },
+    {
+      "slot": 46,
+      "character": 20,
+      "vehicle": 10
+    },
+    {
+      "slot": 47,
+      "character": 23,
+      "vehicle": 11
+    },
+    {
+      "slot": 48,
+      "character": 1,
+      "vehicle": 12
+    },
+    {
+      "slot": 49,
+      "character": 0,
+      "vehicle": 13
+    },
+    {
+      "slot": 50,
+      "character": 2,
+      "vehicle": 14
+    },
+    {
+      "slot": 51,
+      "character": 4,
+      "vehicle": 15
+    },
+    {
+      "slot": 52,
+      "character": 7,
+      "vehicle": 16
+    },
+    {
+      "slot": 53,
+      "character": 3,
+      "vehicle": 17
+    },
+    {
+      "slot": 54,
+      "character": 5,
+      "vehicle": 18
+    },
+    {
+      "slot": 55,
+      "character": 16,
+      "vehicle": 19
+    },
+    {
+      "slot": 56,
+      "character": 9,
+      "vehicle": 20
+    },
+    {
+      "slot": 57,
+      "character": 6,
+      "vehicle": 21
+    },
+    {
+      "slot": 58,
+      "character": 15,
+      "vehicle": 22
+    },
+    {
+      "slot": 59,
+      "character": 11,
+      "vehicle": 23
+    },
+    {
+      "slot": 60,
+      "character": 8,
+      "vehicle": 24
+    },
+    {
+      "slot": 61,
+      "character": 10,
+      "vehicle": 25
+    },
+    {
+      "slot": 62,
+      "character": 19,
+      "vehicle": 26
+    },
+    {
+      "slot": 63,
+      "character": 12,
+      "vehicle": 27
+    },
+    {
+      "slot": 64,
+      "character": 17,
+      "vehicle": 28
+    },
+    {
+      "slot": 65,
+      "character": 21,
+      "vehicle": 29
+    },
+    {
+      "slot": 66,
+      "character": 13,
+      "vehicle": 30
+    },
+    {
+      "slot": 67,
+      "character": 18,
+      "vehicle": 31
+    },
+    {
+      "slot": 68,
+      "character": 22,
+      "vehicle": 32
+    },
+    {
+      "slot": 69,
+      "character": 14,
+      "vehicle": 33
+    },
+    {
+      "slot": 70,
+      "character": 20,
+      "vehicle": 34
+    },
+    {
+      "slot": 71,
+      "character": 23,
+      "vehicle": 35
+    },
+    {
+      "slot": 72,
+      "character": 1,
+      "vehicle": 0
+    },
+    {
+      "slot": 73,
+      "character": 0,
+      "vehicle": 1
+    },
+    {
+      "slot": 74,
+      "character": 2,
+      "vehicle": 2
+    },
+    {
+      "slot": 75,
+      "character": 4,
+      "vehicle": 3
+    },
+    {
+      "slot": 76,
+      "character": 7,
+      "vehicle": 4
+    },
+    {
+      "slot": 77,
+      "character": 3,
+      "vehicle": 5
+    },
+    {
+      "slot": 78,
+      "character": 5,
+      "vehicle": 6
+    },
+    {
+      "slot": 79,
+      "character": 16,
+      "vehicle": 7
+    },
+    {
+      "slot": 80,
+      "character": 9,
+      "vehicle": 8
+    },
+    {
+      "slot": 81,
+      "character": 6,
+      "vehicle": 9
+    },
+    {
+      "slot": 82,
+      "character": 15,
+      "vehicle": 10
+    },
+    {
+      "slot": 83,
+      "character": 11,
+      "vehicle": 11
+    },
+    {
+      "slot": 84,
+      "character": 8,
+      "vehicle": 12
+    },
+    {
+      "slot": 85,
+      "character": 10,
+      "vehicle": 13
+    },
+    {
+      "slot": 86,
+      "character": 19,
+      "vehicle": 14
+    },
+    {
+      "slot": 87,
+      "character": 12,
+      "vehicle": 15
+    },
+    {
+      "slot": 88,
+      "character": 17,
+      "vehicle": 16
+    },
+    {
+      "slot": 89,
+      "character": 21,
+      "vehicle": 17
+    },
+    {
+      "slot": 90,
+      "character": 13,
+      "vehicle": 18
+    },
+    {
+      "slot": 91,
+      "character": 18,
+      "vehicle": 19
+    },
+    {
+      "slot": 92,
+      "character": 22,
+      "vehicle": 20
+    },
+    {
+      "slot": 93,
+      "character": 14,
+      "vehicle": 21
+    },
+    {
+      "slot": 94,
+      "character": 20,
+      "vehicle": 22
+    },
+    {
+      "slot": 95,
+      "character": 23,
+      "vehicle": 23
+    },
+    {
+      "slot": 96,
+      "character": 1,
+      "vehicle": 24
+    },
+    {
+      "slot": 97,
+      "character": 0,
+      "vehicle": 25
+    },
+    {
+      "slot": 98,
+      "character": 2,
+      "vehicle": 26
+    },
+    {
+      "slot": 99,
+      "character": 4,
+      "vehicle": 27
+    },
+    {
+      "slot": 100,
+      "character": 7,
+      "vehicle": 28
+    },
+    {
+      "slot": 101,
+      "character": 3,
+      "vehicle": 29
+    },
+    {
+      "slot": 102,
+      "character": 5,
+      "vehicle": 30
+    },
+    {
+      "slot": 103,
+      "character": 16,
+      "vehicle": 31
+    },
+    {
+      "slot": 104,
+      "character": 9,
+      "vehicle": 32
+    },
+    {
+      "slot": 105,
+      "character": 6,
+      "vehicle": 33
+    },
+    {
+      "slot": 106,
+      "character": 15,
+      "vehicle": 34
+    },
+    {
+      "slot": 107,
+      "character": 11,
+      "vehicle": 35
+    },
+    {
+      "slot": 108,
+      "character": 8,
+      "vehicle": 0
+    },
+    {
+      "slot": 109,
+      "character": 10,
+      "vehicle": 1
+    },
+    {
+      "slot": 110,
+      "character": 19,
+      "vehicle": 2
+    },
+    {
+      "slot": 111,
+      "character": 12,
+      "vehicle": 3
+    },
+    {
+      "slot": 112,
+      "character": 17,
+      "vehicle": 4
+    },
+    {
+      "slot": 113,
+      "character": 21,
+      "vehicle": 5
+    },
+    {
+      "slot": 114,
+      "character": 13,
+      "vehicle": 6
+    },
+    {
+      "slot": 115,
+      "character": 18,
+      "vehicle": 7
+    },
+    {
+      "slot": 116,
+      "character": 22,
+      "vehicle": 8
+    },
+    {
+      "slot": 117,
+      "character": 14,
+      "vehicle": 9
+    },
+    {
+      "slot": 118,
+      "character": 20,
+      "vehicle": 10
+    },
+    {
+      "slot": 119,
+      "character": 23,
+      "vehicle": 11
+    },
+    {
+      "slot": 120,
+      "character": 1,
+      "vehicle": 12
+    },
+    {
+      "slot": 121,
+      "character": 0,
+      "vehicle": 13
+    },
+    {
+      "slot": 122,
+      "character": 2,
+      "vehicle": 14
+    },
+    {
+      "slot": 123,
+      "character": 4,
+      "vehicle": 15
+    },
+    {
+      "slot": 124,
+      "character": 7,
+      "vehicle": 16
+    },
+    {
+      "slot": 125,
+      "character": 3,
+      "vehicle": 17
+    },
+    {
+      "slot": 126,
+      "character": 5,
+      "vehicle": 18
+    },
+    {
+      "slot": 127,
+      "character": 16,
+      "vehicle": 19
+    }
+  ],
+  "limitations": "Supplemental read-only access to owned test backing files; each Kart::Values character/vehicle agrees with the active RaceData slot. This verifies initialization, not completion, scoring, teardown or future resource peaks."
+}

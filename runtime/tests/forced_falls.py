@@ -128,6 +128,10 @@ def racers(ram, count):
         result.append(
             dict(
                 slot=i,
+                # Kart::Values::__ct stores vehicle/character at +4/+8;
+                # USA GetKartId (8058A258) independently reads the first.
+                vehicle=ram.u32(values + 4),
+                character=ram.u32(values + 8),
                 position_address=position,
                 previous_address=previous,
                 position=point,

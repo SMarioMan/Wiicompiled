@@ -55,6 +55,19 @@ def validate_battle_timer(evidence, completed=False):
         raise RuntimeError(f"Battle ended before its countdown expired: {evidence}")
 
 
+def observed_roster(rows, diverse=False):
+    characters = sorted({row["character"] for row in rows})
+    vehicles = sorted({row["vehicle"] for row in rows})
+    if diverse and (len(characters) != min(len(rows), 24) or
+                    len(vehicles) != min(len(rows), 36) or
+                    any(character >= 24 for character in characters) or
+                    any(vehicle >= 36 for vehicle in vehicles)):
+        raise RuntimeError("Live roster does not contain the requested vanilla character/vehicle diversity")
+    return dict(characters=characters, vehicles=vehicles,
+                players=[dict(slot=row["slot"], character=row["character"], vehicle=row["vehicle"])
+                         for row in rows])
+
+
 def run(args):
     if sys.platform != "linux":
         raise ValueError("The shared RAM observer currently requires Linux")
@@ -151,6 +164,7 @@ def run(args):
                                     validate_battle_timer(timer)
                                 report["snapshots"].append(snapshot)
                                 if not report["slots"]:
+                                    report["observed_roster"] = observed_roster(rows, diverse=args.roster == "diverse")
                                     report["slots"] = [dict(slot=i, sampled_distance=0.0,
                                         respawn_samples=0, min_lap=row["lap"], max_lap=row["lap"],
                                         max_stationary_frames=0, samples=0) for i, row in enumerate(rows)]

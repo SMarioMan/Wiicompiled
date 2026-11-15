@@ -1,0 +1,182 @@
+{
+  "result": "native-finish-flags",
+  "source": "4a74439",
+  "binary_sha256": "d99037419a84346da438a23967792dfacfe7697dcd19f8e35ee217d4b0d37ac6",
+  "players": 12,
+  "capacity": 128,
+  "mode": "vs",
+  "roster": "standard",
+  "course": 8,
+  "laps": 1,
+  "clock_divisor": 1,
+  "slots": [
+    {
+      "slot": 0,
+      "sampled_distance": 149034.2088824508,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 1,
+      "sampled_distance": 143554.29153132875,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 2,
+      "sampled_distance": 143270.6921141385,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 3,
+      "sampled_distance": 144923.86498210693,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 4,
+      "sampled_distance": 142670.80799083525,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 5,
+      "sampled_distance": 141574.9946779544,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 6,
+      "sampled_distance": 144939.71418776378,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 7,
+      "sampled_distance": 143400.19266353466,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 8,
+      "sampled_distance": 146220.79041538938,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 9,
+      "sampled_distance": 141837.01186342002,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 10,
+      "sampled_distance": 136437.3680161369,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    },
+    {
+      "slot": 11,
+      "sampled_distance": 135924.59637259733,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 16
+    }
+  ],
+  "limitations": "Observe a real USA CPU race/battle without writing guest RAM or scaling time.\n\nSequential snapshots are not atomic. Sampled distance is a lower bound, and\nsampled respawns can miss short events. Native finish flags do not establish\nthat every CPU completed a course: retain each slot's lap/movement evidence.\n",
+  "completion": {
+    "stage": 4,
+    "frames": 1999,
+    "players": 12,
+    "capacity": 128,
+    "observed": 12,
+    "min_player_frames": 2170,
+    "course": 8,
+    "mode": 1,
+    "finished": 12,
+    "min_lap": 1,
+    "max_lap": 2
+  },
+  "slots_without_sampled_movement": [],
+  "slots_without_sampled_lap_advance": [],
+  "slots_without_sampled_finish_lap": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "elapsed_seconds": 161.97725100099342,
+  "command": [
+    "WiiCompiled",
+    "--headless",
+    "--race-cpu",
+    "--race-players=12",
+    "--race-mode=vs",
+    "--layout-audit=strict",
+    "--layout-audit-report=vs12-manager-audit-audit.json",
+    "--race=8",
+    "--race-roster=standard",
+    "--race-laps=1"
+  ],
+  "auditor": {
+    "mode": "strict",
+    "registeredTypes": 90,
+    "boundSites": 3233,
+    "stackLifetimeSites": 18,
+    "instancesRegistered": 8685,
+    "observedAccesses": 3740028859,
+    "filteredAccesses": 3720056219,
+    "watchedAccesses": 18435245,
+    "activeInstances": 4,
+    "hits": [],
+    "unscopedStackEntries": []
+  },
+  "notes": [
+    "Twelve active racers in a 128-capacity build, not a freshly compiled twelve-capacity product.",
+    "All twelve slots moved and advanced laps; only slot zero was sampled beyond the one-lap finish threshold before the native race ended. Native finish flags do not prove that every CPU physically crossed the line.",
+    "No external pause or guest-memory writes in this probe. Private incremental native build; portable release packaging is not qualified by this test."
+  ]
+}

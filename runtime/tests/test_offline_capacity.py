@@ -1,6 +1,6 @@
 import unittest
 
-from offline_capacity import battle_timer_evidence, validate_battle_timer
+from offline_capacity import battle_timer_evidence, validate_battle_timer, observed_roster
 
 
 class ReadOnlyMemory:
@@ -75,6 +75,26 @@ class BattleTimerEvidenceTests(unittest.TestCase):
                 battle_timer_evidence(ram, 0x10000, 128, "balloon", 32)
         with self.assertRaisesRegex(RuntimeError, "arena map"):
             battle_timer_evidence(self.fixture("balloon", 0, 180), 0x10000, 128, "balloon", 99)
+
+
+class ObservedRosterTests(unittest.TestCase):
+    def test_full_and_partial_live_rosters_report_actual_values(self):
+        for count in (12, 13, 24, 25, 26, 48, 52, 64, 100, 116, 118, 127, 128):
+            rows = [dict(slot=i, character=i % 24, vehicle=i % 36) for i in range(count)]
+            evidence = observed_roster(rows, diverse=True)
+            self.assertEqual(len(evidence["characters"]), min(count, 24))
+            self.assertEqual(len(evidence["vehicles"]), min(count, 36))
+            self.assertEqual(evidence["players"], rows)
+
+    def test_requested_diversity_cannot_be_inferred_from_a_launch_flag(self):
+        rows = [dict(slot=i, character=0, vehicle=1) for i in range(128)]
+        self.assertEqual(observed_roster(rows)["characters"], [0])
+        with self.assertRaisesRegex(RuntimeError, "Live roster"):
+            observed_roster(rows, diverse=True)
+        rows = [dict(slot=i, character=i % 24, vehicle=i % 36) for i in range(128)]
+        rows[0]["character"] = 99
+        with self.assertRaisesRegex(RuntimeError, "Live roster"):
+            observed_roster(rows, diverse=True)
 
 
 if __name__ == "__main__":

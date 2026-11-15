@@ -10,6 +10,9 @@ public class RacedataRankTableTests
     [InlineData(24)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(12)] [InlineData(13)] [InlineData(25)] [InlineData(26)]
+    [InlineData(52)] [InlineData(64)] [InlineData(116)] [InlineData(118)]
+    [InlineData(127)] [InlineData(128)]
     [Trait("Requires", "USA game assets")]
     public void ExpandedRankPolicyPreservesEveryLegacyRowAndStrictlyOrdersEveryExpandedRank(int capacity)
     {

@@ -602,3 +602,15 @@ structured evidence with binary identity, both race phases and scene exits.
 Default command behavior is retained when those options are omitted. Python
 compilation/help checks pass and the new strict/diverse path passes this actual
 128-racer transition.
+
+### Expanded scoring boundary regression (2026-11-15)
+
+The original USA point updater (`80529E08`) now runs at every required capacity
+for offline GP/VS/Battle modes. The original exact 12/24/48 fixtures remain;
+additional boundaries check preserved cumulative scores, strictly descending
+race awards, the independent first/last award bounds, battle awards and unchanged
+ratings. The rank-policy fixture also covers all thirteen capacities. All 64
+combined tests passed. These are original-code scoring checks, not qualification
+of an entire GP cup or the subsequent team-results presentation. A rendered
+128-player Team VS run exposed a separate six-controls-per-team limit on the
+team totals page; that page remains under investigation.

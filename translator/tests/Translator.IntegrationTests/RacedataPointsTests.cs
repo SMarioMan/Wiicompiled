@@ -35,6 +35,36 @@ public class RacedataPointsTests
     [InlineData(12, 8)]
     [InlineData(24, 8)]
     [InlineData(48, 8)]
+    [InlineData(13, 0)]
+    [InlineData(13, 1)]
+    [InlineData(13, 3)]
+    [InlineData(25, 0)]
+    [InlineData(25, 1)]
+    [InlineData(25, 3)]
+    [InlineData(26, 0)]
+    [InlineData(26, 1)]
+    [InlineData(26, 3)]
+    [InlineData(52, 0)]
+    [InlineData(52, 1)]
+    [InlineData(52, 3)]
+    [InlineData(64, 0)]
+    [InlineData(64, 1)]
+    [InlineData(64, 3)]
+    [InlineData(100, 0)]
+    [InlineData(100, 1)]
+    [InlineData(100, 3)]
+    [InlineData(116, 0)]
+    [InlineData(116, 1)]
+    [InlineData(116, 3)]
+    [InlineData(118, 0)]
+    [InlineData(118, 1)]
+    [InlineData(118, 3)]
+    [InlineData(127, 0)]
+    [InlineData(127, 1)]
+    [InlineData(127, 3)]
+    [InlineData(128, 0)]
+    [InlineData(128, 1)]
+    [InlineData(128, 3)]
     [Trait("Requires", "USA game assets and Clang")]
     public void OriginalPointUpdaterUsesExpandedScoresAndStackWithoutClobberingSavedRegisters(int players, int mode)
     {
@@ -80,7 +110,9 @@ public class RacedataPointsTests
                 12 => "15,12,10,8,7,6,5,4,3,2,1,0",
                 24 => "30,27,24,22,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0",
                 48 => "60,57,54,52,49,47,45,43,41,39,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0",
-                _ => throw new InvalidDataException("Missing independent scoring fixture")
+                // Other capacities use independent order/end-point/state
+                // invariants; retain every existing exact legacy fixture.
+                _ => "0"
             };
             File.WriteAllText(harness, $$"""
                 #include "ppc_runtime.h"
@@ -110,7 +142,8 @@ public class RacedataPointsTests
                     constexpr uint32_t race = data + {{layout.Symbol("Racedata.race.offset")}};
                     constexpr uint32_t settings = race + {{layout.Symbol("Scenario.settings.offset")}};
                     constexpr uint32_t array = race + {{layout.Symbol("Scenario.players.offset")}};
-                    constexpr uint32_t sp = 0x800f0000, frame = {{layout.Symbol("PointsFrame.size")}};
+                    constexpr uint32_t sp = 0x800f0000, frame = {{layout.Symbol("PointsFrame.size")}},
+                        priorScore={{(players is 12 or 24 or 48 ? 3 : 480)}};
                     Memory::Write32(0x809b8f68, data);
                     Memory::Write32(0x809b8f70, info);
                     Memory::Write8(race+4, {{players}});
@@ -124,7 +157,7 @@ public class RacedataPointsTests
                         Memory::Write8(state+0x20, player+1);
                         Memory::Write16(state+0x22, player+5);
                         Memory::Write32(array+player*0xf0+16, 1);
-                        Memory::Write16(array+player*0xf0+0xd8, 3);
+                        Memory::Write16(array+player*0xf0+0xd8, priorScore);
                         Memory::Write16(array+player*0xf0+0xda, 0);
                         Memory::Write16(array+player*0xf0+0xe8, 1000+player*10);
                     }
@@ -162,12 +195,25 @@ public class RacedataPointsTests
                     if (ctx.fpr[30].d != 30.25 || ctx.fpr[31].d != 31.5) return 9;
                     for (uint32_t reg=14; reg<=31; reg++)
                         if (ctx.gpr[reg] != 0x12340000+reg) return 5;
+                    uint32_t previousAward=0xffffffffu;
                     for (uint32_t player=0; player<{{players}}; player++) {
+                        const auto total=Memory::Read16(array+player*0xf0+0xda);
+                        if({{(players is 12 or 24 or 48 ? "false" : "true")}} && {{mode}}<3){
+                            // Unwritten slots retain zero. Valid awards strictly
+                            // descend from the policy's top to zero, with the
+                            // prior cumulative score preserved separately.
+                            if(total<priorScore||Memory::Read16(array+player*0xf0+0xd8)!=priorScore)return 10;
+                            const uint32_t award=total-priorScore;
+                            if((player==0&&award!=(15*{{players}}+6)/12)||
+                               (player+1=={{players}}&&award!=0)||previousAward<=award)return 11;
+                            previousAward=award;
+                        }else{
                         uint32_t award = ({{mode}} == 3 || {{mode}} >= 9) ? player+5 : pointTable[player];
-                        if (Memory::Read16(array+player*0xf0+0xda) != award+3) {
+                        if (Memory::Read16(array+player*0xf0+0xda) != award+priorScore) {
                             std::fprintf(stderr, "player %u score %u, expected %u\n", player,
-                                Memory::Read16(array+player*0xf0+0xda), award+3);
+                                Memory::Read16(array+player*0xf0+0xda), award+priorScore);
                             return 6;
+                        }
                         }
                         if (Memory::Read16(array+player*0xf0+0xe8) != expected[player]) {
                             std::fprintf(stderr, "player %u rating %u, expected %d\n", player,

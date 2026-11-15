@@ -1,0 +1,60 @@
+{
+  "format": "wiicompiled-offline-capacity-checkpoint-v1",
+  "date": "2026-11-15",
+  "course": "NTSC-U Luigi Circuit (0x08)",
+  "mode": "VS",
+  "requestedLaps": 1,
+  "headless": true,
+  "renderer": "null",
+  "scope": "ArchiveMgr heap and generated stack watches; other heap families and raw pointer/bulk escapes are not covered",
+  "limits": "Native finish flags and lap summaries, not proof of every racer path, all effects, complete teardown, or rendered results. Each process was stopped by its driver after completion. No natural crash occurred.",
+  "cases": [
+    {
+      "source": "ab839431bf813b40c0cfaa6ebb96c758d4e16772",
+      "binarySha256": "07067eced6918ddab40134fe7e6aa7114f59f207ec66a0aa31fa7ac1885d6eed",
+      "capacity": 128,
+      "activeRacers": 13,
+      "clockDivisor": 1,
+      "layoutAudit": "log",
+      "completion": "all racers finished",
+      "firstCompleteLine": "[race-progress] stage=4 frames=2050 players=13 capacity=128 observed=13 min_player_frames=2144 course=8 mode=1 finished=13 min_lap=1 max_lap=2",
+      "termination": "intentional diagnostic SIGABRT after successful race completion",
+      "audit": {
+        "registeredTypes": 84,
+        "boundSites": 3149,
+        "stackLifetimeSites": 16,
+        "instancesRegistered": 15120,
+        "observedAccesses": 8721457881,
+        "filteredAccesses": 8717780342,
+        "watchedAccesses": 3522182,
+        "activeInstances": 1,
+        "hits": [],
+        "unscopedStackEntries": []
+      },
+      "fatalReportComplete": true
+    },
+    {
+      "source": "ab839431bf813b40c0cfaa6ebb96c758d4e16772",
+      "binarySha256": "07067eced6918ddab40134fe7e6aa7114f59f207ec66a0aa31fa7ac1885d6eed",
+      "capacity": 128,
+      "activeRacers": 24,
+      "clockDivisor": 1,
+      "layoutAudit": "log",
+      "completion": "all racers flagged finished",
+      "firstCompleteLine": "[race-progress] stage=4 frames=1928 players=24 capacity=128 observed=24 min_player_frames=2099 course=8 mode=1 finished=24 min_lap=1 max_lap=2",
+      "termination": "SIGTERM by test driver after completion",
+      "audit": {
+        "registeredTypes": 84,
+        "boundSites": 3149,
+        "stackLifetimeSites": 16,
+        "instancesRegistered": 25200,
+        "observedAccesses": 16520482814,
+        "filteredAccesses": 16512927525,
+        "watchedAccesses": 7237924,
+        "activeInstances": 1,
+        "hits": [],
+        "unscopedStackEntries": []
+      }
+    }
+  ]
+}

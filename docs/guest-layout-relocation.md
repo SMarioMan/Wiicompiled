@@ -1956,3 +1956,12 @@ at 128), including interaction-vector construction and allocation guards. The
 root initializer preserves aligned, non-overlapping backing-heap ownership for
 both retail-sized and expanded arenas. Resource construction/heap creation are
 fixture callbacks; these checks do not qualify live scene-resource budgets.
+
+### Team result storage through the 128 boundary
+
+`TeamResultStorageTests` now retains its earlier cases and also checks 25, 26,
+52, 64, 116, 118, 127 and 128. All thirteen cases pass. Real USA page/result
+constructors, both uniformly sized team regions, authored controls, relocated
+trailing fields, original unused-row clearing and destruction retain their
+allocation/register guards. Rendering and full results flows are separate work;
+the fixture deliberately stops the original clear loop before its rendering tail.

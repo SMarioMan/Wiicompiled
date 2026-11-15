@@ -7,7 +7,7 @@ using Translator.Core.Loading;
 namespace Translator.Core.Translation;
 
 /// <summary>
-/// Checked byte-domain operations whose count exceeds 255 in an expanded layout.
+/// Checked byte-domain operations whose signed or unsigned range is exceeded in an expanded layout.
 /// Derived loads retain the guest header ABI; selected index masks and local
 /// ordinal arrays widen in translated IR, before SSA and register analysis.
 /// </summary>
@@ -42,9 +42,11 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32") || site.Field is not null || site.Source is not null ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8") || site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
+            if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
+                throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
         }
     }
 
@@ -56,6 +58,22 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
+        if (site.Kind == "rank8")
+        {
+            if (word >> 26 != 31 || (word >> 1 & 1023) != 954 || (word & 1) != 0 ||
+                nodes.Count != 1 || nodes[0] is not IrBinary { Op: "sext" } sign ||
+                sign.Destination != ra || sign.Left.RegisterName != rt || sign.Right.Constant != 8) throw Invalid();
+            var raw = $"addr_layout_byte_rank_{instruction.Address:X8}_raw_loc";
+            var sentinel = $"addr_layout_byte_rank_{instruction.Address:X8}_none_loc";
+            // Preserve the game's -1 sentinel while making valid one-based
+            // positions 128..254 positive. No guest flags or other GPRs change.
+            return new IrInstruction[] {
+                new IrBinary(raw, IrValue.Register(rt), IrValue.Imm(255), "and"),
+                new IrBinary(sentinel, IrValue.Register(raw), IrValue.Imm(1), "add"),
+                new IrBinary(sentinel, IrValue.Register(sentinel), IrValue.Imm(256), "divu"),
+                new IrBinary(sentinel, IrValue.Imm(0), IrValue.Register(sentinel), "sub"),
+                new IrBinary(ra, IrValue.Register(raw), IrValue.Register(sentinel), "or") };
+        }
         if (site.Kind == "derived-count")
         {
             if (word >> 26 != 34 || ra == "r0" || nodes.Count != 1 ||
@@ -121,6 +139,6 @@ public sealed partial class GuestLayoutRelocations
         if (site is null) return null;
         var widened = RewriteByteOperation(site, instruction, nodes, site.Source is null ? 0 : _expanded.Symbol(site.Source),
             site.Field is null ? 0 : _original.Symbol(site.Field));
-        return _expanded.Symbol(site.Count) <= byte.MaxValue ? nodes : widened;
+        return _expanded.Symbol(site.Count) <= (site.Kind == "rank8" ? 127 : byte.MaxValue) ? nodes : widened;
     }
 }

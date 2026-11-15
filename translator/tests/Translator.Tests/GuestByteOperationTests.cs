@@ -53,10 +53,51 @@ public class GuestByteOperationTests
     [Fact]
     public void ByteOperationsRequireFormatThirtyOneAndRejectFutureFormats(){
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[]{30,31,32}){
+        try{foreach(var version in new[]{30,31,32,33}){
             File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 ByteOperations=new[]{new{Instruction="0x80001000",ExpectedWord="0x5483063E",Kind="index32",Count="Pool.objects.count"}}}));
-            if(version==31)Assert.Equal(128,GuestLayoutRelocations.Read(path,128).Players);
+            if(version is 31 or 32)Assert.Equal(128,GuestLayoutRelocations.Read(path,128).Players);
+            else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,128));
+        }}finally{File.Delete(path);}
+    }
+
+    [Theory]
+    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(25)] [InlineData(26)]
+    [InlineData(48)] [InlineData(52)] [InlineData(64)] [InlineData(100)]
+    [InlineData(116)] [InlineData(118)] [InlineData(127)] [InlineData(128)] [InlineData(254)]
+    public void OneBasedByteRanksStayPositivePast127AndRetainTheNoneSentinel(int capacity)
+    {
+        foreach(var word in new[]{0x7d080774u,0x7d280774u})
+        {
+            var nodes=Apply(capacity,new(0x80001000,word,"rank8","players"));
+            if(capacity<=127)Assert.Equal("sext",Assert.IsType<IrBinary>(Assert.Single(nodes)).Op);
+            for(uint low=0;low<256;low++)foreach(var input in new[]{low,low|0x12340000u})
+            {
+                var regs=new Dictionary<string,uint>{{"r8",input},{"r9",input}};
+                uint Value(IrValue v)=>v.RegisterName is {} name?regs[name]:unchecked((uint)v.Constant!.Value);
+                foreach(var node in nodes)
+                {
+                    var binary=Assert.IsType<IrBinary>(node);var a=Value(binary.Left);var b=Value(binary.Right);
+                    regs[binary.Destination]=binary.Op switch {
+                        "and"=>a&b,"or"=>a|b,"add"=>unchecked(a+b),"sub"=>unchecked(a-b),"divu"=>a/b,
+                        "sext"=>unchecked((uint)(sbyte)(byte)a),_=>throw new InvalidOperationException(binary.Op)};
+                }
+                var expected=capacity<=127?unchecked((uint)(sbyte)(byte)input):low==255?uint.MaxValue:low;
+                Assert.Equal(expected,regs["r8"]);Assert.Equal(input,regs["r9"]);
+            }
+        }
+        Assert.Throws<InvalidDataException>(()=>Apply(capacity,new(0x80001000,0x7d080775,"rank8","players")));
+        Assert.Throws<InvalidDataException>(()=>Apply(255,new(0x80001000,0x7d080774,"rank8","players")));
+    }
+
+    [Fact]
+    public void UnsignedRanksRequireFormatThirtyTwo()
+    {
+        var path=Path.GetTempFileName();
+        try{foreach(var version in new[]{31,32}){
+            File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
+                ByteOperations=new[]{new{Instruction="0x80001000",ExpectedWord="0x7D080774",Kind="rank8",Count="players"}}}));
+            if(version==32)Assert.Equal(128,GuestLayoutRelocations.Read(path,128).Players);
             else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,128));
         }}finally{File.Delete(path);}
     }

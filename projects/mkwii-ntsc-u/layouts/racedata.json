@@ -1,5 +1,5 @@
 {
-  "Version": 31,
+  "Version": 32,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -81387,6 +81387,12 @@
       "ExpectedWord": "0x54A0063E",
       "Kind": "index32",
       "Count": "BattleBalloonManager.objects.count"
+    },
+    {
+      "Instruction": "0x8052EC08",
+      "ExpectedWord": "0x7D080774",
+      "Kind": "rank8",
+      "Count": "players"
     }
   ]
 }

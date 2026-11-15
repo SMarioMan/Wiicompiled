@@ -1965,3 +1965,30 @@ constructors, both uniformly sized team regions, authored controls, relocated
 trailing fields, original unused-row clearing and destruction retain their
 allocation/register guards. Rendering and full results flows are separate work;
 the fixture deliberately stops the original clear loop before its rendering tail.
+
+
+### Checked unsigned one-based ranks (format 32)
+
+`rank8` pins a non-recording `extsb` instruction and its exact lifted sign-extension
+before replacing it with unsigned-byte interpretation when the declared capacity
+exceeds 127. It preserves `0xFF` as `-1`, rejects capacities above 254, and changes
+neither condition registers nor unrelated guest registers. Capacities through 127
+retain the original instruction. This is a site-specific semantic patch, not a
+global change to signed racer IDs or physical-screen sentinels.
+
+The first consumer is USA `8052EC08` in position tracking (`8052EB90`). It reads
+`RaceinfoPlayer.position` at `+0x20`, a one-based byte, then indexes the relocated
+`PositionTrackingFrame` scratch arrays using position minus one. At 128 the old
+sign extension produces -128 and the index becomes -129. A rendered diagnostic
+found 128 distinct result controls but only 127 distinct participant IDs, with
+player zero repeated and player 60 missing. The unchanged native 128 fixture
+also fails before this patch; the patched fixture passes sorting, inverse ranks,
+stack/register guards and finished/mixed/tied race states. The rank-to-player
+table at `Raceinfo+0x18` remains owned by the original guest routine.
+
+Primitive tests exhaust all byte values, preserve the none sentinel, cover
+aliased and distinct source/destination registers and reject unproven words or
+ranges. Actual sorting tests retain prior online/offline cases and add offline
+25/26/52/64/116/118/127/128 boundaries. All eighteen native cases and all 977
+translator unit tests pass. Rendered results must be rerun with the
+rebuilt translation before claiming 128 distinct participants in the live UI.

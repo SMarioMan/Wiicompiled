@@ -21,9 +21,9 @@ public class GuestCountConversionTests
     [Fact]
     public void CounterConversionsRequireVersionTwentyNine()
     {
-        var path=Path.GetTempFileName();try{foreach(var version in new[]{28,29,30,31,32}){
+        var path=Path.GetTempFileName();try{foreach(var version in new[]{28,29,30,31,32,33}){
             File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),CountConversions=new[]{new{Instruction="0x80001000",ExpectedWord="0x7c8903a6",Input="r4",Count="ceil(players/6)"}}}));
-            if(version is 29 or 30 or 31)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
+            if(version is 29 or 30 or 31 or 32)Assert.Equal(24,GuestLayoutRelocations.Read(path,24).Players);else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,24));
         }}finally{File.Delete(path);}
     }
 }

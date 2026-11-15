@@ -66,11 +66,11 @@ public class GuestArrayFillCountTests
         Assert.Equal(-1,description.GetProperty("ArrayFills")[0].GetProperty("Arrays")[0].GetProperty("CountAddend").GetInt32());
         var path=Path.GetTempFileName();
         try{
-            foreach(var version in new[]{29,30,31,32}){
+            foreach(var version in new[]{29,30,31,32,33}){
                 File.WriteAllText(path,JsonSerializer.Serialize(new{Version=version,OriginalPlayers=2,Types,
                     References=Array.Empty<object>(),ArrayFills=new[]{new{Begin=$"0x{Start:X8}",
                         ExpectedWords=Fill().ExpectedWords.Select(word=>$"0x{word:X8}"),BaseRegister="r3",ValueRegister="r0",Arrays=Fill().Arrays}}}));
-                if(version is 30 or 31)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
+                if(version is 30 or 31 or 32)Assert.Equal(3,GuestLayoutRelocations.Read(path,3).Players);
                 else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,3));
             }
             var wrong=TranslatorCppTestHarness.CreateImage((Start,0x9003000cu),(Start+4,0x90030010u),(Start+8,0x4e800020u));

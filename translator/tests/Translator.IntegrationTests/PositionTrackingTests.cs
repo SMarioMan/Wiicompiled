@@ -19,6 +19,14 @@ public class PositionTrackingTests
     [InlineData(48, true)]
     [InlineData(100, false)]
     [InlineData(100, true)]
+    [InlineData(25, false)]
+    [InlineData(26, false)]
+    [InlineData(52, false)]
+    [InlineData(64, false)]
+    [InlineData(116, false)]
+    [InlineData(118, false)]
+    [InlineData(127, false)]
+    [InlineData(128, false)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealPositionTrackingSortsAllParticipantsAndPreservesItsExpandedFrame(int players, bool online)
     {

@@ -3317,6 +3317,43 @@
           "Type": "ArchiveManagerState"
         }
       ]
+    },
+    {
+      "Name": "BattlePositionTrackingFrame",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "StackHeader"
+        },
+        {
+          "Name": "ids",
+          "Type": "InputByte",
+          "PerPlayer": true
+        },
+        {
+          "Name": "idsPadding",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "scores",
+          "Type": "GuestFloat32",
+          "PerPlayer": true
+        },
+        {
+          "Name": "conversion",
+          "Type": "FloatSlot",
+          "Count": 2
+        },
+        {
+          "Name": "conversionPadding",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "gprs",
+          "Type": "SavedGprs19"
+        }
+      ]
     }
   ],
   "References": [
@@ -66640,6 +66677,292 @@
       "Operand": "offset",
       "Symbol": "ArchiveManager.kartLoaders.offset",
       "Addend": 12
+    },
+    {
+      "Instruction": "0x805338D0",
+      "ExpectedWord": "0x9421FF70",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x805338D0",
+      "ExpectedWord": "0x9421FF70",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x805338D8",
+      "ExpectedWord": "0x90010094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x805338DC",
+      "ExpectedWord": "0x39610090",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x805338F4",
+      "ExpectedWord": "0x90010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x805338FC",
+      "ExpectedWord": "0x90010050",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80533918",
+      "ExpectedWord": "0x38A10018",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x80533920",
+      "ExpectedWord": "0x38810008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x80533960",
+      "ExpectedWord": "0x90C1004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533970",
+      "ExpectedWord": "0x91210054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80533974",
+      "ExpectedWord": "0xC8010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x80533994",
+      "ExpectedWord": "0xC8010050",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x805339B0",
+      "ExpectedWord": "0x9261004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x805339C8",
+      "ExpectedWord": "0xC8010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x805339E4",
+      "ExpectedWord": "0x92610054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80533A00",
+      "ExpectedWord": "0xC8010050",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80533A24",
+      "ExpectedWord": "0x9261004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533A50",
+      "ExpectedWord": "0xC8010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x80533A58",
+      "ExpectedWord": "0x92810054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80533A6C",
+      "ExpectedWord": "0xC8010050",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80533A78",
+      "ExpectedWord": "0x90E10054",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80533A88",
+      "ExpectedWord": "0x9281004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533A90",
+      "ExpectedWord": "0xC8010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x80533A9C",
+      "ExpectedWord": "0xC8010050",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80533AC8",
+      "ExpectedWord": "0x38A10018",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x80533AD0",
+      "ExpectedWord": "0x38810008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x80533AEC",
+      "ExpectedWord": "0x9001004C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533AF4",
+      "ExpectedWord": "0xC8010048",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.conversion.offset"
+    },
+    {
+      "Instruction": "0x80533B24",
+      "ExpectedWord": "0x38E1001C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.scores.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533B28",
+      "ExpectedWord": "0x39010009",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x80533B2C",
+      "ExpectedWord": "0x38C10018",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x80533B30",
+      "ExpectedWord": "0x38A10008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x80533B48",
+      "ExpectedWord": "0x39210018",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.scores.offset"
+    },
+    {
+      "Instruction": "0x80533B4C",
+      "ExpectedWord": "0x39410008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x80533BB8",
+      "ExpectedWord": "0x39010008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.ids.offset"
+    },
+    {
+      "Instruction": "0x80533C10",
+      "ExpectedWord": "0x39610090",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x80533C18",
+      "ExpectedWord": "0x80010094",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "BattlePositionTrackingFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80533C20",
+      "ExpectedWord": "0x38210090",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "BattlePositionTrackingFrame.size"
     }
   ],
   "GlobalPointers": {
@@ -74270,6 +74593,11 @@
       "Entry": "0x8084F9D8",
       "Receiver": null,
       "Name": "MenuKartModelMgr::Load"
+    },
+    {
+      "Entry": "0x805338D0",
+      "Receiver": null,
+      "Name": "GMDataBattle::HandlePositionTracking"
     }
   ],
   "BoundedAccesses": [
@@ -81391,6 +81719,60 @@
     {
       "Instruction": "0x8052EC08",
       "ExpectedWord": "0x7D080774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533978",
+      "ExpectedWord": "0x7D080774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533998",
+      "ExpectedWord": "0x7E940774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x805339A4",
+      "ExpectedWord": "0x7CC60774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x805339DC",
+      "ExpectedWord": "0x7CC60774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533A08",
+      "ExpectedWord": "0x7CC60774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533A28",
+      "ExpectedWord": "0x7D080774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533A48",
+      "ExpectedWord": "0x7D080774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533A54",
+      "ExpectedWord": "0x7CC60774",
+      "Kind": "rank8",
+      "Count": "players"
+    },
+    {
+      "Instruction": "0x80533AF8",
+      "ExpectedWord": "0x7C060774",
       "Kind": "rank8",
       "Count": "players"
     }

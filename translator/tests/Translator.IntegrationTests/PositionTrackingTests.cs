@@ -30,6 +30,21 @@ public class PositionTrackingTests
     [Trait("Requires", "USA game assets and Clang")]
     public void RealPositionTrackingSortsAllParticipantsAndPreservesItsExpandedFrame(int players, bool online)
     {
+        RunPositionTracking(players, online, false);
+    }
+
+    [Theory]
+    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(25)] [InlineData(26)]
+    [InlineData(48)] [InlineData(52)] [InlineData(64)] [InlineData(100)]
+    [InlineData(116)] [InlineData(118)] [InlineData(127)] [InlineData(128)]
+    [Trait("Requires", "USA game assets and Clang")]
+    public void RealBattlePositionTrackingSortsAllParticipantsAndPreservesItsExpandedFrame(int players)
+    {
+        RunPositionTracking(players, false, true);
+    }
+
+    private static void RunPositionTracking(int players, bool online, bool battle)
+    {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);
         while(directory is not null && !File.Exists(Path.Combine(directory.FullName,"translator/Translator.sln")))directory=directory.Parent;
         var root=directory?.FullName ?? throw new DirectoryNotFoundException("Repository root missing");
@@ -39,14 +54,19 @@ public class PositionTrackingTests
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
         var options=new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet());
-        var translator=new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(manifest,players));
+        var plan=GuestLayoutRelocations.Read(manifest,players);
+        var translator=new FunctionTranslator(image,layoutRelocations:plan);
+        if(battle)Assert.Equal(layout.Symbol("BattlePositionTrackingFrame.size"),
+            layout.Symbol("BattlePositionTrackingFrame.gprs.offset")+52);
         var temp=Path.Combine(Path.GetTempPath(),"mkw-ai-objects-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
-            var entry=online?0x80539f64u:0x8052eb90u;
-            var frameType=online?"OnlinePositionTrackingFrame":"PositionTrackingFrame";
+            var entry=battle?0x805338d0u:online?0x80539f64u:0x8052eb90u;
+            var frameType=battle?"BattlePositionTrackingFrame":online?"OnlinePositionTrackingFrame":"PositionTrackingFrame";
             var entries=new uint[] {entry,0x80020a20,0x80020a6c,0x80020494,0x8002058c,0x80517f00,0x80517ec0};
             var sources=new List<string>();
+            if(battle){File.WriteAllText(Path.Combine(temp,"layout.h"),plan.EmitNativeConstants());
+                sources.Add(Path.Combine(root,"runtime/src/layout_access_audit.cpp"));}
             foreach(var pc in entries)
             {
                 var file=Path.Combine(temp,$"{pc:X8}.cpp");File.WriteAllText(file,translator.Translate(pc,options).CxxCode);sources.Add(file);
@@ -55,9 +75,17 @@ public class PositionTrackingTests
             var declarations=string.Join("\n",entries.Select(pc=>$"extern \"C\" void func_{pc:X8}(CpuContext*);"));
             var registrations=string.Join("\n",entries.Select(pc=>$"register_entry(0x{pc:X8},func_{pc:X8});"));
             var harness=Path.Combine(temp,"harness.cpp");var exe=Path.Combine(temp,"test");
+            var auditChecks=battle?$$"""
+                const auto audit=LayoutAccessAudit::ReportJson();
+                if(audit.find("\"hits\":[]")==std::string::npos ||
+                   audit.find("\"activeInstances\":0")==std::string::npos ||
+                   audit.find("\"instancesRegistered\":{{(players==128?64:4)}},")==std::string::npos){
+                    std::fprintf(stderr,"%s\n",audit.c_str());return 11;}
+                """:"";
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                {{(battle?"#include \"layout.h\"":"")}}
                 #include <array>
                 #include <cstdlib>
                 #include <cstring>
@@ -75,6 +103,7 @@ public class PositionTrackingTests
                     const auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
                     {{registrations}}
+                    {{(battle?"RegisterGeneratedLayoutAccessAuditMap();LayoutAccessAudit::Configure({LayoutAccessAudit::Mode::Strict});":"")}}
                     Memory::Write32(0x809b8f68,root);Memory::Write8(root+0x24,n);
                     Memory::Write32(0x809b8f70,info);Memory::Write32(gm+4,info);
                     Memory::Write32(info+0xc,array);Memory::Write32(info+0x18,ids);
@@ -82,15 +111,19 @@ public class PositionTrackingTests
                     for(uint32_t i=0;i<16;i++){Memory::Write8(sp-frame-0x100+i,0x55);Memory::Write8(sp+8+i,0x55);
                         Memory::Write8(ids-16+i,0x55);Memory::Write8(ids+n+i,0x55);}
                     CpuContext ctx{};ctx.gpr[1]=sp;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
+                    for(uint32_t rotation=0;rotation<{{(battle&&players==128?16:1)}};rotation++)
                     for(uint32_t mode=0;mode<4;mode++){
                         std::array<uint32_t,n> expected{};std::array<double,n> keys{};
                         for(uint32_t i=0;i<n;i++){
                             const uint32_t p=nodes+i*0x100,t=timers+i*16;
                             const bool finished=mode==1 || (mode==2 && i%2==0);
                             const float completion=mode==3 ? float(i%3) : float(i);
-                            expected[i]=i;keys[i]=finished ? 1000000.0-i : completion;
-                            Memory::Write32(array+i*4,p);Memory::Write8(p+0x20,i+1);
+                            expected[(i+rotation)%n]=i;keys[i]=finished ? 1000000.0-i : completion;
+                            const uint16_t score=mode==1?n-i:mode==2?i/2:mode==3?i%3:i;
+                            if({{(battle?"true":"false")}})keys[i]=score;
+                            Memory::Write32(array+i*4,p);Memory::Write8(p+0x20,(i+rotation)%n+1);
                             uint32_t bits;std::memcpy(&bits,&completion,4);Memory::Write32(p+0xc,bits);
+                            Memory::Write16(p+0x22,score);
                             Memory::Write32(p+0x38,finished?2:0);Memory::Write32(p+0x40,t);
                             Memory::Write16(t+4,0);Memory::Write8(t+6,0);Memory::Write16(t+8,i);
                         }
@@ -105,11 +138,12 @@ public class PositionTrackingTests
                         for(uint32_t i=0;i<16;i++)if(Memory::Read8(sp-frame-0x100+i)!=0x55 || Memory::Read8(sp+8+i)!=0x55 ||
                             Memory::Read8(ids-16+i)!=0x55 || Memory::Read8(ids+n+i)!=0x55)return 10;
                     }
+                    {{auditChecks}}
                     return 0;
                 }
                 """);
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",
-                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)){RedirectStandardError=true})!)
+                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+(battle?" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1":"")){RedirectStandardError=true})!)
             {
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(45000);
                 if(!done)compile.Kill(entireProcessTree:true);Assert.True(done,"Position tracking compilation timed out");

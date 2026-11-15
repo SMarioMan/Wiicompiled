@@ -19,6 +19,10 @@ mask widths separate.
 - [x] Relocate both ArchiveMgr racer arrays and retained state; all required storage
   capacities and 188 reviewed field operands pass. Mixed-resource loading and
   external/indirect consumer gameplay qualification remain open.
+- [x] Migrate battle ranking scratch arrays and all nine signed position consumers
+  in `GMDataBattle::HandlePositionTracking`; original-function fixtures pass every
+  required capacity with strict stack auditing. Live battle qualification remains
+  open.
 - [x] Verify existing Coin Runners frame lowering at 116/118/127/128; active-racer
   gameplay coverage remains separate from the tested stack/storage paths.
 - [x] Add ownership-safe light sharing on expanded-race pool exhaustion; original

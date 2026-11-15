@@ -1992,3 +1992,34 @@ ranges. Actual sorting tests retain prior online/offline cases and add offline
 25/26/52/64/116/118/127/128 boundaries. All eighteen native cases and all 977
 translator unit tests pass. Rendered results must be rerun with the
 rebuilt translation before claiming 128 distinct participants in the live UI.
+
+
+### Battle position-tracking frame discovered during live Coin Runners
+
+USA `GMDataBattle::HandlePositionTracking` (`805338D0`) was absent from the
+layout migration. It puts twelve byte participant IDs at stack `+0x08` and twelve
+float scores at `+0x18` in a `0x90` frame. Dynamic player-count loops already
+walked all 128 participants, writing through conversion scratch, saved registers
+and caller storage. The first battle update in the rebuilt Block Plaza probe
+showed ascending participant bytes in the saved return-address area. This is
+independent of the previously tested large `BattleCoinUpdateFrame` at `80871710`.
+
+`BattlePositionTrackingFrame` expands the two arrays, moves the floating-point
+conversion scratch and retains the original save-helper convention. Its eight-byte
+alignment preserves the guest stack ABI; the saved-register region ends exactly
+at the frame boundary. At 128 the frame is `0x2D8`, scores start at `0x8C`,
+conversion scratch at `0x290`, and saved GPRs at `0x2A4`. All 38 stack operands,
+including allocation/restoration, helper end pointers and both unrolled/scalar
+array starts, pin their original words. Nine checked `rank8` rules cover every
+one-based byte position conversion in this routine. Stock twelve-capacity
+addresses and original stable insertion sorting remain intact.
+
+The new prologue rule also generates an automatic stack-lifetime audit binding.
+A pre-fix original-function native test fails at 128; the fixed initial test
+passes with strict auditing and no hits. All thirteen required capacities pass;
+the 128 test verifies 64 registered/retired lifetimes across rotated prior ranks.
+Four retained VS cases and all 977 unit tests also pass. Boundary fixtures execute the complete
+unmodified guest routine and check scores/ties, rank-to-participant and inverse
+positions, registers, stack and array guards. Rotated prior rankings at 128
+exercise every conversion lane, including the unrolled body. Live battle
+completion and the remaining resource-budget lead still require qualification.

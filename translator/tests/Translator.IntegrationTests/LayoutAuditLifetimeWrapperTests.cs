@@ -18,6 +18,8 @@ public class LayoutAuditLifetimeWrapperTests
     [InlineData(true, "DriverManager", 0x80783a50u, 0x80783e18u)]
     [InlineData(false, "BattleBalloonManager", 0x80865454u, 0x80865568u)]
     [InlineData(true, "BattleBalloonManager", 0x80865454u, 0x80865568u)]
+    [InlineData(false, "InputManager", 0x8051ee7cu, 0x8051ed68u)]
+    [InlineData(true, "InputManager", 0x8051ee7cu, 0x8051ed68u)]
     public void WrappersWatchConstructionAndRetireBeforeReleaseIncludingFailures(bool instrumented, string type, uint constructor, uint destructor)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);

@@ -148,3 +148,19 @@ extern "C" void BattleBalloonManager_AuditDestroy(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x80869998,BattleBalloonManager_AuditDestroy,
                            "BattleBalloonManager_AuditDestroy");
+
+// Verified NTSC-U Input::Manager constructor/destructor: 8051EE7C / 8051ED68.
+// This process-lifetime object owns the expanded virtual controller holders and
+// shifted hardware/dummy-controller fields used by native input consumers too.
+extern "C" void InputManager_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(805232F0)(guest); },
+                      "InputManager", "Input::Manager constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x805232F0,InputManager_AuditConstruct,
+                           "InputManager_AuditConstruct");
+
+extern "C" void InputManager_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(805231DC)(guest); });
+}
+REGISTER_NATIVE_WRAPPER_AS(0x805231DC,InputManager_AuditDestroy,
+                           "InputManager_AuditDestroy");

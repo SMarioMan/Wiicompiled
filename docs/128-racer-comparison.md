@@ -554,3 +554,19 @@ reader opens only its owned backing files read-only and validates their sizes,
 game identity and active count. It observes stage two at frame 278, so this
 qualifies resource initialization and roster diversity, not completed GP scoring,
 teardown, later peaks or rendered effects.
+
+## Input manager constructor/destructor watches and boundary construction
+
+USA `Input::Manager` construction/destruction (`8051EE7C`/`8051ED68`) now enrolls
+and retires its metadata-derived allocation through the existing diagnostic
+wrappers. The region table maps their PAL identities `805232F0`/`805231DC` to
+those verified USA entries. The original input object and native/guest controller
+behavior remain owned by their existing implementation.
+
+The original virtual-holder construction region and actual nested controller
+constructors pass strict instance watching at all thirteen required capacities.
+They verify each self-contained holder/controller link, following untouched
+storage, stack/GPR preservation and guards; the test does not claim full manager
+initialization, hardware device I/O or 128-console connectivity. Both new wrapper
+configurations and all eight native import/index checks pass. Live coverage of
+this new persistent InputManager watch remains to be rebuilt and exercised.

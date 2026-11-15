@@ -10,7 +10,7 @@ mask widths separate.
 
 - [x] Implement the auditor foundation: metadata-driven scalar read/write watches,
   object generations, overlap classification, log/strict JSON and controlled stale
-  translated accesses. Stack lifetimes include canceled fibers; ArchiveMgr, AIManager, ItemManager, DriverManager and the balloon manager have
+  translated accesses. Stack lifetimes include canceled fibers; ArchiveMgr, AIManager, ItemManager, DriverManager, InputManager and the balloon manager have
   automatic constructor/destructor/release watches.
 - [ ] Integrate remaining object/heap lifetimes and bulk paths and continue the
   instrumented gameplay discovery loop. The 128-capacity executable completes

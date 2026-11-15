@@ -17,6 +17,8 @@ public class InputStorageLayoutTests
     [InlineData(24)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(25)] [InlineData(26)] [InlineData(52)] [InlineData(64)]
+    [InlineData(116)] [InlineData(118)] [InlineData(127)] [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void OriginalInputManagerRegionConstructsEveryRealVirtualControllerHolder(int players)
     {
@@ -29,7 +31,8 @@ public class InputStorageLayoutTests
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
         var options=new TranslationOptions(EnableLeafInlining:false,KnownFunctionEntryPoints:map.Addresses.ToHashSet());
-        var translator=new FunctionTranslator(image,layoutRelocations:GuestLayoutRelocations.Read(manifest,players));
+        var plan=GuestLayoutRelocations.Read(manifest,players);
+        var translator=new FunctionTranslator(image,layoutRelocations:plan);
         var original=translator.Discover(0x8051ee7c,options);var blocks=new List<IrBasicBlock>();
         // Actual virtual-array construction after the physical real-holder array,
         // stopping before the following dummy controller is constructed.
@@ -54,7 +57,8 @@ public class InputStorageLayoutTests
         try
         {
             var binary=Path.Combine(temp,"image.bin");File.WriteAllBytes(binary,image.Memory);
-            var sources=new List<string>();
+            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp")};
+            File.WriteAllText(Path.Combine(temp,"layout.h"),plan.EmitNativeConstants());
             var entries=new uint[] {0x80020494,0x8051f02c,0x8051caf0,0x8051a734,0x8051a3e8,0x8051d0e0,0x8051af08,0x80006038,0x80005f84,0x8051cc9c};
             foreach(var pc in entries)
             {
@@ -67,6 +71,7 @@ public class InputStorageLayoutTests
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include "layout.h"
                 #include <cstdio>
                 #include <cstring>
                 {{declarations}}
@@ -89,6 +94,8 @@ public class InputStorageLayoutTests
                         Memory::Write8(sp-0x100+i,0x55);Memory::Write8(sp+8+i,0x55);}
                     CpuContext ctx{};ctx.gpr[1]=sp;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;ctx.gpr[29]=data;
+                    RegisterGeneratedLayoutAccessAuditMap();LayoutAccessAudit::Configure({LayoutAccessAudit::Mode::Strict});
+                    auto generation=LayoutAccessAudit::RegisterInstance("InputManager",data,size,"original virtual-holder construction");
                     CpuContextScope scope(&ctx);input_construct_region(&ctx);
                     for(uint32_t i=0;i<{{players}};i++) {
                         const uint32_t holder=data+begin+i*0x180,controller=holder+0xd8;
@@ -102,11 +109,14 @@ public class InputStorageLayoutTests
                     for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=(r==29?data:0x12340000+r))return 9;
                     for(uint32_t i=0;i<16;i++)if(Memory::Read8(data-16+i)!=0x55 || Memory::Read8(data+size+i)!=0x55 ||
                         Memory::Read8(sp-0x100+i)!=0x55 || Memory::Read8(sp+8+i)!=0x55)return 10;
+                    LayoutAccessAudit::RetireInstance(generation);
+                    const auto report=LayoutAccessAudit::ReportJson();
+                    if(report.find("\"hits\":[]")==std::string::npos||report.find("\"activeInstances\":0")==std::string::npos){std::fprintf(stderr,"%s",report.c_str());return 11;}
                     return 0;
                 }
                 """);
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",
-                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)){RedirectStandardError=true})!)
+                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1"){RedirectStandardError=true})!)
             {
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(45000);
                 if(!done)compile.Kill(entireProcessTree:true);Assert.True(done,"Input storage compilation timed out");

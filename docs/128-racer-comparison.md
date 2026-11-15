@@ -112,3 +112,18 @@ alone is not a course completion. Snapshots are sequential,
 not atomic; sampling can miss short rescues, and stationary intervals after an
 individual racer finishes are possible. Battle modes have no lap requirement.
 Retain the separate forced-fall probe for proving rescue and resumed movement.
+
+## Live balloon counter boundary, 2026-11-15
+
+[The 26-active-racer record](validation/128-capacity-balloon-observed-26.json)
+covers a full 180-second Block Plaza Balloon Battle timer in the 128-capacity
+executable at normal clock timing. All 26 slots have distinct physics storage
+and substantial sampled movement. The observer samples 74 respawning states;
+these are observations, not a count of distinct rescue events. The native game
+reaches stage four at frame 11031 with all 26 finish flags. The exercised
+ArchiveMgr/stack watches report no hits across 31.2 billion observed accesses.
+
+This crosses the original ten-per-player byte-count boundary with actual game
+resources, complementing the widened-count fixtures. It does not establish
+balloon visibility, score/ownership correctness, all heap lifetimes, teardown,
+or a 128-active battle.

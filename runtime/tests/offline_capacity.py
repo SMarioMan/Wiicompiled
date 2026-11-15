@@ -47,13 +47,14 @@ def run(args):
         command.append(f"--race={args.course}")
     else:
         command.append("--race")
+    command.append(f"--race-roster={args.roster}")
     battle = args.mode in {"balloon", "coin"}
     expected_mode = 3 if battle else 0 if args.mode == "grand-prix" else 1
     if not battle:
         command.append(f"--race-laps={args.laps}")
     report = dict(result="incomplete", source=args.source,
                   binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),
-                  players=args.players, capacity=args.capacity, mode=args.mode,
+                  players=args.players, capacity=args.capacity, mode=args.mode, roster=args.roster,
                   course=args.course, laps=None if battle else args.laps,
                   clock_divisor=1, command=command, snapshots=[], slots=[],
                   limitations=__doc__)
@@ -170,6 +171,7 @@ if __name__ == "__main__":
     parser.add_argument("--capacity", type=int, required=True)
     parser.add_argument("--course", type=lambda s: int(s, 0))
     parser.add_argument("--mode", choices=("vs", "team-vs", "grand-prix", "balloon", "coin"), default="vs")
+    parser.add_argument("--roster", choices=("standard", "diverse"), default="standard")
     parser.add_argument("--laps", type=int, choices=range(1, 10), default=1)
     parser.add_argument("--sample-frames", type=int, default=120)
     parser.add_argument("--timeout", type=float, default=900)

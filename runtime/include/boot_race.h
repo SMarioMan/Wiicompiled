@@ -8,6 +8,7 @@
 // `--race-mode=vs|team-vs|grand-prix|balloon|coin|time-trial`: select the mode.
 // `--race-cpu`: the same, with the local racer driven by the CPU.
 // `--race-cpu-menu-input`: retain a real controller for menu confirmation.
+// `--race-roster=diverse`: cycle all 24 non-Mii characters and 36 legal vehicles.
 // `--race-players=N` and `--race-laps=N`: select the field and race length.
 namespace BootRace {
 // False when `arg` is not a boot-race option; throws on a malformed one.

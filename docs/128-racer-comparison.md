@@ -474,3 +474,19 @@ strict-before-mutation, stack retirement and reuse checks remain intact. A priva
 optimized native benchmark of twenty million unwatched reads measured 0.347477
 seconds before and 0.150225 seconds after this change. These are synthetic counter
 path timings, not a gameplay-speed or completion qualification.
+
+## Reproducible diverse-roster boot probe
+
+`--race-roster=diverse` makes direct race boot cycle all 24 non-Mii characters
+and all 36 vehicles, pairing each with its correct weight class. The default
+`standard` roster retains the original twelve-character/standard-kart probe.
+The groups match USA `GetCharacterWeightClass` (`80809F90`) and
+`GetKartWeightClass` (`80809DC4`) and their original tables. This diagnostic
+selection does not replace normal guest CPU character or vehicle selection.
+
+The read-only offline observer accepts `--roster` and records it in the command
+and result. All eight native boot layout cases pass, including 128-capacity
+full/partial fields, both roster choices across VS/team VS/GP/both battles/time
+trial, weight compatibility, unique coverage, parser rejection/reset, license
+fallbacks, CPU driving and scenario guards. Python compilation/help checks pass.
+Live mixed-roster resource loading, heap peaks and teardown remain unqualified.

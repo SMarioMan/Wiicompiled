@@ -60,6 +60,21 @@ constexpr std::array<Racer, 12> kRacers{{
     {0x16, 0x02}, // Funky Kong
 }};
 
+// Vanilla character groups from GetCharacterWeightClass (USA 80809F90),
+// excluding Miis. GetKartWeightClass (80809DC4) groups vehicle IDs by ID % 3.
+constexpr std::array<std::array<uint32_t,8>,3> kCharactersByWeight{{
+    {{1,4,5,6,8,12,13,14}},
+    {{0,7,16,15,10,17,18,20}},
+    {{2,3,9,11,19,21,22,23}},
+}};
+bool g_diverseRoster = false;
+Racer RacerForSlot(uint32_t slot) {
+    if (!g_diverseRoster) return kRacers[slot % kRacers.size()];
+    const auto weight = slot % kCharactersByWeight.size();
+    const auto ordinal = slot / kCharactersByWeight.size();
+    return {kCharactersByWeight[weight][ordinal % 8], uint32_t(3 * (ordinal % 12) + weight)};
+}
+
 enum class Mode { Vs, TeamVs, GrandPrix, Balloon, Coin, TimeTrial };
 Mode g_mode = Mode::Vs;
 bool g_explicitCourse = false;
@@ -162,8 +177,9 @@ void SetUpMenuScenario(uint32_t course) {
     const uint32_t scenario = racedata + kLayout.racedataMenu;
     for (uint32_t i = 0; i < kLayout.playerCapacity; ++i) {
         const uint32_t player = scenario + kLayout.scenarioPlayers + i * kLayout.playerStride;
-        Memory::Write32(player + kPlayerKartOffset, kRacers[i % kRacers.size()].kart);
-        Memory::Write32(player + kPlayerCharacterOffset, kRacers[i % kRacers.size()].character);
+        const auto racer = RacerForSlot(i);
+        Memory::Write32(player + kPlayerKartOffset, racer.kart);
+        Memory::Write32(player + kPlayerCharacterOffset, racer.character);
         Memory::Write32(player + kPlayerTypeOffset, i >= active
             ? kPlayerNone : i == 0 ? kPlayerRealLocal : kPlayerCpu);
         Memory::Write32(player + 0xCC, Teams() ? i % 2 : 2);
@@ -187,6 +203,14 @@ void SetUpMenuScenario(uint32_t course) {
 namespace BootRace {
 
 bool ParseArgument(std::string_view arg) {
+    if (arg.starts_with("--race-roster=")) {
+        const auto value = arg.substr(14);
+        if (value == "standard") g_diverseRoster = false;
+        else if (value == "diverse") g_diverseRoster = true;
+        else throw std::invalid_argument("--race-roster expects standard or diverse");
+        if (!g_course) g_course = DefaultCourse();
+        return true;
+    }
     if (arg.starts_with("--race-mode=")) {
         const auto value = arg.substr(12);
         if (value == "vs") g_mode = Mode::Vs;

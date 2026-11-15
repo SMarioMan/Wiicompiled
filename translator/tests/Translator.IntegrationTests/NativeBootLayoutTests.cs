@@ -13,6 +13,8 @@ public class NativeBootLayoutTests
     [InlineData(24, true, 13)]
     [InlineData(48, true, 48)]
     [InlineData(48, true, 24)]
+    [InlineData(128, true, 128)]
+    [InlineData(128, true, 24)]
     public void RealNativeBootUsesTheTranslatedGuestLayout(int players, bool explicitLayout, int activePlayers)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
@@ -37,6 +39,7 @@ public class NativeBootLayoutTests
                 #include "boot_race.h"
                 #include "mkw_guest_layout.h"
                 #include <cstring>
+                #include <set>
                 extern "C" void ArgumentParser_Parse_805b9344(CpuContext*);
                 extern "C" void RacedataScenario_InitRng_8052f924(CpuContext*);
                 extern "C" void Raceinfo_Update_805331b4(CpuContext*);
@@ -119,10 +122,13 @@ public class NativeBootLayoutTests
                     const uint32_t active=tt?1:{{activePlayers}},modeId=battle?3:tt?2:mode=="grand-prix"?0:1;
                     const uint32_t section=battle?0x28:tt?0x1f:mode=="team-vs"?0x24:mode=="grand-prix"?0x1e:0x20;
                     customLap=!battle;
+                    const bool diverse=argc>3 && !std::strcmp(argv[3],"diverse");
+                    if(!BootRace::ParseArgument("--race-roster=diverse")||!BootRace::ParseArgument("--race-roster=standard"))return 39;
+                    if(diverse)BootRace::ParseArgument("--race-roster=diverse");
                     if(!BootRace::ParseArgument("--race-mode="+mode))return 24;
                     if (!BootRace::ParseArgument("--race-cpu")) return 2;
                     if(!BootRace::ParseArgument("--race-players="+std::to_string(active)) || (customLap && !BootRace::ParseArgument("--race-laps=1")))return 18;
-                    for(const char* bad:{"--race-players=0","--race-players={{players+1}}","--race-laps=0","--race-laps=10","--race-laps=1x","--race-mode=unknown"}){
+                    for(const char* bad:{"--race-players=0","--race-players={{players+1}}","--race-laps=0","--race-laps=10","--race-laps=1x","--race-mode=unknown","--race-roster=","--race-roster=unknown"}){
                         bool rejected=false;try{BootRace::ParseArgument(bad);}catch(const std::invalid_argument&){rejected=true;}
                         if(!rejected)return 19;
                     }
@@ -147,11 +153,21 @@ public class NativeBootLayoutTests
                     if(bootCalls!=1)return 23;
                     if(ctx.gpr[3]!=section) return 3;
                     const uint32_t menu=data+l.racedataMenu, settings=menu+l.scenarioSettings;
+                    std::set<uint32_t> characters,vehicles;
+                    // Original non-Mii memberships of GetCharacterWeightClass.
+                    constexpr uint32_t characterWeights[]={1,0,2,2,0,0,0,1,0,2,1,2,0,0,0,1,1,1,1,2,1,2,2,2};
                     for(uint32_t i=0;i<l.playerCapacity;i++) {
                         const uint32_t p=menu+l.scenarioPlayers+i*l.playerStride;
-                        if(Memory::Read32(p+0x10)!=(i>=active?5:i==0?0:1) || Memory::Read32(p+8)>2 ||
-                           Memory::Read32(p+0xc)>0x16 || Memory::Read8(p)!=0x7e || Memory::Read32(p+0xcc)!=(teams?i%2:2)) return 4;
+                        const auto vehicle=Memory::Read32(p+8),character=Memory::Read32(p+0xc);
+                        if(diverse){
+                            if(vehicle>=36||character>=24||vehicle%3!=characterWeights[character])return 40;
+                            if(i<active){characters.insert(character);vehicles.insert(vehicle);}
+                        }
+                        if(Memory::Read32(p+0x10)!=(i>=active?5:i==0?0:1) || Memory::Read32(p+8)>(diverse?35u:2u) ||
+                           Memory::Read32(p+0xc)>(diverse?23u:22u) || Memory::Read8(p)!=0x7e || Memory::Read32(p+0xcc)!=(teams?i%2:2)) return 4;
                     }
+                    if(diverse && (characters.size()!=std::min(active,24u)||vehicles.size()!=std::min(active,36u)))return 41;
+                    if(!diverse && (Memory::Read32(menu+l.scenarioPlayers+8)!=1||Memory::Read32(menu+l.scenarioPlayers+0xc)!=0))return 42;
                     if(Memory::Read32(settings)!=(battle?0x20:8) || Memory::Read32(settings+8)!=modeId ||
                        Memory::Read32(settings+0x10)!=(mode=="coin"?1:0) || Memory::Read32(settings+0x28)!=(teams?2:0) ||
                        Memory::Read32(settings+0x14)!=2 || Memory::Read32(settings+0x18)!=0 || Memory::Read8(settings+0x25)!=(customLap?1:3)) return 5;
@@ -229,10 +245,11 @@ public class NativeBootLayoutTests
                 Assert.True(fallbackFinished,$"{variant} boot timed out");
                 Assert.True(fallback.ExitCode==0,fallbackOutput.GetAwaiter().GetResult());
             }
+            foreach(var roster in new[]{"standard","diverse"})
             foreach(var mode in new[]{"vs","team-vs","grand-prix","balloon","coin","time-trial"})
             {
                 var start=new ProcessStartInfo(exe){RedirectStandardError=true,UseShellExecute=false};
-                start.ArgumentList.Add("present-license");start.ArgumentList.Add(mode);
+                start.ArgumentList.Add("present-license");start.ArgumentList.Add(mode);start.ArgumentList.Add(roster);
                 using var modeRun=Process.Start(start)!;var modeOutput=modeRun.StandardError.ReadToEndAsync();
                 var modeFinished=modeRun.WaitForExit(5000);if(!modeFinished)modeRun.Kill(entireProcessTree:true);
                 Assert.True(modeFinished,$"{mode} setup timed out");

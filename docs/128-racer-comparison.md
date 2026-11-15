@@ -570,3 +570,35 @@ storage, stack/GPR preservation and guards; the test does not claim full manager
 initialization, hardware device I/O or 128-console connectivity. Both new wrapper
 configurations and all eight native import/index checks pass. Live coverage of
 this new persistent InputManager watch remains to be rebuilt and exercised.
+
+## Full-duration 128-active battles and mixed GP scene transition
+
+The clean `4a74439` strict-audit probes complete [Balloon Battle](validation/128-capacity-balloon-observed-128.json)
+and [Coin Runners](validation/128-capacity-coin-observed-128.json) on Block Plaza.
+Both independently read the authored 180,000 ms initial/limit fields and zero
+remaining countdown at completion. Native finish flags cover all 128 racers at
+frames 11,031/11,032. Every slot moves; minimum sampled distances exceed 366,000
+units. Balloon Battle has 274 respawn samples and at most 120 stationary frames;
+Coin Runners has 61 respawn samples and no sampled stationary interval. Samples
+are not distinct events and these observations do not qualify every course.
+
+The reports contain zero retired-layout hits and zero unscoped stack entries over
+99.8/80.4 billion observed accesses. This exercises actual 128-active Coin Runners
+with its large relocated stack frame and the balloon resource/sound paths that
+previously failed. Neither probe writes guest RAM, forces finish flags, scales
+clocks or pauses execution. Their long wall times reflect diagnostic execution;
+rendered effects/results and battle scene teardown remain separate checks.
+
+The [mixed GP round trip](validation/128-capacity-gp-diverse-round-trip.json)
+finishes the first race, advances through original results/menus and scene exit,
+then initializes the next GP course with all 128 racers advancing through frame
+359. Strict auditing reports no hits or stack-coverage gaps across 19,448 instance
+generations. This tests the original ownership/lifetime flow under the diverse
+roster. It does not establish exact live GP scores, final four-race cup awards,
+rendered GP results or portable release behavior.
+
+`boot_round_trip.py` now optionally accepts roster/audit settings and exports
+structured evidence with binary identity, both race phases and scene exits.
+Default command behavior is retained when those options are omitted. Python
+compilation/help checks pass and the new strict/diverse path passes this actual
+128-racer transition.

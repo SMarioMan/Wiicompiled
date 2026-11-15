@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Drive a portable race/battle through finish, menus and a second simulation."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -30,11 +31,23 @@ def run(args):
     expected_mode = 3 if battle else {"grand-prix": 0, "time-trial": 2}.get(args.mode, 1)
     command = [str(executable), "--headless", "--race-cpu-menu-input",
                f"--race-players={args.players}", f"--race-mode={args.mode}"]
+    if args.roster:
+        command.append(f"--race-roster={args.roster}")
+    if args.audit:
+        command.extend((f"--layout-audit={args.audit}",
+                        f"--layout-audit-report={args.audit_report.resolve()}"))
     if not battle:
         command.append(f"--race-laps={args.laps}")
     if args.course is not None:
         command.append(f"--race={args.course}")
     args.log.parent.mkdir(parents=True, exist_ok=True)
+    if args.audit:
+        args.audit_report.parent.mkdir(parents=True, exist_ok=True)
+    evidence = dict(result="incomplete", source=args.source,
+        binary_sha256=hashlib.sha256(executable.read_bytes()).hexdigest(),
+        players=args.players, mode=args.mode, roster=args.roster, audit=args.audit,
+        command=command, scene_exits=0,
+        limitations="Native finish flags and second-race advancement do not prove every CPU crossed the line, correct scoring, or rendered results.")
     with tempfile.TemporaryDirectory(prefix="race-round-trip-", dir=product / "UserData") as directory:
         pad = Path(directory) / "pad.bin"
         write_pad(pad)
@@ -57,6 +70,8 @@ def run(args):
                         else:
                             lines = []
                         for line in lines:
+                            if re.search(r"--- .* Scene Exit ---", line):
+                                evidence["scene_exits"] += 1
                             if any(marker in line for marker in (
                                 "FATAL", "scheduler could not switch away", "WARNING unmapped guest touch")):
                                 raise RuntimeError(f"Guest fault: {line.strip()}")
@@ -73,12 +88,17 @@ def run(args):
                             if progress["stage"] == 4 and progress["finished"] == args.players:
                                 if not battle and progress["min_lap"] < args.laps:
                                     raise RuntimeError("Race ended before every racer reached the final lap")
+                                if not finished:
+                                    evidence["first_completion"] = progress
                                 finished = True
                             elif finished and progress["stage"] == 0:
+                                if not restarted:
+                                    evidence["second_initialization"] = progress
                                 restarted = True
                             elif restarted and progress["stage"] == 2 and progress["frames"] >= 300:
-                                print(json.dumps(dict(result="passed", players=args.players, laps=None if battle else args.laps, mode=args.mode,
-                                    check="finish, menus, second race advancing", progress=progress)), flush=True)
+                                evidence.update(result="passed", laps=None if battle else args.laps,
+                                    check="finish, menus, second race advancing", progress=progress)
+                                print(json.dumps(evidence), flush=True)
                                 return 0
                         if process.poll() is not None:
                             raise RuntimeError(f"Game exited with {process.returncode}; inspect {args.log}")
@@ -88,7 +108,14 @@ def run(args):
                             previous_buttons = buttons
                         time.sleep(.1)
                 raise TimeoutError(f"Race round trip did not complete; inspect {args.log}")
+            except Exception as error:
+                evidence["error"] = str(error)
+                raise
             finally:
+                evidence["elapsed_seconds"] = time.monotonic() - started
+                if args.report:
+                    args.report.parent.mkdir(parents=True, exist_ok=True)
+                    args.report.write_text(json.dumps(evidence, indent=2) + "\n")
                 write_pad(pad)
                 process.terminate()
                 try:
@@ -104,10 +131,20 @@ if __name__ == "__main__":
     parser.add_argument("--players", type=int, required=True, choices=range(1, 256), metavar="N")
     parser.add_argument("--mode", choices=("vs", "team-vs", "grand-prix", "balloon", "coin", "time-trial"), default="vs")
     parser.add_argument("--course", type=lambda value: int(value, 0), choices=range(0x2a), metavar="ID")
+    parser.add_argument("--roster", choices=("standard", "diverse"))
+    parser.add_argument("--source", help="Revision used to build the supplied executable")
+    parser.add_argument("--audit", choices=("log", "strict"))
+    parser.add_argument("--audit-report", type=Path)
+    parser.add_argument("--report", type=Path)
     parser.add_argument("--laps", type=int, default=1, choices=range(1, 10))
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--timeout", type=float, default=300)
     try:
-        raise SystemExit(run(parser.parse_args()))
+        args = parser.parse_args()
+        if args.audit and args.audit_report is None:
+            args.audit_report = args.log.with_suffix(".audit.json")
+        if args.audit_report and not args.audit:
+            parser.error("--audit-report requires --audit")
+        raise SystemExit(run(args))
     except (OSError, ValueError, RuntimeError, TimeoutError) as error:
         parser.exit(1, f"{error}\n")

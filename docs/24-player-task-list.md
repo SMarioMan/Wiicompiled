@@ -23,6 +23,10 @@ mask widths separate.
   in `GMDataBattle::HandlePositionTracking`; original-function fixtures pass every
   required capacity with strict stack auditing. Live battle qualification remains
   open.
+- [x] Migrate the independent audio actor-sorting stack tables and their saved
+  state after the 128-active Balloon Battle startup exposed an overflow. All
+  required storage boundaries and a strict original-code control pass; rebuilt
+  live battle qualification remains open.
 - [x] Verify existing Coin Runners frame lowering at 116/118/127/128; active-racer
   gameplay coverage remains separate from the tested stack/storage paths.
 - [x] Add ownership-safe light sharing on expanded-race pool exhaustion; original

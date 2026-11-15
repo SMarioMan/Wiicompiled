@@ -3407,6 +3407,76 @@
           "Type": "Pointer"
         }
       ]
+    },
+    {
+      "Name": "SoundActorDistance",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "SoundObjectActorCapacity",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "course",
+          "Type": "SoundActorDistance",
+          "Count": 180
+        },
+        {
+          "Name": "balloons",
+          "Type": "SoundActorDistance",
+          "Count": 10,
+          "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "SoundActorSortFrame",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "StackHeader"
+        },
+        {
+          "Name": "special",
+          "Type": "SoundActorDistance",
+          "Count": 10
+        },
+        {
+          "Name": "karts",
+          "Type": "SoundActorDistance",
+          "PerPlayer": true
+        },
+        {
+          "Name": "racers",
+          "Type": "SoundActorDistance",
+          "PerPlayer": true
+        },
+        {
+          "Name": "items",
+          "Type": "SoundActorDistance",
+          "Count": 5,
+          "PerPlayer": true
+        },
+        {
+          "Name": "objects",
+          "Type": "SoundObjectActorCapacity"
+        },
+        {
+          "Name": "gprs",
+          "Type": "Pointer",
+          "Count": 10
+        },
+        {
+          "Name": "fpr31",
+          "Type": "FloatSlot"
+        },
+        {
+          "Name": "tailPadding",
+          "Type": "FloatSlot"
+        }
+      ]
     }
   ],
   "References": [
@@ -67429,6 +67499,431 @@
       "Operand": "offset",
       "Symbol": "AIBattleTargetSelector.states.offset",
       "Addend": 12
+    },
+    {
+      "Instruction": "0x8070B0B4",
+      "ExpectedWord": "0x9421F370",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8070B0B4",
+      "ExpectedWord": "0x9421F370",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x8070B0BC",
+      "ExpectedWord": "0x90010C94",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B0C0",
+      "ExpectedWord": "0xDBE10C80",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x8070B0C8",
+      "ExpectedWord": "0x39610C80",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x8070B0E8",
+      "ExpectedWord": "0x38A100C0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8070B0EC",
+      "ExpectedWord": "0x38010118",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070B0FC",
+      "ExpectedWord": "0x900100B8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070B100",
+      "ExpectedWord": "0xD00100BC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.racers.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B108",
+      "ExpectedWord": "0x388100D8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8070B198",
+      "ExpectedWord": "0x38610118",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070B1CC",
+      "ExpectedWord": "0x38A10300",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8070B1D0",
+      "ExpectedWord": "0x38010C58",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.gprs.offset"
+    },
+    {
+      "Instruction": "0x8070B1E0",
+      "ExpectedWord": "0x900102F8",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070B1E4",
+      "ExpectedWord": "0xD00102FC",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.objects.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B1EC",
+      "ExpectedWord": "0x38810C18",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.gprs.offset",
+      "Addend": -64
+    },
+    {
+      "Instruction": "0x8070B27C",
+      "ExpectedWord": "0x38610C58",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.gprs.offset"
+    },
+    {
+      "Instruction": "0x8070B2B0",
+      "ExpectedWord": "0x38A10060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8070B2B4",
+      "ExpectedWord": "0x380100B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070B2C4",
+      "ExpectedWord": "0x90010058",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070B2C8",
+      "ExpectedWord": "0xD001005C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.karts.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B2D0",
+      "ExpectedWord": "0x38810078",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset",
+      "Addend": 32
+    },
+    {
+      "Instruction": "0x8070B360",
+      "ExpectedWord": "0x386100B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070B394",
+      "ExpectedWord": "0x38A10010",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.special.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8070B398",
+      "ExpectedWord": "0x38010058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070B3A8",
+      "ExpectedWord": "0x90010008",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.special.offset"
+    },
+    {
+      "Instruction": "0x8070B3AC",
+      "ExpectedWord": "0xD001000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.special.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B3B4",
+      "ExpectedWord": "0x38810018",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.special.offset",
+      "Addend": 16
+    },
+    {
+      "Instruction": "0x8070B444",
+      "ExpectedWord": "0x38610058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070B478",
+      "ExpectedWord": "0x38A10120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x8070B47C",
+      "ExpectedWord": "0x380102F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070B48C",
+      "ExpectedWord": "0x90010118",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070B490",
+      "ExpectedWord": "0xD001011C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.items.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070B498",
+      "ExpectedWord": "0x388102B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset",
+      "Addend": -64
+    },
+    {
+      "Instruction": "0x8070B528",
+      "ExpectedWord": "0x386102F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070B638",
+      "ExpectedWord": "0x386100B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070B6C0",
+      "ExpectedWord": "0x38610058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070B920",
+      "ExpectedWord": "0x386102F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070B9A8",
+      "ExpectedWord": "0x38610008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.special.offset"
+    },
+    {
+      "Instruction": "0x8070BA4C",
+      "ExpectedWord": "0x38610118",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070BA88",
+      "ExpectedWord": "0x386102F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070BAA4",
+      "ExpectedWord": "0x386100B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070BAB8",
+      "ExpectedWord": "0x38610058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070BACC",
+      "ExpectedWord": "0x38610008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.special.offset"
+    },
+    {
+      "Instruction": "0x8070BAE0",
+      "ExpectedWord": "0x38610118",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070BB00",
+      "ExpectedWord": "0x3AE102F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.offset"
+    },
+    {
+      "Instruction": "0x8070BB50",
+      "ExpectedWord": "0x3AE100B8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.offset"
+    },
+    {
+      "Instruction": "0x8070BB9C",
+      "ExpectedWord": "0x3AE10058",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.offset"
+    },
+    {
+      "Instruction": "0x8070BBE8",
+      "ExpectedWord": "0x3AE10008",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.special.offset"
+    },
+    {
+      "Instruction": "0x8070BC34",
+      "ExpectedWord": "0x3AE10118",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.offset"
+    },
+    {
+      "Instruction": "0x8070BC94",
+      "ExpectedWord": "0x39610C80",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x8070BC98",
+      "ExpectedWord": "0xCBE10C80",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.fpr31.offset"
+    },
+    {
+      "Instruction": "0x8070BCA0",
+      "ExpectedWord": "0x80010C94",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SoundActorSortFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8070BCA8",
+      "ExpectedWord": "0x38210C90",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.size"
+    },
+    {
+      "Instruction": "0x8070BB44",
+      "ExpectedWord": "0x2C16012C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.objects.size/8"
+    },
+    {
+      "Instruction": "0x8070BB94",
+      "ExpectedWord": "0x2C16000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.racers.count"
+    },
+    {
+      "Instruction": "0x8070BBE0",
+      "ExpectedWord": "0x2C16000C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.karts.count"
+    },
+    {
+      "Instruction": "0x8070BC78",
+      "ExpectedWord": "0x2C16003C",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "SoundActorSortFrame.items.count"
     }
   ],
   "GlobalPointers": {
@@ -75114,6 +75609,11 @@
       "Entry": "0x80726044",
       "Receiver": null,
       "Name": ""
+    },
+    {
+      "Entry": "0x8070B0B4",
+      "Receiver": null,
+      "Name": "Audio::RaceMgr::SortAndToggleActors"
     }
   ],
   "BoundedAccesses": [

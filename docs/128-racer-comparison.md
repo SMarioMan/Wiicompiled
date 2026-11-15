@@ -28,6 +28,7 @@ expanded inline storage, moved trailing fields and checked original consumers.
 | Coin Runners nested update scratch and signed-16-bit displacement threshold. | **Already covered for tested stack lowering.** `BattleCoinUpdateFrame` grows its nested arrays, save areas and complete frame. Real translated native fixtures now pass at 116/118/127/128 as well as 12/13/24/48/100. The fixture's fixed 32 KiB expected-data buffer was replaced with generated frame-sized storage. | Retain the current full-width IR lowering. Extend active-count gameplay coverage independently: these storage fixtures still cap active racers at 24. | Passed actual translated prologue/epilogue, scratch initialization/inverse indexes, saved registers, caller/stack guards at 116/118/127/128. Full 128-active gameplay remains unqualified. |
 | Battle rank scratch: twelve byte IDs and twelve float scores in `GMDataBattle::HandlePositionTracking`. | **Confirmed missing, now migrated.** USA `805338D0` retained a `0x90` stack frame, with IDs at `+8`, scores at `+0x18`, conversion scratch at `+0x48` and saved registers above. The first real 128-active Coin Runners update overwrote saved registers/return addresses after the sound-heap fix let loading finish. | Model `BattlePositionTrackingFrame`; relocate all 38 stack operands and protect all nine one-based position conversions, including the unrolled path. Preserve original sorting and tie order. | A pre-fix native 128 regression fails. Fixed original-function tests pass all thirteen required capacities, with strict stack auditing; 128 rotates prior rankings through every conversion lane over 64 audited lifetimes. Rebuilt live battle qualification remains open. |
 | Race-scene heap budgets and cross-heap ownership. | **Partially covered.** Checked `HeapRoutes` retain separate backing owners; the NDEV reserve shrinks with capacity. Real 24-player scene round trips exist; the original root partitioner passes guarded ownership checks at all thirteen required capacities through 128. This differs intentionally from MKW100's overflow arena. | Preserve routing/reserves. Measure mixed-resource peaks at 128 and verify every allocation/free/resize/reset owner. A live 128-active Coin Runners startup exhausted the MEM2 scene heap; the identified battle sound-heap request now tries the retained MEM1 backing owner using the original child factory, with original-parent retry on failure. Validate this narrow route live before claiming the failure resolved. | Effect/item-heavy races, mixed characters/vehicles, scene exit, second race and owner/heap guard reports. |
+| Audio actor sorting scratch: two 12-entry tables, 60 item entries and 300 object pointer/distance pairs. | **Confirmed missing, migrated and storage-tested.** A 128-active Balloon Battle startup corrupts the caller stack with actor/distance pairs in USA `Audio::RaceMgr::SortAndToggleActors` (`8070B0B4`), downstream of the already expanded ObjectsMgr pools. | Expand the stack layout and every base/end/save/restore/iteration operand while retaining original collection, classification, ordering calls and sound admission limits. | Original translated loops, guarded full object and racer/item fields, strict lifetime watches, all boundary counts, unchanged twelve-capacity emission and rebuilt live Balloon Battle. |
 | ObjectsMgr fixed object-registration pools and interaction vectors. | **Already covered for tested manager paths through 128.** Existing `ObjectPoolCapacity` derives `80 + 10*N` entries rather than retaining the original 200-object budget. | Preserve the checked allocations/counts. Qualify rendered object resources and full battle lifecycle separately. | Original USA manager allocation, vector initialization, complete pool registration and destruction pass all thirteen required capacities, including 1,360 entries at 128. Resource constructors remain callbacks. |
 | AI manager controller arrays, rank/route subobjects and battle team lists. | **Partially covered.** `AIManager`, `AIVsSub`, `AIEnemyRoutes`, `AIRacerObjects` and battle roster layouts already expand these families. Strict-audited original AI manager initialization, both controller lookups and route initialization pass all thirteen required capacities; automatic manager constructor/destructor/release watches now join the ArchiveMgr watches. | Map each vanilla reference site to our corresponding function and check indirect, pointer-walk, reset and destructor paths; do not infer a gap from unchanged index strides alone. | Existing native fixtures extended to boundaries, plus retired-access traces and high-ID AI movement/respawns. |
 | Per-controller battle opponent selector: two six-entry pointer/state arrays and following scalar, `0x40` allocation. | **Confirmed missing, migrated and fixture-verified.** A real 128-active Coin Runners update reached gameplay, then the population loop overwrote neighboring AI selectors with opponent pointers. The parent inlines allocation, construction, reset, population and several lookups; protecting only standalone methods is insufficient. | Expand both arrays to the existing team-roster capacity `ceil(N/2)`, move the tail, inventory inline consumers, and retain full target eligibility for original six-way queries. | Native guarded original-code fixtures, strict stale-read/write controls, odd team sizes, high-ID targets, two lifetimes and a rebuilt full battle. |
@@ -397,3 +398,38 @@ of 200,000 attributed current-field reads across 128 independently paged objects
 measured 0.577209 seconds before and 0.017504 seconds after page indexing. This is
 a synthetic lookup measurement, not a gameplay speed claim; rebuilt live timing
 and completed battle qualification remain open.
+
+## Audio actor sorting stack: live Balloon Battle discovery
+
+The clean `addc9dc` 128-active Balloon Battle probe on Block Plaza failed during
+startup after 20.06 seconds, before its first race snapshot. Its existing watches
+reported zero hits, but did not yet model this stack frame. The reported audio
+virtual-call fault was downstream: the crash snapshot contains object actor
+pointers paired with distance `27078.1875` beyond the 300-entry temporary table,
+through the saved registers and caller frame. Original USA `80709408` calls
+`Audio::RaceMgr::SortAndToggleActors` (`8070B0B4`) immediately before that fault.
+
+The routine has independent stack tables: ten special actors, twelve kart
+actors, twelve racer actors, sixty item actors and three hundred object actors.
+Each record is an eight-byte pointer/distance pair. Expanding ObjectsMgr alone
+does not protect these computed stack writes. `SoundActorSortFrame` expands
+both racer tables to N, items to 5*N and objects to 180+10*N, retaining the original
+300-object allowance at twelve and exceeding ObjectsMgr's 80+10*N total pool.
+At 128 the object scratch holds 1,460 pairs and the frame grows from `0xC90` to
+`0x4A30`. Fifty-four checked stack operands and four iteration bounds cover
+initialization (including unrolled end pointers), collection, sorting arguments,
+toggling, spills and restoration. Original admission limits and classification
+remain unchanged. The original PSQ instructions' signed negative displacement
+is retained; it is not mistaken for a positive `+0xC88` layout field.
+
+All thirteen capacity fixtures and an original-code negative control pass with
+the original collection/distance/toggle loops and strict stack watches. The
+negative control stops the actual stale FPR save at `8070B0C0` before it writes
+the expanded object region. Alternating full object and mixed racer/item fields
+exercise four invocation lifetimes, guards and register restoration. Twelve-player
+C++ output is byte-for-byte unchanged. All 977 unit tests and the complete
+declared-consumer proof/original-output/expanded-compilation test pass. The
+fixture now also executes the original guest heapsort and distance comparator;
+the strengthened 128-active case passes. Its full boundary rerun and rebuilt
+gameplay remain pending. List traversal, positions, item eligibility and toggle endpoints are
+controlled callbacks, so this remains separate from live sound qualification.

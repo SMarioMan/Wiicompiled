@@ -226,3 +226,19 @@ reached the first battle update, exposing the missing battle-ranking stack frame
 above. Neither run qualifies completed 128-active Coin Runners gameplay. Both
 early audit reports contain no hits in their modeled lifetimes; the missing
 ranking frame was absent from that metadata and could not be watched yet.
+
+
+## Clean 128-participant VS results in 16:9
+
+A clean `2851cbc` build with the checked main ranking fix completes the one-lap
+128-active Luigi Circuit VS probe and produces a rank-to-participant permutation
+containing every ID `0..127` exactly once. Every inverse position matches. The
+rendered results show all 128 cards in 16 rows and eight columns, with one local
+highlight and the retained retail fonts/materials/rank glyphs. Final point totals
+are visible after the original score-count animation completes.
+
+[The rendering and read-only ranking record](validation/128-capacity-vs-rendered-128-16x9.json)
+contains the binary hash, every ranking/inverse-position value and explicit pause,
+termination and qualification limits. The earlier duplicate ID zero/missing ID 60
+is absent. Four-to-three, GP/team/battle flows and second-race qualification of
+this rebuilt source remain separate work.

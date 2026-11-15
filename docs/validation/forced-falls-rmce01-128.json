@@ -1,0 +1,3223 @@
+{
+  "result": "passed",
+  "binary_sha256": "c92c8ad94a96963afa90ec3e959018584a3e2b77bda5eae583a4d9e684ae2278",
+  "players": 128,
+  "course": 8,
+  "mode": "vs",
+  "slots": {
+    "0": {
+      "before": [
+        -20739.2421875,
+        908.9734497070312,
+        9426.65625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20661.26953125,
+        486.1443786621094,
+        26616.630859375
+      ],
+      "distance": 2677.082371621836,
+      "after": [
+        -21140.95703125,
+        510.4848937988281,
+        23982.875
+      ],
+      "after_player_frames": 1160
+    },
+    "1": {
+      "before": [
+        -20296.12109375,
+        913.4505004882812,
+        8916.8681640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20529.408203125,
+        486.115234375,
+        26605.73828125
+      ],
+      "distance": 3959.2753274816505,
+      "after": [
+        -21048.630859375,
+        525.2549438476562,
+        22680.65625
+      ],
+      "after_player_frames": 1160
+    },
+    "2": {
+      "before": [
+        -16914.802734375,
+        1127.065673828125,
+        3568.031494140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20376.4375,
+        486.1439208984375,
+        26615.875
+      ],
+      "distance": 2944.604444666278,
+      "after": [
+        -21003.275390625,
+        513.2591552734375,
+        23738.763671875
+      ],
+      "after_player_frames": 1160
+    },
+    "3": {
+      "before": [
+        -19456.431640625,
+        965.8619384765625,
+        8104.2001953125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20289.044921875,
+        486.17095947265625,
+        26627.6015625
+      ],
+      "distance": 3156.950357602663,
+      "after": [
+        -20053.388671875,
+        516.4642333984375,
+        23479.458984375
+      ],
+      "after_player_frames": 1160
+    },
+    "4": {
+      "before": [
+        -18809.974609375,
+        959.1732788085938,
+        8198.392578125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20233.55859375,
+        494.73846435546875,
+        26641.109375
+      ],
+      "distance": 2176.8062417942187,
+      "after": [
+        -18655.072265625,
+        507.3067932128906,
+        25142.154296875
+      ],
+      "after_player_frames": 1160
+    },
+    "5": {
+      "before": [
+        -19487.310546875,
+        926.63671875,
+        9209.318359375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20223.7578125,
+        486.0765380859375,
+        26617.875
+      ],
+      "distance": 3959.092460611579,
+      "after": [
+        -20111.822265625,
+        522.1986694335938,
+        22660.365234375
+      ],
+      "after_player_frames": 1160
+    },
+    "6": {
+      "before": [
+        -20798.830078125,
+        897.22314453125,
+        9712.7529296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20160.921875,
+        486.0181884765625,
+        26596.36328125
+      ],
+      "distance": 2522.1014879280906,
+      "after": [
+        -19239.076171875,
+        504.7868347167969,
+        24248.76953125
+      ],
+      "after_player_frames": 1160
+    },
+    "7": {
+      "before": [
+        -18263.037109375,
+        1003.9859008789062,
+        7229.2529296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20105.1484375,
+        486.0469055175781,
+        26608.384765625
+      ],
+      "distance": 3603.7601631801913,
+      "after": [
+        -20020.40625,
+        518.396484375,
+        23005.62109375
+      ],
+      "after_player_frames": 1160
+    },
+    "8": {
+      "before": [
+        -16809.82421875,
+        1174.963623046875,
+        2345.806884765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19916.033203125,
+        683.3786010742188,
+        26536.048828125
+      ],
+      "distance": 819.1675048911799,
+      "after": [
+        -19785.23828125,
+        499.63470458984375,
+        25727.390625
+      ],
+      "after_player_frames": 1160
+    },
+    "9": {
+      "before": [
+        -19901.654296875,
+        894.0215454101562,
+        9581.705078125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19863.0546875,
+        641.0968627929688,
+        26525.341796875
+      ],
+      "distance": 1731.5561589687902,
+      "after": [
+        -19133.158203125,
+        495.7264099121094,
+        24955.138671875
+      ],
+      "after_player_frames": 1160
+    },
+    "10": {
+      "before": [
+        -19757.66796875,
+        921.3223266601562,
+        8838.087890625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19790.919921875,
+        613.8402709960938,
+        26535.8203125
+      ],
+      "distance": 1347.3956732228758,
+      "after": [
+        -18884.443359375,
+        530.0873413085938,
+        25538.9375
+      ],
+      "after_player_frames": 1160
+    },
+    "11": {
+      "before": [
+        -19243.763671875,
+        902.9231567382812,
+        9669.435546875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19689.349609375,
+        594.3358154296875,
+        26601.216796875
+      ],
+      "distance": 2005.111873849378,
+      "after": [
+        -17934.4609375,
+        668.5496215820312,
+        25631.248046875
+      ],
+      "after_player_frames": 1160
+    },
+    "12": {
+      "before": [
+        -19120.048828125,
+        978.646728515625,
+        7509.36865234375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19606.42578125,
+        486.1439514160156,
+        26617.248046875
+      ],
+      "distance": 3646.0865169797194,
+      "after": [
+        -18966.3671875,
+        521.64306640625,
+        23027.78125
+      ],
+      "after_player_frames": 1160
+    },
+    "13": {
+      "before": [
+        -19763.365234375,
+        881.939697265625,
+        10266.083984375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20679.009765625,
+        486.40155029296875,
+        26717.578125
+      ],
+      "distance": 3618.8530794226685,
+      "after": [
+        -21239.845703125,
+        520.0008544921875,
+        23142.447265625
+      ],
+      "after_player_frames": 1160
+    },
+    "14": {
+      "before": [
+        -19137.603515625,
+        1022.9308471679688,
+        6148.72412109375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20548.783203125,
+        486.38897705078125,
+        26711.517578125
+      ],
+      "distance": 3294.7801323906583,
+      "after": [
+        -19474.74609375,
+        515.3446044921875,
+        23596.7109375
+      ],
+      "after_player_frames": 1160
+    },
+    "15": {
+      "before": [
+        -20522.328125,
+        865.0745239257812,
+        10816.5751953125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20391.779296875,
+        486.3812255859375,
+        26709.626953125
+      ],
+      "distance": 1658.8799220289436,
+      "after": [
+        -19194.46875,
+        497.19976806640625,
+        25561.44140625
+      ],
+      "after_player_frames": 1160
+    },
+    "16": {
+      "before": [
+        -18825.728515625,
+        941.175537109375,
+        9214.6328125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20354.66015625,
+        518.1044921875,
+        26663.791015625
+      ],
+      "distance": 2186.40475073039,
+      "after": [
+        -20875.974609375,
+        504.3155822753906,
+        24540.4453125
+      ],
+      "after_player_frames": 1160
+    },
+    "17": {
+      "before": [
+        -16385.005859375,
+        1120.3394775390625,
+        4727.02392578125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20284.42578125,
+        486.4137268066406,
+        26752.841796875
+      ],
+      "distance": 2472.720805082099,
+      "after": [
+        -19718.6875,
+        503.5591735839844,
+        24345.708984375
+      ],
+      "after_player_frames": 1160
+    },
+    "18": {
+      "before": [
+        -19490.0234375,
+        989.17529296875,
+        7290.1005859375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20196.9296875,
+        486.28912353515625,
+        26705.630859375
+      ],
+      "distance": 3196.3902411977483,
+      "after": [
+        -20551.51171875,
+        512.37548828125,
+        23528.96875
+      ],
+      "after_player_frames": 1160
+    },
+    "19": {
+      "before": [
+        -18545.484375,
+        986.3604125976562,
+        7593.884765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20139.98046875,
+        486.3400573730469,
+        26725.5625
+      ],
+      "distance": 2136.9695340369285,
+      "after": [
+        -18811.470703125,
+        501.720458984375,
+        25051.734375
+      ],
+      "after_player_frames": 1160
+    },
+    "20": {
+      "before": [
+        -18023.19140625,
+        1004.1504516601562,
+        7377.4541015625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20076.837890625,
+        745.1689453125,
+        26665.166015625
+      ],
+      "distance": 1638.3044185241918,
+      "after": [
+        -19244.2265625,
+        492.0481262207031,
+        25254.208984375
+      ],
+      "after_player_frames": 1160
+    },
+    "21": {
+      "before": [
+        -15856.107421875,
+        1158.6314697265625,
+        3130.836181640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20009.54296875,
+        565.1934814453125,
+        26674.6875
+      ],
+      "distance": 1417.4707460980821,
+      "after": [
+        -19037.337890625,
+        528.453369140625,
+        25643.1640625
+      ],
+      "after_player_frames": 1160
+    },
+    "22": {
+      "before": [
+        -19690.205078125,
+        939.0425415039062,
+        8231.3994140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19823.009765625,
+        526.5338745117188,
+        26706.43359375
+      ],
+      "distance": 2198.2659670613116,
+      "after": [
+        -19030.89453125,
+        503.1346740722656,
+        24655.841796875
+      ],
+      "after_player_frames": 1160
+    },
+    "23": {
+      "before": [
+        -18952.96875,
+        732.0374145507812,
+        14821.9091796875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19783.96875,
+        485.75726318359375,
+        26759.00390625
+      ],
+      "distance": 865.2599543539219,
+      "after": [
+        -19317.4609375,
+        618.1932373046875,
+        26030.275390625
+      ],
+      "after_player_frames": 1160
+    },
+    "24": {
+      "before": [
+        -16311.3916015625,
+        1169.9339599609375,
+        3146.66357421875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19598.98046875,
+        486.2479248046875,
+        26657.3515625
+      ],
+      "distance": 3093.9581450169308,
+      "after": [
+        -19208.85546875,
+        515.4639282226562,
+        23588.087890625
+      ],
+      "after_player_frames": 1160
+    },
+    "25": {
+      "before": [
+        -18686.818359375,
+        946.671630859375,
+        8692.2099609375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19512.7265625,
+        486.4654541015625,
+        26743.41015625
+      ],
+      "distance": 2182.5076162871733,
+      "after": [
+        -18539.453125,
+        502.5532531738281,
+        24789.931640625
+      ],
+      "after_player_frames": 1160
+    },
+    "26": {
+      "before": [
+        -18412.041015625,
+        1039.9505615234375,
+        5753.21533203125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20710.056640625,
+        486.8348388671875,
+        26885.927734375
+      ],
+      "distance": 3227.681099525087,
+      "after": [
+        -21327.9765625,
+        513.4676513671875,
+        23717.947265625
+      ],
+      "after_player_frames": 1160
+    },
+    "27": {
+      "before": [
+        -17184.11328125,
+        1234.608642578125,
+        1205.9105224609375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20548.501953125,
+        486.837158203125,
+        26887.982421875
+      ],
+      "distance": 1599.042039157559,
+      "after": [
+        -21317.041015625,
+        496.7583312988281,
+        25485.740234375
+      ],
+      "after_player_frames": 1160
+    },
+    "28": {
+      "before": [
+        -20119.201171875,
+        995.6903686523438,
+        6885.38037109375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20385.541015625,
+        508.7015380859375,
+        26845.580078125
+      ],
+      "distance": 1267.9912926423058,
+      "after": [
+        -20659.681640625,
+        496.70343017578125,
+        25607.578125
+      ],
+      "after_player_frames": 1160
+    },
+    "29": {
+      "before": [
+        -17099.193359375,
+        1097.5732421875,
+        4372.69873046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20372.10546875,
+        486.87994384765625,
+        26938.533203125
+      ],
+      "distance": 2114.3078182894487,
+      "after": [
+        -20304.19140625,
+        498.8287658691406,
+        24825.31640625
+      ],
+      "after_player_frames": 1160
+    },
+    "30": {
+      "before": [
+        -20018.412109375,
+        1017.3515014648438,
+        6965.46240234375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20249.150390625,
+        486.80914306640625,
+        26912.478515625
+      ],
+      "distance": 2835.2583056833537,
+      "after": [
+        -21243.46875,
+        503.99530029296875,
+        24257.291015625
+      ],
+      "after_player_frames": 1160
+    },
+    "31": {
+      "before": [
+        -19623.712890625,
+        731.370361328125,
+        14815.73828125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20211.5390625,
+        486.8453369140625,
+        26926.705078125
+      ],
+      "distance": 2401.640526663925,
+      "after": [
+        -18058.41015625,
+        507.4070739746094,
+        25862.791015625
+      ],
+      "after_player_frames": 1160
+    },
+    "32": {
+      "before": [
+        -20056.015625,
+        765.5646362304688,
+        13639.7060546875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        459.3761291503906,
+        26882.7890625
+      ],
+      "distance": 440.578872841833,
+      "after": [
+        -19916.02734375,
+        509.14508056640625,
+        26489.69921875
+      ],
+      "after_player_frames": 1160
+    },
+    "33": {
+      "before": [
+        -15128.1201171875,
+        1158.8419189453125,
+        3498.79248046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        459.37493896484375,
+        26882.765625
+      ],
+      "distance": 2365.1126698703347,
+      "after": [
+        -18046.60546875,
+        510.2489318847656,
+        25609.919921875
+      ],
+      "after_player_frames": 1160
+    },
+    "34": {
+      "before": [
+        -18681.13671875,
+        1012.6824340820312,
+        6384.47265625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        459.3752136230469,
+        26882.7890625
+      ],
+      "distance": 2117.1109672198895,
+      "after": [
+        -18224.572265625,
+        519.586181640625,
+        25677.35546875
+      ],
+      "after_player_frames": 1160
+    },
+    "35": {
+      "before": [
+        -20185.533203125,
+        965.7803344726562,
+        7644.9423828125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        459.3752136230469,
+        26882.7890625
+      ],
+      "distance": 1951.3449886057783,
+      "after": [
+        -18405.08203125,
+        692.19384765625,
+        25616.78515625
+      ],
+      "after_player_frames": 1160
+    },
+    "36": {
+      "before": [
+        -19220.072265625,
+        929.6868896484375,
+        9303.9013671875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        463.273681640625,
+        26882.71875
+      ],
+      "distance": 2935.9042346632627,
+      "after": [
+        -19049.0625,
+        510.4294128417969,
+        24048.486328125
+      ],
+      "after_player_frames": 1160
+    },
+    "37": {
+      "before": [
+        -20527.60546875,
+        928.4822998046875,
+        8822.59375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        463.27398681640625,
+        26882.744140625
+      ],
+      "distance": 2173.2469263988646,
+      "after": [
+        -18217.513671875,
+        505.74334716796875,
+        25331.92578125
+      ],
+      "after_player_frames": 1160
+    },
+    "38": {
+      "before": [
+        -17241.9921875,
+        1128.1676025390625,
+        3787.829345703125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        463.2734069824219,
+        26882.693359375
+      ],
+      "distance": 3517.2397776409125,
+      "after": [
+        -18574.458984375,
+        515.9722290039062,
+        23538.7890625
+      ],
+      "after_player_frames": 1160
+    },
+    "39": {
+      "before": [
+        -16593.8046875,
+        1192.91455078125,
+        2583.947265625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        463.4100341796875,
+        26949.41015625
+      ],
+      "distance": 2814.190274585101,
+      "after": [
+        -21452.736328125,
+        507.4024963378906,
+        24278.90625
+      ],
+      "after_player_frames": 1160
+    },
+    "40": {
+      "before": [
+        -18018.0859375,
+        1058.671630859375,
+        5244.314453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20490.0,
+        463.4100341796875,
+        26949.41015625
+      ],
+      "distance": 2133.0410678315166,
+      "after": [
+        -20939.3125,
+        500.8102111816406,
+        24864.228515625
+      ],
+      "after_player_frames": 1160
+    },
+    "41": {
+      "before": [
+        -17092.232421875,
+        1097.5694580078125,
+        4169.14697265625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20415.0,
+        461.7010803222656,
+        26949.22265625
+      ],
+      "distance": 2168.4354592944396,
+      "after": [
+        -21828.4296875,
+        502.8927917480469,
+        25304.73828125
+      ],
+      "after_player_frames": 1160
+    },
+    "42": {
+      "before": [
+        -19187.986328125,
+        1003.6004028320312,
+        6638.35498046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20340.0,
+        461.7016296386719,
+        26949.271484375
+      ],
+      "distance": 2428.321904536704,
+      "after": [
+        -20388.87109375,
+        501.48687744140625,
+        24521.44140625
+      ],
+      "after_player_frames": 1160
+    },
+    "43": {
+      "before": [
+        -19703.2734375,
+        833.7125244140625,
+        11650.0703125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20265.0,
+        461.7016296386719,
+        26949.271484375
+      ],
+      "distance": 1865.7223748609445,
+      "after": [
+        -20176.4765625,
+        494.9476623535156,
+        25085.650390625
+      ],
+      "after_player_frames": 1160
+    },
+    "44": {
+      "before": [
+        -21148.2109375,
+        857.9658203125,
+        10824.96875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20190.0,
+        459.51104736328125,
+        26949.455078125
+      ],
+      "distance": 1893.1168972150529,
+      "after": [
+        -19881.1640625,
+        493.2781066894531,
+        25081.69921875
+      ],
+      "after_player_frames": 1160
+    },
+    "45": {
+      "before": [
+        -19770.220703125,
+        720.2471313476562,
+        15079.1455078125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        459.5099792480469,
+        26949.431640625
+      ],
+      "distance": 1762.757938103662,
+      "after": [
+        -18779.970703125,
+        491.04052734375,
+        25798.33984375
+      ],
+      "after_player_frames": 1160
+    },
+    "46": {
+      "before": [
+        -19736.263671875,
+        841.9524536132812,
+        11379.39453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        459.50946044921875,
+        26949.455078125
+      ],
+      "distance": 1360.8019777105874,
+      "after": [
+        -19634.923828125,
+        492.7436218261719,
+        25650.341796875
+      ],
+      "after_player_frames": 1160
+    },
+    "47": {
+      "before": [
+        -18649.2734375,
+        834.3232421875,
+        11738.5400390625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        459.50946044921875,
+        26949.455078125
+      ],
+      "distance": 924.1070470873334,
+      "after": [
+        -19378.8828125,
+        492.3978271484375,
+        26235.00390625
+      ],
+      "after_player_frames": 1160
+    },
+    "48": {
+      "before": [
+        -19275.974609375,
+        1007.4480590820312,
+        7406.90478515625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        463.40814208984375,
+        26949.384765625
+      ],
+      "distance": 1333.1741333467965,
+      "after": [
+        -19003.87109375,
+        516.7318725585938,
+        25953.328125
+      ],
+      "after_player_frames": 1160
+    },
+    "49": {
+      "before": [
+        -20546.908203125,
+        906.4963989257812,
+        9426.2275390625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        463.408447265625,
+        26949.41015625
+      ],
+      "distance": 2205.2453272283174,
+      "after": [
+        -18505.984375,
+        498.972412109375,
+        25174.703125
+      ],
+      "after_player_frames": 1160
+    },
+    "50": {
+      "before": [
+        -18683.330078125,
+        994.6014404296875,
+        7185.189453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        463.4078674316406,
+        26949.359375
+      ],
+      "distance": 2332.7827365668504,
+      "after": [
+        -18812.294921875,
+        497.2451477050781,
+        24808.9765625
+      ],
+      "after_player_frames": 1160
+    },
+    "51": {
+      "before": [
+        -18667.083984375,
+        950.0818481445312,
+        9030.7529296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        463.408447265625,
+        26949.41015625
+      ],
+      "distance": 2128.2111516870955,
+      "after": [
+        -18163.759765625,
+        647.0579833984375,
+        25440.9140625
+      ],
+      "after_player_frames": 1160
+    },
+    "52": {
+      "before": [
+        -18704.18359375,
+        885.078369140625,
+        10534.43359375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        463.5443115234375,
+        27016.076171875
+      ],
+      "distance": 2056.6572525415886,
+      "after": [
+        -20536.302734375,
+        501.7452087402344,
+        24959.619140625
+      ],
+      "after_player_frames": 1160
+    },
+    "53": {
+      "before": [
+        -17577.12890625,
+        1135.5657958984375,
+        2843.869140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20490.0,
+        461.8387451171875,
+        27015.888671875
+      ],
+      "distance": 1188.945415262528,
+      "after": [
+        -20998.416015625,
+        493.5151672363281,
+        25941.130859375
+      ],
+      "after_player_frames": 1160
+    },
+    "54": {
+      "before": [
+        -17831.533203125,
+        1088.6358642578125,
+        4565.31787109375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20415.0,
+        461.8393249511719,
+        27015.9375
+      ],
+      "distance": 1678.5503987065974,
+      "after": [
+        -21001.20703125,
+        493.50726318359375,
+        25443.076171875
+      ],
+      "after_player_frames": 1160
+    },
+    "55": {
+      "before": [
+        -18330.986328125,
+        1047.4285888671875,
+        5428.08056640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20340.0,
+        461.8393249511719,
+        27015.9375
+      ],
+      "distance": 1871.2345137766295,
+      "after": [
+        -19586.44921875,
+        496.2161865234375,
+        25303.138671875
+      ],
+      "after_player_frames": 1160
+    },
+    "56": {
+      "before": [
+        -20085.537109375,
+        988.8817138671875,
+        7190.73876953125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20265.0,
+        459.64532470703125,
+        27016.12109375
+      ],
+      "distance": 1008.6550089264766,
+      "after": [
+        -20741.08203125,
+        500.6075744628906,
+        26126.890625
+      ],
+      "after_player_frames": 1160
+    },
+    "57": {
+      "before": [
+        -19823.19140625,
+        991.1083374023438,
+        7193.404296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20190.0,
+        459.6450500488281,
+        27016.09765625
+      ],
+      "distance": 999.0858241322845,
+      "after": [
+        -21071.572265625,
+        498.9078063964844,
+        26545.98828125
+      ],
+      "after_player_frames": 1160
+    },
+    "58": {
+      "before": [
+        -21391.7421875,
+        792.3897705078125,
+        12596.216796875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        459.64453125,
+        27016.12109375
+      ],
+      "distance": 592.9569196121504,
+      "after": [
+        -20497.017578125,
+        515.408935546875,
+        26562.623046875
+      ],
+      "after_player_frames": 1160
+    },
+    "59": {
+      "before": [
+        -19332.533203125,
+        776.0399169921875,
+        13423.0966796875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        459.6437072753906,
+        27016.12109375
+      ],
+      "distance": 441.46279944476595,
+      "after": [
+        -19725.353515625,
+        497.9139404296875,
+        26706.46484375
+      ],
+      "after_player_frames": 1160
+    },
+    "60": {
+      "before": [
+        -20472.603515625,
+        835.3945922851562,
+        11595.9111328125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        463.5424499511719,
+        27016.05078125
+      ],
+      "distance": 804.5684624958249,
+      "after": [
+        -19563.8828125,
+        489.76739501953125,
+        26318.6015625
+      ],
+      "after_player_frames": 1160
+    },
+    "61": {
+      "before": [
+        -19114.6328125,
+        967.376708984375,
+        8337.6630859375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        463.542724609375,
+        27016.076171875
+      ],
+      "distance": 2173.5786229207015,
+      "after": [
+        -17931.25390625,
+        514.5573120117188,
+        26073.8671875
+      ],
+      "after_player_frames": 1160
+    },
+    "62": {
+      "before": [
+        -13818.212890625,
+        1259.49169921875,
+        2895.17138671875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        463.54217529296875,
+        27016.025390625
+      ],
+      "distance": 1503.598850665677,
+      "after": [
+        -18572.4609375,
+        497.5610046386719,
+        26169.322265625
+      ],
+      "after_player_frames": 1160
+    },
+    "63": {
+      "before": [
+        -17715.751953125,
+        1075.559326171875,
+        5378.169921875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        463.542724609375,
+        27016.076171875
+      ],
+      "distance": 1783.9589017027915,
+      "after": [
+        -18080.74609375,
+        519.5089721679688,
+        26360.80078125
+      ],
+      "after_player_frames": 1160
+    },
+    "64": {
+      "before": [
+        -21618.53125,
+        697.6485595703125,
+        15749.69140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        463.542724609375,
+        27016.076171875
+      ],
+      "distance": 2604.570357435906,
+      "after": [
+        -18218.302734375,
+        516.7212524414062,
+        24850.23828125
+      ],
+      "after_player_frames": 1160
+    },
+    "65": {
+      "before": [
+        -19961.41015625,
+        810.2814331054688,
+        12332.69921875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        461.97662353515625,
+        27082.556640625
+      ],
+      "distance": 2263.0846888827045,
+      "after": [
+        -20058.453125,
+        506.505859375,
+        24876.890625
+      ],
+      "after_player_frames": 1160
+    },
+    "66": {
+      "before": [
+        -20500.73046875,
+        913.5927124023438,
+        9069.7236328125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20490.0,
+        461.9772033691406,
+        27082.60546875
+      ],
+      "distance": 2583.517241294743,
+      "after": [
+        -21103.923828125,
+        500.5763244628906,
+        24573.091796875
+      ],
+      "after_player_frames": 1160
+    },
+    "67": {
+      "before": [
+        -17320.84765625,
+        1074.3277587890625,
+        5838.3212890625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20415.0,
+        461.9772033691406,
+        27082.60546875
+      ],
+      "distance": 3182.319006259852,
+      "after": [
+        -20578.630859375,
+        508.1511535644531,
+        23904.49609375
+      ],
+      "after_player_frames": 1160
+    },
+    "68": {
+      "before": [
+        -16716.412109375,
+        1217.4744873046875,
+        1707.544189453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20340.0,
+        459.7796630859375,
+        27082.7890625
+      ],
+      "distance": 1214.243626971109,
+      "after": [
+        -20013.212890625,
+        500.8348083496094,
+        25913.345703125
+      ],
+      "after_player_frames": 1160
+    },
+    "69": {
+      "before": [
+        -14809.6015625,
+        1211.29931640625,
+        2734.986328125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20265.0,
+        459.77935791015625,
+        27082.765625
+      ],
+      "distance": 1153.7413886495913,
+      "after": [
+        -19876.12109375,
+        492.951416015625,
+        25996.537109375
+      ],
+      "after_player_frames": 1160
+    },
+    "70": {
+      "before": [
+        -15864.3994140625,
+        1134.71142578125,
+        4116.4833984375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20190.0,
+        459.7796630859375,
+        27082.7890625
+      ],
+      "distance": 1043.39866354873,
+      "after": [
+        -20486.498046875,
+        571.306640625,
+        26082.404296875
+      ],
+      "after_player_frames": 1160
+    },
+    "71": {
+      "before": [
+        -14889.54296875,
+        1226.5162353515625,
+        2417.37744140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        459.77886962890625,
+        27082.7890625
+      ],
+      "distance": 948.4236308850681,
+      "after": [
+        -20336.6484375,
+        586.82666015625,
+        26160.62890625
+      ],
+      "after_player_frames": 1160
+    },
+    "72": {
+      "before": [
+        -16338.5791015625,
+        1234.0614013671875,
+        1576.5364990234375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        463.6767883300781,
+        27082.71875
+      ],
+      "distance": 1216.659457392998,
+      "after": [
+        -19241.927734375,
+        488.07562255859375,
+        26164.3828125
+      ],
+      "after_player_frames": 1160
+    },
+    "73": {
+      "before": [
+        -20782.44140625,
+        754.6202392578125,
+        14051.6123046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        463.67706298828125,
+        27082.744140625
+      ],
+      "distance": 1529.662600402487,
+      "after": [
+        -19406.36328125,
+        499.0833740234375,
+        25658.73828125
+      ],
+      "after_player_frames": 1160
+    },
+    "74": {
+      "before": [
+        -18919.330078125,
+        945.0299072265625,
+        8607.6953125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        463.676513671875,
+        27082.693359375
+      ],
+      "distance": 2067.331021929858,
+      "after": [
+        -18103.556640625,
+        588.5419311523438,
+        26042.271484375
+      ],
+      "after_player_frames": 1160
+    },
+    "75": {
+      "before": [
+        -16160.8779296875,
+        1230.9710693359375,
+        1731.3056640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        463.67706298828125,
+        27082.744140625
+      ],
+      "distance": 883.1137320434751,
+      "after": [
+        -19762.3515625,
+        496.89794921875,
+        26201.201171875
+      ],
+      "after_player_frames": 1160
+    },
+    "76": {
+      "before": [
+        -20956.970703125,
+        887.03662109375,
+        10270.693359375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        463.67706298828125,
+        27082.744140625
+      ],
+      "distance": 2063.8627433253496,
+      "after": [
+        -17942.513671875,
+        607.9728393554688,
+        26068.55859375
+      ],
+      "after_player_frames": 1160
+    },
+    "77": {
+      "before": [
+        -18627.140625,
+        1032.6019287109375,
+        5839.10546875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        461.9748840332031,
+        27082.556640625
+      ],
+      "distance": 2386.1941844177422,
+      "after": [
+        -17951.107421875,
+        528.060791015625,
+        25422.287109375
+      ],
+      "after_player_frames": 1160
+    },
+    "78": {
+      "before": [
+        -18368.251953125,
+        1075.77734375,
+        5135.53271484375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        462.1148986816406,
+        27149.271484375
+      ],
+      "distance": 1856.6124594880066,
+      "after": [
+        -21595.12109375,
+        493.22515869140625,
+        25604.6484375
+      ],
+      "after_player_frames": 1160
+    },
+    "79": {
+      "before": [
+        -15851.0927734375,
+        1254.2767333984375,
+        1448.2025146484375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20490.0,
+        462.1148986816406,
+        27149.271484375
+      ],
+      "distance": 1617.599925109869,
+      "after": [
+        -21331.04296875,
+        493.69708251953125,
+        25767.505859375
+      ],
+      "after_player_frames": 1160
+    },
+    "80": {
+      "before": [
+        -21167.353515625,
+        691.906494140625,
+        15795.7607421875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20415.0,
+        459.9140625,
+        27149.455078125
+      ],
+      "distance": 974.7753048606255,
+      "after": [
+        -21223.177734375,
+        488.59246826171875,
+        26604.4453125
+      ],
+      "after_player_frames": 1160
+    },
+    "81": {
+      "before": [
+        -19410.705078125,
+        1015.5549926757812,
+        6130.78076171875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20340.0,
+        459.9137878417969,
+        27149.431640625
+      ],
+      "distance": 758.4897621912293,
+      "after": [
+        -20303.99609375,
+        491.48870849609375,
+        26391.796875
+      ],
+      "after_player_frames": 1160
+    },
+    "82": {
+      "before": [
+        -20761.2734375,
+        711.8121337890625,
+        15224.09765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20265.0,
+        459.9140625,
+        27149.455078125
+      ],
+      "distance": 462.1057753584442,
+      "after": [
+        -20716.2734375,
+        495.3085021972656,
+        27248.923828125
+      ],
+      "after_player_frames": 1160
+    },
+    "83": {
+      "before": [
+        -19430.552734375,
+        817.25048828125,
+        12140.7529296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20190.0,
+        459.9140625,
+        27149.455078125
+      ],
+      "distance": 1120.231114494569,
+      "after": [
+        -19197.625,
+        480.93243408203125,
+        26629.734375
+      ],
+      "after_player_frames": 1160
+    },
+    "84": {
+      "before": [
+        -19313.84375,
+        1014.8245239257812,
+        6365.6142578125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        463.81207275390625,
+        27149.384765625
+      ],
+      "distance": 810.0411490007735,
+      "after": [
+        -20124.08203125,
+        492.539306640625,
+        26339.39453125
+      ],
+      "after_player_frames": 1160
+    },
+    "85": {
+      "before": [
+        -16688.419921875,
+        1131.694580078125,
+        3629.789306640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        463.8115539550781,
+        27149.41015625
+      ],
+      "distance": 469.8887001956891,
+      "after": [
+        -19609.892578125,
+        496.54998779296875,
+        26960.193359375
+      ],
+      "after_player_frames": 1160
+    },
+    "86": {
+      "before": [
+        -16376.91796875,
+        1177.2989501953125,
+        2748.709716796875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        463.8110046386719,
+        27149.359375
+      ],
+      "distance": 1376.8072670600723,
+      "after": [
+        -19471.685546875,
+        499.66876220703125,
+        25863.96484375
+      ],
+      "after_player_frames": 1160
+    },
+    "87": {
+      "before": [
+        -17638.349609375,
+        1078.8143310546875,
+        4687.12744140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        463.8115539550781,
+        27149.41015625
+      ],
+      "distance": 2331.0294307518407,
+      "after": [
+        -17942.875,
+        560.3784790039062,
+        25867.84765625
+      ],
+      "after_player_frames": 1160
+    },
+    "88": {
+      "before": [
+        -18579.544921875,
+        1061.0947265625,
+        5073.25
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        463.8115539550781,
+        27149.41015625
+      ],
+      "distance": 1766.478269939511,
+      "after": [
+        -18106.748046875,
+        514.7932739257812,
+        26699.609375
+      ],
+      "after_player_frames": 1160
+    },
+    "89": {
+      "before": [
+        -17911.447265625,
+        1086.5567626953125,
+        4338.9873046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        462.1127014160156,
+        27149.22265625
+      ],
+      "distance": 2579.145229427584,
+      "after": [
+        -18003.451171875,
+        518.3106689453125,
+        25242.291015625
+      ],
+      "after_player_frames": 1160
+    },
+    "90": {
+      "before": [
+        -21230.7109375,
+        766.1572875976562,
+        13507.6376953125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        462.11328125,
+        27149.271484375
+      ],
+      "distance": 2183.867792474507,
+      "after": [
+        -17937.052734375,
+        520.1331787109375,
+        25813.802734375
+      ],
+      "after_player_frames": 1160
+    },
+    "91": {
+      "before": [
+        -17665.9453125,
+        1092.12890625,
+        4408.1357421875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        462.2525329589844,
+        27215.9375
+      ],
+      "distance": 2999.2119053657257,
+      "after": [
+        -21694.001953125,
+        508.0002746582031,
+        24437.3359375
+      ],
+      "after_player_frames": 1160
+    },
+    "92": {
+      "before": [
+        -18603.5390625,
+        1004.1678466796875,
+        6684.923828125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20490.0,
+        460.04840087890625,
+        27216.12109375
+      ],
+      "distance": 2674.0260296855017,
+      "after": [
+        -21638.892578125,
+        495.6123046875,
+        24801.486328125
+      ],
+      "after_player_frames": 1160
+    },
+    "93": {
+      "before": [
+        -15698.576171875,
+        1202.7650146484375,
+        2332.40771484375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20415.0,
+        460.0481262207031,
+        27216.09765625
+      ],
+      "distance": 1169.7862992790554,
+      "after": [
+        -20976.029296875,
+        498.3756103515625,
+        26189.625
+      ],
+      "after_player_frames": 1160
+    },
+    "94": {
+      "before": [
+        -13468.65625,
+        1303.2435302734375,
+        2417.8994140625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20340.0,
+        460.04840087890625,
+        27216.12109375
+      ],
+      "distance": 895.5030346877043,
+      "after": [
+        -20075.56640625,
+        571.044921875,
+        26360.55078125
+      ],
+      "after_player_frames": 1160
+    },
+    "95": {
+      "before": [
+        -16155.1630859375,
+        1159.4228515625,
+        3327.900634765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 996,
+      "recovery_position": [
+        -20265.0,
+        460.04840087890625,
+        27216.12109375
+      ],
+      "distance": 202.83834980717117,
+      "after": [
+        -20427.6953125,
+        494.8833312988281,
+        27094.986328125
+      ],
+      "after_player_frames": 1168
+    },
+    "96": {
+      "before": [
+        -18320.5625,
+        1072.5106201171875,
+        4813.1640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20190.0,
+        463.9471130371094,
+        27216.05078125
+      ],
+      "distance": 1909.5602138861314,
+      "after": [
+        -20059.384765625,
+        502.7303161621094,
+        25310.962890625
+      ],
+      "after_player_frames": 1160
+    },
+    "97": {
+      "before": [
+        -16449.349609375,
+        1203.6170654296875,
+        2293.40234375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20115.0,
+        463.9466247558594,
+        27216.076171875
+      ],
+      "distance": 381.6123080150063,
+      "after": [
+        -19847.55859375,
+        502.4582824707031,
+        26943.857421875
+      ],
+      "after_player_frames": 1160
+    },
+    "98": {
+      "before": [
+        -15348.689453125,
+        1245.44140625,
+        1933.77880859375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20040.0,
+        463.94525146484375,
+        27216.025390625
+      ],
+      "distance": 1794.4901119979063,
+      "after": [
+        -18319.572265625,
+        510.2898864746094,
+        26705.806640625
+      ],
+      "after_player_frames": 1160
+    },
+    "99": {
+      "before": [
+        -16583.5078125,
+        1164.4085693359375,
+        3060.528564453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19965.0,
+        463.9458312988281,
+        27216.076171875
+      ],
+      "distance": 1937.1262124761738,
+      "after": [
+        -18372.49609375,
+        595.054443359375,
+        26113.17578125
+      ],
+      "after_player_frames": 1160
+    },
+    "100": {
+      "before": [
+        -16196.755859375,
+        1129.80859375,
+        4519.6533203125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19890.0,
+        463.9458312988281,
+        27216.076171875
+      ],
+      "distance": 2042.7183954681318,
+      "after": [
+        -18402.759765625,
+        492.83905029296875,
+        25815.78515625
+      ],
+      "after_player_frames": 1160
+    },
+    "101": {
+      "before": [
+        -14406.9814453125,
+        1252.886962890625,
+        2430.072265625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19815.0,
+        462.2503356933594,
+        27215.888671875
+      ],
+      "distance": 1239.846675476584,
+      "after": [
+        -18805.03125,
+        490.06494140625,
+        26496.734375
+      ],
+      "after_player_frames": 1160
+    },
+    "102": {
+      "before": [
+        -15272.5322265625,
+        1165.1837158203125,
+        3230.025634765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19740.0,
+        462.2508850097656,
+        27215.9375
+      ],
+      "distance": 755.5651533004668,
+      "after": [
+        -19788.7890625,
+        475.6192626953125,
+        26461.94921875
+      ],
+      "after_player_frames": 1160
+    },
+    "103": {
+      "before": [
+        -18097.546875,
+        1012.3869018554688,
+        6695.6240234375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        462.2508850097656,
+        27215.9375
+      ],
+      "distance": 1986.2749039593346,
+      "after": [
+        -17911.982421875,
+        526.8053588867188,
+        26282.01171875
+      ],
+      "after_player_frames": 1160
+    },
+    "104": {
+      "before": [
+        -18857.451171875,
+        1045.305908203125,
+        5310.4150390625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        471.663818359375,
+        27282.7890625
+      ],
+      "distance": 1172.8392125442624,
+      "after": [
+        -21518.7890625,
+        493.4927978515625,
+        26600.265625
+      ],
+      "after_player_frames": 1160
+    },
+    "105": {
+      "before": [
+        -14599.6357421875,
+        1340.035888671875,
+        838.8186645507812
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20483.181640625,
+        471.66351318359375,
+        27282.765625
+      ],
+      "distance": 1888.7597306885114,
+      "after": [
+        -22091.73046875,
+        522.9082641601562,
+        26292.82421875
+      ],
+      "after_player_frames": 1160
+    },
+    "106": {
+      "before": [
+        -15016.3232421875,
+        1310.0234375,
+        1013.1165161132812
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20401.36328125,
+        471.663818359375,
+        27282.7890625
+      ],
+      "distance": 1128.4010532456723,
+      "after": [
+        -21456.78125,
+        499.14837646484375,
+        26883.5625
+      ],
+      "after_player_frames": 1160
+    },
+    "107": {
+      "before": [
+        -16712.998046875,
+        1192.5072021484375,
+        2051.41259765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20319.544921875,
+        471.663818359375,
+        27282.7890625
+      ],
+      "distance": 634.9803622655993,
+      "after": [
+        -20951.109375,
+        515.93115234375,
+        27217.013671875
+      ],
+      "after_player_frames": 1160
+    },
+    "108": {
+      "before": [
+        -13738.58984375,
+        1390.3587646484375,
+        870.2316284179688
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20237.7265625,
+        464.08148193359375,
+        27282.71875
+      ],
+      "distance": 1037.0985779014388,
+      "after": [
+        -20488.73828125,
+        493.8050231933594,
+        26276.455078125
+      ],
+      "after_player_frames": 1160
+    },
+    "109": {
+      "before": [
+        -14830.853515625,
+        1283.1014404296875,
+        1622.6328125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20155.908203125,
+        464.0809326171875,
+        27282.744140625
+      ],
+      "distance": 1217.9436570902258,
+      "after": [
+        -20194.501953125,
+        489.86651611328125,
+        26065.412109375
+      ],
+      "after_player_frames": 1160
+    },
+    "110": {
+      "before": [
+        -15908.470703125,
+        1190.18310546875,
+        2512.185302734375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20074.091796875,
+        464.0803527832031,
+        27282.693359375
+      ],
+      "distance": 1450.7190739255536,
+      "after": [
+        -18957.017578125,
+        493.870361328125,
+        26357.095703125
+      ],
+      "after_player_frames": 1160
+    },
+    "111": {
+      "before": [
+        -12019.630859375,
+        1446.4505615234375,
+        1565.1644287109375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19992.2734375,
+        464.080078125,
+        27282.744140625
+      ],
+      "distance": 2120.322857550762,
+      "after": [
+        -18410.107421875,
+        630.4102783203125,
+        25871.177734375
+      ],
+      "after_player_frames": 1160
+    },
+    "112": {
+      "before": [
+        -17500.333984375,
+        1123.0018310546875,
+        3397.099609375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19910.455078125,
+        464.080078125,
+        27282.744140625
+      ],
+      "distance": 1572.808113966082,
+      "after": [
+        -18511.326171875,
+        503.7447814941406,
+        26564.298828125
+      ],
+      "after_player_frames": 1160
+    },
+    "113": {
+      "before": [
+        -17679.970703125,
+        1104.34423828125,
+        3884.9814453125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19828.63671875,
+        462.3880615234375,
+        27282.556640625
+      ],
+      "distance": 207.38253674829213,
+      "after": [
+        -19692.509765625,
+        498.407470703125,
+        27126.10546875
+      ],
+      "after_player_frames": 1160
+    },
+    "114": {
+      "before": [
+        -17862.947265625,
+        1095.9869384765625,
+        3946.56103515625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19746.818359375,
+        462.38861083984375,
+        27282.60546875
+      ],
+      "distance": 1869.6498582670106,
+      "after": [
+        -18260.015625,
+        502.9264221191406,
+        26149.0234375
+      ],
+      "after_player_frames": 1160
+    },
+    "115": {
+      "before": [
+        -17633.126953125,
+        1121.5205078125,
+        3675.068359375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19665.0,
+        462.38861083984375,
+        27282.60546875
+      ],
+      "distance": 2011.355472684456,
+      "after": [
+        -18111.125,
+        501.6299133300781,
+        26005.490234375
+      ],
+      "after_player_frames": 1160
+    },
+    "116": {
+      "before": [
+        -14196.59765625,
+        1327.3887939453125,
+        1343.7686767578125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20565.0,
+        471.83380126953125,
+        27349.455078125
+      ],
+      "distance": 1834.6001993493812,
+      "after": [
+        -21723.181640625,
+        492.0377197265625,
+        25926.650390625
+      ],
+      "after_player_frames": 1160
+    },
+    "117": {
+      "before": [
+        -13355.8876953125,
+        1371.981201171875,
+        1405.842529296875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20483.181640625,
+        471.8335266113281,
+        27349.431640625
+      ],
+      "distance": 830.9228093438587,
+      "after": [
+        -21176.556640625,
+        502.0371398925781,
+        26891.541015625
+      ],
+      "after_player_frames": 1160
+    },
+    "118": {
+      "before": [
+        -14202.8447265625,
+        1280.9169921875,
+        2103.008544921875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20401.36328125,
+        471.83380126953125,
+        27349.455078125
+      ],
+      "distance": 903.6749892492381,
+      "after": [
+        -20884.716796875,
+        503.49798583984375,
+        26585.912109375
+      ],
+      "after_player_frames": 1160
+    },
+    "119": {
+      "before": [
+        -13982.28125,
+        1310.9241943359375,
+        1796.9765625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20319.544921875,
+        471.83380126953125,
+        27349.455078125
+      ],
+      "distance": 609.1051698428029,
+      "after": [
+        -20272.796875,
+        492.5193176269531,
+        26742.146484375
+      ],
+      "after_player_frames": 1160
+    },
+    "120": {
+      "before": [
+        -16997.326171875,
+        1137.1268310546875,
+        3200.124755859375
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20237.7265625,
+        464.21588134765625,
+        27349.384765625
+      ],
+      "distance": 658.3937789211718,
+      "after": [
+        -20033.99609375,
+        498.7966613769531,
+        26723.3046875
+      ],
+      "after_player_frames": 1160
+    },
+    "121": {
+      "before": [
+        -15363.470703125,
+        1279.535400390625,
+        1369.63330078125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20155.908203125,
+        464.21539306640625,
+        27349.41015625
+      ],
+      "distance": 1220.6671117890812,
+      "after": [
+        -18954.4765625,
+        500.455078125,
+        27133.5625
+      ],
+      "after_player_frames": 1160
+    },
+    "122": {
+      "before": [
+        -17069.03515625,
+        1240.227783203125,
+        1349.7647705078125
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -20074.091796875,
+        464.2148132324219,
+        27349.359375
+      ],
+      "distance": 331.49863034248773,
+      "after": [
+        -20080.037109375,
+        506.7124328613281,
+        27017.9140625
+      ],
+      "after_player_frames": 1160
+    },
+    "123": {
+      "before": [
+        -16902.025390625,
+        1150.2860107421875,
+        2951.52978515625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19992.2734375,
+        464.214599609375,
+        27349.41015625
+      ],
+      "distance": 1298.4822310817221,
+      "after": [
+        -19155.349609375,
+        512.2733154296875,
+        26356.62890625
+      ],
+      "after_player_frames": 1160
+    },
+    "124": {
+      "before": [
+        -12521.64453125,
+        1497.020751953125,
+        339.2347717285156
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19910.455078125,
+        464.214599609375,
+        27349.41015625
+      ],
+      "distance": 798.4083364373505,
+      "after": [
+        -19441.724609375,
+        502.1192932128906,
+        26703.076171875
+      ],
+      "after_player_frames": 1160
+    },
+    "125": {
+      "before": [
+        -14819.228515625,
+        1261.154296875,
+        1953.408447265625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19828.63671875,
+        477.1304931640625,
+        27349.22265625
+      ],
+      "distance": 873.5531771303542,
+      "after": [
+        -20140.25390625,
+        495.6950988769531,
+        26533.140625
+      ],
+      "after_player_frames": 1160
+    },
+    "126": {
+      "before": [
+        -16960.65625,
+        1111.8685302734375,
+        3881.5498046875
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 730,
+      "recovered": 868,
+      "moved": 988,
+      "recovery_position": [
+        -19746.818359375,
+        477.13104248046875,
+        27349.271484375
+      ],
+      "distance": 602.5354051879482,
+      "after": [
+        -19202.560546875,
+        497.4138488769531,
+        27090.751953125
+      ],
+      "after_player_frames": 1160
+    },
+    "127": {
+      "before": [
+        -10895.5673828125,
+        1498.1988525390625,
+        1735.4742431640625
+      ],
+      "before_player_frames": 772,
+      "before_lap": 1,
+      "lap_progress": 3137,
+      "seen_respawn": 729,
+      "recovered": 867,
+      "moved": 987,
+      "recovery_position": [
+        -19665.0,
+        477.13104248046875,
+        27349.271484375
+      ],
+      "distance": 1880.1075098200504,
+      "after": [
+        -18319.134765625,
+        496.78369140625,
+        26036.46875
+      ],
+      "after_player_frames": 1159
+    }
+  },
+  "injected_frame": 600,
+  "fall_height": -199308.09350585938,
+  "last_frame": 3137,
+  "source": "dd1cd1b08dbfef25d6a19e9bff5aedcd897591ad",
+  "capacity": 128,
+  "clockDivisor": 1,
+  "layoutAudit": "off",
+  "termination": "Test driver terminates its owned process after all 128 slots satisfy rescue, movement and lap-advance checks.",
+  "limitations": [
+    "Controlled writes lower current and previous physics Y positions for all racers at frame 600; no flags, lap counters or control-flow patches injected.",
+    "One course: USA Luigi Circuit. Not all courses, battle respawns, score correctness or 128-console networking.",
+    "lap_progress records the most recent observed progress sample, not each racer first lap-crossing frame.",
+    "This is a functional rescue probe, not a log/strict retired-layout qualification."
+  ]
+}

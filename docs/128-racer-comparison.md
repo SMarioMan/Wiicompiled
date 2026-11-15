@@ -157,3 +157,17 @@ or skipped stack-lifetime entries across 26.5 billion observed accesses. Other
 heap families and the later bulk-cache instrumentation are not covered by this
 binary. Full-course/mode coverage, forced rescues, scoring, rendered results,
 teardown and another race remain open, as does future 128-console networking.
+
+## Forced rescue at all 128 racer IDs, 2026-11-15
+
+[The controlled fall record](validation/forced-falls-rmce01-128.json) uses a
+128-capacity executable with 128 active racers on Luigi Circuit. At race frame
+600 the probe lowers only each kart's current/previous Y positions. It does not
+set rescue flags or lap state. All 128 slots enter native respawning states at
+frames 729–730, return above the fall threshold at frames 867–868, and resume
+measurable movement at frames 987–996. By frame 3137 every slot has also advanced
+a lap after the fall, including racer 127. The driver then stops its owned game.
+
+Auditing is off for this independent functional probe. This validates the
+exercised all-slot rescue/recovery path on one course; it does not qualify all
+courses, battle respawns, scene ownership or 128-console networking.

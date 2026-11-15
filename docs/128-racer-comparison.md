@@ -126,6 +126,14 @@ full width reported. Unattributed ranges retain conservative classification.
 This closes those specific raw-pointer escapes; it does not instrument every
 host pointer user or prove coverage for bulk ranges starting outside a field.
 
+Watched constructors publish JSON checkpoints immediately before guest
+construction and after success. This retains an early lifetime snapshot when
+resource loading fails before the first race-progress log. Fatal memory dumps
+still disable observation to avoid re-entering a mutex interrupted by a signal;
+an early checkpoint is last-known state, not a claim to contain every final
+access before the failure. Enabled/disabled lifetime fixtures verify that the
+live-object report exists before the original constructor runs.
+
 ## Live balloon counter boundary, 2026-11-15
 
 [The 26-active-racer record](validation/128-capacity-balloon-observed-26.json)

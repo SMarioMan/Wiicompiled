@@ -26,6 +26,7 @@ public class LayoutAuditLifetimeWrapperTests
                 #include "guest_abi/layout_access_audit.h"
                 #include <stdexcept>
                 #include <string>
+                #include <fstream>
                 extern "C" void {{{type}}}_AuditConstruct(CpuContext*);
                 extern "C" void {{{type}}}_AuditDestroy(CpuContext*);
                 extern "C" void GuestDelete_AuditRetirement(CpuContext*);
@@ -33,9 +34,12 @@ public class LayoutAuditLifetimeWrapperTests
                 constexpr uint32_t base=0x80020000;
                 bool expectedLive=true,fail=false;
                 uint32_t constructors=0,destructors=0,releases=0;
+                const char* reportPath=nullptr;
                 bool active(bool live){return ReportJson().find(live?"\"activeInstances\":1":"\"activeInstances\":0")!=std::string::npos;}
                 void originalCtor(CpuContext* c){
                     if(c->gpr[3]!=base||!active(expectedLive))std::abort();++constructors;
+                    if(expectedLive){std::ifstream input(reportPath);std::string saved((std::istreambuf_iterator<char>(input)),{});
+                        if(saved.find("\"activeInstances\":1")==std::string::npos)std::abort();}
                     ScopedSite site({.pc=0x80001000,.type="{{{type}}}",.field="tail",.native=true});
                     Memory::Read32(base+56); // intentionally stale constructor reader
                     if(fail)throw std::runtime_error("controlled construction failure");
@@ -53,10 +57,11 @@ public class LayoutAuditLifetimeWrapperTests
                     TranslatedFunctionInfo info{};info.address=address;info.name="original archive lifetime fixture";
                     info.rawCpuInvoker=fn;info.entryPoint=reinterpret_cast<void*>(fn);TranslatedFunctionRegistry::Register(info);
                 }
-                int main(){
+                int main(int argc,char** argv){
+                    if(argc!=2)return 9;reportPath=argv[1];
                     Memory::Init(1024*1024);
                     constexpr Field fields[]={{"header",0,8,1,8,0,8,1,8},{"holders",8,48,12,4,8,96,24,4,true},{"tail",56,4,1,4,104,4,1,4}};
-                    RegisterType({"{{{type}}}",60,108,fields});Configure({Mode::Log});
+                    RegisterType({"{{{type}}}",60,108,fields});Configure({Mode::Log,false,reportPath});
                     // Actual NTSC-U function entries; wrapper identities use the
                     // existing PAL-to-USA region mapping rather than PAL data.
                     entry(0x{{{constructor:X8}}},originalCtor);entry(0x{{{destructor:X8}}},originalDtor);entry(0x80229a90,originalDelete);
@@ -78,7 +83,7 @@ public class LayoutAuditLifetimeWrapperTests
                     if(report.find("\"count\":3")==std::string::npos||report.find("0x80002000")!=std::string::npos)return 5;
                     Configure({Mode::Off});expectedLive=false;c.gpr[3]=base;{{{type}}}_AuditConstruct(&c);
                     c.gpr[3]=base;c.gpr[4]=0;{{{type}}}_AuditDestroy(&c);if(!active(false))return 6;
-                    Reset();Configure({Mode::Log});c.gpr[3]=base;{{{type}}}_AuditConstruct(&c);
+                    Reset();Configure({Mode::Log,false,reportPath});c.gpr[3]=base;{{{type}}}_AuditConstruct(&c);
                     c.gpr[3]=base;c.gpr[4]=0;{{{type}}}_AuditDestroy(&c);
                     return constructors==5&&destructors==4&&releases==1&&active(false)?0:7;
                 #endif
@@ -91,7 +96,8 @@ public class LayoutAuditLifetimeWrapperTests
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",args){RedirectStandardError=true})!){
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(60000);if(!done)compile.Kill(entireProcessTree:true);
                 Assert.True(done,"Lifetime wrapper compilation timed out");Assert.True(compile.ExitCode==0,errors.GetAwaiter().GetResult());}
-            using var run=Process.Start(new ProcessStartInfo(exe){RedirectStandardError=true})!;
+            var runInfo=new ProcessStartInfo(exe){RedirectStandardError=true};runInfo.ArgumentList.Add(Path.Combine(temp,"early-report.json"));
+            using var run=Process.Start(runInfo)!;
             var output=run.StandardError.ReadToEndAsync();var finished=run.WaitForExit(15000);if(!finished)run.Kill(entireProcessTree:true);
             Assert.True(finished,"Lifetime wrapper execution timed out");Assert.True(run.ExitCode==0,$"Lifetime wrapper returned {run.ExitCode}: {output.GetAwaiter().GetResult()}");
         }finally{Directory.Delete(temp,recursive:true);}

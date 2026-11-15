@@ -12,8 +12,13 @@ void WatchConstruction(CpuContext* ctx, const char* type, const char* lifetime) 
         generation = LayoutAccessAudit::RegisterInstance(type, ctx->gpr[3], 0, lifetime);
     }
     try {
+        // Resource loading can fail before the first race-progress checkpoint.
+        // Publish the watch before entering guest construction and refresh it
+        // after success, while no auditor lock is held.
+        if (generation) LayoutAccessAudit::WriteReport();
         static const auto next = GuestFunctions::NextTranslation(GuestRegion::Address<Entry>());
         next(ctx);
+        if (generation) LayoutAccessAudit::WriteReport();
     } catch (...) {
         if (generation) LayoutAccessAudit::RetireInstance(generation);
         throw;

@@ -140,3 +140,20 @@ This crosses the original ten-per-player byte-count boundary with actual game
 resources, complementing the widened-count fixtures. It does not establish
 balloon visibility, score/ownership correctness, all heap lifetimes, teardown,
 or a 128-active battle.
+
+## First 128-active VS completion, 2026-11-15
+
+[The exact-build record](validation/128-capacity-vs-observed-128.json) captures
+a normal-clock, one-lap Luigi Circuit run with 128 active racers at capacity 128.
+Every sampled racer has a distinct physics pointer, finite positions and more
+than 136,000 units of sampled movement. Racer 127 moves and enters lap two.
+None stays stationary across consecutive samples. At native completion, stage
+four/frame 2472, 123 racers have been sampled entering lap two; five receive
+automatic finish flags while still on their final lap. This is not evidence
+that all 128 independently crossed the finish line.
+
+The exercised ArchiveMgr, AIManager and generated stack watches report no hits
+or skipped stack-lifetime entries across 26.5 billion observed accesses. Other
+heap families and the later bulk-cache instrumentation are not covered by this
+binary. Full-course/mode coverage, forced rescues, scoring, rendered results,
+teardown and another race remain open, as does future 128-console networking.

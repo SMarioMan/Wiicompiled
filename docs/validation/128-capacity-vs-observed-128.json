@@ -1,0 +1,1212 @@
+{
+  "result": "native-finish-flags",
+  "source": "284d1d9ee74f12d3e3543d372c66e52e0ce5df08",
+  "binary_sha256": "86e6cd407af9c274f18644f86580321e38afe4a5ab34dd500e0b8c6f67ba2b91",
+  "players": 128,
+  "capacity": 128,
+  "mode": "vs",
+  "course": 8,
+  "laps": 1,
+  "clock_divisor": 1,
+  "completion": {
+    "stage": 4,
+    "frames": 2472,
+    "players": 128,
+    "capacity": 128,
+    "observed": 128,
+    "min_player_frames": 2140,
+    "course": 8,
+    "mode": 1,
+    "finished": 128,
+    "min_lap": 1,
+    "max_lap": 2
+  },
+  "elapsed_seconds": 1406.5089537790045,
+  "slots_without_sampled_movement": [],
+  "slots_without_sampled_lap_advance": [],
+  "slots_without_sampled_finish_lap": [
+    9,
+    21,
+    40,
+    52,
+    119
+  ],
+  "slots": [
+    {
+      "slot": 0,
+      "sampled_distance": 149153.17106929806,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 1,
+      "sampled_distance": 161469.75504270112,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 2,
+      "sampled_distance": 176988.00110107096,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 3,
+      "sampled_distance": 163141.55139054736,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 4,
+      "sampled_distance": 146199.60433564888,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 5,
+      "sampled_distance": 166637.38799183874,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 6,
+      "sampled_distance": 171126.67151095846,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 7,
+      "sampled_distance": 160064.03597281917,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 8,
+      "sampled_distance": 178493.91200839484,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 9,
+      "sampled_distance": 152043.94699182312,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 10,
+      "sampled_distance": 174660.2263735859,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 11,
+      "sampled_distance": 161189.94278105148,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 12,
+      "sampled_distance": 167706.6771659955,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 13,
+      "sampled_distance": 157837.42326595949,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 14,
+      "sampled_distance": 176758.9623062681,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 15,
+      "sampled_distance": 154686.22745265122,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 16,
+      "sampled_distance": 173094.4198365958,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 17,
+      "sampled_distance": 162803.9506924219,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 18,
+      "sampled_distance": 163109.4117728548,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 19,
+      "sampled_distance": 175750.50366250274,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 20,
+      "sampled_distance": 163494.0960710525,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 21,
+      "sampled_distance": 150267.38808282863,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 22,
+      "sampled_distance": 172691.983254361,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 23,
+      "sampled_distance": 161930.28577648982,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 24,
+      "sampled_distance": 148901.9151029427,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 25,
+      "sampled_distance": 165439.86041306108,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 26,
+      "sampled_distance": 167351.59757642352,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 27,
+      "sampled_distance": 153511.03245901165,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 28,
+      "sampled_distance": 176232.894595826,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 29,
+      "sampled_distance": 164968.6909658997,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 30,
+      "sampled_distance": 160057.54664689396,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 31,
+      "sampled_distance": 164155.79188883616,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 32,
+      "sampled_distance": 158314.03477340197,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 33,
+      "sampled_distance": 170837.92862752476,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 34,
+      "sampled_distance": 174880.4939665744,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 35,
+      "sampled_distance": 171661.77747116346,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 36,
+      "sampled_distance": 173781.4196246457,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 37,
+      "sampled_distance": 168345.84455937604,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 38,
+      "sampled_distance": 173029.712411391,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 39,
+      "sampled_distance": 178167.13634736207,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 40,
+      "sampled_distance": 149419.93034153798,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 41,
+      "sampled_distance": 168867.29176504712,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 42,
+      "sampled_distance": 166069.57479628196,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 43,
+      "sampled_distance": 171996.87925598674,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 44,
+      "sampled_distance": 181679.3319780376,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 45,
+      "sampled_distance": 154253.99229095745,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 46,
+      "sampled_distance": 168496.40495777267,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 47,
+      "sampled_distance": 171921.91102644906,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 48,
+      "sampled_distance": 168079.8702893199,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 49,
+      "sampled_distance": 171361.83306731962,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 50,
+      "sampled_distance": 168185.4640503108,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 51,
+      "sampled_distance": 170576.28255638108,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 52,
+      "sampled_distance": 136194.3667704154,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 53,
+      "sampled_distance": 168245.20783588052,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 54,
+      "sampled_distance": 160106.68552847573,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 55,
+      "sampled_distance": 165030.04704817937,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 56,
+      "sampled_distance": 164562.49688983633,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 57,
+      "sampled_distance": 162436.51379423024,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 58,
+      "sampled_distance": 166752.04015415633,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 59,
+      "sampled_distance": 143575.23101865596,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 60,
+      "sampled_distance": 165772.4045607039,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 61,
+      "sampled_distance": 159679.16305897347,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 62,
+      "sampled_distance": 173803.2847500273,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 63,
+      "sampled_distance": 162982.86239861348,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 64,
+      "sampled_distance": 174750.08230946414,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 65,
+      "sampled_distance": 163053.68892821585,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 66,
+      "sampled_distance": 158346.00706278533,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 67,
+      "sampled_distance": 160147.92441333915,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 68,
+      "sampled_distance": 165891.2261305873,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 69,
+      "sampled_distance": 157906.9756775507,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 70,
+      "sampled_distance": 152601.32133450868,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 71,
+      "sampled_distance": 168732.7333079468,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 72,
+      "sampled_distance": 164802.04685218268,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 73,
+      "sampled_distance": 166798.96772890355,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 74,
+      "sampled_distance": 155007.30338819517,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 75,
+      "sampled_distance": 176293.84909288216,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 76,
+      "sampled_distance": 166916.21090164132,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 77,
+      "sampled_distance": 171050.44208035502,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 78,
+      "sampled_distance": 165590.22617787824,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 79,
+      "sampled_distance": 165133.76230212706,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 80,
+      "sampled_distance": 154001.03055069468,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 81,
+      "sampled_distance": 167800.2210809606,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 82,
+      "sampled_distance": 169753.19366791114,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 83,
+      "sampled_distance": 175239.96837529034,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 84,
+      "sampled_distance": 168914.5032324669,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 85,
+      "sampled_distance": 161376.30873867963,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 86,
+      "sampled_distance": 154577.94955633883,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 87,
+      "sampled_distance": 176114.68668043482,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 88,
+      "sampled_distance": 167302.30663172298,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 89,
+      "sampled_distance": 162423.71564050304,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 90,
+      "sampled_distance": 156445.8893661746,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 91,
+      "sampled_distance": 166942.68273180383,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 92,
+      "sampled_distance": 173840.59645858448,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 93,
+      "sampled_distance": 171165.70740841815,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 94,
+      "sampled_distance": 163129.60761673856,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 95,
+      "sampled_distance": 148884.8805695512,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 96,
+      "sampled_distance": 168315.52737022276,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 97,
+      "sampled_distance": 171140.9290449572,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 98,
+      "sampled_distance": 178554.7292827905,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 99,
+      "sampled_distance": 166379.48939177045,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 100,
+      "sampled_distance": 159550.6396960806,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 101,
+      "sampled_distance": 165351.99695908223,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 102,
+      "sampled_distance": 167314.1190563145,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 103,
+      "sampled_distance": 154075.4191207962,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 104,
+      "sampled_distance": 163024.5647693793,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 105,
+      "sampled_distance": 161673.91539967075,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 106,
+      "sampled_distance": 174913.54637848143,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 107,
+      "sampled_distance": 156591.3080626445,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 108,
+      "sampled_distance": 178917.03718416565,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 109,
+      "sampled_distance": 162583.8304084222,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 110,
+      "sampled_distance": 151899.81099690296,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 111,
+      "sampled_distance": 158690.16941230756,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 112,
+      "sampled_distance": 163120.3727137684,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 113,
+      "sampled_distance": 159154.90808797147,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 114,
+      "sampled_distance": 163622.3584664749,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 115,
+      "sampled_distance": 168265.31221994135,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 116,
+      "sampled_distance": 168938.89443917276,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 117,
+      "sampled_distance": 169726.90868064424,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 118,
+      "sampled_distance": 167724.51745104752,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 119,
+      "sampled_distance": 144554.06421943422,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 120,
+      "sampled_distance": 157042.96651609216,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 121,
+      "sampled_distance": 165597.14201057394,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 122,
+      "sampled_distance": 179403.00031540156,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 123,
+      "sampled_distance": 165511.42678197252,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 124,
+      "sampled_distance": 161323.87832869627,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 125,
+      "sampled_distance": 160420.06275936833,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 126,
+      "sampled_distance": 155997.39519565177,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    },
+    {
+      "slot": 127,
+      "sampled_distance": 175931.3539045322,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 20
+    }
+  ],
+  "observerSource": "200994db45fe1e37922bf7684b4b27b7696c2be1",
+  "audit": {
+    "mode": "log",
+    "phase": "last observed race stage 4",
+    "registeredTypes": 84,
+    "boundSites": 3149,
+    "stackLifetimeSites": 16,
+    "instancesRegistered": 7932,
+    "observedAccesses": 26544624544,
+    "filteredAccesses": 26534827916,
+    "watchedAccesses": 6027584,
+    "activeInstances": 2,
+    "unscopedStackEntries": [],
+    "hits": []
+  },
+  "termination": "SIGTERM by observer after native completion; waited before RAM backing cleanup.",
+  "limitations": [
+    "One-lap Luigi Circuit, primarily offline, headless null renderer; not all modes or courses.",
+    "Sequential 120-frame samples are not atomic and may miss short rescue events.",
+    "Only ArchiveMgr and AIManager heap lifetimes and generated stack watches active. Bulk-cache instrumentation added later is absent from this binary.",
+    "Five slots not sampled entering lap two; native automatic finish flags do not prove every CPU crossed the finish line.",
+    "No forced falls, scene round trip, live scoring correctness or rendered results qualification.",
+    "This does not qualify 128-console networking."
+  ]
+}

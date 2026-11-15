@@ -75,6 +75,20 @@ extern "C" void AIManager_AuditDestroy(CpuContext* ctx) {
 REGISTER_NATIVE_WRAPPER_AS(0x807390AC, AIManager_AuditDestroy,
                            "AIManager_AuditDestroy");
 
+// Verified NTSC-U Item::Manager constructor/destructor: 807902CC / 80790664.
+// The singleton factory calls the constructor before publishing its pointer.
+extern "C" void ItemManager_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction<0x807992D8>(ctx, "ItemManager", "Item::Manager constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x807992D8, ItemManager_AuditConstruct,
+                           "ItemManager_AuditConstruct");
+
+extern "C" void ItemManager_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction<0x80799670>(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80799670, ItemManager_AuditDestroy,
+                           "ItemManager_AuditDestroy");
+
 extern "C" void GuestDelete_AuditRetirement(CpuContext* ctx) {
 #ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
     // Retire before the allocator can hand this address to another object.

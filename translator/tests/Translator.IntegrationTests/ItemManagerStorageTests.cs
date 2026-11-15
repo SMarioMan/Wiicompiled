@@ -12,8 +12,16 @@ public class ItemManagerStorageTests
     [InlineData(12)]
     [InlineData(13)]
     [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(48)]
+    [InlineData(52)]
+    [InlineData(64)]
     [InlineData(100)]
+    [InlineData(116)]
+    [InlineData(118)]
+    [InlineData(127)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealItemManagerKeepsItsPlayerCacheSeparateFromAllObjectHolders(int players)
     {
@@ -37,9 +45,11 @@ public class ItemManagerStorageTests
                 0x807d5d98,0x807d96fc,0x807acf8c,0x807ae8e0,0x807d6070,0x807d9d4c,0x80792d88,0x80792ec4,
                 0x8078ccc0,0x8078e540,0x8078e6d4,0x8078d464,0x8078db24,0x8078e4a0,0x8078cd88,0x80790e44,
                 0x8078e91c,0x807904d0,0x8078da3c,0x8078f83c,0x8078cf5c};
-            var sources=new List<string>();
+            File.WriteAllText(Path.Combine(temp,"layout.h"),plan.EmitNativeConstants());
+            var sources=new List<string>{Path.Combine(root,"runtime/src/layout_access_audit.cpp"),
+                Path.Combine(root,"runtime/src/hle/layout_audit_lifetimes.cpp"),Path.Combine(root,"runtime/src/guest_region.cpp")};
             foreach(var pc in entries){var path=Path.Combine(temp,$"{pc:X8}.cpp");
-                File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures)).CxxCode);sources.Add(path);}
+                File.WriteAllText(path,translator.Translate(pc,new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),LeafInliningBlockedTargets:fixtures.Append(0x807902ccu).ToHashSet())).CxxCode);sources.Add(path);}
             var declarations=string.Join("\n",entries.Select(pc=>$"extern \"C\" void func_{pc:X8}(CpuContext*);"));
             var registrations=string.Join("\n",entries.Select(pc=>$"register_entry(0x{pc:X8},func_{pc:X8});"));
             var binary=Path.Combine(temp,"image.bin");File.WriteAllBytes(binary,image.Memory);
@@ -47,6 +57,8 @@ public class ItemManagerStorageTests
             File.WriteAllText(harness,$$"""
                 #include "ppc_runtime.h"
                 #include "abi_bridge.h"
+                #include "layout.h"
+                extern "C" void ItemManager_AuditDestroy(CpuContext*);
                 #include <array>
                 #include <cstdio>
                 #include <cstring>
@@ -93,6 +105,7 @@ public class ItemManagerStorageTests
                     if(argc!=2)return 1;Memory::Init(32*1024*1024);FILE* input=std::fopen(argv[1],"rb");if(!input)return 2;
                     auto loaded=std::fread(Memory::GetPointer(0x80000000,{{image.Memory.Length}}),1,{{image.Memory.Length}},input);
                     std::fclose(input);if(loaded!={{image.Memory.Length}})return 3;
+                    RegisterGeneratedLayoutAccessAuditMap();LayoutAccessAudit::Configure({LayoutAccessAudit::Mode::Strict});
                     {{registrations}}
                     register_entry(0x80229a48,allocate);register_entry(0x80229a6c,allocate);
                     register_entry(0x8021a050,no_op);register_entry(0x8021a0a4,no_op);
@@ -113,6 +126,7 @@ public class ItemManagerStorageTests
                         CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                         for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
                         func_8079012C(&ctx);
+                        if(LayoutAccessAudit::ReportJson().find("\"activeInstances\":1")==std::string::npos)return 17;
                         if(ctx.gpr[3]!=root || allocations!=2 || initialized!=15 || constructed!=n || playerInit!=n)return 4;
                         if(Memory::Read32(root+dummy)!=0x808cd288 || Memory::Read16(root+dummy+0xc)!=0xffff ||
                             Memory::Read32(root+dummy+0x74)!=0 || Memory::Read32(root+dummy+0x78)!=0 || Memory::Read32(root+dummy+0x7c)!=64)return 15;
@@ -129,7 +143,8 @@ public class ItemManagerStorageTests
                         Memory::Write32(root+total,0);ctx.gpr[3]=root;func_80790A44(&ctx);
                         if(Memory::Read32(root+total)!=static_cast<uint32_t>(-15))return 10;
                         func_807916C4(&ctx);if(cleaned!=15 || resetPlayers!=n || !holder_storage())return 11;
-                        Memory::Write32(0x809bee20,0);ctx.gpr[3]=root;ctx.gpr[4]=0;func_80790664(&ctx);
+                        Memory::Write32(0x809bee20,0);ctx.gpr[3]=root;ctx.gpr[4]=0;ItemManager_AuditDestroy(&ctx);
+                        if(LayoutAccessAudit::ReportJson().find("\"activeInstances\":0")==std::string::npos)return 18;
                         if(destructed!=15 || !guards())return 12;
                         for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 13;
                         if(ctx.gpr[1]!=stack)return 14;
@@ -137,8 +152,11 @@ public class ItemManagerStorageTests
                     return 0;
                 }
                 """);
+            var support=Path.Combine(temp,"translator_test_support.cpp");
+            var arguments=TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)+" -DMKW_ENABLE_LAYOUT_ACCESS_AUDIT=1";
+            File.WriteAllText(support,File.ReadAllText(support).Replace("const uint8_t kMkwGuestRegion = 0;","const uint8_t kMkwGuestRegion = 1;",StringComparison.Ordinal));
             using(var compile=Process.Start(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",
-                TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false)){RedirectStandardError=true})!)
+                arguments){RedirectStandardError=true})!)
             {
                 var errors=compile.StandardError.ReadToEndAsync();var done=compile.WaitForExit(60000);
                 if(!done)compile.Kill(entireProcessTree:true);Assert.True(done,"Item manager compilation timed out");Assert.True(compile.ExitCode==0,errors.GetAwaiter().GetResult());

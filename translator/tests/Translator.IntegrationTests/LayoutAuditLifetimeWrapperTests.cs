@@ -10,6 +10,8 @@ public class LayoutAuditLifetimeWrapperTests
     [InlineData(true, "ArchiveManager", 0x8053a7b0u, 0x8053a9e0u)]
     [InlineData(false, "AIManager", 0x8072b8acu, 0x8072ba84u)]
     [InlineData(true, "AIManager", 0x8072b8acu, 0x8072ba84u)]
+    [InlineData(false, "ItemManager", 0x807902ccu, 0x80790664u)]
+    [InlineData(true, "ItemManager", 0x807902ccu, 0x80790664u)]
     public void WrappersWatchConstructionAndRetireBeforeReleaseIncludingFailures(bool instrumented, string type, uint constructor, uint destructor)
     {
         var directory=new DirectoryInfo(AppContext.BaseDirectory);

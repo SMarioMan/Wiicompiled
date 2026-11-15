@@ -119,8 +119,12 @@ The strict `dcbz` check runs outside its scalar fallback catch so it cannot be
 swallowed and retried. Controlled native fixtures prove stale reads and writes
 stop before copying/zeroing, while correct relocated accesses retain overlapping
 `memmove` behavior and GX DMA notifications. Enabled and disabled fixtures pass.
+Known field intent also identifies a stale starting pointer when the transfer
+extends beyond the old field into neighboring storage. A controlled 96-byte
+copy starting in a retired 64-byte tail is rejected before mutation, with its
+full width reported. Unattributed ranges retain conservative classification.
 This closes those specific raw-pointer escapes; it does not instrument every
-host pointer user or prove coverage for bulk ranges spanning multiple fields.
+host pointer user or prove coverage for bulk ranges starting outside a field.
 
 ## Live balloon counter boundary, 2026-11-15
 

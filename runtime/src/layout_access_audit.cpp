@@ -309,7 +309,14 @@ void Observe(uint32_t address,uint32_t width,Operation op){
                     // outside the intended current field; unknown accesses
                     // retain the smaller historical range and stay leads.
                     const uint64_t oldExtent=known?std::max<uint64_t>(field.oldSize,uint64_t(field.newCount)*field.oldStride):field.oldSize;
-                    if(!contains(oldStart,oldExtent,address,width))continue;
+                    // Bulk copies/clears can start at a stale field pointer and
+                    // extend into neighboring fields. Proven field intent and
+                    // a start inside the old field still establish that stale
+                    // pointer; requiring the entire transfer to fit hid it.
+                    // Unattributed ranges retain the conservative whole-access
+                    // check and are never promoted to high-confidence hits.
+                    if(!contains(oldStart,oldExtent,address,width) &&
+                       !(known && contains(oldStart,oldExtent,address,1)))continue;
                     stale=known&&unique;
                     if(stale){
                         const uint32_t relative=uint32_t(address-oldStart);index=relative/field.oldStride;

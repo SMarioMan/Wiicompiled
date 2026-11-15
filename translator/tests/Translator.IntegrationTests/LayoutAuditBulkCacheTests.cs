@@ -69,11 +69,20 @@ public class LayoutAuditBulkCacheTests
                         try{DCZeroRange_HLE_801a16e4(&c);return 7;}catch(const StaleAccess&){}
                     }
                     if(!unchanged(oldTail,32,0x55)||notifications)return 8;
+                    {
+                        ScopedSite site({.pc=0x80006000,.type="BulkObject",.field="tail",.native=true});
+                        c.gpr[3]=oldTail;c.gpr[4]=out;c.gpr[5]=96;
+                        // Starts at a stale tail pointer but spans beyond the
+                        // original 64-byte field: do not miss this raw copy.
+                        try{LCStoreData_HLE_801a18dc(&c);return 16;}catch(const StaleAccess&){}
+                    }
+                    if(!unchanged(oldTail,96,0x55)||notifications)return 17;
                     auto report=ReportJson();
-                    for(auto pc:{"0x80001000","0x80002000","0x80003000","0x80004000"})
+                    for(auto pc:{"0x80001000","0x80002000","0x80003000","0x80004000","0x80006000"})
                         if(report.find(pc)==std::string::npos)return 9;
                     if(report.find("\"operation\":\"read\"")==std::string::npos ||
-                       report.find("\"width\":32")==std::string::npos)return 10;
+                       report.find("\"width\":32")==std::string::npos ||
+                       report.find("\"width\":96")==std::string::npos)return 10;
                 #else
                     Configure({Mode::Off});
                     memset_zero_32(oldTail);if(!unchanged(oldTail,32,0))return 11;

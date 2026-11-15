@@ -180,6 +180,10 @@ public class RetiredLayoutAuditTests
                     auto observe=[](){for(unsigned i=0;i<10000;i++)Observe(0x800b0000,4,Operation::Read);};
                     std::thread workerA(observe),workerB(observe);workerA.join();workerB.join();
                     if(counter("observedAccesses")!=observedBefore+20000 || counter("filteredAccesses")!=filteredBefore+20000)return 13;
+                    // A valid short allocation can sit at the end of the guest
+                    // address space even when its original layout was larger.
+                    auto edge=RegisterInstance("AuditObject",0xfffffff0,16);
+                    SetGuestPc(0);Observe(0xfffffff8,8,Operation::Read);RetireInstance(edge);
                     WriteReport();
                 }
                 """);

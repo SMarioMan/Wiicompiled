@@ -71,7 +71,8 @@ void ensurePageIndex(State& s){
 void changePages(State& s,const Instance& instance,bool add){
     ensurePageIndex(s);
     const uint64_t bytes=std::max(instance.bytes,s.types.at(instance.type).oldSize);
-    const uint64_t last=(uint64_t(instance.base)+bytes-1)>>12;
+    const uint64_t end=std::min(uint64_t(instance.base)+bytes,uint64_t(UINT32_MAX)+1);
+    const uint64_t last=(end-1)>>12;
     for(uint64_t page=instance.base>>12;page<=last;page++){
         if(add)s.watchedPages[page].fetch_add(1,std::memory_order_release);
         else s.watchedPages[page].fetch_sub(1,std::memory_order_release);

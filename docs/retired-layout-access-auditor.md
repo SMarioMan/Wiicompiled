@@ -182,3 +182,9 @@ accesses, with over 99.98% excluded from field scanning and no reported hits in
 the exercised watches. This is coverage of the active ArchiveMgr and generated
 stack watches, not proof that every heap family or gameplay path is covered.
 Complete higher-capacity gameplay and resource qualification remain pending.
+
+The page index caps bookkeeping at the 32-bit guest-address boundary. A short
+current allocation at that boundary can have a larger original layout; its
+original extent must not index a page beyond the address space. The native
+regression registers such an allocation, observes its final eight bytes and
+retires it without touching guest RAM or corrupting the host index.

@@ -1093,7 +1093,7 @@
     {
       "Name": "NdevDebugReserveUnits",
       "Alignment": 1,
-      "Size": 23322624
+      "Size": 279871488
     },
     {
       "Name": "TeamResultHeader",
@@ -3352,6 +3352,28 @@
         {
           "Name": "gprs",
           "Type": "SavedGprs19"
+        }
+      ]
+    },
+    {
+      "Name": "NdevDebugReserveAxis",
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "players",
+          "Type": "InputByte",
+          "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "NdevDebugReserveDivisor",
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "axes",
+          "Type": "NdevDebugReserveAxis",
+          "PerPlayer": true
         }
       ]
     }
@@ -29872,7 +29894,7 @@
       "ExpectedWord": "0x3C1AFC4B",
       "Node": 0,
       "Operand": "right",
-      "Symbol": "floor(NdevDebugReserveUnits.size/players)",
+      "Symbol": "floor(NdevDebugReserveUnits.size/NdevDebugReserveDivisor.size)",
       "Scale": -32
     },
     {
@@ -29880,7 +29902,7 @@
       "ExpectedWord": "0x3F6003B5",
       "Node": 0,
       "Operand": "value",
-      "Symbol": "floor(NdevDebugReserveUnits.size/players)",
+      "Symbol": "floor(NdevDebugReserveUnits.size/NdevDebugReserveDivisor.size)",
       "Scale": 32
     },
     {

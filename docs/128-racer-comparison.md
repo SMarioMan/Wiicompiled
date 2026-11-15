@@ -242,3 +242,30 @@ contains the binary hash, every ranking/inverse-position value and explicit paus
 termination and qualification limits. The earlier duplicate ID zero/missing ID 60
 is absent. Four-to-three, GP/team/battle flows and second-race qualification of
 this rebuilt source remain separate work.
+
+
+## Reclaim the unused NDEV reserve within the existing root partition
+
+The live 128-active battle probes established remaining MEM2 pressure even after
+moving the sound child: course `0x21` failed a 117,368-byte model request, and
+Block Plaza retained only 87,432 free bytes at the later battle-ranking fault.
+Both snapshots showed the separate debug owner entirely free (5,830,048 bytes).
+Original `GameScene::CreateHeap` (`80517470`) selects an allocation slot by its
+heap index; its sole direct race caller (`8054E550`) requests secondary index 1.
+Debug-slot direct references are primarily state flags and teardown. Indexed or
+indirect debug consumers remain a live qualification concern.
+
+Retain the checked root partition and distinct owners, but make the NDEV reserve
+decay as `32 * floor(279871488 / (N*N))`. Capacity-aware axis/divisor metadata
+supplies `N*N`; the original twelve-racer reserve remains exactly `0x3B50000`.
+At 128 the reserve is 546,624 bytes, reclaiming 5,284,032 bytes for the existing
+MEM2 owner without enlarging mapped memory or changing any allocation/free route.
+The debug owner remains present. This replaces the earlier linear inverse reserve
+curve; it does not import an overflow allocator or ownership map.
+
+All thirteen original root-initializer fixtures pass for retail and NDEV memory
+extents, with aligned non-overlapping partitions, original system-heap ownership,
+register/structure guards and identical emitted twelve-capacity code. All 977
+unit tests pass. Live resource loading, effects and scene round trips must still
+verify the smaller debug budget and reclaimed MEM2 headroom before this pressure
+issue is considered resolved.

@@ -35,6 +35,10 @@ public class RootHeapBudgetTests
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
         var translator=new FunctionTranslator(image,layoutRelocations:plan);
+        if(players==12){var stockOptions=new TranslationOptions(KnownFunctionEntryPoints:map.Addresses.ToHashSet(),
+            LeafInliningBlockedTargets:new HashSet<uint>{0x801a0f28,0x80229324,0x80226698,0x80226744,0x802299f0});
+            Assert.Equal(new FunctionTranslator(image).Translate(0x80241648,stockOptions).CxxCode,
+                translator.Translate(0x80241648,stockOptions).CxxCode);}
         var temp=Path.Combine(Path.GetTempPath(),"mkw-root-budget-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         try
         {
@@ -81,7 +85,7 @@ public class RootHeapBudgetTests
                         Memory::Write32(ctx.gpr[13]-29024,0x80010000);Memory::Write32(ctx.gpr[13]-25416,0x81700000);
                         Memory::Write32(ctx.gpr[13]-29020,0x90000800);Memory::Write32(ctx.gpr[13]-25412,end);
                         ctx.gpr[3]=root;func_80241648(&ctx);
-                        auto expectedReserve=end==0x97dc0000?uint32_t(23322624/capacity*32):0;
+                        auto expectedReserve=end==0x97dc0000?uint32_t(279871488/(capacity*capacity)*32):0;
                         if(created!=(expectedReserve?3:2) || subheaps!=1 || arenaCalls!=2 || current!=1)return 4;
                         if(ranges[0].start!=0x80010100 || ranges[0].size!=0x81700000-0x80010100)return 5;
                         if(ranges[1].start!=0x90000900 || ranges[1].size!=end-0x90000900-expectedReserve)return 6;

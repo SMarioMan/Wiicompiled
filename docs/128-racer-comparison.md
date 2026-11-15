@@ -269,3 +269,12 @@ register/structure guards and identical emitted twelve-capacity code. All 977
 unit tests pass. Live resource loading, effects and scene round trips must still
 verify the smaller debug budget and reclaimed MEM2 headroom before this pressure
 issue is considered resolved.
+
+
+The clean `2851cbc` binary also renders all 128 cards together in **4:3**, in a
+960-by-720 viewport within the 1280-by-720 window. The first race and a second
+race after the original results/next-race/scene teardown flow both retain every
+participant ID exactly once and matching inverse positions. Final 16-by-8 results
+were captured after the second race, with one local highlight and retail styling.
+[The 4:3 record](validation/128-capacity-vs-rendered-128-4x3.json) preserves both
+rank maps and capture limits. GP/team/battle results remain unqualified.

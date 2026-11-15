@@ -61,6 +61,10 @@ void BindSite(const Site& site);
 void BindStackSite(uint32_t pc, std::string_view type);
 uint64_t RegisterInstance(std::string_view type, uint32_t base, uint32_t allocatedBytes = 0,
                           std::string_view lifetime = {}, uint32_t owner = 0);
+// Idempotent first-use registration for objects whose constructors were inlined.
+// An existing watch must have the same allocation extent and owner.
+uint64_t EnsureInstance(std::string_view type, uint32_t base, uint32_t allocatedBytes = 0,
+                        std::string_view lifetime = {}, uint32_t owner = 0);
 void RetireInstance(uint64_t generation);
 void RetireAllocation(uint32_t base);
 void RetireOwner(uint32_t owner);

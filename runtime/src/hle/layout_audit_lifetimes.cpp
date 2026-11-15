@@ -100,3 +100,19 @@ extern "C" void GuestDelete_AuditRetirement(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x80229E14, GuestDelete_AuditRetirement,
                            "GuestDelete_AuditRetirement");
+
+// The parent normally inlines construction. The update wrapper enrolls those
+// objects at first use; standalone construction still receives a pre-call watch.
+// Verified NTSC-U constructor/destructor: 8072535C / 8072537C.
+extern "C" void AIBattleTargetSelector_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8072C548)(guest); },
+                      "AIBattleTargetSelector", "battle target constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8072C548,AIBattleTargetSelector_AuditConstruct,
+                           "AIBattleTargetSelector_AuditConstruct");
+
+extern "C" void AIBattleTargetSelector_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(8072C568)(guest); });
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8072C568,AIBattleTargetSelector_AuditDestroy,
+                           "AIBattleTargetSelector_AuditDestroy");

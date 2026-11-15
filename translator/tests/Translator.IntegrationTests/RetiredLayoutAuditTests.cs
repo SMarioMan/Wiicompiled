@@ -104,6 +104,10 @@ public class RetiredLayoutAuditTests
                     constexpr uint32_t base=0x80020000,oldTail=base+56,newTail=base+104;
                     Memory::Write32(oldTail,0x11111111);Memory::Write32(newTail,0x22222222);
                     auto generation=RegisterInstance("AuditObject",base,108,"controlled race",123);
+                    if(EnsureInstance("AuditObject",base,0,"first use",123)!=generation)return 60;
+                    try{EnsureInstance("AuditObject",base,109,"wrong size",123);return 61;}catch(const std::invalid_argument&){}
+                    try{EnsureInstance("AuditObject",base,108,"wrong owner",456);return 62;}catch(const std::invalid_argument&){}
+                    try{RegisterInstance("AuditObject",base,108,"duplicate",123);return 63;}catch(const std::invalid_argument&){}
                     Configure({Mode::Log,false,argv[1]});SetPhase("race-start");
                     CpuContext c{};CpuContextScope cpu(&c);c.gpr[1]=0x800f0000;
                     c.gpr[3]=base;func_80002000(&c);if(c.gpr[3]!=0x22222222)return 2;
@@ -131,7 +135,8 @@ public class RetiredLayoutAuditTests
                     if(!stopped||Memory::Read32(oldTail)!=before)return 5;
                     RetireInstance(generation);
                     SetGuestPc(0x80001000);Memory::Write32(oldTail,0x55555555); // ordinary reuse, no watch
-                    auto next=RegisterInstance("AuditObject",base,108,"second race",456);
+                    auto next=EnsureInstance("AuditObject",base,108,"second race",456);
+                    if(next==generation)return 64;
                     if(next==generation)return 6;
                     RetireOwner(456);
                     SetGuestPc(0x80001100);Memory::Write32(oldTail,0x66666666);

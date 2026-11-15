@@ -327,3 +327,25 @@ declared-consumer proof/original-emission/expanded-compilation check also pass.
 The new native source compiles with instrumentation disabled. The live battle
 retest must include the smaller NDEV reserve and the migrated selector together;
 none of these fixture results qualifies a completed 128-active battle yet.
+
+
+## First-use watches for inlined battle selectors
+
+`EnsureInstance` atomically reuses an existing watch only when type, base,
+allocation extent and owner agree. Ordinary `RegisterInstance` retains duplicate
+rejection. Releasing and reusing storage creates a new generation. This lets a
+native first-use hook enroll an object whose constructor was inlined without
+silently replacing another lifetime or weakening size/owner checks.
+
+The battle update wrapper enrolls the migrated selector before guest classification.
+Standalone construction has its usual pre-call watch; destructor and global-delete
+hooks retire deleting and non-deleting lifetimes. Inlined initialization/population
+before the first update is still covered by static and controlled native fixtures,
+not by this live first-use watch. No guest allocation or game state is changed.
+
+Eight constructor/destructor configurations plus both auditor foundation cases
+pass. They retain earlier overlap, stale read/write, reuse and cleanup tests and
+add idempotence, mismatched extent/owner rejection and fresh generation checks.
+The 128 selector fixture reuses its preexisting watch correctly; both C++17 header
+configurations and all eight native import/index tests also pass. A rebuilt live
+expanded battle must verify these added watches in the actual scene lifecycle.

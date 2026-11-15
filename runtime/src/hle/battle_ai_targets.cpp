@@ -46,6 +46,12 @@ REGISTER_NATIVE_WRAPPER_AS(0x8072C740, BattleAI_FirstMatchingTarget,
 // expanded AI subsequently retains that cache ordering between updates.
 extern "C" void BattleAI_UpdateTargets(CpuContext* ctx) {
     const auto base=ctx->gpr[3];
+#ifdef MKW_ENABLE_LAYOUT_ACCESS_AUDIT
+    if(GuestRegion::Current()==GuestRegion::Id::NtscU &&
+       LayoutAccessAudit::enabled.load(std::memory_order_relaxed) &&
+       LayoutAccessAudit::HasType("AIBattleTargetSelector"))
+        LayoutAccessAudit::EnsureInstance("AIBattleTargetSelector",base,0,"battle target update/destructor");
+#endif
     MKW_GUEST_NEXT(8072C5E8)(ctx);
     if (GuestRegion::Current()!=GuestRegion::Id::NtscU || MkwGuestLayout::kLayout.playerCapacity<=12) return;
     const auto& layout=MkwGuestLayout::kBattleTargets;

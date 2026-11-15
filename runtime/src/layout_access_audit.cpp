@@ -203,17 +203,24 @@ void BindStackSite(uint32_t pc,std::string_view type){
     const auto index=(pc>>2)&0xffffu;
     s.stackPcFilter[index>>6].fetch_or(uint64_t(1)<<(index&63),std::memory_order_release);
 }
-uint64_t RegisterInstance(std::string_view type,uint32_t base,uint32_t bytes,std::string_view lifetime,uint32_t owner){
+static uint64_t RegisterInstanceImpl(std::string_view type,uint32_t base,uint32_t bytes,std::string_view lifetime,uint32_t owner,bool ensure){
     auto& s=state();std::lock_guard lock(s.mutex);const auto found=s.types.find(type);
     if(!base||found==s.types.end())throw std::invalid_argument("Unknown retired-layout instance type/base");
     if(!bytes)bytes=found->second.newSize;
     if(uint64_t(base)+bytes>uint64_t(UINT32_MAX)+1)throw std::invalid_argument("Retired-layout instance wraps guest address space");
-    for(const auto& [id,instance]:s.instances){(void)id;if(instance.base==base&&instance.type==type)
-        throw std::invalid_argument("Retired-layout instance is already live; retire before reuse");}
+    for(const auto& [id,instance]:s.instances){if(instance.base==base&&instance.type==type){
+        if(ensure && instance.bytes==bytes && instance.owner==owner)return id;
+        throw std::invalid_argument("Retired-layout instance is already live; retire before reuse");}}
     const auto generation=s.nextGeneration++;
     s.instances.emplace(generation,Instance{generation,std::string(type),base,bytes,owner,std::string(lifetime)});
     changePages(s,s.instances.at(generation),true);
     return generation;
+}
+uint64_t RegisterInstance(std::string_view type,uint32_t base,uint32_t bytes,std::string_view lifetime,uint32_t owner){
+    return RegisterInstanceImpl(type,base,bytes,lifetime,owner,false);
+}
+uint64_t EnsureInstance(std::string_view type,uint32_t base,uint32_t bytes,std::string_view lifetime,uint32_t owner){
+    return RegisterInstanceImpl(type,base,bytes,lifetime,owner,true);
 }
 void RetireInstance(uint64_t id){auto& s=state();std::lock_guard lock(s.mutex);retireMatching(s,[&](const Instance& x){return x.generation==id;});}
 void RetireAllocation(uint32_t base){auto& s=state();std::lock_guard lock(s.mutex);retireMatching(s,[&](const Instance& x){return x.base==base;});}

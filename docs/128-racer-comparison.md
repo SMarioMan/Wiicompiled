@@ -30,6 +30,7 @@ expanded inline storage, moved trailing fields and checked original consumers.
 | Race-scene heap budgets and cross-heap ownership. | **Partially covered.** Checked `HeapRoutes` retain separate backing owners; the NDEV reserve shrinks with capacity. Real 24-player scene round trips exist; the original root partitioner passes guarded ownership checks at all thirteen required capacities through 128. This differs intentionally from MKW100's overflow arena. | Preserve routing/reserves. Measure mixed-resource peaks at 128 and verify every allocation/free/resize/reset owner. A live 128-active Coin Runners startup exhausted the MEM2 scene heap; the identified battle sound-heap request now tries the retained MEM1 backing owner using the original child factory, with original-parent retry on failure. Validate this narrow route live before claiming the failure resolved. | Effect/item-heavy races, mixed characters/vehicles, scene exit, second race and owner/heap guard reports. |
 | ObjectsMgr fixed object-registration pools and interaction vectors. | **Already covered for tested manager paths through 128.** Existing `ObjectPoolCapacity` derives `80 + 10*N` entries rather than retaining the original 200-object budget. | Preserve the checked allocations/counts. Qualify rendered object resources and full battle lifecycle separately. | Original USA manager allocation, vector initialization, complete pool registration and destruction pass all thirteen required capacities, including 1,360 entries at 128. Resource constructors remain callbacks. |
 | AI manager controller arrays, rank/route subobjects and battle team lists. | **Partially covered.** `AIManager`, `AIVsSub`, `AIEnemyRoutes`, `AIRacerObjects` and battle roster layouts already expand these families. Strict-audited original AI manager initialization, both controller lookups and route initialization pass all thirteen required capacities; automatic manager constructor/destructor/release watches now join the ArchiveMgr watches. | Map each vanilla reference site to our corresponding function and check indirect, pointer-walk, reset and destructor paths; do not infer a gap from unchanged index strides alone. | Existing native fixtures extended to boundaries, plus retired-access traces and high-ID AI movement/respawns. |
+| Per-controller battle opponent selector: two six-entry pointer/state arrays and following scalar, `0x40` allocation. | **Confirmed missing, migrated and fixture-verified.** A real 128-active Coin Runners update reached gameplay, then the population loop overwrote neighboring AI selectors with opponent pointers. The parent inlines allocation, construction, reset, population and several lookups; protecting only standalone methods is insufficient. | Expand both arrays to the existing team-roster capacity `ceil(N/2)`, move the tail, inventory inline consumers, and retain full target eligibility for original six-way queries. | Native guarded original-code fixtures, strict stale-read/write controls, odd team sizes, high-ID targets, two lifetimes and a rebuilt full battle. |
 | Input virtual-controller holders, stride `0x180`. | **Partially covered.** `InputManager` already models per-racer holders and relocated following controllers; native boot/layout fixtures exercise this. | Check construction, pointer differences, attachment and teardown at 128, preserving four physical screen/controller roles. | High-ID CPU input and guarded lifecycle fixtures, with no physical-controller expansion. |
 | Item players/online partner pointers and retained object-holder tail. | **Partially covered.** `ItemManager` and nested item state have relocated per-racer arrays and following fields. Automatic constructor/destructor/release watches now cover the manager before singleton publication. Strict-audited original initialization, partner-cache indexing, all fifteen object holders, updates, reset and destruction pass all thirteen required capacities over two lifetimes; resource constructors remain callbacks. | Audit the vanilla reference sites and computed/indirect readers; keep network-only work parked. | High-ID vanilla item use, reset/destruction and native/guest access agreement at 128. |
 | Gesso/Blooper state, POW affected flags and Race HUD balloon positions. | **Partially covered.** `GessoManager`, `PowManager` and `RaceBalloons` distinguish participant arrays from four screen slots/severity roles. Original POW/Blooper construction, per-racer targeting, independent one-to-four screen slots, updates and cleanup fixtures now pass all thirteen required capacities, including the highest racer IDs at 127/128. Race HUD balloon presentation remains a separate qualification. | Extend active high-ID effects and all computed readers, rather than growing fixed screen/severity arrays. | Racer 127 targeting/effects, screen bounds and no unexplained retired-layout reports. |
@@ -278,3 +279,51 @@ participant ID exactly once and matching inverse positions. Final 16-by-8 result
 were captured after the second race, with one local highlight and retail styling.
 [The 4:3 record](validation/128-capacity-vs-rendered-128-4x3.json) preserves both
 rank maps and capture limits. GP/team/battle results remain unqualified.
+
+
+## Battle opponent-selector migration
+
+The `7137b24` live 128-active Block Plaza Coin Runners probe passes initialization
+and countdown, then fails at the first active AI update. `8072492C` calls a
+neighboring selector whose vtable was overwritten by opponent pointers. The
+responsible object at `93C4507C` had an original `0x40` allocation: header `+0`,
+six pointers at `+0xC`, six state words at `+0x24`, and a trailing word at `+0x3C`.
+`80724678` and `80725798` already populate it from the enlarged opposing roster.
+This helper is distinct from the already migrated AIManager and team rosters.
+
+`AIBattleTargetSelector` uses the same `ceil(N/2)` dimension as those rosters.
+At 128 it has 64 pointers, 64 state words and size `0x210`; states start at
+`0x10C` and the trailing scalar moves to `0x20C`. The migration pins the live
+allocation immediate at `80723824`, inline constructor tail store at `807239A4`,
+standalone construction/reset, both original reset fills, the update count and
+state addresses, and all discovered inline state reads. Eight extra reads use an
+advanced `r5` base rather than `r4`; they are inventoried separately. The superficially
+similar `8072664C` load belongs to another selector and is not rewritten.
+
+A generated companion export supplies native target-array offsets and capacity
+without changing the established `MkwGuestLayout::Layout` ABI. The standalone
+first-match wrapper scans the relocated arrays. For the original inlined six-way
+queries, the update wrapper first runs the original distance/angle classifier
+across all slots, then stably promotes the first non-null representative of each
+of its five fixed state classes into the prefix. It retains every paired target
+and state in the same guest arrays; no persistent shadow storage is introduced.
+Each current classification's first matching identity is preserved. Expanded AI
+retains this cache ordering between updates, so later priority can favor previous
+representatives; the twelve-capacity path calls through without promotion.
+
+The controlled original-code fixture supplies guarded expanded backing while
+observing the original 64-byte request. Strict mode stops its stale inline tail
+write before changing a live target slot, then stops the original stale state
+read. Positive tests cover the allocation/inline-construction seam, standalone
+constructor, real inline reset/population paths, full classification iteration,
+advanced-base inline lookups, nulls, all state classes, high-ID targets, guards,
+reset and destruction over two lifetimes. Position and angle helpers use fixture
+callbacks; complete battle gameplay remains a separate qualification.
+
+
+All fourteen final selector cases pass: the thirteen required capacities and the
+original-code stale-access control at 128. All 977 unit tests and the complete
+declared-consumer proof/original-emission/expanded-compilation check also pass.
+The new native source compiles with instrumentation disabled. The live battle
+retest must include the smaller NDEV reserve and the migrated selector together;
+none of these fixture results qualifies a completed 128-active battle yet.

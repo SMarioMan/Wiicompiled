@@ -9,6 +9,15 @@
 #endif
 
 namespace MkwGuestLayout {
+#ifdef MKW_LAYOUT_AIBATTLETARGETSELECTOR_TARGETS_COUNT
+const BattleTargetLayout kBattleTargets{
+    MKW_LAYOUT_AIBATTLETARGETSELECTOR_TARGETS_COUNT,
+    MKW_LAYOUT_AIBATTLETARGETSELECTOR_TARGETS_OFFSET,
+    MKW_LAYOUT_AIBATTLETARGETSELECTOR_STATES_OFFSET};
+#else
+const BattleTargetLayout kBattleTargets{6, 0xC, 0x24};
+#endif
+
 #if defined(MKW_GUEST_LAYOUT_EXPLICIT) && MKW_GUEST_LAYOUT_EXPLICIT
 static_assert(MKW_TRANSLATED_PLAYER_CAPACITY == MKW_LAYOUT_PLAYER_CAPACITY,
               "Native and translated player capacities must agree");

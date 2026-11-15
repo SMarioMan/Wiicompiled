@@ -3376,6 +3376,37 @@
           "PerPlayer": true
         }
       ]
+    },
+    {
+      "Name": "AIBattleTargetHeader",
+      "Alignment": 4,
+      "Size": 12
+    },
+    {
+      "Name": "AIBattleTargetSelector",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "AIBattleTargetHeader"
+        },
+        {
+          "Name": "targets",
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 2
+        },
+        {
+          "Name": "states",
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 2
+        },
+        {
+          "Name": "tail",
+          "Type": "Pointer"
+        }
+      ]
     }
   ],
   "References": [
@@ -66985,6 +67016,419 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "BattlePositionTrackingFrame.size"
+    },
+    {
+      "Instruction": "0x80723824",
+      "ExpectedWord": "0x38600040",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "AIBattleTargetSelector.size"
+    },
+    {
+      "Instruction": "0x807239A4",
+      "ExpectedWord": "0x9223003C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.tail.offset"
+    },
+    {
+      "Instruction": "0x80725374",
+      "ExpectedWord": "0x9003003C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.tail.offset"
+    },
+    {
+      "Instruction": "0x807253F4",
+      "ExpectedWord": "0x9003003C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.tail.offset"
+    },
+    {
+      "Instruction": "0x8072544C",
+      "ExpectedWord": "0x3B780024",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725518",
+      "ExpectedWord": "0x2C1A0006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "AIBattleTargetSelector.targets.count"
+    },
+    {
+      "Instruction": "0x807254D4",
+      "ExpectedWord": "0x93BC0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x807254F4",
+      "ExpectedWord": "0x93BC0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725504",
+      "ExpectedWord": "0x93DC0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x8072550C",
+      "ExpectedWord": "0x93FC0024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725560",
+      "ExpectedWord": "0x80030024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725580",
+      "ExpectedWord": "0x80030028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807255A4",
+      "ExpectedWord": "0x80030024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x807255C4",
+      "ExpectedWord": "0x80030028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807255E4",
+      "ExpectedWord": "0x8003002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80725604",
+      "ExpectedWord": "0x80030030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x807257F0",
+      "ExpectedWord": "0x907B000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.targets.offset"
+    },
+    {
+      "Instruction": "0x80724074",
+      "ExpectedWord": "0x93C3003C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.tail.offset"
+    },
+    {
+      "Instruction": "0x807246EC",
+      "ExpectedWord": "0x907B000C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.targets.offset"
+    },
+    {
+      "Instruction": "0x80725BF4",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725C10",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725C30",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725C4C",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725C68",
+      "ExpectedWord": "0x8004002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80725C84",
+      "ExpectedWord": "0x80040030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80725CF4",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725D10",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725D30",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725D4C",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725D68",
+      "ExpectedWord": "0x8004002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80725D84",
+      "ExpectedWord": "0x80040030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80725DF0",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725E0C",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725EA0",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725EBC",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725EDC",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725EF8",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725F14",
+      "ExpectedWord": "0x8004002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80725F30",
+      "ExpectedWord": "0x80040030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80726108",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80726124",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807261B8",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x807261D4",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x807261F4",
+      "ExpectedWord": "0x80040024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80726210",
+      "ExpectedWord": "0x80040028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8072622C",
+      "ExpectedWord": "0x8004002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80726248",
+      "ExpectedWord": "0x80040030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80725E2C",
+      "ExpectedWord": "0x80050024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80725E48",
+      "ExpectedWord": "0x80050028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x80725E64",
+      "ExpectedWord": "0x8005002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80725E80",
+      "ExpectedWord": "0x80050030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
+    },
+    {
+      "Instruction": "0x80726144",
+      "ExpectedWord": "0x80050024",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset"
+    },
+    {
+      "Instruction": "0x80726160",
+      "ExpectedWord": "0x80050028",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x8072617C",
+      "ExpectedWord": "0x8005002C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 8
+    },
+    {
+      "Instruction": "0x80726198",
+      "ExpectedWord": "0x80050030",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "AIBattleTargetSelector.states.offset",
+      "Addend": 12
     }
   ],
   "GlobalPointers": {
@@ -74620,6 +75064,56 @@
       "Entry": "0x805338D0",
       "Receiver": null,
       "Name": "GMDataBattle::HandlePositionTracking"
+    },
+    {
+      "Entry": "0x807236EC",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8072535C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x8072537C",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807253BC",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x807253FC",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80725554",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80725620",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80723FE0",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80725AD8",
+      "Receiver": null,
+      "Name": ""
+    },
+    {
+      "Entry": "0x80726044",
+      "Receiver": null,
+      "Name": ""
     }
   ],
   "BoundedAccesses": [
@@ -80808,6 +81302,72 @@
           "Count": "RKNetController.playerAids.count",
           "Width": 1,
           "StartIndex": 0
+        }
+      ]
+    },
+    {
+      "Begin": "0x807253C0",
+      "ExpectedWords": [
+        "0x9003000C",
+        "0x90030024",
+        "0x90030010",
+        "0x90030028",
+        "0x90030014",
+        "0x9003002C",
+        "0x90030018",
+        "0x90030030",
+        "0x9003001C",
+        "0x90030034",
+        "0x90030020",
+        "0x90030038"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "AIBattleTargetSelector.targets.offset",
+          "Stride": "Pointer.size",
+          "Count": "AIBattleTargetSelector.targets.count",
+          "Width": 4
+        },
+        {
+          "Array": "AIBattleTargetSelector.states.offset",
+          "Stride": "Pointer.size",
+          "Count": "AIBattleTargetSelector.targets.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80724040",
+      "ExpectedWords": [
+        "0x93C3000C",
+        "0x93C30024",
+        "0x93C30010",
+        "0x93C30028",
+        "0x93C30014",
+        "0x93C3002C",
+        "0x93C30018",
+        "0x93C30030",
+        "0x93C3001C",
+        "0x93C30034",
+        "0x93C30020",
+        "0x93C30038"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r30",
+      "Arrays": [
+        {
+          "Array": "AIBattleTargetSelector.targets.offset",
+          "Stride": "Pointer.size",
+          "Count": "AIBattleTargetSelector.targets.count",
+          "Width": 4
+        },
+        {
+          "Array": "AIBattleTargetSelector.states.offset",
+          "Stride": "Pointer.size",
+          "Count": "AIBattleTargetSelector.targets.count",
+          "Width": 4
         }
       ]
     }

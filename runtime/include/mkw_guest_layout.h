@@ -24,4 +24,10 @@ struct Layout {
     uint32_t friendRoomPlayerCount;
 };
 extern const Layout kLayout;
+
+// Separate export keeps the established Layout ABI intact for native glue.
+struct BattleTargetLayout {
+    uint32_t capacity, targets, states;
+};
+extern const BattleTargetLayout kBattleTargets;
 }

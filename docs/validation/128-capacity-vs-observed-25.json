@@ -1,0 +1,289 @@
+{
+  "result": "native-finish-flags",
+  "source": "02eaad070022d1bcbaf10af3506349919eea1832",
+  "binary_sha256": "943cd209b83f9f9903bb39ef812fa112637a4052c2f973ee929e8824f42cd820",
+  "players": 25,
+  "capacity": 128,
+  "mode": "vs",
+  "course": 8,
+  "laps": 1,
+  "clock_divisor": 1,
+  "completion": {
+    "stage": 4,
+    "frames": 2065,
+    "players": 25,
+    "capacity": 128,
+    "observed": 25,
+    "min_player_frames": 2150,
+    "course": 8,
+    "mode": 1,
+    "finished": 25,
+    "min_lap": 1,
+    "max_lap": 2
+  },
+  "slots": [
+    {
+      "slot": 0,
+      "sampled_distance": 148078.65895344483,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 1,
+      "sampled_distance": 147852.3113519404,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 2,
+      "sampled_distance": 145368.35142510207,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 3,
+      "sampled_distance": 145985.44558340678,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 4,
+      "sampled_distance": 140475.5456296137,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 5,
+      "sampled_distance": 150145.78427873037,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 6,
+      "sampled_distance": 143694.91364463235,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 7,
+      "sampled_distance": 140649.39834917441,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 8,
+      "sampled_distance": 149776.26270094144,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 9,
+      "sampled_distance": 151573.16741213686,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 10,
+      "sampled_distance": 152452.53633049424,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 11,
+      "sampled_distance": 146821.06608246136,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 12,
+      "sampled_distance": 151446.63454730835,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 13,
+      "sampled_distance": 144420.36699353493,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 14,
+      "sampled_distance": 140449.89705688323,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 15,
+      "sampled_distance": 147140.22687052106,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 16,
+      "sampled_distance": 150765.85630314724,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 17,
+      "sampled_distance": 142928.18528157938,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 18,
+      "sampled_distance": 140978.46910743913,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 19,
+      "sampled_distance": 154701.68511651608,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 20,
+      "sampled_distance": 143926.87795086092,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 21,
+      "sampled_distance": 141597.03752427243,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 22,
+      "sampled_distance": 147154.92619525245,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 23,
+      "sampled_distance": 144411.26784582,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 2,
+      "max_stationary_frames": 0,
+      "samples": 17
+    },
+    {
+      "slot": 24,
+      "sampled_distance": 141691.36997431229,
+      "respawn_samples": 0,
+      "min_lap": 0,
+      "max_lap": 1,
+      "max_stationary_frames": 0,
+      "samples": 17
+    }
+  ],
+  "elapsed_seconds": 258.5040455069975,
+  "slots_without_sampled_movement": [],
+  "slots_without_sampled_lap_advance": [],
+  "observerSource": "07841a1228f200229c01cb59f4cb0116d6e1802c",
+  "slots_without_sampled_finish_lap": [
+    4,
+    6,
+    7,
+    14,
+    17,
+    18,
+    20,
+    21,
+    24
+  ],
+  "finishLapDerivation": "Derived from per-slot max_lap <= configured laps; initial transition from lap zero to one is not a completed lap.",
+  "audit": {
+    "mode": "log",
+    "phase": "last observed race stage 4",
+    "registeredTypes": 84,
+    "boundSites": 3149,
+    "stackLifetimeSites": 16,
+    "instancesRegistered": 6710,
+    "observedAccesses": 6097142033,
+    "filteredAccesses": 6095295349,
+    "watchedAccesses": 1719805,
+    "activeInstances": 1,
+    "unscopedStackEntries": [],
+    "hits": []
+  },
+  "termination": "SIGTERM by observer after all native finish flags; process waited before RAM backing cleanup.",
+  "limitations": [
+    "Headless null renderer; visual results and light/effect quality unqualified.",
+    "Sequential snapshots at 120-frame intervals; short respawns may be missed.",
+    "Only ArchiveMgr heap and generated stack lifetime watches active in this binary.",
+    "Native race end can auto-finish CPUs; no claim that all CPUs crossed the finish line.",
+    "No scene round trip or 128-active-racer qualification."
+  ]
+}

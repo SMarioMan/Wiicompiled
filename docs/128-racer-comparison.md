@@ -106,7 +106,9 @@ DISPLAY=:99 SDL_AUDIODRIVER=dummy python3 runtime/tests/offline_capacity.py \
 The report records the executable hash, arguments, per-racer snapshots, sampled
 distance and stationary intervals. `native-finish-flags` means exactly that; it
 does not claim that every CPU completed the course. Missing sampled movement or
-lap advance is listed separately for investigation. Snapshots are sequential,
+lap advance is listed separately for investigation, as are slots not observed
+entering the lap after the configured final lap. Entering lap one from the grid
+alone is not a course completion. Snapshots are sequential,
 not atomic; sampling can miss short rescues, and stationary intervals after an
 individual racer finishes are possible. Battle modes have no lap requirement.
 Retain the separate forced-fall probe for proving rescue and resumed movement.

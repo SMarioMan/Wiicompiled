@@ -136,6 +136,8 @@ def run(args):
                                                                             if r["sampled_distance"] < 200]
                                 report["slots_without_sampled_lap_advance"] = [] if battle else [
                                     r["slot"] for r in report["slots"] if r["max_lap"] <= r["min_lap"]]
+                                report["slots_without_sampled_finish_lap"] = [] if battle else [
+                                    r["slot"] for r in report["slots"] if r["max_lap"] <= args.laps]
                                 return report
                         if process.poll() is not None:
                             raise RuntimeError(f"Game exited: {process.returncode}")

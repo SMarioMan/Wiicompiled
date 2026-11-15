@@ -12,6 +12,10 @@
 #include <cstddef>
 #include <cstdint>
 
+// Invalidate GX caches after DMA-class host writes (DVD, cache zero, LC stores).
+// HLE callers need this declaration without the full GX renderer interface.
+extern "C" void GxNotifyGuestRamDmaWrite(uint32_t addr, uint32_t size);
+
 // Canonical MEM1/MEM2 physical address for any of the guest's cached, uncached
 // or physical aliases. Lives here rather than in the GX HLE so the tracking
 // table, its notifiers and the GX caches all agree on one address space.

@@ -113,6 +113,15 @@ not atomic; sampling can miss short rescues, and stationary intervals after an
 individual racer finishes are possible. Battle modes have no lap requirement.
 Retain the separate forced-fall probe for proving rescue and resumed movement.
 
+The auditor also observes the raw 32-byte `dcbz` helper, aligned `DCZeroRange`
+writes and both sides of locked-cache load/store/data copies before mutation.
+The strict `dcbz` check runs outside its scalar fallback catch so it cannot be
+swallowed and retried. Controlled native fixtures prove stale reads and writes
+stop before copying/zeroing, while correct relocated accesses retain overlapping
+`memmove` behavior and GX DMA notifications. Enabled and disabled fixtures pass.
+This closes those specific raw-pointer escapes; it does not instrument every
+host pointer user or prove coverage for bulk ranges spanning multiple fields.
+
 ## Live balloon counter boundary, 2026-11-15
 
 [The 26-active-racer record](validation/128-capacity-balloon-observed-26.json)

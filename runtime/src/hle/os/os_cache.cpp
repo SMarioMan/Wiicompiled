@@ -9,7 +9,7 @@
 #include "hle_stubs.h"
 #include "ppc_runtime.h"
 #include "runtime_log.h"
-#include "hle/gx/gx_internal.h"
+#include "gx_guest_write.h"
 
 // ============================================================================
 // Data cache maintenance (DCInvalidate/Flush/Store)
@@ -138,6 +138,8 @@ bool CopyGuestRange(uint32_t dstAddr, uint32_t srcAddr, uint32_t len, const char
     try {
         auto* dst = ::Memory::GetPointer(dstAddr, len);
         auto* src = ::Memory::GetPointer(srcAddr, len);
+        MKW_LAYOUT_AUDIT_READ(srcAddr, len);
+        MKW_LAYOUT_AUDIT_WRITE(dstAddr, len);
         std::memmove(dst, src, len);
         return true;
     } catch (const ::Memory::AccessViolation& e) {
@@ -161,6 +163,7 @@ extern "C" void DCZeroRange_HLE_801a16e4(CpuContext* ctx)
     const uint32_t alignedLen = AlignUp32((addr - alignedAddr) + len);
     try {
         auto* dst = ::Memory::GetPointer(alignedAddr, alignedLen);
+        MKW_LAYOUT_AUDIT_WRITE(alignedAddr, alignedLen);
         std::memset(dst, 0, alignedLen);
         GxNotifyGuestRamDmaWrite(alignedAddr, alignedLen);
     } catch (const ::Memory::AccessViolation& e) {

@@ -900,6 +900,9 @@ extern "C" int32_t memset_zero_32(int32_t address)
 {
     // dcbz zeros a 32-byte block.
     // The translator aligns the address to 32 bytes before calling this.
+    // Observe outside the fallback catch: a strict audit failure must propagate
+    // before the raw store, rather than being retried as scalar writes.
+    MKW_LAYOUT_AUDIT_WRITE(static_cast<uint32_t>(address), 32);
     try {
         // Try fast path: get direct pointer to memory
         uint8_t* ptr = Memory::GetPointer(static_cast<uint32_t>(address), 32);

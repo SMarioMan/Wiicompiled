@@ -372,12 +372,6 @@ GXTlutObj* CreateHostTlutObj(uint32_t addr);
 void MarkHostTlutObjConstructed(uint32_t addr);
 GXTlutObj* GetHostTlutObj(uint32_t addr);
 void MarkTlutObjsDirtyForRange(uint32_t addr, uint32_t size);
-// One-stop invalidation for DMA-class host-side writes into guest RAM (DVD
-// reads, DCZeroRange, LC stores): texobjs + TLUTs + EFB copies + display
-// lists. extern "C" so HLE modules outside the GX layer can declare it without
-// pulling in this header.
-extern "C" void GxNotifyGuestRamDmaWrite(uint32_t addr, uint32_t size);
-
 void HleFifoWrite(u32 val, uint32_t sizeBytes);
 void SubmitAttribute(GXAttr attr, float* comps, const VtxAttrFmt& fmt, const u32* rawComps = nullptr);
 void SubmitIndexedAttribute(GXAttr attr, uint32_t index);

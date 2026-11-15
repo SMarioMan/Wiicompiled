@@ -85,3 +85,28 @@ all effects, rendered results, complete teardown, or another race. The original
 12/13/24/48/100 team-result storage fixtures are retained and extended through all
 required boundaries; all thirteen cases pass, including both team control arrays
 at 128. That storage proof remains separate from visual qualification.
+
+## Read-only per-racer live observer
+
+`runtime/tests/offline_capacity.py` supplements the aggregate progress log with
+verified USA Kart::Link positions, unique per-slot physics pointers, lap counters,
+player update frames and sampled respawn flags. It uses the existing test-only
+RAM backing helper and opens those files read-only. It never injects controller
+input, changes guest RAM or scales the clock. For example, from a Linux portable
+product with the auditor compiled in:
+
+```sh
+DISPLAY=:99 SDL_AUDIODRIVER=dummy python3 runtime/tests/offline_capacity.py \
+  --product /path/to/product --source BUILT_REVISION \
+  --players 26 --capacity 128 --mode balloon --timeout 2400 \
+  --log /tmp/balloon26.log --report /tmp/balloon26.json \
+  --audit-report /tmp/balloon26-audit.json
+```
+
+The report records the executable hash, arguments, per-racer snapshots, sampled
+distance and stationary intervals. `native-finish-flags` means exactly that; it
+does not claim that every CPU completed the course. Missing sampled movement or
+lap advance is listed separately for investigation. Snapshots are sequential,
+not atomic; sampling can miss short rescues, and stationary intervals after an
+individual racer finishes are possible. Battle modes have no lap requirement.
+Retain the separate forced-fall probe for proving rescue and resumed movement.

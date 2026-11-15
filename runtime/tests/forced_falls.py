@@ -16,7 +16,8 @@ from pathlib import Path
 
 
 class Ram:
-    def __init__(self, process, folder, guest_base):
+    def __init__(self, process, folder, guest_base, *, read_only=False):
+        self.read_only = read_only
         self.process, self.folder, self.guest_base = (
             process,
             folder.resolve(),
@@ -40,7 +41,7 @@ class Ram:
                             f"Guest RAM does not use this test directory: {path}"
                         )
                     if path not in self.fds:
-                        self.fds[path] = os.open(path, os.O_RDWR)
+                        self.fds[path] = os.open(path, os.O_RDONLY if read_only else os.O_RDWR)
                     offset = int(fields[2], 16) + address - begin
                     self.regions.append((guest, guest + size, self.fds[path], offset))
                     break
@@ -73,6 +74,8 @@ class Ram:
         return struct.unpack(">3f", self.read(address, 12))
 
     def put_float(self, address, value):
+        if self.read_only:
+            raise RuntimeError("This guest RAM observer is read-only")
         fd, offset = self.address(address, 4)
         if os.pwrite(fd, struct.pack(">f", value), offset) != 4:
             raise RuntimeError("Short guest RAM write")

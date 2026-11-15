@@ -26,7 +26,7 @@ expanded inline storage, moved trailing fields and checked original consumers.
 | NW4R activity lists: four per EGG group, record stride `0x1C`. | **Already covered for backing allocation/initialization.** New `EffectActivityStorageTests` executes USA `802246C8`, its actual internal allocator and pool-header constructors, NW4R `800270A0`, activity constructors and list initialization at all required counts. At 128 it initializes 528 activity entries from the existing 132-group model. | No allocation rewrite is needed. Qualify nonempty particle/effect pools, high-ID gameplay lookups/draws/destruction and actual scene heap ownership; the new backing fixture configures other resource pools empty. | Passed count propagation, computed arena allocation, actual record construction/iteration, both list link offsets, final-racer group bounds and allocation guards over two fresh initialization cycles. Racer 127 live effects/destruction remain unqualified. |
 | Light-set pool: two requests per kart plus items; signed-byte light IDs cap safe expansion. | **Partially covered after ownership fix.** Verified USA acquire `8055D018` returns null on an empty available list; `LoadBLIGHT` at `8055D608` narrows `index+8` through a signed byte. Narrow wrappers now share acquired lights on expanded-race exhaustion and defer the original release until the final owner. | Keep original pool/ID limits. Per-holder references survive other live holder construction and reset on that holder's lifetime. Qualify actual mixed-roster rendering and scene resource loading; shared light parameters reflect their last updater. | Passed real USA acquire/release and NW4R lists at every required active count, two concurrent holders, shuffled final-owner releases, discarded-owner teardown and second lifetime. Stock acquisition independently returns null after 120 slots; original 12-racer exhaustion remains unchanged. Live rendering/resources remain unqualified. |
 | Coin Runners nested update scratch and signed-16-bit displacement threshold. | **Already covered for tested stack lowering.** `BattleCoinUpdateFrame` grows its nested arrays, save areas and complete frame. Real translated native fixtures now pass at 116/118/127/128 as well as 12/13/24/48/100. The fixture's fixed 32 KiB expected-data buffer was replaced with generated frame-sized storage. | Retain the current full-width IR lowering. Extend active-count gameplay coverage independently: these storage fixtures still cap active racers at 24. | Passed actual translated prologue/epilogue, scratch initialization/inverse indexes, saved registers, caller/stack guards at 116/118/127/128. Full 128-active gameplay remains unqualified. |
-| Race-scene heap budgets and cross-heap ownership. | **Partially covered.** Checked `HeapRoutes` retain separate backing owners; the NDEV reserve shrinks with capacity. Real 24-player scene round trips exist; the original root partitioner passes guarded ownership checks at all thirteen required capacities through 128. This differs intentionally from MKW100's overflow arena. | Preserve routing/reserves. Measure mixed-resource peaks at 128 and verify every allocation/free/resize/reset owner before adding any fallback. | Effect/item-heavy races, mixed characters/vehicles, scene exit, second race and owner/heap guard reports. |
+| Race-scene heap budgets and cross-heap ownership. | **Partially covered.** Checked `HeapRoutes` retain separate backing owners; the NDEV reserve shrinks with capacity. Real 24-player scene round trips exist; the original root partitioner passes guarded ownership checks at all thirteen required capacities through 128. This differs intentionally from MKW100's overflow arena. | Preserve routing/reserves. Measure mixed-resource peaks at 128 and verify every allocation/free/resize/reset owner. A live 128-active Coin Runners startup exhausted the MEM2 scene heap; the identified battle sound-heap request now tries the retained MEM1 backing owner using the original child factory, with original-parent retry on failure. Validate this narrow route live before claiming the failure resolved. | Effect/item-heavy races, mixed characters/vehicles, scene exit, second race and owner/heap guard reports. |
 | ObjectsMgr fixed object-registration pools and interaction vectors. | **Already covered for tested manager paths through 128.** Existing `ObjectPoolCapacity` derives `80 + 10*N` entries rather than retaining the original 200-object budget. | Preserve the checked allocations/counts. Qualify rendered object resources and full battle lifecycle separately. | Original USA manager allocation, vector initialization, complete pool registration and destruction pass all thirteen required capacities, including 1,360 entries at 128. Resource constructors remain callbacks. |
 | AI manager controller arrays, rank/route subobjects and battle team lists. | **Partially covered.** `AIManager`, `AIVsSub`, `AIEnemyRoutes`, `AIRacerObjects` and battle roster layouts already expand these families. Strict-audited original AI manager initialization, both controller lookups and route initialization pass all thirteen required capacities; automatic manager constructor/destructor/release watches now join the ArchiveMgr watches. | Map each vanilla reference site to our corresponding function and check indirect, pointer-walk, reset and destructor paths; do not infer a gap from unchanged index strides alone. | Existing native fixtures extended to boundaries, plus retired-access traces and high-ID AI movement/respawns. |
 | Input virtual-controller holders, stride `0x180`. | **Partially covered.** `InputManager` already models per-racer holders and relocated following controllers; native boot/layout fixtures exercise this. | Check construction, pointer differences, attachment and teardown at 128, preserving four physical screen/controller roles. | High-ID CPU input and guarded lifecycle fixtures, with no physical-controller expansion. |
@@ -179,3 +179,37 @@ a lap after the fall, including racer 127. The driver then stops its owned game.
 Auditing is off for this independent functional probe. This validates the
 exercised all-slot rescue/recovery path on one course; it does not qualify all
 courses, battle respawns, scene ownership or 128-console networking.
+
+
+## Battle sound-heap pressure discovered at 128
+
+A real 128-active Coin Runners probe built from `3173994` failed during race
+resource construction, before the first gameplay progress sample. Its 54.3 MiB
+MEM2 structure heap reported only 32,796 free bytes when a 90,680-byte model
+allocation failed. The subsequent invalid model access is a consequence requiring
+retest, not evidence of a Coin Runners stack-displacement failure.
+
+The retained MEM1 structure owner had 7,354,476 free bytes in the fatal snapshot.
+A 7,340,288-byte child allocation occupied MEM2. Original RMCE01 code identifies
+it as the **battle sound heap**: `RaceScene::CreateAndInitInstances` (`8054E1E8`)
+selects `Audio::GameHeap` type 2; `SetType` (`806F911C`) returns the original
+7 MiB table size plus `0x100`. The factory call at `8054E2B8` reads the secondary
+slot `+0xC98` and retains the child at scene `+0xC70`. `GameScene::Reset` destroys
+that child at `80516CF4..80516D14`. VS uses a different 10 MiB sound budget.
+
+`ExpHeap_CreateBattleSoundHeap` is restricted to the verified USA caller, exact
+battle request and expanded builds. It tries the retained primary backing owner
+at `+0xC88`; if original creation returns null it restores the call context and
+retries the original parent. The original factory records the actual parent at
+child `+0x18`; original destruction frees to that owner. Existing default routing,
+backing owners, sound sizes and root partitioning remain intact. This avoids an
+individual-allocation ownership map or a new overflow arena.
+
+Both retail-capacity and expanded native fixtures pass. They pin the USA caller
+instructions and sound-size table, execute the original child factory, parent
+lookup and destroy routines, and check selected ownership, failed allocation,
+failed construction cleanup, original-parent retry, unrelated callers/requests,
+missing/aliased owners, preserved registers and two successive lifetimes.
+Parent allocation and low-level heap construction/destruction are fixture
+callbacks. A clean rebuilt live Coin Runners run, real sound resources and scene
+round trips remain necessary before closing this resource-budget issue.

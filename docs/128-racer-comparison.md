@@ -349,3 +349,26 @@ add idempotence, mismatched extent/owner rejection and fresh generation checks.
 The 128 selector fixture reuses its preexisting watch correctly; both C++17 header
 configurations and all eight native import/index tests also pass. A rebuilt live
 expanded battle must verify these added watches in the actual scene lifecycle.
+
+## Expanded race-rank sound sequence variable
+
+The reference signed-byte consumer list led to USA
+`Audio::RaceRSARPlayer::PlaySound` at `8070EB64`. Its E5/E6 path reads the
+one-based position at `RaceinfoPlayer+0x20`, sign-extends it at `8070ECA8`,
+computes `12-position`, and calls `Audio::Manager::WriteSeqVariable` at
+`8070ECB4`. Rank 128 therefore produced 140, outside the authored 0..11 axis.
+This is distinct from safe zero-based racer IDs 0..127.
+
+A narrow native wrapper for the existing sequence-variable writer recognizes
+only that checked caller and variable zero. Expanded active rosters map their
+valid ranks monotonically onto the original twelve-position axis. It recovers
+the unsigned byte from the original producer's value; no game structure or
+relocation system changes. Smaller active rosters, other callers/variables,
+invalid ranks and the zero/FF sentinels retain original arguments and call-through.
+
+Both 12- and 128-capacity native fixtures pass: every byte position, all thirteen
+required active-count boundaries plus zero/one/two, caller/variable isolation,
+missing RaceData, endpoint/order checks and register/stack preservation. Six
+original USA producer words are pinned. The fixture substitutes the final
+sequence-variable callee; audible mixing and DSP output remain unqualified.
+This fix does not implement the separately queued multi-instance mixing goal.

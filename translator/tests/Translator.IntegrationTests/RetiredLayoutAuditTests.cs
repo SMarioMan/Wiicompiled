@@ -185,6 +185,17 @@ public class RetiredLayoutAuditTests
                     auto observe=[](){for(unsigned i=0;i<10000;i++)Observe(0x800b0000,4,Operation::Read);};
                     std::thread workerA(observe),workerB(observe);workerA.join();workerB.join();
                     if(counter("observedAccesses")!=observedBefore+20000 || counter("filteredAccesses")!=filteredBefore+20000)return 13;
+                    // More host threads than exclusive counter slots must use
+                    // the shared atomic fallback without dropping increments.
+                    const auto overflowObserved=counter("observedAccesses"),overflowFiltered=counter("filteredAccesses");
+                    std::vector<std::thread> workers;std::atomic<bool> startWorkers{false};
+                    for(unsigned t=0;t<100;t++)workers.emplace_back([&](){
+                        while(!startWorkers.load(std::memory_order_acquire))std::this_thread::yield();
+                        for(unsigned i=0;i<1000;i++)Observe(0x800b0000,4,Operation::Read);
+                    });
+                    startWorkers.store(true,std::memory_order_release);
+                    for(auto& worker:workers)worker.join();
+                    if(counter("observedAccesses")!=overflowObserved+100000||counter("filteredAccesses")!=overflowFiltered+100000)return 67;
                     // A valid short allocation can sit at the end of the guest
                     // address space even when its original layout was larger.
                     auto edge=RegisterInstance("AuditObject",0xfffffff0,16);

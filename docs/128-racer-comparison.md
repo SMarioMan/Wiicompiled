@@ -457,3 +457,20 @@ with a strict manager watch at all thirteen capacities. The 24-racer fixture
 initially exceeded its unchanged compiler timeout under CPU contention; its
 isolated retry passes. Model resources remain callbacks. Rebuilt live coverage
 of these two new manager watches and complete scene lifetimes remains open.
+
+## Single-writer auditor counters with a shared overflow path
+
+Observed/filtered counters previously used locked read-modify-write operations
+for every guest access, including page-filter negatives. The first 64 host
+threads now each own a never-reassigned counter slot. They update that slot with
+atomic loads/stores, and reports still read it atomically. Additional threads use
+a separate shared slot with atomic fetch-add; they cannot race an exclusive
+writer. Reset clears both sets without reassigning existing thread bindings.
+
+All four auditor/bulk foundation tests pass, including a new synchronized
+100-thread run that preserves exactly 100,000 additional observed and filtered
+accesses across exclusive-slot exhaustion. Existing stale read/write, overlap,
+strict-before-mutation, stack retirement and reuse checks remain intact. A private
+optimized native benchmark of twenty million unwatched reads measured 0.347477
+seconds before and 0.150225 seconds after this change. These are synthetic counter
+path timings, not a gameplay-speed or completion qualification.

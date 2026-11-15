@@ -48,7 +48,8 @@ struct State {
     std::map<std::string,Hit> hits;
     uint64_t nextGeneration=1, nextFrame=1, watchedAccesses=0;
     std::array<AccessCounters,64> counters{};
-    std::atomic<uint32_t> nextCounterSlot{0};
+    AccessCounters sharedCounters;
+    std::atomic<uint64_t> nextCounterSlot{0};
     // Diagnostic index only: no guest pages are protected or poisoned.
     std::unique_ptr<std::atomic<uint32_t>[]> watchedPages;
     std::unordered_map<uint32_t,std::vector<uint64_t>> pageInstances;
@@ -56,12 +57,26 @@ struct State {
     std::string phase;
 };
 State& state(){static State value;return value;}
-AccessCounters& threadCounters(State& s){
-    thread_local const uint32_t slot=s.nextCounterSlot.fetch_add(1,std::memory_order_relaxed)%s.counters.size();
-    return s.counters[slot];
+struct ThreadCounters {
+    AccessCounters* values;
+    bool exclusive;
+    void increment(bool filtered) const {
+        auto& value=filtered?values->filtered:values->observed;
+        // Slots are assigned once and never reused. Only this host thread
+        // writes its exclusive counters; reports read them atomically.
+        if(exclusive)value.store(value.load(std::memory_order_relaxed)+1,std::memory_order_relaxed);
+        else value.fetch_add(1,std::memory_order_relaxed);
+    }
+};
+const ThreadCounters& threadCounters(State& s){
+    thread_local const ThreadCounters binding=[&s]{
+        const auto slot=s.nextCounterSlot.fetch_add(1,std::memory_order_relaxed);
+        return ThreadCounters{slot<s.counters.size()?&s.counters[slot]:&s.sharedCounters,slot<s.counters.size()};
+    }();
+    return binding;
 }
 uint64_t accessCount(const State& s,bool filtered){
-    uint64_t total=0;
+    uint64_t total=(filtered?s.sharedCounters.filtered:s.sharedCounters.observed).load(std::memory_order_relaxed);
     for(const auto& counter:s.counters)
         total+=(filtered?counter.filtered:counter.observed).load(std::memory_order_relaxed);
     return total;
@@ -271,12 +286,12 @@ FunctionScope::~FunctionScope(){if(active_){
 
 void Observe(uint32_t address,uint32_t width,Operation op){
     if(!enabled.load(std::memory_order_acquire)||!width)return;
-    auto& s=state();auto& counters=threadCounters(s);counters.observed.fetch_add(1,std::memory_order_relaxed);
+    auto& s=state();const auto& counters=threadCounters(s);counters.increment(false);
     // A first prologue write can create its watch on an otherwise unwatched
     // page. The conservative PC filter must bypass the address fast path.
     if(!touchesWatchedPage(s,address,width) &&
        !(op==Operation::Write && width==4 && mayStartStack(s,context().site.pc))){
-        counters.filtered.fetch_add(1,std::memory_order_relaxed);return;
+        counters.increment(true);return;
     }
     bool stop=false, changed=false;std::string message,report,path;
     {
@@ -396,6 +411,7 @@ void Reset(){
     s.options={};s.types.clear();s.sites.clear();s.stackSites.clear();s.unscopedStackSites.clear();s.hits.clear();
     s.nextGeneration=1;s.nextFrame=1;s.watchedAccesses=0;
     for(auto& counter:s.counters){counter.observed=0;counter.filtered=0;}
+    s.sharedCounters.observed=0;s.sharedCounters.filtered=0;
     s.phase.clear();cachedContext=nullptr;contexts.clear();contextProvider.store(nullptr,std::memory_order_relaxed);
 }
 bool ParseArgument(std::string_view arg){

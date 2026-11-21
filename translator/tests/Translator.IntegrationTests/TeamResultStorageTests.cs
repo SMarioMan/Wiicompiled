@@ -61,11 +61,11 @@ public class TeamResultStorageTests
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},pageSize={{layout.Symbol("TeamResultPage.size")}},resultSize={{layout.Symbol("TeamResult.size")}},
                     slots={{layout.Symbol("TeamResult.players.count")}},playersOffset={{layout.Symbol("TeamResult.players.offset")}},rowsSize={{layout.Symbol("TeamResult.players.size")}},
-                    items={{layout.Symbol("TeamResult.items.offset")}},text={{layout.Symbol("TeamResult.text.offset")}},
+                    controls={{layout.Symbol("TeamResult.items.count")}},items={{layout.Symbol("TeamResult.items.offset")}},text={{layout.Symbol("TeamResult.text.offset")}},
                     root=0x81010000,stack=0x81f00000;
                 uint32_t allocated=0,freed=0,headers=0,texts=0,deleted=0,parent=0,parentDeleted=0;
                 uint32_t result(uint32_t team){return root+416+team*resultSize;}
-                bool control(uint32_t p){for(uint32_t t=0;t<2;t++)if(p==result(t) || (p>=result(t)+items && p<result(t)+items+6*372 && (p-result(t)-items)%372==0))return true;return false;}
+                bool control(uint32_t p){for(uint32_t t=0;t<2;t++)if(p==result(t) || (p>=result(t)+items && p<result(t)+items+controls*372 && (p-result(t)-items)%372==0))return true;return false;}
                 void allocate(CpuContext* ctx){if(ctx->gpr[3]!=pageSize || allocated++)std::abort();ctx->gpr[3]=root;}
                 void free_page(CpuContext* ctx){if(ctx->gpr[3]!=root || freed++)std::abort();}
                 void page_ctor(CpuContext* ctx){if(ctx->gpr[3]!=root || parent++)std::abort();std::memset(Memory::GetPointer(root,416),0,416);}
@@ -75,11 +75,11 @@ public class TeamResultStorageTests
                 void text_ctor(CpuContext* ctx){auto p=ctx->gpr[3];if(p!=result(0)+text && p!=result(1)+text)std::abort();texts++;std::memset(Memory::GetPointer(p,196),0,196);}
                 void construct(CpuContext* ctx){auto p=ctx->gpr[3],ctor=ctx->gpr[4],stride=ctx->gpr[6],count=ctx->gpr[7];
                     if(ctor==0x805f44d4){if(p!=root+416 || stride!=resultSize || count!=2 || ctx->gpr[5]!=0x805f4538)std::abort();}
-                    else if(ctor!=0x8060c378 || stride!=372 || count!=6 || ctx->gpr[5]!=0x8060c4a0)std::abort();
+                    else if(ctor!=0x8060c378 || stride!=372 || count!=controls || ctx->gpr[5]!=0x8060c4a0)std::abort();
                     for(uint32_t i=0;i<count;i++){ctx->gpr[3]=p+i*stride;InvokeIndirectCpu(ctor,ctx);}ctx->gpr[3]=p;}
                 void destroy(CpuContext* ctx){auto p=ctx->gpr[3],dtor=ctx->gpr[4],stride=ctx->gpr[5],count=ctx->gpr[6];
                     if(dtor==0x805f4538){if(p!=root+416 || stride!=resultSize || count!=2)std::abort();}
-                    else if(dtor!=0x8060c4a0 || stride!=372 || count!=6)std::abort();
+                    else if(dtor!=0x8060c4a0 || stride!=372 || count!=controls)std::abort();
                     for(uint32_t i=count;i>0;i--){ctx->gpr[3]=p+(i-1)*stride;ctx->gpr[4]=uint32_t(-1);InvokeIndirectCpu(dtor,ctx);}ctx->gpr[3]=p;}
                 void register_entry(uint32_t address,void(*entry)(CpuContext*)){
                     TranslatedFunctionInfo info{};info.address=address;info.name="team result storage fixture";
@@ -100,10 +100,10 @@ public class TeamResultStorageTests
                         allocated=freed=headers=texts=deleted=parent=parentDeleted=0;
                         std::memset(Memory::GetPointer(root-16,pageSize+32),0x55,pageSize+32);
                         ctx.gpr[3]=pageId;func_805F24DC(&ctx);
-                        if(ctx.gpr[3]!=root || allocated!=1 || parent!=1 || headers!=14 || texts!=2 || !guards())return 4;
+                        if(ctx.gpr[3]!=root || allocated!=1 || parent!=1 || headers!=2*(controls+1) || texts!=2 || !guards())return 4;
                         for(uint32_t t=0;t<2;t++){
                             for(uint32_t j=0;j<rowsSize;j++)if(Memory::Read8(result(t)+playersOffset+j)!=0x55)return 5;
-                            for(uint32_t j=0;j<6;j++)if(Memory::Read32(result(t)+items+j*372)!=0x80010000)return 6;
+                            for(uint32_t j=0;j<controls;j++)if(Memory::Read32(result(t)+items+j*372)!=0x80010000)return 6;
                         }
                         auto saved15=ctx.gpr[15],saved18=ctx.gpr[18];
                         std::vector<uint8_t> snapshot(pageSize);
@@ -124,7 +124,7 @@ public class TeamResultStorageTests
                         }
                         ctx.gpr[15]=saved15;ctx.gpr[18]=saved18;
                         ctx.gpr[3]=root;ctx.gpr[4]=1;dtors[pageId-0x32](&ctx);
-                        if(freed!=1 || deleted!=14 || parentDeleted!=2 || !guards())return 7;
+                        if(freed!=1 || deleted!=2*(controls+1) || parentDeleted!=2 || !guards())return 7;
                         for(uint32_t r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 8;
                         if(ctx.gpr[1]!=stack)return 9;
                     }

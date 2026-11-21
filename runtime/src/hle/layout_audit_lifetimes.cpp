@@ -43,6 +43,18 @@ void WatchDestruction(CpuContext* ctx, GuestFunctions::Entry next) {
 }
 }
 
+// Verified USA inline team-result constructor/destructor: 805F44D4/805F4538.
+extern "C" void TeamResult_AuditConstruct(CpuContext* ctx) {
+    WatchConstruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(80625388)(guest); },
+                      "TeamResult", "team results constructor/destructor");
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80625388, TeamResult_AuditConstruct, "TeamResult_AuditConstruct");
+
+extern "C" void TeamResult_AuditDestroy(CpuContext* ctx) {
+    WatchDestruction(ctx, [](CpuContext* guest) { MKW_GUEST_NEXT(806253EC)(guest); });
+}
+REGISTER_NATIVE_WRAPPER_AS(0x806253EC, TeamResult_AuditDestroy, "TeamResult_AuditDestroy");
+
 // PAL function identities map through the existing region table. The equivalent
 // verified NTSC-U entries are 8053A7B0, 8053A9E0 and 80229A90. Only diagnostic
 // state changes here: the winning guest translation still owns construction,

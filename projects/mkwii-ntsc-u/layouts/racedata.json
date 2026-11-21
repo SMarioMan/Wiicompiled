@@ -1157,7 +1157,8 @@
         {
           "Name": "items",
           "Type": "TeamResultItem",
-          "Count": 6
+          "PerPlayer": true,
+          "PlayersPerElement": 2
         },
         {
           "Name": "resultTeamPoint",
@@ -1178,7 +1179,8 @@
         {
           "Name": "addPoints",
           "Type": "Pointer",
-          "Count": 6
+          "PerPlayer": true,
+          "PlayersPerElement": 2
         }
       ]
     },
@@ -3480,6 +3482,142 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x805F4510",
+      "ExpectedWord": "0x38E00006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x805F4568",
+      "ExpectedWord": "0x38C00006",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EBF5C",
+      "ExpectedWord": "0x3AE40006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EBF64",
+      "ExpectedWord": "0x3AE00007",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 1
+    },
+    {
+      "Instruction": "0x807EBF80",
+      "ExpectedWord": "0x3AF70006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.addPoints.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EC180",
+      "ExpectedWord": "0x2C1C0006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EC8E8",
+      "ExpectedWord": "0x2C140006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECAB0",
+      "ExpectedWord": "0x2C190006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.items.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EC390",
+      "ExpectedWord": "0x28190006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.addPoints.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECBC8",
+      "ExpectedWord": "0x2C190006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.addPoints.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECD70",
+      "ExpectedWord": "0x2C1D0006",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "TeamResult.addPoints.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807EC6A4",
+      "ExpectedWord": "0x9B570270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 128
+    },
+    {
+      "Instruction": "0x807EC6BC",
+      "ExpectedWord": "0x9B770270",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.items.offset",
+      "Addend": 128
+    },
+    {
+      "Instruction": "0x807EC6A8",
+      "ExpectedWord": "0x80760B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECB9C",
+      "ExpectedWord": "0x807C0B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECBB8",
+      "ExpectedWord": "0x807C0B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x807ECD20",
+      "ExpectedWord": "0x807E0B78",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "TeamResult.addPoints.offset",
+      "Addend": 0
+    },
     {
       "Instruction": "0x8065B5B8",
       "ExpectedWord": "0x38000003",

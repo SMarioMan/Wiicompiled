@@ -30,4 +30,9 @@ struct BattleTargetLayout {
     uint32_t capacity, targets, states;
 };
 extern const BattleTargetLayout kBattleTargets;
+
+struct TeamResultLayout {
+    uint32_t players, count, stride;
+};
+extern const TeamResultLayout kTeamResults;
 }

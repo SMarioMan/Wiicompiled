@@ -344,6 +344,42 @@ def expand_team_results(data, players):
     struct.pack_into('>H', output, 16, variants+len(section))
     return bytes(output)
 
+def expand_team_add_points(data, players, team_data):
+    if data[:8] != b'bctr\x00\x02\x00\x01': raise ValueError('Unsupported point BRCTR version')
+    variants, strings = u16(data, 14), u16(data, 16)
+    table, count, messages, message_count, pictures, picture_count = struct.unpack_from('>6H', data, variants)
+    if (table, count, messages, message_count, pictures, picture_count) != (12, 9, 552, 1, 560, 0) or strings != variants+560:
+        raise ValueError('Expected original battle point variants and message table')
+    originals = [data[variants+12+i*60:variants+12+(i+1)*60] for i in range(count)]
+    for index, record in enumerate(originals[3:]):
+        name_at = strings+u16(record, 0)
+        if data[name_at:data.index(0, name_at)] != f'BattleResultAddPoint{index}'.encode():
+            raise ValueError('Unexpected team point variant name')
+    if players == 12: return data
+    team_variants = u16(team_data, 14)
+    rows = math.ceil(players/2)
+    if u16(team_data, team_variants+2) != rows: raise ValueError('Team point row mismatch')
+    names = bytearray(data[strings:]); records = bytearray(b''.join(originals[:3]))
+    for index in range(rows):
+        record = bytearray(originals[3+index%6])
+        if index >= 6:
+            struct.pack_into('>H', record, 0, len(names))
+            names.extend(f'BattleResultAddPoint{index}\0'.encode())
+        team = team_data[team_variants+12+index*60:team_variants+12+(index+1)*60]
+        for offset in (12, 32):
+            x, y = struct.unpack_from('>ff', team, offset)
+            sx, sy = struct.unpack_from('>ff', team, offset+12)
+            struct.pack_into('>ff', record, offset, x+100*sx, y-45*sy)
+            struct.pack_into('>ff', record, offset+12, .5*sx, .5*sy)
+        records.extend(record)
+    message_at = 12+len(records)
+    message_table = data[variants+messages:variants+pictures]
+    section = struct.pack('>6H', 12, rows+3, message_at, message_count, message_at+len(message_table), picture_count)+records+message_table
+    if variants+len(section) > 65535 or len(names) > 65535: raise ValueError('Point BRCTR offsets exceed 16 bits')
+    output = bytearray(data[:variants])+section+names
+    struct.pack_into('>H', output, 16, variants+len(section))
+    return bytes(output)
+
 def ordinal(rank, language):
     if language in ('U', 'E'):
         suffix = 'th' if rank % 100 in (11, 12, 13) else {1:'st', 2:'nd', 3:'rd'}.get(rank % 10, 'th')
@@ -596,6 +632,10 @@ def build(root, players):
                 archive.files[key] = compact_team_parents(archive.files[key]); modified.append(key)
         team = 'result/ctrl/ResultVSTeam.brctr'
         if team in archive.files: archive.files[team] = expand_team_results(archive.files[team], players); modified.append(team)
+        points = 'game_image/ctrl/BattleResultAddPoint.brctr'
+        if points in archive.files:
+            if team not in archive.files: raise ValueError('Missing team row template for points')
+            archive.files[points] = expand_team_add_points(archive.files[points], players, archive.files[team]); modified.append(points)
         for animation in ('game_image_position_texture_pattern.brlan', 'game_image_position_multi_texture_pattern.brlan'):
             key = 'game_image/anim/'+animation
             if key not in archive.files: continue

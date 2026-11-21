@@ -8,6 +8,44 @@ spec = importlib.util.spec_from_file_location('expanded_ui', Path(__file__).pare
 UI = importlib.util.module_from_spec(spec); spec.loader.exec_module(UI)
 
 class ExpandedResultsTests(unittest.TestCase):
+    def test_team_point_variants_preserve_messages_and_follow_every_row(self):
+        names = bytearray(b'\0'); records = bytearray()
+        for i in range(9):
+            record = bytearray(60)
+            struct.pack_into('>H', record, 0, len(names))
+            names.extend((f'BattleAddPoint_{i}' if i < 3 else f'BattleResultAddPoint{i-3}').encode()+b'\0')
+            records.extend(record)
+        source = bytearray(b'bctr\0\2\0\1'+bytes(12))
+        struct.pack_into('>HHH', source, 12, 20, 20, 580)
+        message = b'\x00\x00\x12\x34\x00\x00\x56\x78'
+        source.extend(struct.pack('>6H', 12, 9, 552, 1, 560, 0)+records+message+names)
+        for capacity in (12,13,24,25,26,48,52,64,100,116,118,127,128):
+            rows = (capacity+1)//2
+            team = bytearray(32+rows*60)
+            struct.pack_into('>H', team, 14, 20)
+            struct.pack_into('>H', team, 22, rows)
+            for i in range(rows):
+                for offset in (12,32):
+                    struct.pack_into('>5f', team, 32+i*60+offset, i*2., -i*3., 50., .25, .5)
+            expanded = UI.expand_team_add_points(bytes(source), capacity, team)
+            if capacity == 12:
+                self.assertEqual(expanded, source)
+                continue
+            strings = UI.u16(expanded,16)
+            self.assertEqual(expanded[32:32+3*60], records[:3*60])
+            message_at = UI.u16(expanded,24)+20
+            self.assertEqual(expanded[message_at:message_at+8], message)
+            self.assertEqual(UI.u16(expanded,22), rows+3)
+            for i in range(rows):
+                at = 32+(i+3)*60
+                name = strings+UI.u16(expanded,at)
+                self.assertEqual(expanded[name:expanded.index(0,name)], f'BattleResultAddPoint{i}'.encode())
+                for offset in (12,32):
+                    x,y = struct.unpack_from('>ff',expanded,at+offset)
+                    self.assertEqual((x,y),(i*2+25.,-i*3-22.5))
+                    self.assertEqual(struct.unpack_from('>ff',expanded,at+offset+12),(.125,.25))
+            with self.assertRaises(ValueError): UI.expand_team_add_points(expanded,capacity,team)
+
     def test_yaz0_overlap_literals_and_window_boundaries(self):
         rng = random.Random(1024)
         for data in [b'', b'x', b'ab', b'a'*20000, bytes(range(256))*40,

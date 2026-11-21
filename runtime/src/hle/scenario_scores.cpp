@@ -6,6 +6,32 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <stdexcept>
+
+// USA 80529160 accumulates the prior scores into two 16-bit stack totals.
+// Expanded VS series can overflow those totals without any invalid access.
+extern "C" void Scenario_ExpandedTeamWinner(CpuContext* ctx) {
+    const auto& layout = MkwGuestLayout::kLayout;
+    const auto data = Memory::Read32(MKW_GADDR(809BD728));
+    const auto count = data ? Memory::Read8(data + layout.racedataRace + 4) : 0;
+    if (count <= 12) {
+        MKW_GUEST_NEXT(8052DCA8)(ctx);
+        return;
+    }
+    if (count > layout.playerCapacity)
+        throw std::runtime_error("Team winner racer count exceeds guest layout capacity");
+    uint32_t totals[2]{};
+    const auto scenario = ctx->gpr[3];
+    for (uint32_t i = 0; i < count; ++i) {
+        const auto player = scenario + layout.scenarioPlayers + i * layout.playerStride;
+        const auto team = Memory::Read32(player + 0xcc);
+        if (team > 1) throw std::runtime_error("Invalid team in team winner calculation");
+        totals[team] += Memory::Read16(player + 0xd8);
+    }
+    // Original ties choose team zero.
+    ctx->gpr[3] = totals[0] < totals[1] ? 1 : 0;
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8052DCA8, Scenario_ExpandedTeamWinner, "Scenario_ExpandedTeamWinner");
 
 // These retail helpers unroll two groups of six players. Keep those groups and
 // their register/return behavior, then apply the same operations to later slots.

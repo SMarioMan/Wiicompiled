@@ -10,7 +10,7 @@ namespace Translator.Core.Translation;
 // The caller retains its original mask/extraction operations after this load.
 public sealed record GuestBitsetLoad(uint Instruction, uint ExpectedWord, int Node,
     string Base, string Index, string Destination, string Offset, string Count,
-    int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1);
+    int WordBits = 16, int WordBytes = 2, int BitsPerPlayer = 1, uint? ExpectedShiftWord = null);
 
 public sealed partial class GuestLayoutRelocations
 {
@@ -26,15 +26,18 @@ public sealed partial class GuestLayoutRelocations
             if (site.Instruction % 4 != 0 || site.Node != 0 || registers.Distinct().Count() != 3 ||
                 registers.Any(register => !IsGpr(register) || register is "r1" or "r2") ||
                 site.WordBytes is not (2 or 4) || site.WordBits <= 0 || site.WordBits > site.WordBytes * 8 ||
+                site.ExpectedShiftWord.HasValue && (site.WordBits & (site.WordBits-1)) != 0 ||
                 site.BitsPerPlayer <= 0 || site.BitsPerPlayer > 32 ||
                 (long)OriginalPlayers * site.BitsPerPlayer > site.WordBits || Players < OriginalPlayers ||
                 _original.Symbol(site.Count) != 1 ||
                 _expanded.Symbol(site.Count) != ((long)Players * site.BitsPerPlayer + site.WordBits - 1) / site.WordBits ||
                 new[] { _original, _expanded }.Any(layout => layout.Symbol(site.Offset) < 0 || layout.Symbol(site.Offset) % site.WordBytes != 0))
                 throw new InvalidDataException("Invalid packed-word load shape.");
-            bool At(uint pc) => pc == site.Instruction;
-            bool Inside(uint begin, uint end) => begin <= site.Instruction && site.Instruction < end;
+            bool At(uint pc) => pc == site.Instruction || site.ExpectedShiftWord.HasValue && pc == site.Instruction + 4;
+            bool Inside(uint begin, uint end) => begin <= site.Instruction && site.Instruction < end ||
+                site.ExpectedShiftWord.HasValue && begin <= site.Instruction + 4 && site.Instruction + 4 < end;
             if (references.Any(reference => At(reference.Instruction)) ||
+                _bitsetLoads.Any(other => other != site && (At(other.Instruction) || other.ExpectedShiftWord.HasValue && At(other.Instruction + 4))) ||
                 _arrayCopies.Any(copy => Inside(copy.Begin, CopyEnd(copy))) ||
                 _arrayFills.Any(fill => Inside(fill.Begin, FillEnd(fill))) ||
                 _bitsetStores.Any(store => Inside(store.Begin, BitsetEnd(store))) ||
@@ -60,26 +63,50 @@ public sealed partial class GuestLayoutRelocations
             if (word != site.ExpectedWord || nodes.Count != 1 ||
                 nodes[site.Node] != new IrLoad(site.Destination, new(site.Base, _original.Symbol(site.Offset)), site.WordBytes))
                 throw new InvalidDataException($"Unproven packed-word load at 0x{site.Instruction:X8}.");
+            if (site.ExpectedShiftWord is uint shift)
+            {
+                var pc = site.Instruction + 4;
+                var actual = BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(pc, 4), 4));
+                var shiftNodes = new PpcLifter().Lift(new[] { PpcDecoder.Decode(pc, actual) })[0].Ir;
+                if (actual != shift || shiftNodes.Count != 1 || shiftNodes[0] is not IrBinary { Op: "ppc_slw" } binary ||
+                    binary.Right.RegisterName != site.Index || binary.Left.RegisterName == site.Destination)
+                    throw new InvalidDataException($"Unproven packed-word shift at 0x{pc:X8}.");
+            }
         }
     }
 
     private IReadOnlyList<IrInstruction>? ApplyBitsetLoad(PpcInstruction instruction, IReadOnlyList<IrInstruction> nodes)
     {
-        var site = _bitsetLoads.FirstOrDefault(candidate => candidate.Instruction == instruction.Address);
+        var site = _bitsetLoads.FirstOrDefault(candidate => candidate.Instruction == instruction.Address ||
+            candidate.ExpectedShiftWord.HasValue && candidate.Instruction + 4 == instruction.Address);
         if (site is null) return null;
-        if (instruction.Word != site.ExpectedWord) throw new InvalidDataException("Packed-word load instruction mismatch.");
+        bool shift = instruction.Address != site.Instruction;
+        if (instruction.Word != (shift ? site.ExpectedShiftWord : site.ExpectedWord))
+            throw new InvalidDataException("Packed-word instruction mismatch.");
         if (Players == OriginalPlayers) return nodes;
         var prefix = $"addr_layout_bitload_{site.Instruction:X8}_";
         string Name(string suffix) => prefix + suffix + "_loc";
         IrValue V(string suffix) => IrValue.Register(Name(suffix));
-        var replacement = new IrInstruction[] {
+        // A paired shift uses the normalized bit without changing the live index.
+        if (shift)
+        {
+            var original = (IrBinary)nodes[0];
+            return new IrInstruction[] {
+                new IrBinary(Name("bit"), IrValue.Register(site.Index), IrValue.Imm(site.WordBits - 1), "and"),
+                original with { Right = V("bit") }
+            };
+        }
+        var replacement = new List<IrInstruction> {
             new IrBinary(Name("word"),IrValue.Register(site.Index),IrValue.Imm(site.WordBits),"divu"),
             new IrBinary(Name("bytes"),V("word"),IrValue.Imm(site.WordBytes),"mul"),
             new IrBinary(Name("address"),IrValue.Register(site.Base),V("bytes"),"add"),
-            new IrBinary(Name("first"),V("word"),IrValue.Imm(site.WordBits),"mul"),
-            new IrBinary(site.Index,IrValue.Register(site.Index),V("first"),"sub"),
             new IrLoad(site.Destination,new(Name("address"),_expanded.Symbol(site.Offset)),site.WordBytes)
         };
+        if (!site.ExpectedShiftWord.HasValue)
+        {
+            replacement.Insert(3, new IrBinary(Name("first"), V("word"), IrValue.Imm(site.WordBits), "mul"));
+            replacement.Insert(4, new IrBinary(site.Index, IrValue.Register(site.Index), V("first"), "sub"));
+        }
         return nodes.Take(site.Node).Concat(replacement).Concat(nodes.Skip(site.Node + 1)).ToArray();
     }
 }

@@ -15,6 +15,7 @@ public class PacketManagerStorageTests
     [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealPacketManagerInitializesUniformTimersAndReadsExpandedPlayerMappings(int players)
     {
@@ -195,12 +196,13 @@ public class PacketManagerStorageTests
                     Memory::Write8(racedata+{{layout.Symbol("Racedata.race.offset")}}+4,capacity);
                     for(uint32_t current=0;current<2;current++)for(uint32_t p=0;p<capacity;p++)
                         for(uint32_t present=0;present<2;present++)for(uint32_t disconnected=0;disconnected<2;disconnected++){
-                            const auto aid=p%peerCount,playerBit=(p&32)?0u:1u<<(p&31);
+                            const auto aid=p%peerCount,playerBit=1u<<(p%32);
                             Memory::Write8(controller+aidMap+p,aid);Memory::Write32(controller+currentSub,current);
                             Memory::Write32(controller+subs+current*subStride+16,present?1u<<aid:0);
-                            Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},disconnected?playerBit:0);
+                            Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}}+(p/32)*4,disconnected?playerBit:0);
                             ctx.gpr[3]=root;ctx.gpr[4]=p;func_80650398(&ctx);
-                            if(ctx.gpr[3]!=(present && !(disconnected && playerBit)))return 17;
+                            if(ctx.gpr[3]!=(present && !disconnected))return 17;
+                            Memory::Write32(controller+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}}+(p/32)*4,0);
                         }
                     for(uint32_t p : {capacity,capacity+1,0xffffffffu}){
                         ctx.gpr[3]=root;ctx.gpr[4]=p;func_80650398(&ctx);if(ctx.gpr[3])return 18;

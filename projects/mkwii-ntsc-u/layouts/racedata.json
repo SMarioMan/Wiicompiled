@@ -1876,7 +1876,9 @@
         },
         {
           "Name": "disconnectedPlayers",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         },
         {
           "Name": "ratingRange",
@@ -42214,15 +42216,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x8064F3FC",
-      "ExpectedWord": "0x80052930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x8064F410",
       "ExpectedWord": "0x8003291C",
       "Node": 0,
@@ -42321,15 +42314,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x8064FB34",
-      "ExpectedWord": "0x80052930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x8064FB48",
       "ExpectedWord": "0x8003291C",
       "Node": 0,
@@ -42344,15 +42328,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.currentSub.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8064FC30",
-      "ExpectedWord": "0x80032930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -42434,15 +42409,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.currentSub.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8064FFB8",
-      "ExpectedWord": "0x80052930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -42555,38 +42521,11 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x80650400",
-      "ExpectedWord": "0x80082930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80650548",
-      "ExpectedWord": "0x80052930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x80650560",
       "ExpectedWord": "0x8003291C",
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.currentSub.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806505FC",
-      "ExpectedWord": "0x80052930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -42749,15 +42688,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.currentSub.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80651240",
-      "ExpectedWord": "0x80032930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -42992,15 +42922,6 @@
       "Node": 0,
       "Operand": "right",
       "Symbol": "RKNetController.receivedPackets.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80651BEC",
-      "ExpectedWord": "0x901E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -43433,15 +43354,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.disconnectedAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80652BD0",
-      "ExpectedWord": "0x933B2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -44067,78 +43979,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x80654620",
-      "ExpectedWord": "0x809E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065462C",
-      "ExpectedWord": "0x901E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x8065465C",
-      "ExpectedWord": "0x809E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80654668",
-      "ExpectedWord": "0x901E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80654698",
-      "ExpectedWord": "0x809E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806546A4",
-      "ExpectedWord": "0x901E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806546D4",
-      "ExpectedWord": "0x809E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806546E0",
-      "ExpectedWord": "0x901E2930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x806546F0",
       "ExpectedWord": "0x807E292C",
       "Node": 0,
@@ -44529,15 +44369,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.lastReceivedTimes.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655754",
-      "ExpectedWord": "0x90032930",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedPlayers.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -79234,6 +79065,54 @@
   ],
   "ArrayFills": [
     {
+      "Begin": "0x80651BEC",
+      "ExpectedWords": [
+        "0x901E2930"
+      ],
+      "BaseRegister": "r30",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedPlayers.offset",
+          "Stride": "RKNetController.disconnectedPlayers.stride",
+          "Count": "RKNetController.disconnectedPlayers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80652BD0",
+      "ExpectedWords": [
+        "0x933B2930"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r25",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedPlayers.offset",
+          "Stride": "RKNetController.disconnectedPlayers.stride",
+          "Count": "RKNetController.disconnectedPlayers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80655754",
+      "ExpectedWords": [
+        "0x90032930"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedPlayers.offset",
+          "Stride": "RKNetController.disconnectedPlayers.stride",
+          "Count": "RKNetController.disconnectedPlayers.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
       "Begin": "0x8072B948",
       "ExpectedWords": [
         "0x901F0024",
@@ -82199,6 +82078,78 @@
   ],
   "BitsetStores": [
     {
+      "Begin": "0x80654620",
+      "ExpectedWords": [
+        "0x809E2930",
+        "0x7C600030",
+        "0x7C800378",
+        "0x901E2930"
+      ],
+      "Base": "r30",
+      "Index": "r5",
+      "Unit": "r3",
+      "Shift": "r0",
+      "Loaded": "r4",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4
+    },
+    {
+      "Begin": "0x8065465C",
+      "ExpectedWords": [
+        "0x809E2930",
+        "0x7C600030",
+        "0x7C800378",
+        "0x901E2930"
+      ],
+      "Base": "r30",
+      "Index": "r5",
+      "Unit": "r3",
+      "Shift": "r0",
+      "Loaded": "r4",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4
+    },
+    {
+      "Begin": "0x80654698",
+      "ExpectedWords": [
+        "0x809E2930",
+        "0x7C600030",
+        "0x7C800378",
+        "0x901E2930"
+      ],
+      "Base": "r30",
+      "Index": "r5",
+      "Unit": "r3",
+      "Shift": "r0",
+      "Loaded": "r4",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4
+    },
+    {
+      "Begin": "0x806546D4",
+      "ExpectedWords": [
+        "0x809E2930",
+        "0x7C600030",
+        "0x7C800378",
+        "0x901E2930"
+      ],
+      "Base": "r30",
+      "Index": "r5",
+      "Unit": "r3",
+      "Shift": "r0",
+      "Loaded": "r4",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4
+    },
+    {
       "Begin": "0x8052FD04",
       "ExpectedWords": [
         "0xA0E30050",
@@ -82445,6 +82396,110 @@
     }
   ],
   "BitsetLoads": [
+    {
+      "Instruction": "0x8064F3FC",
+      "ExpectedWord": "0x80052930",
+      "Node": 0,
+      "Base": "r5",
+      "Index": "r30",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7F43F030"
+    },
+    {
+      "Instruction": "0x8064FB34",
+      "ExpectedWord": "0x80052930",
+      "Node": 0,
+      "Base": "r5",
+      "Index": "r30",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7F43F030"
+    },
+    {
+      "Instruction": "0x8064FC30",
+      "ExpectedWord": "0x80032930",
+      "Node": 0,
+      "Base": "r3",
+      "Index": "r10",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7CC45030"
+    },
+    {
+      "Instruction": "0x8064FFB8",
+      "ExpectedWord": "0x80052930",
+      "Node": 0,
+      "Base": "r5",
+      "Index": "r31",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7F83F830"
+    },
+    {
+      "Instruction": "0x80650400",
+      "ExpectedWord": "0x80082930",
+      "Node": 0,
+      "Base": "r8",
+      "Index": "r4",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7CE42030"
+    },
+    {
+      "Instruction": "0x80650548",
+      "ExpectedWord": "0x80052930",
+      "Node": 0,
+      "Base": "r5",
+      "Index": "r31",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7F83F830"
+    },
+    {
+      "Instruction": "0x806505FC",
+      "ExpectedWord": "0x80052930",
+      "Node": 0,
+      "Base": "r5",
+      "Index": "r30",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7F43F030"
+    },
+    {
+      "Instruction": "0x80651240",
+      "ExpectedWord": "0x80032930",
+      "Node": 0,
+      "Base": "r3",
+      "Index": "r6",
+      "Destination": "r0",
+      "Offset": "RKNetController.disconnectedPlayers.offset",
+      "Count": "RKNetController.disconnectedPlayers.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ExpectedShiftWord": "0x7FE33030"
+    },
     {
       "Instruction": "0x80658728",
       "ExpectedWord": "0x8083002C",

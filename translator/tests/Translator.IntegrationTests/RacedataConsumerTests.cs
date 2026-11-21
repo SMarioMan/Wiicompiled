@@ -36,6 +36,16 @@ public class RacedataConsumerTests
         var fills = definition.GetProperty("ArrayFills").EnumerateArray().Select(fill => (
             Begin: Hex(fill.GetProperty("Begin").GetString()!),
             End: checked(Hex(fill.GetProperty("Begin").GetString()!)+(uint)fill.GetProperty("ExpectedWords").GetArrayLength()*4))).ToArray();
+        var bitsetOffsets = definition.GetProperty("BitsetLoads").EnumerateArray().Select(load => (
+                Pc: Hex(load.GetProperty("Instruction").GetString()!),
+                Offset: load.GetProperty("Offset").GetString()!))
+            .Concat(definition.GetProperty("BitsetStores").EnumerateArray().SelectMany(store =>
+            {
+                var begin = Hex(store.GetProperty("Begin").GetString()!);
+                var last = checked(begin + (uint)(store.GetProperty("ExpectedWords").GetArrayLength() - 1) * 4);
+                var offset = store.GetProperty("Offset").GetString()!;
+                return new[] { (Pc: begin, Offset: offset), (Pc: last, Offset: offset) };
+            })).ToDictionary(site => site.Pc, site => site.Offset);
         var transfers = definition.GetProperty("ArrayTransfers").EnumerateArray().SelectMany(transfer => {
             var begin=Hex(transfer.GetProperty("Begin").GetString()!);
             var end=checked(begin+(uint)transfer.GetProperty("ExpectedWords").GetArrayLength()*4);
@@ -74,6 +84,14 @@ public class RacedataConsumerTests
                     {
                         var reference = candidate.Reference;
                         if (copies.Concat(fills).Concat(transfers).Any(span => reference.Instruction >= span.Begin && reference.Instruction < span.End)) continue;
+                        if (bitsetOffsets.TryGetValue(reference.Instruction, out var bitsetOffset))
+                        {
+                            Assert.Equal("offset", reference.Operand);
+                            Assert.Equal(candidate.Before, originalLayout.Symbol(bitsetOffset));
+                            Assert.Equal(candidate.After, expandedLayout.Symbol(bitsetOffset));
+                            covered.Add(reference.Instruction);
+                            continue;
+                        }
                         Assert.True(sites.TryGetValue((reference.Instruction, reference.Node, reference.Operand), out var declared),
                             $"Missing proven reference at {reference.Instruction:X8} in {entry:X8} {name}");
                         var symbol = declared.GetProperty("Symbol").GetString()!;

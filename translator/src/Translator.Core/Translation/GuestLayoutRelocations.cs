@@ -152,7 +152,8 @@ public sealed partial class GuestLayoutRelocations
             ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"), site.Scene, site.PrimaryRegister, site.SecondaryRegister,
             site.ZeroRegister, site.PrimaryHeap, site.SecondaryHeap, site.PrimarySlot, site.SecondarySlot }),
         BitsetLoads = _bitsetLoads.Select(site => new {Instruction=$"0x{site.Instruction:X8}",ExpectedWord=$"0x{site.ExpectedWord:X8}",
-            site.Node,site.Base,site.Index,site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer}),
+            site.Node,site.Base,site.Index,site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer,
+            ExpectedShiftWord=site.ExpectedShiftWord is uint shift ? $"0x{shift:X8}" : null}),
         ArrayTransfers = _arrayTransfers.Select(site => new {Begin=$"0x{site.Begin:X8}",ExpectedWords=site.ExpectedWords.Select(word=>$"0x{word:X8}"),
             site.SourceBase,site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource,site.OriginalElements}),
         BitsetStores = _bitsetStores.Select(site => new { Begin=$"0x{site.Begin:X8}",
@@ -394,7 +395,8 @@ public sealed partial class GuestLayoutRelocations
             file.AuthoredCountIndices?.Select(site => new GuestAuthoredCountIndex(Hex(site.Instruction),Hex(site.ExpectedWord),
                 site.Input,site.Destination,site.FirstCount,site.LastCount)),
             file.BitsetLoads?.Select(site => new GuestBitsetLoad(Hex(site.Instruction),Hex(site.ExpectedWord),site.Node,site.Base,site.Index,
-                site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer)),
+                site.Destination,site.Offset,site.Count,site.WordBits,site.WordBytes,site.BitsPerPlayer,
+                site.ExpectedShiftWord is null ? null : Hex(site.ExpectedShiftWord))),
             file.ArrayTransfers?.Select(site => new GuestArrayTransfer(Hex(site.Begin),site.ExpectedWords.Select(Hex).ToArray(),site.SourceBase,
                 site.SourceOffset,site.DestinationBase,site.DestinationOffset,site.Value,site.Stride,site.Count,site.Width,site.AllowObjectSource,site.OriginalElements)),
             file.WordComparisons?.Select(site => new GuestWordComparison(Hex(site.Begin),site.ExpectedWords.Select(Hex).ToArray(),
@@ -422,7 +424,7 @@ public sealed partial class GuestLayoutRelocations
     private sealed record WordTableFile(string Address,uint[] ExpectedValues,GuestWordTableEntry[] Entries,WordTableLoadFile[] Loads);
     private sealed record WordTableLoadFile(string Instruction,string ExpectedWord,string Base,string Destination,int Offset=0,string? Index=null);
     private sealed record BitsetLoadFile(string Instruction,string ExpectedWord,int Node,string Base,string Index,string Destination,
-        string Offset,string Count,int WordBits=16,int WordBytes=2,int BitsPerPlayer=1);
+        string Offset,string Count,int WordBits=16,int WordBytes=2,int BitsPerPlayer=1,string? ExpectedShiftWord=null);
     private sealed record ArrayTransferFile(string Begin,string[] ExpectedWords,string SourceBase,string SourceOffset,string DestinationBase,
         string DestinationOffset,string Value,string Stride,string Count,int Width=4,bool AllowObjectSource=false,int OriginalElements=1);
     private sealed record AuthoredCountIndexFile(string Instruction,string ExpectedWord,string Input,string Destination,int FirstCount,int LastCount);

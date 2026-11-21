@@ -91,7 +91,10 @@ public sealed partial class GuestLayoutRelocations
         if(site is null)return null;
         if(instruction.Word!=site.ExpectedWords[(int)(instruction.Address-site.Begin)/4])
             throw new InvalidDataException("Bitset store instruction mismatch.");
-        if(Players==OriginalPlayers || instruction.Address!=BitsetEnd(site)-4)return nodes;
+        if (Players == OriginalPlayers) return nodes;
+        if (instruction.Address == site.Begin && _original.Symbol(site.Offset) != _expanded.Symbol(site.Offset))
+            return new IrInstruction[] { new IrLoad(site.Loaded, new(site.Base, _expanded.Symbol(site.Offset)), site.WordBytes) };
+        if (instruction.Address != BitsetEnd(site)-4) return nodes;
         var prefix=$"addr_layout_bitset_{site.Begin:X8}_";
         string Name(string suffix)=>prefix+suffix+"_loc";
         IrValue V(string suffix)=>IrValue.Register(Name(suffix));
@@ -113,6 +116,13 @@ public sealed partial class GuestLayoutRelocations
 
     private void ValidateBitsetControlFlow(IReadOnlyList<PpcInstruction> instructions,IReadOnlyList<BasicBlock> blocks)
     {
+        foreach (var site in _bitsetLoads.Where(site => site.ExpectedShiftWord.HasValue))
+        {
+            var shift = site.Instruction + 4;
+            int inside = instructions.Count(instruction => instruction.Address == site.Instruction || instruction.Address == shift);
+            if (inside == 1 || inside == 2 && blocks.Any(block => block.StartAddress == shift))
+                throw new InvalidDataException($"Packed-word load/shift is partial or has an interior entry at 0x{site.Instruction:X8}.");
+        }
         foreach(var site in _bitsetStores)
         {
             var end=BitsetEnd(site);var inside=instructions.Count(instruction=>instruction.Address>=site.Begin && instruction.Address<end);

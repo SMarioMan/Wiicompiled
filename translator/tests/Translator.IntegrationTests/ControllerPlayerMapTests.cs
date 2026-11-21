@@ -9,7 +9,7 @@ namespace Translator.Tests;
 public class ControllerPlayerMapTests
 {
     [Theory]
-    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(32)] [InlineData(48)] [InlineData(100)]
+    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(32)] [InlineData(48)] [InlineData(100)] [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void OriginalControllerImportsAndResetsTheWholePlayerAidMap(int players)
     {
@@ -57,7 +57,7 @@ public class ControllerPlayerMapTests
                     for(unsigned active:{2u,n})for(unsigned path=0;path<3;path++){
                         std::memset(Memory::GetPointer(controller-16,size+32),0xa5,size+32);
                         std::vector<uint8_t> expected(size,0xa5);
-                        std::memset(expected.data()+disconnectedAids,0,4);std::memset(expected.data()+disconnectedPlayers,0,4);
+                        std::memset(expected.data()+disconnectedAids,0,4);std::memset(expected.data()+disconnectedPlayers,0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
                         Memory::Write32(0x809bd940,path==0?rh1:0);Memory::Write32(0x809bd930,path<=1?selectHandler:0);
                         for(unsigned p=0;p<n;p++){auto aid=p<active?p%32:255;Memory::Write8(source+p,aid);expected[aids+p]=path<2?aid:255;}
                         rh1Calls=selectCalls=0;c.gpr[3]=controller;func_80655738(&c);

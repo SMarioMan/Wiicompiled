@@ -32,6 +32,16 @@ class GuestLayoutTests(unittest.TestCase):
                          (12, 0x3ba0, 0xb68, 0xb70))
         self.assertIsNone(context_hash)
 
+    def test_authored_branches_use_named_endpoints(self):
+        patches = BUILD.static_patches()
+        branches = [patch for patch in patches
+                    if patch['Operation'] in {'Branch', 'BranchLink', 'BranchConditional', 'CaptureBranchTarget'}]
+        self.assertTrue(branches)
+        for patch in branches:
+            with self.subTest(patch=patch):
+                self.assertTrue(patch['Address'].startswith(('game:', 'module:')))
+                self.assertTrue(patch['Value'].startswith(('game:', 'module:')))
+
     def test_expanded_offsets_and_full_width_assembly_address_match_the_context(self):
         values, context_hash = self.resolve(self.context(), True)
         self.assertEqual(values['capacity'], 24)

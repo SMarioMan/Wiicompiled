@@ -32,7 +32,7 @@ def static_patches():
         add('Addr16Ha', address + 2 if isinstance(address, int) else address + '+0x2', target)
         add('Addr16Lo', address + 6 if isinstance(address, int) else address + '+0x6', target)
 
-    add('BranchLink', 0x80008ED0, 'module:MKWSetBootArgs')
+    add('BranchLink', 'game:RKSystem::Main+0x20', 'module:MKWSetBootArgs')
     add('Branch', 'game:DWC_ConnectToGameServerAsync2+0xEC', 'game:DWC_ConnectToGameServerAsync2+0x1EC')
     write('game:DWC_ConnectToGameServerAsync2+0x1F8', 0x38000001)
     add('Copy16', 'module:dwc_gamedata_offset', 'game:dwc_process_status_record+0x16')
@@ -50,14 +50,15 @@ def static_patches():
     write('game:dwc_think+0x12C', 0x38A00002)
     write('game:dwc_think+0x130', 0x90A3035C)
     add('Branch', 'game:dwc_think+0x134', skip_sdk_state_update)
-    add('CaptureBranchTarget', 'module:MKWOriginalExtract', 0x8060406C)
-    add('BranchLink', 0x8060406C, 'module:MKWBootSection')
-    add('BranchLink', 0x8051FF80, 'module:MKWSetController')
-    add('Branch', 0x8066B8D4, 0x8066B934)
+    boot_section_call = 'game:SectionMgr::Init+0xDC'
+    add('CaptureBranchTarget', 'module:MKWOriginalExtract', boot_section_call)
+    add('BranchLink', boot_section_call, 'module:MKWBootSection')
+    add('BranchLink', 'game:Input::Manager::InitControllerHolders+0x11C', 'module:MKWSetController')
+    add('Branch', 'game:LoginResultHandler+0x224', 'game:LoginResultHandler+0x284')
     pointer_pair(0x8065ACC0 + 8 * 4, 0x3C600000, 0x38630000, 'module:pid_struct')
     for index, word in [(0x1A, 0x60000000), (0x1B, 0x7FA5EB78), (0x1F, 0x60000000)]:
         write(0x805C4F88 + index * 4, word)
-    add('BranchLink', 0x805C4F88 + 0x1C * 4, 'module:on_populate_friend')
+    add('BranchLink', 'game:FriendList::Init+0x70', 'module:on_populate_friend')
     write(0x805C5098, 0x4E800020)
     write(0x80615148, 0x3860008D)
     add('BranchConditional', 'game:Pages::WFCFriendsMenu::OnBackPress+0x8',
@@ -68,14 +69,15 @@ def static_patches():
                           (0x8065307C + 0x269 * 4, 0x28040007),
                           (0x8065307C + 0x296 * 4, 0x3B400000)]:
         write(address, word)
-    add('BranchLink', 0x8065307C + 0x12B * 4, 'module:sleep_a_frame')
-    add('Branch', 0x805C97F0, 'module:OnRemoveFriendPressed')
-    add('Copy32', 'module:BMG_Print', 0x805C11E0)
-    add('Branch', 'module:BMG_Print+0x4', 0x805C11E4)
-    add('Branch', 0x805C11E0, 'module:MyBMG_Print')
-    add('BranchLink', 0x80831BCC, 'module:OnMarioKartChannelPressed')
+    add('BranchLink', 'game:RKNet::Controller::MainLoop+0x4AC', 'module:sleep_a_frame')
+    add('Branch', 'game:Pages::FriendInfo::OnRemoveButtonClick', 'module:OnRemoveFriendPressed')
+    message_entry = 'game:Text::PaneHandler::SetMessage'
+    add('Copy32', 'module:BMG_Print', message_entry)
+    add('Branch', 'module:BMG_Print+0x4', message_entry + '+0x4')
+    add('Branch', message_entry, 'module:MyBMG_Print')
+    add('BranchLink', 'game:Pages::MainMenu::OnButtonClick+0xD4', 'module:OnMarioKartChannelPressed')
     add('Branch', 'game:Pages::MainMenu::OnButtonClick+0xD8', 'game:Pages::MainMenu::OnButtonClick+0x3D0')
-    add('Branch', 0x80839A2C, 0x8083A150)
+    add('Branch', 'game:Pages::RaceMenu::OnButtonClick+0x13C8', 'game:Pages::RaceMenu::OnButtonClick+0x1AEC')
     return patches
 
 
@@ -174,6 +176,7 @@ def build(args):
     patches.write_text(json.dumps(static_patches(), indent=2) + '\n')
     imports = output / 'imports.json'
     imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0',
+                                   'LoginResultHandler': '0x8066B6B0',  # Unnamed guest function containing the login error branch.
                                    'MKWHasLicense': '0x8053F7D4', 'MKWSaveManager': '0x809B8F88',
                                    'MKWDebugReport': '0x801A2530',
                                    'MKWOriginalRoster': '0x80619D8C', 'MKWCreateRoom': '0x8061A01C',

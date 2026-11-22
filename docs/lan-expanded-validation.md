@@ -473,3 +473,12 @@ shutdown. The 128-slot fixture reaches AID 127 and verifies guard words,
 including where an out-of-range AID would have stamped a timestamp. The
 unreliable forwarding loop still reads a one-word recipient mask. That loop
 and the matchmaking connection tables still limit live LAN capacity.
+
+The LAN discovery cache and pending reservation table now size to the configured
+capacity, with a floor of 32 entries. A compiled fixture exercises the module's
+actual endpoint registration and both PID lookup paths at capacities 12, 32,
+33 and 128. It fills every slot, verifies lookup in slot 127 at capacity 128 and
+checks that an extra endpoint leaves the full cache intact. All 27 LAN tests
+passed with rebuilt 12- and 24-slot modules, and the 24-slot linked payload is
+byte-identical to the previous build. This storage is used before SDK AID
+assignment. The live LAN build limit remains 32.

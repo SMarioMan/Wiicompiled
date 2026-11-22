@@ -29,7 +29,7 @@ _Static_assert(LAN_DISCOVERY_TICKS_PER_UNIT * BROADCAST_INTERVAL == secs_to_tick
 // Version 3 uses capacity-sized SELECT sections and packed team words.
 #define DISCOVERY_PROTOCOL 3
 #define BROADCAST_MAGIC (('R' << 24) | ('M' << 16) | ('C' << 8) | 'X')
-#define BROADCAST_TRACK_MAX 32
+#define BROADCAST_TRACK_MAX (MKW_LAN_CAPACITY > 32 ? MKW_LAN_CAPACITY : 32)
 /* Leave time for SDK matching and the other receive socket during discovery
  * bursts. Draining until EAGAIN can monopolize this thread on a busy link. */
 #define RECEIVE_BATCH_MAX 8

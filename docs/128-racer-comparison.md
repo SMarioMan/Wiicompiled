@@ -683,3 +683,9 @@ race scenario's settings. The screen assignment fixture exercises the real
 writer and both consumers, including the highest player ID at each capacity,
 four local slots, spectator fallback and unused slots. Before the reads, it
 fills the old location with `0xff` in expanded builds.
+
+The `754cf57` Linux executable passed the live VS countdown on Luigi Circuit
+at the normal game clock with a saved test license and a neutral controller.
+All 128 racers advanced through frame 308 with the connection tables' 1,664-byte
+MEM2 reservation intact and arena start `0x90000E80`. The binary SHA-256 is
+`5bc4f1e9a44aa559ee27d9a008e54cad5b24def4f3de62b1c57addd05507562f`.

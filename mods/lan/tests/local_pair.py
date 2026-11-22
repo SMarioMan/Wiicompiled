@@ -65,6 +65,8 @@ def run(args):
     test_clock = int(os.environ.get('MKW_TEST_CLOCK_DIVISOR', '1'))
     if not 1 <= test_clock <= 64:
         raise ValueError('Test clock divisor must be between one and 64')
+    if args.visible and test_clock != 1:
+        raise ValueError('--visible requires the normal test clock')
     if test_clock != 1:
         print(json.dumps(dict(test_clock_divisor=test_clock,
             validation='functional only; not default-timing or real-time performance')), flush=True)
@@ -128,7 +130,10 @@ def run(args):
                 environment = dict(os.environ, WIICOMPILED_TEST_PAD_FILE=str(pad))
                 if args.finish:
                     environment['MKW_TEST_LAN_CPU'] = '1'
-                processes.append(subprocess.Popen([str(executable), '--headless', '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role], cwd=directory,
+                command = [str(executable), '--lan-local', f'--lan-id={instance}', f'--lan-peers={args.capacity}', role]
+                if not args.visible:
+                    command.append('--headless')
+                processes.append(subprocess.Popen(command, cwd=directory,
                     env=environment, stdout=log, stderr=subprocess.STDOUT))
                 if args.sequential_join or (args.host_first and index == 0):
                     launched = ids[:index+1]
@@ -317,6 +322,7 @@ if __name__ == '__main__':
     parser.add_argument('--mesh', action='store_true', help='Require complete SDK connections without starting a race')
     parser.add_argument('--race', action='store_true', help='Also navigate menus and require every race simulation to advance')
     parser.add_argument('--finish', action='store_true', help='Drive local racers with the CPU and require every peer to observe all race finishes')
+    parser.add_argument('--visible', action='store_true', help='Run the same checks with a visible game window on each peer')
     options = parser.parse_args()
     options.race = options.race or options.finish
     try:

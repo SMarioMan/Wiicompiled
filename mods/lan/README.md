@@ -173,6 +173,10 @@ python3 mods/lan/tests/local_pair.py \
   --host '/absolute/path/LAN Host' --client '/absolute/path/LAN Client'
 ```
 
+Add `--visible` to inspect the peer windows during the same automated checks.
+Use it with `--finish` to let the CPU drive the local racers while watching the
+race. This option runs at normal timing and requires a working graphics backend.
+
 The test requires identical executable hashes in all directories. It passes
 `--lan-local`, runtime IDs and automation flags; use `--host-id=2 --client-id=1`
 to reverse the roles with the same executable. Repeat `--client` for additional

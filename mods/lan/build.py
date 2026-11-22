@@ -85,7 +85,7 @@ def guest_layout(context_path=None, allow_experimental=False):
     """Resolve the guest ABI once for all C code and assembly in the module."""
     values = dict(capacity=12, input_gcn=0x3ba0, race_course=0xb68,
                   race_mode=0xb70, race_player_count=0x24,
-                  net_subs=0x38, net_sub_stride=0x58, net_current_sub=0x291c)
+                  net_subs=0x38, net_sub_stride=0x58, net_current_sub=0x291c, match_nodes=32)
     if context_path is None:
         return values, None
     data = context_path.read_bytes()
@@ -108,11 +108,19 @@ def guest_layout(context_path=None, allow_experimental=False):
         return value
     race = offset('Racedata', 'race')
     settings = race + offset('Scenario', 'settings')
+    match_nodes = 32
+    if 'DWCMatch' in types:
+        nodes = types['DWCMatch']['Fields']['peers']
+        match_nodes = nodes['Count']
+        if (type(match_nodes) is not int or match_nodes != ((capacity + 31) // 32) * 32 or
+                nodes['Offset'] != 0x38 or nodes['Stride'] != 0x30 or
+                offset('DWCMatch', 'tail') != 0x38 + 0x30 * match_nodes):
+            raise ValueError('Invalid SDK matchmaking node layout')
     values = dict(capacity=capacity, input_gcn=offset('InputManager', 'gcnControllers'),
                   race_course=settings, race_mode=settings+8, race_player_count=race+4,
                   net_subs=offset('RKNetController','subs'),
                   net_sub_stride=types['RKNetSub']['Size'],
-                  net_current_sub=offset('RKNetController','currentSub'))
+                  net_current_sub=offset('RKNetController','currentSub'), match_nodes=match_nodes)
     if type(values['net_sub_stride']) is not int or values['net_sub_stride'] < 1:
         raise ValueError('Invalid guest network subrecord stride')
     if any(value > 0xffffffff for value in values.values()):
@@ -123,6 +131,7 @@ def guest_layout(context_path=None, allow_experimental=False):
 def guest_layout_header(values):
     return ('#pragma once\n/* Generated guest ABI for this LAN module. */\n'
             f'#define MKW_LAN_CAPACITY {values["capacity"]}\n'
+            f'#define MKW_LAN_MATCH_NODES {values["match_nodes"]}\n'
             f'#define MKW_LAN_INPUT_GCN_HI {values["input_gcn"] >> 16}\n'
             f'#define MKW_LAN_INPUT_GCN_LO {values["input_gcn"] & 0xffff}\n'
             f'#define MKW_LAN_RACE_COURSE_OFFSET {values["race_course"]}\n'

@@ -490,9 +490,21 @@ smaller-list reload and guard words around the relocated tables.
 The original root heap partitioner also passes with this reserved prefix at all
 thirteen offline capacity boundaries through 128.
 
-The SDK matchmaking node array is independent of these connection tables.
-Matchmaking still needs expanded node storage and connection/suspend mask
-consumers still need wider words before the live LAN cap can rise.
+The friends-match allocation now gives the embedded SDK matchmaking array up
+to 128 48-byte nodes. It leaves the header and first node at their original
+offsets. Above capacity 32, the match trailer and transport block move after
+the expanded array. The translator checks 1,414 trailer and transport
+operands against the original code. The four node-list clears and the two
+free-AID bounds use the same capacity, and the LAN module checks its C layout
+against the translator's node geometry.
+
+Original-code fixtures at capacities 12, 32, 33 and 128 exercise initialization,
+free-AID selection, full-list exhaustion, lookup by index, profile ID and AID,
+removal and compaction, and clearing with guard words around the allocated
+block. A separate fixture follows the original friends-match initializer into
+transport initialization at each storage boundary through 128. The 12- and
+24-slot LAN payloads are byte-identical to their previous builds. The room
+connection and suspend masks still limit the live LAN build to 32 slots.
 
 The SDK's unreliable forwarding header now carries a single recipient AID
 above capacity 32. `DWC_SendUnreliable` requests one recipient, and the two

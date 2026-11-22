@@ -3,6 +3,7 @@
 
 #include <gamespy/gt2.h>
 #include <stdint.h>
+#include "mkw_lan_guest_layout.h"
 
 struct mkw_net_state {
 	uint8_t _unk0[0x28 - 0x0];
@@ -39,7 +40,7 @@ enum dwc_match_state {
 	DWC_MATCH_STATE_SEARCH_OWN = 0x14
 };
 
-struct dwc_gamedata /* size 0x10f8 */ {
+struct dwc_gamedata {
 	uint8_t _unk00[0x04 - 0x00];
 	struct dwc_gamedata2 *gamedata2; /* +0x04 */
 	uint8_t _unk08[0x16 - 0x08];
@@ -63,8 +64,9 @@ struct dwc_gamedata /* size 0x10f8 */ {
 		uint8_t _unk17[0x28 - 0x17];
 		uint32_t players_at_console_little_endian; /* +0x28 */
 		uint8_t _unk2c[0x30 - 0x2c];
-	} peers[32]; /* +0x38; SDK node storage already supports 32 AIDs. */
-    uint8_t _unk638[0x6d0 - (0x38 + 32 * 0x30)];
+	} peers[MKW_LAN_MATCH_NODES]; /* +0x38 */
+    /* The remaining comments give original offsets. Only the node count moves the tail. */
+    uint8_t _unk638[0x6d0 - 0x638];
 	uint16_t public_port; /* +0x6d0 probably? */
 	uint8_t _unk6d2[0x6d4 - 0x6d2];
 	uint32_t public_ip; /* +0x6d4 probably? */
@@ -92,16 +94,17 @@ struct dwc_gamedata /* size 0x10f8 */ {
 	uint8_t sb_self_lookup_complete; /* +0x895 maybe */
 	uint8_t _unk896[0x8a8 - 0x896];
 	uint32_t players_at_console_little_endian; /* +0x8a8 */
-	uint8_t _unk8ac[0x10f8 - 0x8ac];
+	uint8_t _unk8ac[0x8c0 - 0x8ac];
 };
 
-/* These are SDK storage limits, independent of the game's participant arrays. */
-typedef char mkw_dwc_peer_offset_check[__builtin_offsetof(struct dwc_gamedata, peers) == 0x38 ? 1 : -1];
-typedef char mkw_dwc_port_offset_check[__builtin_offsetof(struct dwc_gamedata, public_port) == 0x6d0 ? 1 : -1];
-typedef char mkw_dwc_reservation_timeout_check[__builtin_offsetof(struct dwc_gamedata, reservation_timeout_ms) == 0x740 ? 1 : -1];
-typedef char mkw_dwc_size_check[sizeof(struct dwc_gamedata) == 0x10f8 ? 1 : -1];
+#define MKW_DWC_MATCH_TAIL_SHIFT ((MKW_LAN_MATCH_NODES - 32) * 0x30)
+_Static_assert(__builtin_offsetof(struct dwc_gamedata, peers) == 0x38, "SDK matchmaking nodes");
+_Static_assert(__builtin_offsetof(struct dwc_gamedata, public_port) == 0x6d0 + MKW_DWC_MATCH_TAIL_SHIFT, "SDK public port");
+_Static_assert(__builtin_offsetof(struct dwc_gamedata, reservation_timeout_ms) == 0x740 + MKW_DWC_MATCH_TAIL_SHIFT, "SDK reservation timeout");
+_Static_assert(sizeof(struct dwc_gamedata) == 0x8c0 + MKW_DWC_MATCH_TAIL_SHIFT, "SDK matchmaking block");
 
-struct dwc_gamedata2 /* size 0x1458 */ {
+/* Prefix of the friends-match allocation. Transport follows gamedata. */
+struct dwc_gamedata2 {
 	struct gt2_socket *socket;
 	uint8_t _unk04[0x14 - 0x04];
 	uint32_t buffer_size_send; /* +0x14 0x2000*/
@@ -113,6 +116,7 @@ struct dwc_gamedata2 /* size 0x1458 */ {
 	uint8_t _unk68[0x360 - 0x68];
 	struct dwc_gamedata gamedata; /* +0x360 */
 };
+_Static_assert(__builtin_offsetof(struct dwc_gamedata2, gamedata) == 0x360, "SDK matchmaking block offset");
 
 static inline struct dwc_gamedata *get_dwc_gamedata(void) {
 	struct dwc_gamedata *result;

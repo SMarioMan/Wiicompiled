@@ -52,10 +52,12 @@ public class DwcTransportStorageTests
                 constexpr uint32_t controlSize = {{layout.Symbol("DWCControl.size")}};
                 constexpr uint32_t transportSize = {{layout.Symbol("DWCTransport.size")}};
                 constexpr uint32_t controlGlobal = 0x80381f70, transportGlobal = 0x80381f98;
-                static_assert(controlSize == 0xc20 + records * 64 + 24);
+                constexpr uint32_t match = root + 0x360, matchSize = 0x8c0 + (records - 32) * 48;
+                static_assert(transport == match + matchSize);
+                static_assert(controlSize == 0x360 + matchSize + records * 64 + 24);
                 static_assert(transportSize == records * 64 + 24);
                 #define CHECK(condition) do { if (!(condition)) { std::fprintf(stderr, "DWC line %d: %s\n", __LINE__, #condition); std::abort(); } } while (false)
-                struct ControlCleared {};
+                struct Initialized {};
                 unsigned clearing, remoteAid, handlerCalls;
                 void noOp(CpuContext*) {}
                 void allocate(CpuContext* c) {
@@ -63,13 +65,18 @@ public class DwcTransportStorageTests
                     c->gpr[3] = root;
                 }
                 void clear(CpuContext* c) {
-                    CHECK(c->gpr[3] == (clearing == 0 ? root : transport));
-                    const auto size = clearing == 0 ? controlSize : transportSize;
+                    constexpr uint32_t connections = records == 32 ? 0x802ecfe0 : 0x90000800;
+                    constexpr uint32_t bases[] = {root, connections, connections + records * 4, transport};
+                    constexpr uint32_t sizes[] = {controlSize, records * 4, records * 8, transportSize};
+                    CHECK(clearing < 4 && c->gpr[3] == bases[clearing]);
+                    const auto size = sizes[clearing];
                     CHECK(c->gpr[5] == size && c->gpr[4] == 0);
-                    std::memset(Memory::GetPointer(c->gpr[3], size), 0, size);
+                    if (clearing == 0 || clearing == 3)
+                        std::memset(Memory::GetPointer(c->gpr[3], size), 0, size);
                     ++clearing;
-                    if (clearing == 1) throw ControlCleared{};
                 }
+                void initMatch(CpuContext* c) { CHECK(c->gpr[3] == match); }
+                void initTransport(CpuContext* c) { func_800E8728(c); throw Initialized{}; }
                 void aid(CpuContext* c) { c->gpr[3] = remoteAid; }
                 void localAid(CpuContext* c) { c->gpr[3] = 0; }
                 void now(CpuContext* c) { c->gpr[3] = 0x11223344; c->gpr[4] = 0x55667788; }
@@ -94,6 +101,11 @@ public class DwcTransportStorageTests
                 int main() {
                     Memory::Init(32 * 1024 * 1024);
                     entry(0x800ccfc8, noOp);
+                    entry(0x800ccb98, noOp);
+                    entry(0x800cfeb8, noOp);
+                    entry(0x800ce374, noOp);
+                    entry(0x800d4b1c, initMatch);
+                    entry(0x800e8728, initTransport);
                     entry(0x800ccd20, allocate);
                     entry(0x80006038, clear);
                     entry(0x80020a34, save<24>);
@@ -109,14 +121,12 @@ public class DwcTransportStorageTests
                     c.gpr[1] = stack;
                     c.gpr[13] = 0x80388880;
                     c.gpr[2] = 0x8038ac20;
+                    c.gpr[4] = root + 0x100;
                     std::memset(Memory::GetPointer(root - 4, controlSize + 68), 0x5a, controlSize + 68);
-                    try { func_800D0CC8(&c); CHECK(false); } catch (const ControlCleared&) {}
-                    CHECK(clearing == 1 && Memory::Read32(controlGlobal) == root);
-                    CHECK(Memory::Read32(root + controlSize - 4) == 0);
+                    try { func_800D0CC8(&c); CHECK(false); } catch (const Initialized&) {}
+                    CHECK(clearing == 4 && Memory::Read32(controlGlobal) == root);
                     c.gpr[1] = stack;
-                    c.gpr[3] = transport;
-                    func_800E8728(&c);
-                    CHECK(clearing == 2 && Memory::Read32(transportGlobal) == transport);
+                    CHECK(Memory::Read32(transportGlobal) == transport);
                     CHECK(Memory::Read16(end + 16) == 1465 && Memory::Read32(end + 20) == 20000);
                     c.gpr[3] = 0x80005000;
                     func_800E86E0(&c);

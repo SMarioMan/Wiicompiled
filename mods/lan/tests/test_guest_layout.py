@@ -32,6 +32,20 @@ class GuestLayoutTests(unittest.TestCase):
                          (12, 0x3ba0, 0xb68, 0xb70))
         self.assertIsNone(context_hash)
 
+    def test_matchmaking_node_layout_matches_the_translator(self):
+        context = self.context()
+        fields = {'peers': {'Count': 32, 'Offset': 0x38, 'Stride': 0x30}, 'tail': {'Offset': 0x638}}
+        context['Layout']['Types']['DWCMatch'] = {'Fields': fields}
+        values, _ = self.resolve(context, True)
+        self.assertEqual(values['match_nodes'], 32)
+        self.assertIn('#define MKW_LAN_MATCH_NODES 32\n', BUILD.guest_layout_header(values))
+        for name in ('Count', 'Offset', 'Stride'):
+            original = fields['peers'][name]
+            with self.subTest(field=name), self.assertRaisesRegex(ValueError, 'matchmaking node layout'):
+                fields['peers'][name] = original + 1
+                self.resolve(context, True)
+            fields['peers'][name] = original
+
     def test_authored_branches_use_named_endpoints(self):
         patches = BUILD.static_patches()
         branches = [patch for patch in patches

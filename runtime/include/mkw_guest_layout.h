@@ -33,6 +33,7 @@ extern const BattleTargetLayout kBattleTargets;
 
 struct TeamResultLayout {
     uint32_t players, count, stride;
+    uint32_t resultTeamPoint, currentScore, teamScore;
 };
 extern const TeamResultLayout kTeamResults;
 }

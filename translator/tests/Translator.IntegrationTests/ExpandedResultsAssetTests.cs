@@ -50,7 +50,7 @@ public class ExpandedResultsAssetTests
 
                 for name in ('Race.szs','Race_U.szs','Race_M.szs','Race_Q.szs'):
                     a=m.Archive((root/'files/Scene/UI'/name).read_bytes())
-                    for key in ('result/ctrl/ResultVS.brctr','result/ctrl/ResultGP.brctr','result/ctrl/ResultTA.brctr','result/ctrl/ResultVSTeam.brctr','result/ctrl/ResultVSTeamNULL.brctr','message/Race.bmg','game_image/anim/game_image_position_texture_pattern.brlan','game_image/anim/game_image_position_multi_texture_pattern.brlan'):
+                    for key in ('result/ctrl/ResultVS.brctr','result/ctrl/ResultGP.brctr','result/ctrl/ResultTA.brctr','result/ctrl/ResultVSTeam.brctr','result/ctrl/ResultVSTeamNULL.brctr','game_image/ctrl/BattleResultAddPoint.brctr','message/Race.bmg','game_image/anim/game_image_position_texture_pattern.brlan','game_image/anim/game_image_position_multi_texture_pattern.brlan'):
                         if key in a.files:(root.parent/(name+'-'+pathlib.Path(key).name)).write_bytes(a.files[key])
                 for name in ('MenuMulti.szs','MenuSingle.szs'):
                     a=m.Archive((root/'files/Scene/UI'/name).read_bytes())
@@ -84,7 +84,7 @@ public class ExpandedResultsAssetTests
                 void original_rank(CpuContext* c){c->gpr[3]+=0x514;}
                 bool load(const char* path,uint32_t address){auto file=std::fopen(path,"rb");if(!file)return false;std::fseek(file,0,SEEK_END);auto size=std::ftell(file);std::rewind(file);auto n=std::fread(Memory::GetPointer(address,size),1,size,file);std::fclose(file);return n==size;}
                 float f(uint32_t address){return std::bit_cast<float>(Memory::Read32(address));}
-                int main(int argc,char** argv){if(argc!=16)return 1;Memory::Init(32*1024*1024);if(!load(argv[1],0x80000000))return 2;
+                int main(int argc,char** argv){if(argc!=17)return 1;Memory::Init(32*1024*1024);if(!load(argv[1],0x80000000))return 2;
                     entry(0x8001273c,compare);entry(0x8060bfac,matrix);entry(0x80833764,original_rank);
                     Memory::Write32(0x80381c80,systemState);Memory::Write32(loader,control);
                     CpuContext c{};CpuContextScope scope(&c);c.gpr[1]=stack;c.gpr[2]=0x8038ac20;c.gpr[13]=0x80388880;c.lr=0x80006000;
@@ -160,12 +160,30 @@ public class ExpandedResultsAssetTests
                         float expected=players>24?152.f:aspect?190.f:145.f;
                         if(std::abs(f(control+4)-(team?expected:-expected))>.0001f)return 24;
                     }
+                    if(!load(argv[16],asset))return 25;
+                    section=asset+Memory::Read16(asset+14);strings=asset+Memory::Read16(asset+16);
+                    Memory::Write32(loader+0x14,section);
+                    Memory::Write32(loader+0x18,section+Memory::Read16(section));
+                    Memory::Write32(loader+0x24,strings);
+                    constexpr uint32_t rows=(players+1)/2;
+                    if(Memory::Read16(section+2)!=rows+3 || Memory::Read16(section+6)!=1)return 26;
+                    for(uint32_t aspect=0;aspect<2;aspect++)for(uint32_t row=0;row<rows;row++){
+                        char name[32];std::snprintf(name,sizeof(name),"BattleResultAddPoint%u",row);
+                        std::memcpy(Memory::GetPointer(text,sizeof(name)),name,sizeof(name));
+                        c.gpr[3]=loader;c.gpr[4]=text;func_805BA994(&c);auto record=c.gpr[3];
+                        if(record!=section+12+(row+3)*60)return 27;
+                        Memory::Write32(systemState+0x58,aspect);c.gpr[3]=loader;c.gpr[4]=record;func_805BAA14(&c);
+                        float x=0.f,y=70.f-225.f*row/(rows-1),scale=6.f/rows;
+                        if(players==128){x=(int(row/16)-1.5f)*76.f;y=70.f-(row%16+.5f)*225.f/16.f;scale=72.f/(272.f*1.03f);}
+                        if(std::abs(f(control+4)-(x+100*scale))>.0001f || std::abs(f(control+8)-(y-45*scale))>.0001f ||
+                           std::abs(f(control+0x10)-.5f*scale)>.0001f || std::abs(f(control+0x14)-.5f*scale)>.0001f)return 28;
+                    }
                     if(c.gpr[1]!=stack || c.lr!=0x80006000)return 13;for(uint32_t r=14;r<32;r++)if(c.gpr[r]!=0x12340000+r)return 14;
                     return 0;
                 }
                 """);
             Run(Environment.GetEnvironmentVariable("MKW_TEST_CXX")??"clang++",TranslatorCppTestHarness.BuildCompileArguments(root,temp,sources,harness,exe,includeDataSections:false),120000);
-            Run(exe,new[]{binary,Path.Combine(temp,"Race.szs-ResultVS.brctr"),Path.Combine(temp,"Race.szs-ResultGP.brctr"),Path.Combine(temp,"Race.szs-ResultTA.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeam.brctr"),Path.Combine(temp,"Race_U.szs-Race.bmg"),Path.Combine(temp,"Race_M.szs-Race.bmg"),Path.Combine(temp,"Race_Q.szs-Race.bmg"),Path.Combine(temp,"Race_U.szs-game_image_position_texture_pattern.brlan"),Path.Combine(temp,"Race_U.szs-game_image_position_multi_texture_pattern.brlan"),Path.Combine(temp,"MenuMulti.szs-Vote.brctr"),Path.Combine(temp,"MenuMulti.szs-WifiMemberConfirm.brctr"),Path.Combine(temp,"MenuSingle.szs-Vote.brctr"),Path.Combine(temp,"MenuSingle.szs-WifiMemberConfirm.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeamNULL.brctr")},10000);
+            Run(exe,new[]{binary,Path.Combine(temp,"Race.szs-ResultVS.brctr"),Path.Combine(temp,"Race.szs-ResultGP.brctr"),Path.Combine(temp,"Race.szs-ResultTA.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeam.brctr"),Path.Combine(temp,"Race_U.szs-Race.bmg"),Path.Combine(temp,"Race_M.szs-Race.bmg"),Path.Combine(temp,"Race_Q.szs-Race.bmg"),Path.Combine(temp,"Race_U.szs-game_image_position_texture_pattern.brlan"),Path.Combine(temp,"Race_U.szs-game_image_position_multi_texture_pattern.brlan"),Path.Combine(temp,"MenuMulti.szs-Vote.brctr"),Path.Combine(temp,"MenuMulti.szs-WifiMemberConfirm.brctr"),Path.Combine(temp,"MenuSingle.szs-Vote.brctr"),Path.Combine(temp,"MenuSingle.szs-WifiMemberConfirm.brctr"),Path.Combine(temp,"Race.szs-ResultVSTeamNULL.brctr"),Path.Combine(temp,"Race.szs-BattleResultAddPoint.brctr")},10000);
         }finally{Directory.Delete(temp,recursive:true);}
     }
     private static void Run(string command,IEnumerable<string> args,int timeout){var start=new ProcessStartInfo(command){RedirectStandardError=true};foreach(var arg in args)start.ArgumentList.Add(arg);Run(start,timeout);}

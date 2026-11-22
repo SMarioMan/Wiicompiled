@@ -28,8 +28,20 @@ Validation in this instance:
 - Fresh 128-capacity assets generated from original USA files. Independent
   readback verified 64 team point variants, the three preserved unrelated
   variants and the original message table.
+- The original resource loader resolved all point-control variants at 24 and 128
+  and applied their corresponding team-row transforms in both aspect ratios.
+- Original team-control loading reserved and populated every row and child point
+  control at 12, 25 and 128 for both team IDs. The twelve authored animation-name
+  pointers remained separate from row capacity.
 
-These checks do not qualify the original full loader, strict live result-page
-accesses, rendered readability, leaving results or another race. Rebuild native
-imports, per-game constants and build shards before gameplay validation.
-128-console networking remains a separate unfinished migration.
+Private Linux probes at `94c3750` finished a one-lap Team VS race with all 128
+racers and entered the individual and team leaderboard pages. The team page had
+64 populated row IDs per side. It animated team targets of 4,205 and 4,295 at one
+  point per update, which kept the original progression waiting for minutes in the
+cloud probes. The expanded animation fix increases the display step with the
+score budget while retaining the original per-row order, exact scores and child
+animations. Original-code fixtures verify that both expanded sizes settle within
+240 updates plus one update per row, and six populated rows retain retail timing.
+Live rendering and the transition to a second race still need to be
+checked on the rebuilt binary. The SDK's 32-console limit remains a separate
+network migration.

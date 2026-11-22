@@ -58,7 +58,7 @@ public static class RetroRewindRegionPatches
 
     private const uint EsrbBranchSite = 0x80604094;
     private const uint EsrbOriginalInstruction = 0x3C608038;
-    private const uint EsrbSkipBranch = 0x4800001C;
+    private const uint EsrbResumeSite = 0x806040B0;
     private const int EsrbStoreIndex = 7;
 
     // PulsarSystem.cpp's removeESRB boot hook: if (region == 'E') *(u32*)0x80604094 = 0x4800001C.
@@ -95,8 +95,8 @@ public static class RetroRewindRegionPatches
 
         var code = chunk.CodeBlob.ToArray();
         BinaryPrimitives.WriteUInt32BigEndian(code.AsSpan(sites[0] + EsrbStoreIndex * 4, 4), 0x60000000);
-        var branch = new KamekCommand(-1, ((uint)KamekCommandId.Write32 << 24) | 0xFFFFFE, KamekCommandId.Write32,
-            true, EsrbBranchSite, [EsrbSkipBranch]);
+        var branch = new KamekCommand(-1, ((uint)KamekCommandId.Branch << 24) | 0xFFFFFE, KamekCommandId.Branch,
+            true, EsrbBranchSite, [EsrbResumeSite]);
         return new KamekChunk(chunk.Index, chunk.FileOffset, chunk.BssSize, chunk.CodeSize,
             chunk.CtorStart, chunk.CtorEnd, chunk.ChunkSize, code, chunk.Commands.Append(branch).ToArray());
     }

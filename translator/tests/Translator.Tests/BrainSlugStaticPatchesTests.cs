@@ -75,4 +75,38 @@ public class BrainSlugStaticPatchesTests
         Assert.Throws<InvalidDataException>(() => BrainSlugStaticPatches.Apply(Module(),
             [new(operation, address, value)], _ => null, _ => 0x60000000));
     }
+
+    [Theory]
+    [InlineData(16u, 0x41820010u)]
+    [InlineData(0x120u, 0x41820120u)]
+    [InlineData(0x7FFCu, 0x41827FFCu)]
+    public void ResolvesMovedConditionalBranchTargetsInBothDirections(uint distance, uint expected)
+    {
+        var linked = BrainSlugStaticPatches.Apply(Module(),
+        [
+            new("BranchConditional", "game:start", "game:finish", "0x41820000"),
+            new("BranchConditional", "game:finish", "game:start", "0x40820001"),
+            new("BranchConditional", "module:stub", "module:state", "0x40820000")
+        ], name => name == "start" ? Original : Original + distance, _ => 0);
+        var chunk = KamekPulFile.Parse(linked.ToCodePul('E')).SelectRegion("E");
+        Assert.All(chunk.Commands, command => Assert.Equal(KamekCommandId.Write32, command.Id));
+        Assert.Equal(expected, Assert.Single(chunk.Commands[0].Arguments));
+        Assert.Equal(0x40820001u | (unchecked(0u - distance) & 0xFFFCu), Assert.Single(chunk.Commands[1].Arguments));
+        Assert.False(chunk.Commands[2].AddressIsAbsolute);
+        Assert.Equal(0x40820010u, Assert.Single(chunk.Commands[2].Arguments));
+    }
+
+    [Theory]
+    [InlineData("0x80009000", "0x41820000")]
+    [InlineData("0x80001002", "0x41820000")]
+    [InlineData("module:state", "0x41820000")]
+    [InlineData("0x80001004", "0x41820004")]
+    [InlineData("0x80001004", "0x41820002")]
+    [InlineData("0x80001004", "0x48000000")]
+    [InlineData("0x80001004", null)]
+    public void RejectsInvalidConditionalBranchOperands(string target, string? condition)
+    {
+        Assert.Throws<InvalidDataException>(() => BrainSlugStaticPatches.Apply(Module(),
+            [new("BranchConditional", "0x80001000", target, condition)], _ => null, _ => 0));
+    }
 }

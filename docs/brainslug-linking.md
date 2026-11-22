@@ -60,6 +60,14 @@ module trampolines and original-call pointers cannot accidentally capture their
 own replacements. The JSON hash is recorded in link provenance. The LAN builder
 uses this interface for its startup and OSLink patches.
 
+`Branch`, `BranchLink` and `BranchConditional` take a target reference in
+`Value`. For a conditional branch, `Condition` holds the PowerPC branch
+instruction template with a zero displacement, such as `"0x41820000"` for
+`beq`. The linker resolves both endpoints, checks the signed displacement range
+and writes the resulting instruction. Conditional branches require both
+endpoints to be in the game image or both to be in the module so the
+displacement remains valid when the module moves.
+
 Module images now load after the embedded game data and before DOL constructors
 or the guest entry point. The later REL initializer applies base patches without
 recopying the module image, preserving any state changed by early hooks. Mod

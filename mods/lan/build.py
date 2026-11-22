@@ -13,22 +13,18 @@ SOURCE = pathlib.Path(__file__).resolve().parent / 'source'
 def static_patches():
     patches = []
 
-    def add(operation, address, value):
+    def add(operation, address, value, *, condition=None):
         def ref(value):
             return f'0x{value:X}' if isinstance(value, int) else value
-        patches.append(dict(Operation=operation, Address=ref(address), Value=ref(value)))
+        patch = dict(Operation=operation, Address=ref(address), Value=ref(value))
+        if condition is not None:
+            patch['Condition'] = ref(condition)
+        patches.append(patch)
 
     def write(address, value):
-        if value & 0xFC000002 == 0x48000000:
-            displacement = value & 0x03FFFFFC
-            if displacement & 0x02000000:
-                displacement -= 0x04000000
-            if displacement < 0:
-                raise ValueError('Backward branch requires an explicit symbolic target')
-            target = address + displacement if isinstance(address, int) else address + f'+0x{displacement:X}'
-            add('BranchLink' if value & 1 else 'Branch', address, target)
-        else:
-            add('Write32', address, value)
+        if value >> 26 in (16, 18):
+            raise ValueError('Direct branches require an explicit target')
+        add('Write32', address, value)
 
     def pointer_pair(address, instruction_hi, instruction_lo, target):
         write(address, instruction_hi)
@@ -37,30 +33,38 @@ def static_patches():
         add('Addr16Lo', address + 6 if isinstance(address, int) else address + '+0x6', target)
 
     add('BranchLink', 0x80008ED0, 'module:MKWSetBootArgs')
-    write('game:DWC_ConnectToGameServerAsync2+0xEC', 0x48000100)
+    add('Branch', 'game:DWC_ConnectToGameServerAsync2+0xEC', 'game:DWC_ConnectToGameServerAsync2+0x1EC')
     write('game:DWC_ConnectToGameServerAsync2+0x1F8', 0x38000001)
     add('Copy16', 'module:dwc_gamedata_offset', 'game:dwc_process_status_record+0x16')
     write('game:dwc_unknown_800ccc38+0x3C', 0x60000000)
-    write('game:dwc_unknown_800d577c+0x80C', 0x48000014)
+    add('Branch', 'game:dwc_unknown_800d577c+0x80C', 'game:dwc_unknown_800d577c+0x820')
     # Both original calls hold the candidate SDK node in r31. Keep the SDK's
     # own deadline routine available for stock/small fields and other callers.
     add('BranchLink', 'game:dwc_think+0x1D34', 'module:LANMeshTryTick')
     add('BranchLink', 'game:dwc_think+0x1D8C', 'module:LANMeshTryTick')
     pointer_pair('game:dwc_think+0x110', 0x3C600000, 0x80630000, 0x809BD508)
-    for index, word in enumerate([0x80630000, 0x80630274, 0x80A3035C, 0x2C050001,
-                                  0x40821A80, 0x38A00002, 0x90A3035C, 0x48001A74]):
+    for index, word in enumerate([0x80630000, 0x80630274, 0x80A3035C, 0x2C050001]):
         write(f'game:dwc_think+0x{0x118 + index * 4:X}', word)
+    skip_sdk_state_update = 'game:dwc_think+0x1BA8'
+    add('BranchConditional', 'game:dwc_think+0x128', skip_sdk_state_update, condition=0x40820000)
+    write('game:dwc_think+0x12C', 0x38A00002)
+    write('game:dwc_think+0x130', 0x90A3035C)
+    add('Branch', 'game:dwc_think+0x134', skip_sdk_state_update)
     add('CaptureBranchTarget', 'module:MKWOriginalExtract', 0x8060406C)
     add('BranchLink', 0x8060406C, 'module:MKWBootSection')
     add('BranchLink', 0x8051FF80, 'module:MKWSetController')
-    write(0x8066B8D4, 0x48000060)
+    add('Branch', 0x8066B8D4, 0x8066B934)
     pointer_pair(0x8065ACC0 + 8 * 4, 0x3C600000, 0x38630000, 'module:pid_struct')
     for index, word in [(0x1A, 0x60000000), (0x1B, 0x7FA5EB78), (0x1F, 0x60000000)]:
         write(0x805C4F88 + index * 4, word)
     add('BranchLink', 0x805C4F88 + 0x1C * 4, 'module:on_populate_friend')
-    for address, word in [(0x805C5098, 0x4E800020), (0x80615148, 0x3860008D),
-                          (0x8061A300, 0x41820028), (0x8061A204, 0x41820030),
-                          (0x8066FCE0, 0x38600000), (0x8066FCE4, 0x4E800020),
+    write(0x805C5098, 0x4E800020)
+    write(0x80615148, 0x3860008D)
+    add('BranchConditional', 'game:Pages::WFCFriendsMenu::OnBackPress+0x8',
+        'game:Pages::WFCFriendsMenu::OnBackPress+0x30', condition=0x41820000)
+    add('BranchConditional', 'game:Pages::WFCFriendsMenu::OnBackButtonClick+0x24',
+        'game:Pages::WFCFriendsMenu::OnBackButtonClick+0x54', condition=0x41820000)
+    for address, word in [(0x8066FCE0, 0x38600000), (0x8066FCE4, 0x4E800020),
                           (0x8065307C + 0x269 * 4, 0x28040007),
                           (0x8065307C + 0x296 * 4, 0x3B400000)]:
         write(address, word)
@@ -70,8 +74,8 @@ def static_patches():
     add('Branch', 'module:BMG_Print+0x4', 0x805C11E4)
     add('Branch', 0x805C11E0, 'module:MyBMG_Print')
     add('BranchLink', 0x80831BCC, 'module:OnMarioKartChannelPressed')
-    write(0x80831BD0, 0x480002F8)
-    write(0x80839A2C, 0x48000724)
+    add('Branch', 'game:Pages::MainMenu::OnButtonClick+0xD8', 'game:Pages::MainMenu::OnButtonClick+0x3D0')
+    add('Branch', 0x80839A2C, 0x8083A150)
     return patches
 
 

@@ -4,7 +4,7 @@ using Translator.Core.Parsing.Kamek;
 namespace Translator.Core.Parsing.BrainSlug;
 
 /// <summary>A build-time replacement for a module's runtime instruction writes.</summary>
-public sealed record BrainSlugStaticPatch(string Operation, string Address, string Value);
+public sealed record BrainSlugStaticPatch(string Operation, string Address, string Value, string? Condition = null);
 
 public static class BrainSlugStaticPatches
 {
@@ -36,7 +36,7 @@ public static class BrainSlugStaticPatches
             var value = Resolve(patch.Value);
             var id = patch.Operation switch
             {
-                "Write32" or "Copy32" => KamekCommandId.Write32,
+                "Write32" or "Copy32" or "BranchConditional" => KamekCommandId.Write32,
                 "Write16" or "Copy16" => KamekCommandId.Write16,
                 "Addr32" or "CaptureBranchTarget" => KamekCommandId.Addr32,
                 "Addr16Hi" => KamekCommandId.Addr16Hi,
@@ -50,6 +50,32 @@ public static class BrainSlugStaticPatches
             if (destination.Value % width != 0 ||
                 (destination.Relative ? (ulong)destination.Value + width > linked.Chunk.CodeSize : destination.Value < 0x80000000))
                 throw new InvalidDataException("Invalid static patch destination.");
+            if (patch.Operation == "BranchConditional")
+            {
+                // Both endpoints must move together when Kamek places the module.
+                if (destination.Relative != value.Relative || (!value.Relative && value.Value < 0x80000000))
+                    throw new InvalidDataException("A conditional branch requires endpoints in the same image.");
+                var template = Hex(patch.Condition ?? "");
+                var delta = (long)value.Value - destination.Value;
+                if ((template & 0xFC00FFFEu) != 0x40000000u)
+                    throw new InvalidDataException("A conditional branch template must have an empty relative displacement.");
+                if ((delta & 3) != 0 || delta is < -0x8000 or > 0x7FFC)
+                    throw new InvalidDataException("A conditional branch requires an aligned target in rel14 range.");
+                if (value.Relative)
+                {
+                    if ((ulong)value.Value + 4 > linked.Chunk.CodeSize)
+                        throw new InvalidDataException("A conditional branch target leaves the module image.");
+                }
+                else
+                {
+                    // Use the linker's original-game reader to verify executable endpoints.
+                    readGameInstruction(destination.Value);
+                    readGameInstruction(value.Value);
+                }
+                value = (template | (unchecked((uint)delta) & 0xFFFCu), false);
+            }
+            else if (patch.Condition is not null)
+                throw new InvalidDataException("A branch condition is only valid for BranchConditional.");
             if (patch.Operation is "Copy32" or "Copy16" or "CaptureBranchTarget")
             {
                 if (value.Relative || value.Value < 0x80000000 || value.Value % (patch.Operation == "Copy16" ? 2u : 4u) != 0)

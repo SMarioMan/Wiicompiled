@@ -91,11 +91,11 @@ public sealed class RetroRewindRegionPatchesTests
         var chunk = EsrbChunk(0x40);
         var patched = RetroRewindRegionPatches.ApplyUsEsrbSkip(chunk, "RMCE01", EsrbImage(0x3C608038));
 
-        var write = Assert.Single(patched.Commands);
-        Assert.Equal(KamekCommandId.Write32, write.Id);
-        Assert.True(write.AddressIsAbsolute);
-        Assert.Equal(0x80604094u, write.Address);
-        Assert.Equal([0x4800001Cu], write.Arguments);
+        var branch = Assert.Single(patched.Commands);
+        Assert.Equal(KamekCommandId.Branch, branch.Id);
+        Assert.True(branch.AddressIsAbsolute);
+        Assert.Equal(0x80604094u, branch.Address);
+        Assert.Equal([0x806040B0u], branch.Arguments);
         Assert.Equal(0x60000000u, BinaryPrimitives.ReadUInt32BigEndian(patched.CodeBlob.AsSpan(0x40 + 7 * 4, 4)));
         Assert.Equal(0x90034094u, BinaryPrimitives.ReadUInt32BigEndian(chunk.CodeBlob.AsSpan(0x40 + 7 * 4, 4)));
     }

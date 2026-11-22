@@ -1,9 +1,51 @@
 {
-  "Version": 33,
+  "Version": 34,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
   "Types": [
+    {
+      "Name": "DWCConnectionPointerBlock",
+      "Alignment": 4,
+      "Size": 32
+    },
+    {
+      "Name": "DWCConnectionMetadataBlock",
+      "Alignment": 8,
+      "Size": 64
+    },
+    {
+      "Name": "DWCConnectionAidBlock",
+      "Alignment": 1,
+      "Size": 8
+    },
+    {
+      "Name": "DWCConnectionTables",
+      "Alignment": 32,
+      "Fields": [
+        {
+          "Name": "pointers",
+          "Type": "DWCConnectionPointerBlock",
+          "Count": 4,
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        },
+        {
+          "Name": "metadata",
+          "Type": "DWCConnectionMetadataBlock",
+          "Count": 4,
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        },
+        {
+          "Name": "aids",
+          "Type": "DWCConnectionAidBlock",
+          "Count": 4,
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        }
+      ]
+    },
     {
       "Name": "DWCControlPrefix",
       "Alignment": 8,
@@ -3564,6 +3606,537 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x800D0DC8",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D0DD4",
+      "ExpectedWord": "0x38A00080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.size"
+    },
+    {
+      "Instruction": "0x800D0E74",
+      "ExpectedWord": "0x3863D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D0E78",
+      "ExpectedWord": "0x38A00100",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.metadata.size"
+    },
+    {
+      "Instruction": "0x800D1834",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1838",
+      "ExpectedWord": "0x38A00080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.size"
+    },
+    {
+      "Instruction": "0x800D1848",
+      "ExpectedWord": "0x3863D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D184C",
+      "ExpectedWord": "0x38A00100",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.metadata.size"
+    },
+    {
+      "Instruction": "0x800D196C",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1970",
+      "ExpectedWord": "0x38A00080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.size"
+    },
+    {
+      "Instruction": "0x800D1980",
+      "ExpectedWord": "0x3863D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1984",
+      "ExpectedWord": "0x38A00100",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.metadata.size"
+    },
+    {
+      "Instruction": "0x800D1AA4",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1AA8",
+      "ExpectedWord": "0x38A00080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.size"
+    },
+    {
+      "Instruction": "0x800D1AB8",
+      "ExpectedWord": "0x3863D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1ABC",
+      "ExpectedWord": "0x38A00100",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.metadata.size"
+    },
+    {
+      "Instruction": "0x800D1D6C",
+      "ExpectedWord": "0x38000004",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.count"
+    },
+    {
+      "Instruction": "0x800D1D70",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D1FFC",
+      "ExpectedWord": "0x3BBDCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2024",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2038",
+      "ExpectedWord": "0x2C1E0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D2154",
+      "ExpectedWord": "0x387FD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2158",
+      "ExpectedWord": "0x38A00020",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2160",
+      "ExpectedWord": "0x3BFFD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2194",
+      "ExpectedWord": "0x3863D160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D21F4",
+      "ExpectedWord": "0x3BBBCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D220C",
+      "ExpectedWord": "0x3B3BCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2248",
+      "ExpectedWord": "0x2C1A0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D22C0",
+      "ExpectedWord": "0x387FD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D22C4",
+      "ExpectedWord": "0x38A00020",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D22CC",
+      "ExpectedWord": "0x3B7FD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2300",
+      "ExpectedWord": "0x3BFFD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2450",
+      "ExpectedWord": "0x387FD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2454",
+      "ExpectedWord": "0x38A00020",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D245C",
+      "ExpectedWord": "0x3BDFD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2490",
+      "ExpectedWord": "0x3BFFD160",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2898",
+      "ExpectedWord": "0x3BFFCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D28C0",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D28D4",
+      "ExpectedWord": "0x2C1E0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D2934",
+      "ExpectedWord": "0x38000004",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.count"
+    },
+    {
+      "Instruction": "0x800D2938",
+      "ExpectedWord": "0x3884CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D29DC",
+      "ExpectedWord": "0x3884CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D29FC",
+      "ExpectedWord": "0x3BFFCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2A34",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2A48",
+      "ExpectedWord": "0x2C1E0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D2A78",
+      "ExpectedWord": "0x3884D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2A98",
+      "ExpectedWord": "0x3BFFCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2AD8",
+      "ExpectedWord": "0x2C1E0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D2B88",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2B8C",
+      "ExpectedWord": "0x38A00080",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.pointers.size"
+    },
+    {
+      "Instruction": "0x800D2B9C",
+      "ExpectedWord": "0x3863D060",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.metadata.offset",
+      "Addend": -12320,
+      "Scale": 1,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D2BA0",
+      "ExpectedWord": "0x38A00100",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCConnectionTables.metadata.size"
+    },
+    {
+      "Instruction": "0x800D38EC",
+      "ExpectedWord": "0x3A10CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D3918",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D392C",
+      "ExpectedWord": "0x2C1C0020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
+    {
+      "Instruction": "0x800D3970",
+      "ExpectedWord": "0x3863CFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D39A0",
+      "ExpectedWord": "0x3BDDCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D39E0",
+      "ExpectedWord": "0x3A1DCFE0",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Addend": -12320,
+      "Scale": 0,
+      "ResizedAddend": 265357312
+    },
+    {
+      "Instruction": "0x800D3A18",
+      "ExpectedWord": "0x2C110020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.pointers.count",
+      "Scale": 8
+    },
     {
       "Instruction": "0x800D0D10",
       "ExpectedWord": "0x38801438",

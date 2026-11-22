@@ -25,6 +25,8 @@ struct Layout {
 };
 extern const Layout kLayout;
 
+extern const uint32_t kDwcConnectionReserve;
+
 // Separate export keeps the established Layout ABI intact for native glue.
 struct BattleTargetLayout {
     uint32_t capacity, targets, states;

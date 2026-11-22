@@ -482,3 +482,16 @@ checks that an extra endpoint leaves the full cache intact. All 27 LAN tests
 passed with rebuilt 12- and 24-slot modules, and the 24-slot linked payload is
 byte-identical to the previous build. This storage is used before SDK AID
 assignment. The live LAN build limit remains 32.
+
+The SDK's 32 connection pointers at `802ECFE0`, the paired 8-byte connection
+metadata records at `802ED060` and the AID list at `802ED160` now use one checked
+layout. Through capacity 32, they retain their original addresses and sizes.
+Above 32, they grow together in groups of 32 and occupy reserved space before
+the MEM2 arena. Relocations cover the original bases, clear lengths, connection
+lookup loops and unrolled free-slot scans. Original-code fixtures at 12, 32, 33
+and 128 cover a server reset, final-slot allocation and lookup, AID enumeration,
+smaller-list reload and guard words around the relocated tables.
+
+The SDK matchmaking node array is independent of these connection tables.
+Matchmaking still needs expanded node storage and connection/suspend mask
+consumers still need wider words before the live LAN cap can rise.

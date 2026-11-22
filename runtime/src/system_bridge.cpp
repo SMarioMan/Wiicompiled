@@ -578,7 +578,8 @@ void SystemBridge::SeedLowMemDefaults(const Memory::Config& config) {
         entries.push_back({0x80003118u, mem2Size, "Physical MEM2 size", true});
         entries.push_back({0x8000311Cu, mem2Size, "Simulated MEM2 size", true});
         entries.push_back({0x80003120u, mem2End, "MEM2 end", true});
-        entries.push_back({0x80003124u, kMem2LoFloor, "MEM2 arena lo", true});
+        // The expanded DWC tables occupy the aligned prefix immediately before the arena.
+        entries.push_back({0x80003124u, kMem2LoFloor + MkwGuestLayout::kDwcConnectionReserve, "MEM2 arena lo", true});
         entries.push_back({0x80003128u, mem2ArenaHi, "MEM2 arena hi", true});
         entries.push_back({0x80003130u, ipcBufLo, "IPC Buffer lo", true});
         entries.push_back({0x80003134u, ipcBufHi, "IPC Buffer hi", true});

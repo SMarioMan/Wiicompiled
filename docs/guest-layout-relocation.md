@@ -80,6 +80,10 @@ Symbols include `Type.size`, `Type.field.offset`, `.size`, `.count`, `.stride`
 and `.end`; `+` composes nested offsets. A reference may add a fixed field offset
 with `Addend`, after multiplying the symbol by `Scale` (default one). Negative
 scales express stack-frame allocation without hardcoded negative sizes.
+Format version 34 adds `ResizedAddend` for a table that moves when its layout
+symbol changes. The original instruction is checked against `Addend`. When the
+symbol differs from its original value, the translated operand uses the new
+symbol and `ResizedAddend`.
 The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.

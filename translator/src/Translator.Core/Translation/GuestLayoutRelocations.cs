@@ -9,7 +9,15 @@ using Translator.Core.Lifting;
 namespace Translator.Core.Translation;
 
 public sealed record GuestLayoutReference(uint Instruction, uint ExpectedWord, int Node,
-    string Operand, string Symbol, int Addend = 0, int Scale = 1);
+    string Operand, string Symbol, int Addend = 0, int Scale = 1, int? ResizedAddend = null)
+{
+    public int Value(GuestLayouts layout, GuestLayouts original)
+    {
+        var value = layout.Symbol(Symbol);
+        var addend = value == original.Symbol(Symbol) ? Addend : ResizedAddend ?? Addend;
+        return checked(value * Scale + addend);
+    }
+}
 
 /// <summary>
 /// Checked semantic relocations applied before SSA, inlining, ABI analysis and C++ emission.
@@ -18,6 +26,8 @@ public sealed record GuestLayoutReference(uint Instruction, uint ExpectedWord, i
 /// </summary>
 public sealed partial class GuestLayoutRelocations
 {
+    public const int CurrentFormatVersion = 34;
+
     private readonly GuestLayouts _original;
     private readonly GuestLayouts _expanded;
     private readonly IReadOnlyDictionary<uint, GuestLayoutReference[]> _references;
@@ -54,8 +64,8 @@ public sealed partial class GuestLayoutRelocations
         {
             if (site.Instruction % 4 != 0 || site.Node < 0)
                 throw new InvalidDataException("Invalid guest layout relocation site.");
-            _ = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend);
-            _ = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend);
+            _ = site.Value(_original, _original);
+            _ = site.Value(_expanded, _original);
         }
         _references = sites.GroupBy(r => r.Instruction).ToDictionary(g => g.Key, g => g.ToArray());
         _arrayCopies = (arrayCopies ?? Array.Empty<GuestArrayCopies>()).ToArray();
@@ -195,9 +205,9 @@ public sealed partial class GuestLayoutRelocations
         References = _references.OrderBy(p => p.Key).SelectMany(p => p.Value).Select(site => new
         {
             Instruction = $"0x{site.Instruction:X8}", ExpectedWord = $"0x{site.ExpectedWord:X8}",
-            site.Node, site.Operand, site.Symbol, site.Addend, site.Scale,
-            Before = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend),
-            After = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend)
+            site.Node, site.Operand, site.Symbol, site.Addend, site.Scale, site.ResizedAddend,
+            Before = site.Value(_original, _original),
+            After = site.Value(_expanded, _original)
         })
     };
 
@@ -244,8 +254,8 @@ public sealed partial class GuestLayoutRelocations
         {
             if (origin.Word != site.ExpectedWord || site.Node >= result.Length)
                 throw new InvalidDataException($"Guest layout instruction mismatch at 0x{origin.Address:X8}.");
-            var expected = checked(_original.Symbol(site.Symbol) * site.Scale + site.Addend);
-            var replacement = checked(_expanded.Symbol(site.Symbol) * site.Scale + site.Addend);
+            var expected = site.Value(_original, _original);
+            var replacement = site.Value(_expanded, _original);
             IrValue Replace(IrValue value)
             {
                 if (value.Kind != "const" || value.Constant != expected) throw Mismatch();
@@ -288,7 +298,9 @@ public sealed partial class GuestLayoutRelocations
         if (json.StartsWith(new byte[] { 0xef, 0xbb, 0xbf })) json = json[3..];
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
-        if (file.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11 or 12 or 13 or 14 or 15 or 16 or 17 or 18 or 19 or 20 or 21 or 22 or 23 or 24 or 25 or 26 or 27 or 28 or 29 or 30 or 31 or 32 or 33)) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version is < 1 or > CurrentFormatVersion) throw new InvalidDataException("Unsupported guest layout format.");
+        if (file.Version < 34 && file.References.Any(site => site.ResizedAddend is not null))
+            throw new InvalidDataException("Resized operand addends require layout format version 34.");
         if (file.Version < 33 && (file.BitsetLoads?.Any(site => site.ExpectedShiftWord is not null) == true ||
             file.BitsetStores?.Any(site => site.Unit == site.Shift) == true))
             throw new InvalidDataException("Paired packed loads and in-place mask shifts require layout format version 33.");
@@ -367,7 +379,7 @@ public sealed partial class GuestLayoutRelocations
             throw new InvalidDataException("Per-array fill sources require layout format version 15.");
         return new GuestLayoutRelocations(file.Types, file.OriginalPlayers, players,
             file.References.Select(r => new GuestLayoutReference(Hex(r.Instruction), Hex(r.ExpectedWord),
-                r.Node, r.Operand, r.Symbol, r.Addend, r.Scale)), file.Complete,
+                r.Node, r.Operand, r.Symbol, r.Addend, r.Scale, r.ResizedAddend)), file.Complete,
             file.ArrayCopies?.Select(copy => new GuestArrayCopies(Hex(copy.Begin),
                 copy.ExpectedWords.Select(Hex).ToArray(), copy.BaseRegister, copy.Array,
                 copy.Stride, copy.Count, copy.Fields)),
@@ -454,5 +466,5 @@ public sealed partial class GuestLayoutRelocations
     private sealed record ArrayCopyFile(string Begin, string[] ExpectedWords, string BaseRegister,
         string Array, string Stride, string Count, GuestArrayFieldCopy[] Fields);
     private sealed record ReferenceFile(string Instruction, string ExpectedWord, int Node,
-        string Operand, string Symbol, int Addend = 0, int Scale = 1);
+        string Operand, string Symbol, int Addend = 0, int Scale = 1, int? ResizedAddend = null);
 }

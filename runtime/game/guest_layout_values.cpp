@@ -9,6 +9,12 @@
 #endif
 
 namespace MkwGuestLayout {
+#ifdef MKW_LAYOUT_DWCCONNECTIONTABLES_SIZE
+const uint32_t kDwcConnectionReserve = MKW_LAYOUT_DWCCONNECTIONTABLES_POINTERS_COUNT > 4
+    ? MKW_LAYOUT_DWCCONNECTIONTABLES_SIZE : 0;
+#else
+const uint32_t kDwcConnectionReserve = 0;
+#endif
 #ifdef MKW_LAYOUT_TEAMRESULT_PLAYERS_OFFSET
 const TeamResultLayout kTeamResults{
     MKW_LAYOUT_TEAMRESULT_PLAYERS_OFFSET, MKW_LAYOUT_TEAMRESULT_PLAYERS_COUNT,

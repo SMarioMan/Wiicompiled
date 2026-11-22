@@ -121,6 +121,8 @@ static inline struct dwc_gamedata *get_dwc_gamedata(void) {
 }
 
 #define MII_SIZE 0x4c
+/* FriendList::__ct (RMCE01 805C4D68) constructs 30 entries of size 0x1d8. */
+#define MKW_FRIEND_LIST_SLOTS 30
 
 struct menu_friend_list_friend /* size 0x1d0 */ {
 	uint8_t _unk00[0x08 - 0x00];

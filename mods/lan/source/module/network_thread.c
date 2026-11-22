@@ -393,6 +393,8 @@ static void process_broadcast(const struct broadcast_packet buffer, const so_add
 	for (int i = 0; i < MII_SIZE; i++)
 		tracked_peers[peer].mii[i] = buffer.mii[i];
 
+	if (peer >= MKW_FRIEND_LIST_SLOTS) return;
+
 	int isr;
 	_CPU_ISR_Disable(isr);
 	void *menu_data = *(void **)get_port_address(9);
@@ -849,6 +851,7 @@ void network_thread_set_mii(const uint8_t mii[MII_SIZE], uint16_t longitude, uin
 }
 
 void network_thread_set_friend(int index, struct menu_friend_list_friend *f) {
+	if ((unsigned)index >= MKW_FRIEND_LIST_SLOTS) return;
 	int isr;
 	_CPU_ISR_Disable(isr);
 	f->friend_code = index + 1;

@@ -12,20 +12,31 @@ class StatusLearning(unittest.TestCase):
         module = Path(__file__).parents[1] / 'source/module'
         source = (module / 'network_thread.c').read_text()
         header = (module / 'network_thread.h').read_text()
+        game = (module / 'mkw.h').read_text()
         capacity = re.search(r'^#define BROADCAST_TRACK_MAX .*$', source, re.M)[0]
+        constants = re.findall(r'^#define (?:MII_SIZE|MKW_FRIEND_LIST_SLOTS) .*$', game, re.M)
+        constants += re.findall(r'^#define (?:BROADCAST_MAGIC|DISCOVERY_PROTOCOL) .*$', source, re.M)
         peer_info = re.search(r'struct peer_info \{.*?\};', header, re.S)[0]
         table = re.search(r'static struct tracked_peer \{.*?\} tracked_peers\[BROADCAST_TRACK_MAX\];', source, re.S)[0]
-        lookup = source[source.index('static int find_or_alloc_peer('):source.index('static void process_broadcast(')]
+        records = re.findall(r'struct (?:menu_friend_list_friend(?:_full)?) /\* size .*?\n\};', game, re.S)
+        packet = re.search(r'struct broadcast_packet \{.*?\} __attribute__\(\(packed\)\);', source, re.S)[0]
+        lookup = source[source.index('static int find_or_alloc_peer('):source.index('/* Status handshakes')]
         learn = source[source.index('static void learn_status_peer('):source.index('/* The SDK accepts one server reservation')]
+        populate = source[source.index('void network_thread_set_friend('):source.index('struct peer_info network_get_peer_info(')]
         harness=r'''
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define MII_SIZE 0x4c
 typedef struct {uint32_t sa_addr;uint16_t sa_port;} so_addr_t;
 static uint64_t timestamp=777;
 static uint32_t local_ip=0x7f000001;
-''' + '\n'.join((capacity, peer_info, table, lookup, learn)) + r'''
+static void *menu_words[0x404 / 4 + 1];
+static void *menu = menu_words;
+static void *section_manager = &menu;
+static void *get_port_address(int index) { if (index != 9) abort(); return &section_manager; }
+#define _CPU_ISR_Disable(token) ((token) = 1)
+#define _CPU_ISR_Restore(token) ((void)(token))
+''' + '\n'.join((*constants, capacity, peer_info, table, *records, packet, lookup, learn, populate)) + r'''
 #define CHECK(x) do{if(!(x)){fprintf(stderr,"status learning line %u: %s\n",__LINE__,#x);abort();}}while(0)
 int main(void){
     _Static_assert(BROADCAST_TRACK_MAX == EXPECTED_SLOTS, "discovery slot count");
@@ -58,6 +69,27 @@ int main(void){
     CHECK(find_peer_by_pid(addr.sa_addr)==-1);
     CHECK(find_peer_by_fake_pid(EXPECTED_SLOTS+1)==-1);
     CHECK(tracked_peers[EXPECTED_SLOTS-1].info.ip==addr.sa_addr-1);
+
+    struct menu_friend_list_friend_full roster[MKW_FRIEND_LIST_SLOTS + 1] = {0};
+    menu_words[0x404 / 4] = roster;
+    struct broadcast_packet broadcast = {.magic=BROADCAST_MAGIC,.protocol=DISCOVERY_PROTOCOL,
+        .capacity=MKW_LAN_CAPACITY,.longitude=77,.communication_port=6000,.mii={42}};
+    for (unsigned i = MKW_FRIEND_LIST_SLOTS-1; i < EXPECTED_SLOTS; ++i) {
+        addr.sa_addr = tracked_peers[i].info.ip;
+        broadcast.pid = tracked_peers[i].real_pid;
+        process_broadcast(broadcast, addr);
+        CHECK(tracked_peers[i].info.status && tracked_peers[i].info.communication_port == 6000);
+        CHECK(tracked_peers[i].mii[0] == 42);
+    }
+    CHECK(roster[MKW_FRIEND_LIST_SLOTS-1].f.longitude == 77);
+    CHECK(roster[MKW_FRIEND_LIST_SLOTS-1].f.mii[0] == 42);
+    CHECK(roster[MKW_FRIEND_LIST_SLOTS].f.mii_known == 0);
+    struct menu_friend_list_friend friend_card = {0};
+    network_thread_set_friend(-1, &friend_card);
+    network_thread_set_friend(MKW_FRIEND_LIST_SLOTS, &friend_card);
+    CHECK(friend_card.friend_code == 0);
+    network_thread_set_friend(MKW_FRIEND_LIST_SLOTS-1, &friend_card);
+    CHECK(friend_card.friend_code == MKW_FRIEND_LIST_SLOTS && friend_card.mii[0] == 42);
 }
 '''
         with tempfile.TemporaryDirectory(prefix='lan-status-learning-') as temporary:

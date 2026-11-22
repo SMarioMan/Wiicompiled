@@ -67,7 +67,7 @@ void MyBMG_Print(void *r3, struct bmg_struct *bmg1, struct bmg_struct *bmg2, int
 		{
 			// 11012, IP and 11013, not connected
 			int *intParams = parameters;
-			if (intParams && intParams[0] == 0 && intParams[1] == 0 && intParams[2] < 31 && intParams[2] > 0)
+			if (intParams && intParams[0] == 0 && intParams[1] == 0 && intParams[2] <= MKW_FRIEND_LIST_SLOTS && intParams[2] > 0)
 			{
 				// peer
 				int peer = intParams[2] - 1;

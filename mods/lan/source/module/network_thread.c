@@ -800,8 +800,8 @@ bool network_thread_send_status_record(int type, uint32_t pid, uint32_t ip, uint
     /* The public SDK address is intentionally a NAT placeholder. Prefer the
      * private endpoint in its roster when discovery has not learned this PID. */
     struct dwc_gamedata *game = get_dwc_gamedata();
-    const unsigned count = game && game->player_count < 32 ? game->player_count : game ? 32 : 0;
-    for (unsigned i = 0; !destination && i < count; i++)
+    const unsigned count = game ? game->player_count : 0;
+    for (unsigned i = 0; !destination && i < count && i < MKW_LAN_MATCH_NODES; i++)
         if (game->peers[i].player_id == pid && game->peers[i].local_ip &&
             game->peers[i].local_ip != MKW_ADVERTISED_IP && (game->peers[i].local_ip >> 28) < 14)
             destination = game->peers[i].local_ip;

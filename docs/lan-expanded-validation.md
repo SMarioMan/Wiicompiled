@@ -506,6 +506,12 @@ transport initialization at each storage boundary through 128. The 12- and
 24-slot LAN payloads are byte-identical to their previous builds. The room
 connection and suspend masks still limit the live LAN build to 32 slots.
 
+LAN status replies can route to the private endpoint of the last SDK node even
+before the discovery cache learns its PID. The endpoint scan and mesh-deadline
+policy now follow the declared storage limit through 128. The route fixture
+also checks that a node outside the current participant count receives no reply
+and that an oversized count stays within the allocation.
+
 The SDK's unreliable forwarding header now carries a single recipient AID
 above capacity 32. `DWC_SendUnreliable` requests one recipient, and the two
 other calls to its internal sender pass through the original packet. The

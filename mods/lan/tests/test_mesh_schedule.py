@@ -43,9 +43,9 @@ int main(void){
     for(uint32_t peer=2;peer<=32;peer++)jitter_mask|=1u<<((lan_mesh_delay_ms(0x7f000001,0x7f000000+peer,0)-125)/4);
     CHECK(__builtin_popcount(jitter_mask)>=8);
     uint32_t peer[12]={0};peer[0]=0x7f000002;game.my_pid=0x7f000001;game.dwc_match_state=1;
-    for(unsigned count=1;count<=33;count++){
+    for(unsigned count=1;count<=MKW_LAN_MATCH_NODES+1;count++){
         game.player_count=count;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
-        if(MKW_LAN_CAPACITY<=12 || count<=2 || count>32)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
+        if(MKW_LAN_CAPACITY<=12 || count<=2 || count>MKW_LAN_MATCH_NODES)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
         else CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],0)) && !originals && clocks==1);
     }
     game.player_count=24;
@@ -78,9 +78,9 @@ int main(void){
 '''
         with tempfile.TemporaryDirectory(prefix='lan-mesh-schedule-') as temporary:
             path=Path(temporary)
-            for capacity in (12,24):
+            for capacity, nodes in ((12,32), (24,32), (33,64), (128,128)):
                 (path/'test.c').write_text(harness)
-                compile = subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Werror',f'-DMKW_LAN_CAPACITY={capacity}','-I',str(module),
+                compile = subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Werror',f'-DMKW_LAN_CAPACITY={capacity}',f'-DMKW_LAN_MATCH_NODES={nodes}','-I',str(module),
                     str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
                 self.assertEqual(compile.returncode,0,compile.stderr)
                 run = subprocess.run([str(path/'test')],capture_output=True,text=True)

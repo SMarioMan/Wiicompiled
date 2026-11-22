@@ -24,7 +24,7 @@ class StatusRoute(unittest.TestCase):
 #define AF_INET 2
 typedef int so_ret_t;
 typedef struct {unsigned sa_len,sa_family,sa_port;uint32_t sa_addr;} so_addr_t;
-static struct dwc_gamedata {unsigned last_enter_type,last_enter_port;uint32_t last_enter_ip,last_enter_pid,last_enter_length;uint64_t last_enter_timestamp;unsigned player_count;struct {uint32_t player_id,local_ip;} peers[32];} game;
+static struct dwc_gamedata {unsigned last_enter_type,last_enter_port;uint32_t last_enter_ip,last_enter_pid,last_enter_length;uint64_t last_enter_timestamp;unsigned player_count;struct {uint32_t player_id,local_ip;} peers[MKW_LAN_MATCH_NODES];} game;
 static struct dwc_gamedata *get_dwc_gamedata(void){return &game;}
 static uint64_t OSGetTime(void){return 0x123456789abcdef0ULL;}
 static struct {struct {uint32_t ip;unsigned communication_port;} info;} tracked_peers[2];
@@ -56,14 +56,27 @@ int main(void){
     CHECK(network_thread_send_status_record(2,99,0x0a000063,7000,&packet,1) && sent==5);
     CHECK(game.last_enter_type==2 && game.last_enter_port==7000 && game.last_enter_ip==0x0a000063 && game.last_enter_pid==99 && game.last_enter_length==1 && game.last_enter_timestamp==0x123456789abcdef0ULL);
     send_result=-1;CHECK(!network_thread_send_status_record(1,99,0x0a000063,7000,&packet,1) && sent==6);
+    send_result=1;
+    game.player_count=MKW_LAN_MATCH_NODES;
+    game.peers[MKW_LAN_MATCH_NODES-1].player_id=1234;
+    game.peers[MKW_LAN_MATCH_NODES-1].local_ip=0x0a000070;
+    CHECK(network_thread_send_status_record(1,1234,MKW_ADVERTISED_IP,7000,&packet,1) && sent==7 && seen_ip==0x0a000070);
+    game.player_count--;
+    CHECK(!network_thread_send_status_record(1,1234,MKW_ADVERTISED_IP,7000,&packet,1) && sent==7);
+    game.player_count=MKW_LAN_MATCH_NODES+1;
+    CHECK(!network_thread_send_status_record(1,1235,MKW_ADVERTISED_IP,7000,&packet,1) && sent==7);
 }
 '''
         with tempfile.TemporaryDirectory(prefix='lan-status-route-') as temporary:
             path=Path(temporary);(path/'test.c').write_text(harness)
-            compile=subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Werror',str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
-            self.assertEqual(compile.returncode,0,compile.stderr)
-            run=subprocess.run([str(path/'test')],capture_output=True,text=True)
-            self.assertEqual(run.returncode,0,run.stderr)
+            for nodes in (32, 64, 128):
+                with self.subTest(nodes=nodes):
+                    command = [os.environ.get('CC', 'cc'), '-std=c11', '-Wall', '-Werror',
+                               f'-DMKW_LAN_MATCH_NODES={nodes}', str(path/'test.c'), '-o', str(path/'test')]
+                    compile = subprocess.run(command, capture_output=True, text=True)
+                    self.assertEqual(compile.returncode, 0, compile.stderr)
+                    run = subprocess.run([str(path/'test')], capture_output=True, text=True)
+                    self.assertEqual(run.returncode, 0, run.stderr)
 
 
 if __name__=='__main__':

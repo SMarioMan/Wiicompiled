@@ -5,6 +5,72 @@
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
+      "Name": "DWCControlPrefix",
+      "Alignment": 8,
+      "Size": 3104
+    },
+    {
+      "Name": "DWCTransportPeer",
+      "Alignment": 8,
+      "Size": 64
+    },
+    {
+      "Name": "DWCTransportChunkBytes",
+      "Alignment": 2,
+      "Size": 2
+    },
+    {
+      "Name": "DWCTransport",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "peers",
+          "Type": "DWCTransportPeer",
+          "Count": 32,
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        },
+        {
+          "Name": "sendCallback",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "userReceiveCallback",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "receiveTimeoutCallback",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "pingCallback",
+          "Type": "Pointer"
+        },
+        {
+          "Name": "sendSplitMax",
+          "Type": "DWCTransportChunkBytes"
+        },
+        {
+          "Name": "receiveTimeout",
+          "Type": "Pointer"
+        }
+      ]
+    },
+    {
+      "Name": "DWCControl",
+      "Alignment": 8,
+      "Fields": [
+        {
+          "Name": "prefix",
+          "Type": "DWCControlPrefix"
+        },
+        {
+          "Name": "transport",
+          "Type": "DWCTransport"
+        }
+      ]
+    },
+    {
       "Name": "Header",
       "Alignment": 4,
       "Size": 32
@@ -3486,6 +3552,166 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x800D0D10",
+      "ExpectedWord": "0x38801438",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCControl.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800D0D20",
+      "ExpectedWord": "0x38A01438",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCControl.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8514",
+      "ExpectedWord": "0xA0030810",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendSplitMax.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8620",
+      "ExpectedWord": "0xA0630810",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendSplitMax.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8674",
+      "ExpectedWord": "0x81830800",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E86F4",
+      "ExpectedWord": "0x90640804",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.userReceiveCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E871C",
+      "ExpectedWord": "0x90640814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeout.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8734",
+      "ExpectedWord": "0x38A00818",
+      "Node": 0,
+      "Operand": "value",
+      "Symbol": "DWCTransport.size",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E874C",
+      "ExpectedWord": "0xB0030810",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendSplitMax.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8760",
+      "ExpectedWord": "0x90030814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeout.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E87E0",
+      "ExpectedWord": "0x28000020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCTransport.peers.count",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8870",
+      "ExpectedWord": "0x8005080C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.pingCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E888C",
+      "ExpectedWord": "0x8184080C",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.pingCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E88FC",
+      "ExpectedWord": "0x83850814",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeout.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8AB0",
+      "ExpectedWord": "0x80060808",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeoutCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8B24",
+      "ExpectedWord": "0x81840808",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeoutCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8B68",
+      "ExpectedWord": "0xA0840810",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendSplitMax.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E8C10",
+      "ExpectedWord": "0x81840800",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.sendCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E9314",
+      "ExpectedWord": "0x81830804",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.userReceiveCallback.offset",
+      "Addend": 0
+    },
+    {
+      "Instruction": "0x800E9338",
+      "ExpectedWord": "0x80030808",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCTransport.receiveTimeoutCallback.offset",
+      "Addend": 0
+    },
     {
       "Instruction": "0x805F4510",
       "ExpectedWord": "0x38E00006",

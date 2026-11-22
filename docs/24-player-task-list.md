@@ -1,12 +1,10 @@
 # Expanded-player migration task list
 
-The active target is now **128 racers in vanilla Mario Kart Wii, primarily
-offline**. Keep the existing architecture and WIP. The LAN milestones and
-extended goals below remain recorded; 128-player networking and mod-pack data
-are outside the current investigation. See [the reference comparison and active
-implementation plan](128-racer-comparison.md). The ultimate goal remains up to
-**128 console multiplayer**; keep racer capacity, console capacity and network
-mask widths separate.
+The target is **128 racers in vanilla Mario Kart Wii**, including the LAN mod.
+Offline and LAN qualification have separate milestones. Keep racer capacity,
+console capacity and network mask widths separate. See [the reference comparison
+and implementation record](128-racer-comparison.md) and [the LAN validation
+checkpoint](lan-expanded-validation.md).
 
 - [x] Implement the auditor foundation: metadata-driven scalar read/write watches,
   object generations, overlap classification, log/strict JSON and controlled stale

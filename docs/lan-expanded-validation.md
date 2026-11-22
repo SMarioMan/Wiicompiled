@@ -430,12 +430,46 @@ two-peer SDK connection in both the headless and visible runners at normal
 timing. Both headless peers advanced on Luigi Circuit (online VS, mode 7) and
 reached lap three. The longer 680-second run ended before either reported a
 finish. Its final samples showed 7,803 host frames and 8,649 client frames.
-This run did not qualify 24 simultaneous racers, race results or reconnects.
+
+The same executable subsequently completed the two-peer finish check at normal
+timing. SDK mesh readiness was observed at 60.79 seconds. At 810.42 seconds,
+both peers reported both racers finished on Luigi Circuit after three laps.
+The host observed frame 7,988 at the finish checkpoint and the client observed
+frame 8,708. The executable SHA-256 was
+`5199be02eeadedab044db87c274904bb9e07d44c92eb031d2387ca67f0e618bf`.
+LAN qualification still needs larger fields, results screens and reconnection.
 
 In the verified USA executable, `DWC_GetAidList` (`800D211C`) clears and fills a
 32-byte static list at `802ED160`. `DWC_GetDirectConnectedAIDBitmap` (`800D21BC`)
-scans the SDK connection table and returns a single word to
-`RKNet::Controller::UpdateSubsAndVR`. The executable's direct callers of
-`DWC_GetAidBitmap` (`800D2414`) include the controller, suspend-vote handling,
-match polling and server shutdown. These paths still need a common wider view
-of active console IDs before the LAN build can accept console IDs above 31.
+scans the 32-entry connection table at `802ECFE0` and returns one word.
+The direct relative branches in the verified executable sections resolve to
+these call sites.
+
+| Getter | Sites | Caller |
+| --- | --- | --- |
+| `DWC_GetAidList` (`800D211C`) | `800E88DC` | `DWCi_TransportProcess` |
+| `DWC_GetDirectConnectedAIDBitmap` (`800D21BC`) | `806549EC` | `RKNet::Controller::UpdateSubsAndVR` |
+| `DWC_GetAidBitmap` (`800D2414`) | `80654988` | `RKNet::Controller::UpdateSubsAndVR` |
+| `DWC_GetAidBitmap` | `800D496C`, `800D49C8`, `800D49DC` | `DWC_GetSuspendMatch` |
+| `DWC_GetAidBitmap` | `800D7BDC`, `800DA730` | Match processing and match polling |
+| `DWC_GetAidBitmap` | `800E6920`, `800E6DC0` | Server-down queries and server polling |
+
+The direct-connected bitmap getter also inlines the same 32-byte AID list.
+Widening the controller's departure flags leaves both lists, the SDK connection
+table, the returned masks and the inlined consumers at their original limits.
+The LAN build guard remains at 32 capacity slots until these paths can use
+wider console state consistently.
+
+The SDK transport owns a second per-AID array, distinct from the connection
+table. The original friends-match allocation embeds it at `0xC20`, with 32
+64-byte records followed by four callbacks, a halfword send-split limit and a
+receive timeout. Relocations cover the outer allocation, both clears, the
+receive callback's timestamp bound and the trailer accesses. The allocation
+retains the original 32 records through capacity 32 and grows in groups of 32.
+
+Original-code fixtures at 12, 32, 33, 65, 97 and 128 test storage, initialization,
+callbacks, receive-buffer setup, timestamp updates, clearing a connection and
+shutdown. The 128-slot fixture reaches AID 127 and verifies guard words,
+including where an out-of-range AID would have stamped a timestamp. The
+unreliable forwarding loop still reads a one-word recipient mask. That loop
+and the matchmaking connection tables still limit live LAN capacity.

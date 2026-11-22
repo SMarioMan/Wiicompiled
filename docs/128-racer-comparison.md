@@ -669,3 +669,17 @@ It advanced through results into award section `0x35` and activated the original
 award page `0x3c` with vtable `0x808ba250`. The executable SHA-256 is
 `603567316af6cc5fa862084b48ac7ac6c93d55565ecb291cd242c6857f861286`.
 The run checked native finish flags and page activation in headless mode.
+
+### Local-player map during the race transition
+
+A later 128-slot Linux boot reproduced a `WipeControl::OnUpdate` fault in VS
+on the existing `57912bd` executable and in the DWC table build. In the latter
+snapshot, the original `Racedata + 0xb84` bytes were `00 ff 00 00`, while the
+expanded settings held `00 01 ff ff`. The second HUD slot read the old `0xff`
+and used it as a kart index.
+
+The original loads at `8052D42C` and `8052D4AC` now derive the address from the
+race scenario's settings. The screen assignment fixture exercises the real
+writer and both consumers, including the highest player ID at each capacity,
+four local slots, spectator fallback and unused slots. Before the reads, it
+fills the old location with `0xff` in expanded builds.

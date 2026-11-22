@@ -15,6 +15,7 @@ public class RacedataScreenTests
     [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealScreenAssignmentIncludesHighLocalPlayersAndBoundsSpectatorFallback(int players)
     {
@@ -32,7 +33,7 @@ public class RacedataScreenTests
         Directory.CreateDirectory(temp);
         try
         {
-            var entries = new uint[] { 0x8052a9a0, 0x8052d3d0 };
+            var entries = new uint[] { 0x8052a9a0, 0x8052d3d0, 0x8052d428, 0x8052d480 };
             var sources = new List<string>();
             foreach (var pc in entries)
             {
@@ -53,6 +54,8 @@ public class RacedataScreenTests
                 #include <cstring>
                 extern "C" void func_8052A9A0(CpuContext*);
                 extern "C" void func_8052D3D0(CpuContext*);
+                extern "C" void func_8052D428(CpuContext*);
+                extern "C" void func_8052D480(CpuContext*);
                 constexpr uint32_t capacity={{players}},size={{layout.Symbol("Scenario.size")}},extent=size+720,
                     settings={{layout.Symbol("Scenario.settings.offset")}},raceOffset={{layout.Symbol("Racedata.race.offset")}},
                     root=0x81010000,inputManager=0x81080000,device=0x81090000,vtable=0x810a0000,stack=0x81f00000;
@@ -110,6 +113,24 @@ public class RacedataScreenTests
                         for(unsigned p=0;p<capacity;p++){
                             ctx.gpr[3]=root-raceOffset;ctx.gpr[4]=p;func_8052D3D0(&ctx);
                             if(static_cast<int32_t>(ctx.gpr[3])!=expectedHud[p])return 5;
+                        }
+                        if(capacity>12)Memory::Write32(root-raceOffset+0xb84,0xffffffff);
+                        Memory::Write32(root+settings+12,0);
+                        for(unsigned slot=0;slot<4;slot++){
+                            const auto player=static_cast<int8_t>(expected[settings+28+slot]);
+                            ctx.gpr[3]=root-raceOffset;ctx.gpr[4]=slot;func_8052D428(&ctx);
+                            if(static_cast<int32_t>(ctx.gpr[3])!=player){
+                                std::fprintf(stderr,"local player n=%u kind=%u slot=%u: got %d, expected %d\n",
+                                    capacity,kind,slot,static_cast<int32_t>(ctx.gpr[3]),player);
+                                return 9;
+                            }
+                            if(player>=0)Memory::Write32(root+8+player*240+16,4);
+                            ctx.gpr[3]=root-raceOffset;ctx.gpr[4]=slot;func_8052D480(&ctx);
+                            if(ctx.gpr[3]!=(player>=0)){
+                                std::fprintf(stderr,"local player predicate n=%u kind=%u slot=%u: got %u for player %d\n",
+                                    capacity,kind,slot,ctx.gpr[3],player);
+                                return 10;
+                            }
                         }
                         for(unsigned r=14;r<32;r++)if(ctx.gpr[r]!=0x12340000+r)return 6;
                         if(ctx.gpr[1]!=stack)return 7;

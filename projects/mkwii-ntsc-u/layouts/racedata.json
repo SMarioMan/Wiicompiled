@@ -6741,6 +6741,14 @@
       "Scale": 1
     },
     {
+      "Instruction": "0x8052D42C",
+      "ExpectedWord": "0x88030B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 28
+    },
+    {
       "Instruction": "0x8052D438",
       "ExpectedWord": "0x80030B70",
       "Node": 0,
@@ -6757,6 +6765,14 @@
       "Symbol": "Racedata.race.offset+Scenario.settings.offset",
       "Addend": 12,
       "Scale": 1
+    },
+    {
+      "Instruction": "0x8052D4AC",
+      "ExpectedWord": "0x88040B84",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "Racedata.race.offset+Scenario.settings.offset",
+      "Addend": 28
     },
     {
       "Instruction": "0x8052D714",

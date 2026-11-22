@@ -3439,13 +3439,25 @@
       ]
     },
     {
-      "Name": "NdevDebugReserveDivisor",
+      "Name": "NdevDebugReserveSquare",
       "Alignment": 1,
       "Fields": [
         {
           "Name": "axes",
           "Type": "NdevDebugReserveAxis",
           "PerPlayer": true
+        }
+      ]
+    },
+    {
+      "Name": "NdevDebugReserveDivisor",
+      "Alignment": 1,
+      "Fields": [
+        {
+          "Name": "groups",
+          "Type": "NdevDebugReserveSquare",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         }
       ]
     },

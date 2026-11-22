@@ -271,6 +271,19 @@ unit tests pass. Live resource loading, effects and scene round trips must still
 verify the smaller debug budget and reclaimed MEM2 headroom before this pressure
 issue is considered resolved.
 
+Two later 128-racer Block Plaza Coin Runners starts exhausted the MEM2 scene
+heap during Lakitu model setup. The first had 41,636 free bytes for a
+111,992-byte request. The second had 65,156 free bytes for a 111,928-byte
+request. The first crash snapshot showed the battle sound child on its MEM1
+parent and the reserved MEM2 debug owner empty.
+
+The new reserve scales by a further factor of `ceil(N/32)`. It keeps the
+existing budget through capacity 32 and reduces the reserve from 546,624 to
+136,640 bytes at 128, returning 409,984 bytes to the existing MEM2 partition.
+The same original root initializer owns both partitions and the debug heap
+retains backing storage. Model loading and another battle are the live
+qualification checkpoints for this change.
+
 
 The clean `2851cbc` binary also renders all 128 cards together in **4:3**, in a
 960-by-720 viewport within the 1280-by-720 window. The first race and a second

@@ -79,14 +79,14 @@ public class RootHeapBudgetTests
                     register_entry(0x80226744,create_system);register_entry(0x802299f0,make_current);
                     CpuContext ctx{};ctx.gpr[1]=stack;ctx.gpr[2]=0x8038ac20;ctx.gpr[13]=0x80388880;CpuContextScope scope(&ctx);
                     for(uint32_t r=14;r<32;r++)ctx.gpr[r]=0x12340000+r;
-                    for(uint32_t end:{0x93dc0000u,0x97dc0000u}){
+                    for(uint32_t end:{0x93dc0000u,0x97dc0000u,0x98fb0960u}){
                         created=subheaps=arenaCalls=current=0;ranges={};
                         std::memset(Memory::GetPointer(root-16,128),0x55,128);Memory::Write32(root+52,1024*1024);
                         Memory::Write32(ctx.gpr[13]-29024,0x80010000);Memory::Write32(ctx.gpr[13]-25416,0x81700000);
                         Memory::Write32(ctx.gpr[13]-29020,0x90000800);Memory::Write32(ctx.gpr[13]-25412,end);
                         ctx.gpr[3]=root;func_80241648(&ctx);
                         unsigned groups = (capacity + 31) / 32;
-                        auto expectedReserve = end == 0x97dc0000 ? uint32_t(279871488 / (capacity * capacity * groups) * 32) : 0;
+                        auto expectedReserve = end > 0x94000000u ? uint32_t(279871488 / (capacity * capacity * groups) * 32) : 0;
                         if(created!=(expectedReserve?3:2) || subheaps!=1 || arenaCalls!=2 || current!=1)return 4;
                         if(ranges[0].start!=0x80010100 || ranges[0].size!=0x81700000-0x80010100)return 5;
                         if(ranges[1].start!=0x90000900 || ranges[1].size!=end-0x90000900-expectedReserve)return 6;

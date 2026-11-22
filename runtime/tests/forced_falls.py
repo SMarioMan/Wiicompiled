@@ -24,10 +24,7 @@ class Ram:
             guest_base,
         )
         self.regions, self.fds = [], {}
-        for guest, size in (
-            (0x80000000, 24 * 1024 * 1024),
-            (0x90000000, 128 * 1024 * 1024),
-        ):
+        for guest in (0x80000000, 0x90000000):
             address = guest_base + guest
             for line in Path(f"/proc/{process.pid}/maps").read_text().splitlines():
                 fields = line.split(maxsplit=5)
@@ -43,7 +40,11 @@ class Ram:
                     if path not in self.fds:
                         self.fds[path] = os.open(path, os.O_RDONLY if read_only else os.O_RDWR)
                     offset = int(fields[2], 16) + address - begin
-                    self.regions.append((guest, guest + size, self.fds[path], offset))
+                    fd = self.fds[path]
+                    size = os.fstat(fd).st_size - offset
+                    if size <= 0:
+                        raise RuntimeError(f"Empty RAM backing for {guest:#x}")
+                    self.regions.append((guest, guest + size, fd, offset))
                     break
             else:
                 raise RuntimeError(f"No current RAM alias for {guest:#x}")

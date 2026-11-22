@@ -69,7 +69,7 @@ void RefreshMixMemoryMap();
 // Host pointer for a guest range that lies entirely inside MEM1 or MEM2 through
 // any of their physical/cached/uncached aliases; nullptr otherwise.
 inline uint8_t* MixResolveRange(uint32_t addr, size_t bytes) {
-    if (bytes == 0 || bytes > Memory::kMem2Size) {
+    if (bytes == 0 || bytes > Memory::kLargeFieldMem2Size) {
         return nullptr;
     }
     if (addr > UINT32_MAX - static_cast<uint32_t>(bytes - 1)) {
@@ -77,7 +77,6 @@ inline uint8_t* MixResolveRange(uint32_t addr, size_t bytes) {
     }
 
     constexpr uint32_t kMem1Size = static_cast<uint32_t>(Memory::kMem1Size);
-    constexpr uint32_t kMem2Size = static_cast<uint32_t>(Memory::kMem2Size);
 
     uint32_t offset = 0;
     bool inMem1 = false;
@@ -100,18 +99,19 @@ inline uint8_t* MixResolveRange(uint32_t addr, size_t bytes) {
     }
 
     bool inMem2 = false;
-    if (addr - Memory::kMem2PhysicalBase < kMem2Size) {
+    const auto mem2Size = Memory::MappedMem2Size();
+    if (addr - Memory::kMem2PhysicalBase < mem2Size) {
         offset = addr - Memory::kMem2PhysicalBase;
         inMem2 = true;
-    } else if (addr - Memory::kMem2CachedBase < kMem2Size) {
+    } else if (addr - Memory::kMem2CachedBase < mem2Size) {
         offset = addr - Memory::kMem2CachedBase;
         inMem2 = true;
-    } else if (addr - Memory::kMem2UncachedBase < kMem2Size) {
+    } else if (addr - Memory::kMem2UncachedBase < mem2Size) {
         offset = addr - Memory::kMem2UncachedBase;
         inMem2 = true;
     }
     if (inMem2) {
-        if (bytes > kMem2Size - offset) {
+        if (bytes > mem2Size - offset) {
             return nullptr;
         }
         uint8_t* base = g_mixMem2.load(std::memory_order_relaxed);

@@ -13,6 +13,7 @@ public:
 
     static constexpr size_t kMem1Size = 24u * 1024u * 1024u;
     static constexpr size_t kMem2Size = 128u * 1024u * 1024u;
+    static constexpr size_t kLargeFieldMem2Size = 144u * 1024u * 1024u;
     static constexpr uint32_t kMem1PhysicalBase = 0x00000000u;
     static constexpr uint32_t kMem1CachedBase = 0x80000000u;
     static constexpr uint32_t kMem1UncachedBase = 0xC0000000u;
@@ -20,11 +21,11 @@ public:
     static constexpr uint32_t kMem2CachedBase = 0x90000000u;
     static constexpr uint32_t kMem2UncachedBase = 0xD0000000u;
     static constexpr uint32_t kMem2PhysicalEnd =
-        kMem2PhysicalBase + static_cast<uint32_t>(kMem2Size);
+        kMem2PhysicalBase + static_cast<uint32_t>(kLargeFieldMem2Size);
     static constexpr uint32_t kMem2CachedEnd =
-        kMem2CachedBase + static_cast<uint32_t>(kMem2Size);
+        kMem2CachedBase + static_cast<uint32_t>(kLargeFieldMem2Size);
     static constexpr uint32_t kMem2UncachedEnd =
-        kMem2UncachedBase + static_cast<uint32_t>(kMem2Size);
+        kMem2UncachedBase + static_cast<uint32_t>(kLargeFieldMem2Size);
 
     struct RegionConfig {
         std::string name;
@@ -34,7 +35,7 @@ public:
 
     struct Config {
         std::vector<RegionConfig> regions;
-        static Config WiiDefaults();
+        static Config WiiDefaults(size_t mem2Size = kMem2Size);
     };
 
     class AccessViolation : public std::runtime_error {
@@ -52,6 +53,7 @@ public:
     };
 
     static void Init(const Config& config);
+    static uint32_t MappedMem2Size() noexcept;
     // Single flat MEM1 region. Not used by the shipped runtime, but the
     // translator integration-test harnesses emit calls to it.
     static void Init(size_t mem1Size);

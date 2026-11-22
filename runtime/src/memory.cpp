@@ -497,7 +497,11 @@ void Memory::RefreshWritableFastPathsForExecutableRanges() {
     RefreshFastPathTables();
 }
 
-Memory::Config Memory::Config::WiiDefaults() {
+namespace {
+std::atomic<uint32_t> g_mappedMem2Size{0};
+}
+
+Memory::Config Memory::Config::WiiDefaults(size_t mem2Size) {
     // Physical / cached / uncached views of MEM1 and MEM2, then the locked cache.
     Config config;
 
@@ -522,19 +526,19 @@ Memory::Config Memory::Config::WiiDefaults() {
     config.regions.push_back(RegionConfig{
         .name = "MEM2_PHYS",
         .baseAddress = Memory::kMem2PhysicalBase,
-        .sizeBytes = Memory::kMem2Size,
+        .sizeBytes = mem2Size,
     });
 
     config.regions.push_back(RegionConfig{
         .name = "MEM2",
         .baseAddress = Memory::kMem2CachedBase,
-        .sizeBytes = Memory::kMem2Size,
+        .sizeBytes = mem2Size,
     });
 
     config.regions.push_back(RegionConfig{
         .name = "MEM2_UNCACHED",
         .baseAddress = Memory::kMem2UncachedBase,
-        .sizeBytes = Memory::kMem2Size,
+        .sizeBytes = mem2Size,
     });
 
     // Kamek module overlay: 2 MiB above MEM1, which the game believes ends at 0x81800000, so this
@@ -588,6 +592,7 @@ void Memory::Init(const Config& config) {
     }
 
     // Map virtual regions onto that backing store, with mirroring.
+    uint32_t mem2Size = 0;
     for (const auto& regionConfig : config.regions) {
         Region instance;
         instance.config = regionConfig;
@@ -597,12 +602,19 @@ void Memory::Init(const Config& config) {
             throw std::runtime_error("Flat guest mapping is missing region '" + regionConfig.name + "'");
         }
         instance.storageSize = regionConfig.sizeBytes;
+        if (regionConfig.baseAddress == kMem2CachedBase)
+            mem2Size = static_cast<uint32_t>(regionConfig.sizeBytes);
 
         regions.emplace_back(std::move(instance));
     }
 
     BuildPageTable();
     RefreshFastPathTables();
+    g_mappedMem2Size.store(mem2Size, std::memory_order_relaxed);
+}
+
+uint32_t Memory::MappedMem2Size() noexcept {
+    return g_mappedMem2Size.load(std::memory_order_relaxed);
 }
 
 void Memory::Reset() {
@@ -613,6 +625,7 @@ void Memory::Reset() {
     std::lock_guard<std::mutex> lock(RegionMutex());
     Regions().clear();
     ClearPageTable();
+    g_mappedMem2Size.store(0, std::memory_order_relaxed);
 }
 
 namespace {

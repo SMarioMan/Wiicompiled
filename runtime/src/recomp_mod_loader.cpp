@@ -131,7 +131,7 @@ void AddMem2AliasesLocked(uint32_t start, uint32_t end, const std::string& name)
 
     const uint64_t length = static_cast<uint64_t>(end) - start;
     auto addFromOffset = [&](uint32_t offset) {
-        if (offset + length > Memory::kMem2Size) {
+        if (offset + length > Memory::MappedMem2Size()) {
             return;
         }
         AddExecutableRangeLocked(Memory::kMem2CachedBase + offset,

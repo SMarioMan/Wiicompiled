@@ -1,4 +1,5 @@
 #include "ax_internal.h"
+#include <bit>
 
 #include "abi_bridge.h"
 #include "ax_mix_kernels.h"
@@ -48,8 +49,9 @@ void RefreshMixMemoryMap() {
     if (Memory::Contains(Memory::kMem1CachedBase, Memory::kMem1Size)) {
         mem1 = Memory::GetPointer(Memory::kMem1CachedBase, Memory::kMem1Size);
     }
-    if (Memory::Contains(Memory::kMem2CachedBase, Memory::kMem2Size)) {
-        mem2 = Memory::GetPointer(Memory::kMem2CachedBase, Memory::kMem2Size);
+    const auto mem2Size = Memory::MappedMem2Size();
+    if (mem2Size && Memory::Contains(Memory::kMem2CachedBase, mem2Size)) {
+        mem2 = Memory::GetPointer(Memory::kMem2CachedBase, mem2Size);
     }
     g_mixMem1.store(mem1, std::memory_order_relaxed);
     g_mixMem2.store(mem2, std::memory_order_relaxed);
@@ -133,7 +135,7 @@ struct AramAliases {
 
 AramAliases AramAliasesFor(uint32_t addr) {
     if (addr & 0x10000000u) {
-        const uint32_t exramOffset = addr & static_cast<uint32_t>(Memory::kMem2Size - 1u);
+        const uint32_t exramOffset = addr & (std::bit_ceil(Memory::MappedMem2Size()) - 1u);
         return {0x10000000u | exramOffset, 0x90000000u | exramOffset};
     }
     const uint32_t ramOffset = addr & 0x01ffffffu;

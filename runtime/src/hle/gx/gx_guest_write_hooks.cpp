@@ -54,6 +54,7 @@ void GuestWriteNotifyHook(const void* hostPtr, size_t size) noexcept {
 }
 
 GuestRamAlias ResolveAlias(uint32_t guestBase, size_t size) noexcept {
+    if (size == 0) return {};
     try {
         if (const void* host = Memory::GetPointer(guestBase, 1)) {
             return {host, static_cast<uint64_t>(size), guestBase};
@@ -67,7 +68,7 @@ GuestRamAlias ResolveAlias(uint32_t guestBase, size_t size) noexcept {
 
 void InstallAuroraHooks() {
     g_aliases[0] = ResolveAlias(Memory::kMem1CachedBase, Memory::kMem1Size);
-    g_aliases[1] = ResolveAlias(Memory::kMem2CachedBase, Memory::kMem2Size);
+    g_aliases[1] = ResolveAlias(Memory::kMem2CachedBase, Memory::MappedMem2Size());
     if (g_aliases[0].hostBase == nullptr || g_aliases[1].hostBase == nullptr) {
         // Without both banks a host pointer cannot be classified, so leaving the
         // hooks uninstalled is the only safe answer: aurora then digests every

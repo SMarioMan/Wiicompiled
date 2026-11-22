@@ -313,7 +313,10 @@ void DumpGuestCrashHints(std::ostream& os, const CpuContext* cpu) {
 } // namespace
 
 void SystemBridge::Initialize() {
-    const auto memoryConfig = Memory::Config::WiiDefaults();
+    const bool largeField = ::GuestRegion::Current() == ::GuestRegion::Id::NtscU &&
+        MkwGuestLayout::kLayout.playerCapacity > 96;
+    const auto memoryConfig = Memory::Config::WiiDefaults(
+        largeField ? Memory::kLargeFieldMem2Size : Memory::kMem2Size);
     Memory::Init(memoryConfig);
 
     SeedLowMemDefaults(memoryConfig);
@@ -431,15 +434,12 @@ void SystemBridge::WriteGuestMemorySnapshot(std::ostream& os, const std::filesys
     if (Memory::Contains(kMem1Base, kMem1Size)) {
         writeRegion("MEM1", kMem1Base, kMem1Size, mem1Path);
     }
-    constexpr uint32_t kMem2Base = 0x90000000u;
-    for (uint32_t mem2Size : {0x08000000u, 0x04000000u}) {
-        if (!Memory::Contains(kMem2Base, mem2Size)) {
-            continue;
-        }
+    constexpr uint32_t kMem2Base = Memory::kMem2CachedBase;
+    const auto mem2Size = Memory::MappedMem2Size();
+    if (mem2Size && Memory::Contains(kMem2Base, mem2Size)) {
         std::filesystem::path mem2Path = mem1Path;
         mem2Path += ".mem2";
         writeRegion("MEM2", kMem2Base, mem2Size, mem2Path);
-        break;
     }
     constexpr uint32_t kKamekBase = 0x81800000u;
     constexpr uint32_t kKamekSize = 0x00200000u;

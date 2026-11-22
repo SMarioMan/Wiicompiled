@@ -42,11 +42,14 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8") || site.Field is not null || site.Source is not null ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test") ||
+                     site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
+            if (site.Kind is "recipient-aid" or "recipient-test" && _original.Symbol(site.Count) != 32)
+                throw new InvalidDataException("A forwarding recipient replaces a 32-bit mask.");
         }
     }
 
@@ -58,6 +61,26 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
+        if (site.Kind is "recipient-aid" or "recipient-test")
+        {
+            var index = IrValue.Register($"r{(word >> 11) & 31}");
+            var source = IrValue.Register(rt);
+            if (site.Kind == "recipient-aid")
+            {
+                if (word >> 26 != 31 || (word & 2047) != 48 ||
+                    nodes.Count != 1 || nodes[0] != new IrBinary(ra, source, index, "ppc_slw")) throw Invalid();
+                return new IrInstruction[] { new IrAssign(ra, index) };
+            }
+            var condition = new IrSetCrField(0, IrValue.Register(ra), IrValue.Imm(0), false);
+            if (word >> 26 != 31 || (word & 2047) != 57 || nodes.Count != 2 ||
+                nodes[0] != new IrBinary(ra, source, index, "and") || nodes[1] != condition) throw Invalid();
+            // The existing branches expect a nonzero result and CR0.GT for a match.
+            return new IrInstruction[] {
+                new IrBinary(ra, source, index, "xor"),
+                new IrCall(ra, "PPC_Cntlzw", new[] { IrValue.Register(ra) }),
+                new IrBinary(ra, IrValue.Register(ra), IrValue.Imm(5), "shr"),
+                condition };
+        }
         if (site.Kind == "rank8")
         {
             if (word >> 26 != 31 || (word >> 1 & 1023) != 954 || (word & 1) != 0 ||
@@ -139,6 +162,12 @@ public sealed partial class GuestLayoutRelocations
         if (site is null) return null;
         var widened = RewriteByteOperation(site, instruction, nodes, site.Source is null ? 0 : _expanded.Symbol(site.Source),
             site.Field is null ? 0 : _original.Symbol(site.Field));
-        return _expanded.Symbol(site.Count) <= (site.Kind == "rank8" ? 127 : byte.MaxValue) ? nodes : widened;
+        var originalLimit = site.Kind switch
+        {
+            "recipient-aid" or "recipient-test" => 32,
+            "rank8" => 127,
+            _ => byte.MaxValue
+        };
+        return _expanded.Symbol(site.Count) <= originalLimit ? nodes : widened;
     }
 }

@@ -1,5 +1,5 @@
 {
-  "Version": 34,
+  "Version": 35,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -3606,6 +3606,13 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x800E92A0",
+      "ExpectedWord": "0x28170020",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCConnectionTables.aids.size"
+    },
     {
       "Instruction": "0x800D0DC8",
       "ExpectedWord": "0x3863CFE0",
@@ -83617,6 +83624,36 @@
     }
   ],
   "ByteOperations": [
+    {
+      "Instruction": "0x800E8E44",
+      "ExpectedWord": "0x7C07C830",
+      "Kind": "recipient-aid",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E9224",
+      "ExpectedWord": "0x7C001830",
+      "Kind": "recipient-aid",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E9228",
+      "ExpectedWord": "0x7F200039",
+      "Kind": "recipient-test",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E9260",
+      "ExpectedWord": "0x7F400030",
+      "Kind": "recipient-aid",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E9264",
+      "ExpectedWord": "0x7F200039",
+      "Kind": "recipient-test",
+      "Count": "DWCConnectionTables.aids.size"
+    },
     {
       "Instruction": "0x80591D34",
       "ExpectedWord": "0x57801D78",

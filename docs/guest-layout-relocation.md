@@ -84,6 +84,8 @@ Format version 34 adds `ResizedAddend` for a table that moves when its layout
 symbol changes. The original instruction is checked against `Addend`. When the
 symbol differs from its original value, the translated operand uses the new
 symbol and `ResizedAddend`.
+Format version 35 checks the SDK's unreliable forwarding recipient operations
+and switches them to a direct console ID when capacity exceeds 32.
 The original player count is declared in the manifest. `Complete`
 must remain false until every affected consumer and subsystem has been migrated
 and gameplay has been tested. It is not a switch that implements missing work.

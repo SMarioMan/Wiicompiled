@@ -470,9 +470,7 @@ retains the original 32 records through capacity 32 and grows in groups of 32.
 Original-code fixtures at 12, 32, 33, 65, 97 and 128 test storage, initialization,
 callbacks, receive-buffer setup, timestamp updates, clearing a connection and
 shutdown. The 128-slot fixture reaches AID 127 and verifies guard words,
-including where an out-of-range AID would have stamped a timestamp. The
-unreliable forwarding loop still reads a one-word recipient mask. That loop
-and the matchmaking connection tables still limit live LAN capacity.
+including where an out-of-range AID would have stamped a timestamp.
 
 The LAN discovery cache and pending reservation table now size to the configured
 capacity, with a floor of 32 entries. A compiled fixture exercises the module's
@@ -495,3 +493,13 @@ smaller-list reload and guard words around the relocated tables.
 The SDK matchmaking node array is independent of these connection tables.
 Matchmaking still needs expanded node storage and connection/suspend mask
 consumers still need wider words before the live LAN cap can rise.
+
+The SDK's unreliable forwarding header now carries a single recipient AID
+above capacity 32. `DWC_SendUnreliable` requests one recipient, and the two
+other calls to its internal sender pass through the original packet. The
+expanded path keeps the same header size and the original sender identity.
+Through capacity 32 it retains the one-hot recipient mask. Fixtures at 32,
+33 and 128 drive the translated sender, relay and receiver through IDs 31, 32
+and 127, and check that another ID sharing the same low five bits receives
+nothing. The separate matchmaking and suspend packets retain their current
+32-bit masks.

@@ -24,7 +24,9 @@ matches fail instead of guessing. Derived SDK data-symbol signatures are not
 supported yet.
 
 ELF `ADDR32`, `ADDR16_LO`, `ADDR16_HI`, `ADDR16_HA` and `REL24` relocations become
-Kamek commands. Allocated sections retain their alignment and BSS starts zeroed.
+Kamek commands. The linker resolves `REL14` between executable module addresses
+after placing the sections. Allocated sections retain their alignment and BSS
+starts zeroed.
 Declared optional/mandatory function replacements create original-function
 trampolines; calls to the replaced import use that trampoline. Moving a direct
 branch-and-link preserves its original LR return PC and the scratch registers.

@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Runtime.InteropServices;
 using System.Text;
 using Translator.Core.Parsing.Kamek;
 
@@ -56,6 +57,7 @@ public sealed record BrainSlugLinkResult(
 public sealed class BrainSlugElfFile
 {
     private const uint MaxImageSize = 0xFFFFFC; // Kamek's relative command address is 24 bits.
+    private const byte PowerPcRel14 = 11;
     private sealed record Section(string Name, uint Type, uint Flags, uint Offset, uint Size,
         uint Link, uint Info, uint Alignment, uint EntrySize);
     private sealed record Symbol(string Name, uint Value, uint Size, byte Info, ushort Section);
@@ -148,7 +150,7 @@ public sealed class BrainSlugElfFile
                 var p = checked((int)(s.Offset + pos));
                 var info = U32(p + 4);
                 var kind = (byte)info;
-                Require(kind is 0 or 1 or 4 or 5 or 6 or 10, $"Unsupported PowerPC relocation {kind}.");
+                Require(kind is 0 or 1 or 4 or 5 or 6 or 10 or PowerPcRel14, $"Unsupported PowerPC relocation {kind}.");
                 if (kind == 0) continue;
                 var width = kind is 4 or 5 or 6 ? 2u : 4u;
                 var offset = U32(p);
@@ -183,6 +185,11 @@ public sealed class BrainSlugElfFile
         var commands = new List<KamekCommand>();
         void Command(KamekCommandId kind, uint place, uint value, bool absolute = false) =>
             commands.Add(new KamekCommand(0, 0, kind, absolute, place, [value]));
+        bool IsExecutableWord(uint place) => (place & 3) == 0 && offsets.Any(section =>
+            (_sections[section.Key].Flags & 4) != 0 && place >= section.Value &&
+            (ulong)place + 4 <= (ulong)section.Value + _sections[section.Key].Size);
+        void WriteWord(uint place, uint instruction) =>
+            BinaryPrimitives.WriteUInt32BigEndian(CollectionsMarshal.AsSpan(image).Slice((int)place, 4), instruction);
         uint StubWord(uint instruction)
         {
             var offset = (uint)image.Count;
@@ -205,9 +212,7 @@ public sealed class BrainSlugElfFile
                 var name = StringAt(initialImage, Pointer(p + 4));
                 Require(name.Length != 0, "Empty BrainSlug hook name.");
                 var replacement = Pointer(p + 8);
-                Require((replacement & 3) == 0 && offsets.Any(section =>
-                    (_sections[section.Key].Flags & 4) != 0 && replacement >= section.Value &&
-                    replacement < (ulong)section.Value + _sections[section.Key].Size), "Hook target is not executable.");
+                Require(IsExecutableWord(replacement), "Hook target is not executable.");
                 var original = resolveSymbol(name);
                 if (original is null && type == 0) continue;
                 Require(original is >= 0x80000000 && (original.Value & 3) == 0, $"Missing or invalid hook symbol '{name}'.");
@@ -234,9 +239,11 @@ public sealed class BrainSlugElfFile
                 uint OriginalTarget(uint target) => target == address ? stub : target;
                 if (op == 16 && (first & 2) == 0)
                 {
-                    StubWord((first & 0xFFFF0000) | 8);
+                    var branch = StubWord(0);
                     Jump(checked(address + 4));
+                    var taken = (uint)image.Count;
                     Jump(OriginalTarget(unchecked(address + (uint)(short)(first & 0xFFFC))));
+                    WriteWord(branch, KamekPpcEncoding.EncodeConditionalBranch(branch, taken, first & ~0xFFFCu));
                 }
                 else if (op == 18 && (first & 2) == 0)
                 {
@@ -273,6 +280,16 @@ public sealed class BrainSlugElfFile
                 Require(resolved is >= 0x80000000, $"Missing import '{symbol.Name}'.");
                 value = unchecked(resolved!.Value + (uint)r.Addend);
                 Require(value >= 0x80000000, $"Import '{symbol.Name}' addend leaves guest address space.");
+            }
+            if (r.Kind == PowerPcRel14)
+            {
+                var isTrampolineWord = value >= initialImage.Length && (value & 3) == 0 &&
+                    (ulong)value + 4 <= (ulong)image.Count;
+                Require(relative && IsExecutableWord(r.Place) && (IsExecutableWord(value) || isTrampolineWord),
+                    "REL14 requires two executable module addresses.");
+                var instruction = BinaryPrimitives.ReadUInt32BigEndian(initialImage.AsSpan((int)r.Place, 4));
+                WriteWord(r.Place, KamekPpcEncoding.EncodeConditionalBranch(r.Place, value, instruction & ~0xFFFCu));
+                continue;
             }
             var kind = (KamekCommandId)r.Kind;
             if (!relative && value < 0x80000000)

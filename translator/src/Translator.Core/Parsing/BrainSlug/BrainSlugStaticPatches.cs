@@ -55,12 +55,8 @@ public static class BrainSlugStaticPatches
                 // Both endpoints must move together when Kamek places the module.
                 if (destination.Relative != value.Relative || (!value.Relative && value.Value < 0x80000000))
                     throw new InvalidDataException("A conditional branch requires endpoints in the same image.");
-                var template = Hex(patch.Condition ?? "");
-                var delta = (long)value.Value - destination.Value;
-                if ((template & 0xFC00FFFEu) != 0x40000000u)
-                    throw new InvalidDataException("A conditional branch template must have an empty relative displacement.");
-                if ((delta & 3) != 0 || delta is < -0x8000 or > 0x7FFC)
-                    throw new InvalidDataException("A conditional branch requires an aligned target in rel14 range.");
+                var instruction = KamekPpcEncoding.EncodeConditionalBranch(destination.Value, value.Value,
+                    Hex(patch.Condition ?? ""));
                 if (value.Relative)
                 {
                     if ((ulong)value.Value + 4 > linked.Chunk.CodeSize)
@@ -72,7 +68,7 @@ public static class BrainSlugStaticPatches
                     readGameInstruction(destination.Value);
                     readGameInstruction(value.Value);
                 }
-                value = (template | (unchecked((uint)delta) & 0xFFFCu), false);
+                value = (instruction, false);
             }
             else if (patch.Condition is not null)
                 throw new InvalidDataException("A branch condition is only valid for BranchConditional.");

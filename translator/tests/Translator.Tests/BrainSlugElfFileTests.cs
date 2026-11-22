@@ -115,6 +115,42 @@ public class BrainSlugElfFileTests
     }
 
     [Theory]
+    [InlineData(0u, 0x4182FFFDu)]
+    [InlineData(16u, 0x4182000Du)]
+    public void ResolvesRel14AtEitherModuleBase(uint addend, uint expected)
+    {
+        var data = Rel14Fixture(4, addend);
+        var result = BrainSlugElfFile.Parse(data).Link(_ => Original, _ => 0x60000000);
+        result.ValidatePlacement(0x81200000);
+        result.ValidatePlacement(0x81800100);
+        var chunk = KamekPulFile.Parse(result.ToCodePul('E')).SelectRegion("E");
+        Assert.Equal(expected, Read(chunk.CodeBlob, 4));
+        Assert.DoesNotContain(chunk.Commands, command => !command.AddressIsAbsolute && command.Address == 4);
+    }
+
+    [Theory]
+    [InlineData(5u, 0u)]
+    [InlineData(4u, 2u)]
+    [InlineData(4u, 0x8000u)]
+    public void RejectsRel14ToNonExecutableOrMisalignedTarget(uint symbol, uint addend)
+    {
+        var file = BrainSlugElfFile.Parse(Rel14Fixture(symbol, addend));
+        Assert.Throws<InvalidDataException>(() => file.Link(_ => Original, _ => 0x60000000));
+    }
+
+    private static byte[] Rel14Fixture(uint symbol, uint addend)
+    {
+        var data = Fixture(relocation: 11);
+        var table = Read(data, 32);
+        var text = (int)Read(data, table + 40 + 16);
+        var relocation = (int)Read(data, table + 8 * 40 + 16);
+        Write(data, text + 4, 0x41820001);
+        Write(data, relocation + 4, (symbol << 8) | 11);
+        Write(data, relocation + 8, addend);
+        return data;
+    }
+
+    [Theory]
     [InlineData(0)]
     [InlineData(16)]
     [InlineData(51)]

@@ -2,6 +2,7 @@
 #include "isa/big_endian.h"
 #include "hle/dvd_contract.h"
 #include "hle/runtime_parse_helpers.h"
+#include "hle/storage/dvd_boot.h"
 #include "memory.h"
 
 // Defined in hle/gx/gx_objects.cpp. DVD reads are DMA-class writes to guest
@@ -629,7 +630,7 @@ static fs::path ResolveDvdMappedHostPath(const std::string& dvdPath, const fs::p
     FailDvd("dvd_fst", "DVD file table is unavailable", reason);
 }
 
-static void BuildAndPublishRuntimeFst() {
+static std::vector<uint8_t> BuildRuntimeFst() {
     // Preserve real disc offsets where a runtime entry replaces a file from the
     // extracted image. Created Riivolution paths have no physical disc extent;
     // they are opened by their shared FST/SDK entry number instead.
@@ -705,32 +706,81 @@ static void BuildAndPublishRuntimeFst() {
                   return a.startBytes < b.startBytes;
               });
 
+    return std::move(image.bytes);
+}
+
+static std::vector<uint8_t> PrepareRuntimeFst() {
+    const fs::path& rootPath = GetDvdRoot();
+
+    // Map "<dvd_root>/files" -> "/"
+    ScanDirectory(rootPath / "files", "/");
+
+    // Map "<dvd_root>/sys" -> "/sys/" (e.g. main.dol, bi2.bin)
+    ScanDirectory(rootPath / "sys", "/sys/");
+
+    const auto& overlays = RuntimeRiivolution::Overlays();
+    if (overlays.empty() && RuntimeProduct::IsRetroRewind()) {
+        RT_LOG(RT_TAG_DVD) << "WARNING: no Retro Rewind overlay root was found. "
+                     "File replacements (menu archives, karts, drivers, courses) will not apply "
+                     "and the game will look and play like the unmodded disc. Set "
+                     "[paths] retro_rewind_root in Config.toml "
+                     "with the RetroRewind6 folder."
+                  << std::endl;
+    }
+    // RegisterFileEntry lets the last registration win, so apply the roots in
+    // reverse discovery order: the explicitly configured root outranks the mod
+    // manifest.
+    const size_t vanillaEntryCount = g_fileEntries.size();
+    for (auto overlay = overlays.rbegin(); overlay != overlays.rend(); ++overlay) {
+        ScanOverlayRoot(*overlay);
+    }
+    RT_LOG(RT_TAG_DVD) << "disc index: " << vanillaEntryCount << " disc file(s), "
+              << (g_fileEntries.size() - vanillaEntryCount) << " overlay registration(s) from "
+              << overlays.size() << " root(s)" << std::endl;
+
+    // Load FST mapping so real files keep their physical disc extents.
+    LoadFstIndex();
+    return BuildRuntimeFst();
+}
+
+static const std::vector<uint8_t>& RuntimeFstBytes() {
+    // The boot memory planner and DVDInit must use the same directory snapshot.
+    static const auto bytes = PrepareRuntimeFst();
+    return bytes;
+}
+
+size_t DvdRuntime::BootFstSize() {
+    return RuntimeFstBytes().size();
+}
+
+static void PublishRuntimeFst() {
+    const auto& bytes = RuntimeFstBytes();
     // Use the FST memory reserved before guest code can allocate over it.
-    if (g_dvdFstReservedBase == 0 || image.bytes.size() > g_dvdFstReservedSize ||
+    if (g_dvdFstReservedBase == 0 || bytes.size() > g_dvdFstReservedSize ||
         !Memory::Contains(g_dvdFstReservedBase, g_dvdFstReservedSize)) {
         std::ostringstream reason;
-        reason << "The " << image.bytes.size() << "-byte runtime FST does not fit the "
+        reason << "The " << bytes.size() << "-byte runtime FST does not fit the "
                << g_dvdFstReservedSize << "-byte guest reservation at 0x" << std::hex
                << g_dvdFstReservedBase << ".";
         FailRuntimeFst(reason.str());
     }
 
     const uint32_t fstAddress = g_dvdFstReservedBase;
-    for (size_t i = 0; i < image.bytes.size(); ++i) {
-        Memory::Write8(fstAddress + static_cast<uint32_t>(i), image.bytes[i]);
+    for (size_t i = 0; i < bytes.size(); ++i) {
+        Memory::Write8(fstAddress + static_cast<uint32_t>(i), bytes[i]);
     }
 
     Memory::Write32(0x80000038u, fstAddress);
-    Memory::Write32(0x8000003Cu, static_cast<uint32_t>(image.bytes.size()));
+    Memory::Write32(0x8000003Cu, static_cast<uint32_t>(bytes.size()));
 
-    RT_LOG(RT_TAG_DVD) << "published " << image.entries.size() << " FST entries ("
-              << image.bytes.size() << " bytes) at 0x" << std::hex << fstAddress
+    RT_LOG(RT_TAG_DVD) << "published " << g_fileEntries.size() << " FST entries ("
+              << bytes.size() << " bytes) at 0x" << std::hex << fstAddress
               << " inside the boot-time MEM2 reservation" << std::dec << std::endl;
 
     if (const char* dumpPath = std::getenv("MKW_DUMP_FST")) {
         std::ofstream dump(dumpPath, std::ios::binary);
-        dump.write(reinterpret_cast<const char*>(image.bytes.data()),
-                   static_cast<std::streamsize>(image.bytes.size()));
+        dump.write(reinterpret_cast<const char*>(bytes.data()),
+                   static_cast<std::streamsize>(bytes.size()));
         RT_LOG(RT_TAG_DVD) << "dumped published FST to " << dumpPath << std::endl;
     }
 }
@@ -821,38 +871,7 @@ extern "C" void DVDInit_8015EA1C()
     Memory::Write32(diskHeader + 0x00, CurrentDiscGameCode());
     Memory::Write16(diskHeader + 0x04, 0x3031);     // '01' (Maker)
     Memory::Write8(diskHeader + 0x06, 0x01);        // Disk #1
-    // 4. Scan Files
-    const fs::path& rootPath = GetDvdRoot();
-    
-    // Map "<dvd_root>/files" -> "/"
-    ScanDirectory(rootPath / "files", "/");
-
-    // Map "<dvd_root>/sys" -> "/sys/" (e.g. main.dol, bi2.bin)
-    ScanDirectory(rootPath / "sys", "/sys/");
-
-    const auto& overlays = RuntimeRiivolution::Overlays();
-    if (overlays.empty() && RuntimeProduct::IsRetroRewind()) {
-        RT_LOG(RT_TAG_DVD) << "WARNING: no Retro Rewind overlay root was found. "
-                     "File replacements (menu archives, karts, drivers, courses) will not apply "
-                     "and the game will look and play like the unmodded disc. Set "
-                     "[paths] retro_rewind_root in Config.toml "
-                     "with the RetroRewind6 folder."
-                  << std::endl;
-    }
-    // RegisterFileEntry lets the last registration win, so apply the roots in
-    // reverse discovery order: the explicitly configured root outranks the mod
-    // manifest.
-    const size_t vanillaEntryCount = g_fileEntries.size();
-    for (auto overlay = overlays.rbegin(); overlay != overlays.rend(); ++overlay) {
-        ScanOverlayRoot(*overlay);
-    }
-    RT_LOG(RT_TAG_DVD) << "disc index: " << vanillaEntryCount << " disc file(s), "
-              << (g_fileEntries.size() - vanillaEntryCount) << " overlay registration(s) from "
-              << overlays.size() << " root(s)" << std::endl;
-
-    // Load FST mapping so real files keep their physical disc extents.
-    LoadFstIndex();
-    BuildAndPublishRuntimeFst();
+    PublishRuntimeFst();
 
     // Initialize the translated DVD filesystem so it can use the published FST.
     const uint32_t kDvdFsInitAddress = MKW_GADDR(8015DF1C);

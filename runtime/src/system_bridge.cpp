@@ -19,7 +19,9 @@
 
 
 #include "abi_bridge.h"
+#include "hle/storage/dvd_boot.h"
 #include "memory.h"
+#include "mkw_guest_layout.h"
 #include "ppc_runtime.h"
 #include "recomp_mod_loader.h"
 #include "runtime_config.h"
@@ -506,8 +508,7 @@ void SystemBridge::SeedLowMemDefaults(const Memory::Config& config) {
     constexpr uint32_t kIos36Date = 0x00030110u;
 
     constexpr uint32_t kMem2LoFloor = 0x90000800u;
-    // Reserve enough guest memory for the runtime-built DVD FST.
-    constexpr uint32_t kDvdFstReserveSize = 0x200000u;
+    constexpr uint32_t kMaxDvdFstReserveSize = 0x200000u;
     // IOS36 reserves 128 KiB for IPC immediately below a 128 KiB IOS-owned
     // block. Dolphin's RAM override preserves both sizes and moves them to the
     // top of the expanded MEM2 mapping.
@@ -564,9 +565,14 @@ void SystemBridge::SeedLowMemDefaults(const Memory::Config& config) {
         const uint32_t mem2End = iosReservedLo;
         const uint32_t ipcBufHi = mem2End;
         const uint32_t ipcBufLo = ipcBufHi - kIPCArenaSize;
-        // Reserve FST memory before guest code can use this part of the arena.
-        g_dvdFstReservedSize = kDvdFstReserveSize;
-        g_dvdFstReservedBase = ipcBufLo - kDvdFstReserveSize;
+        // Size the large-field reservation from the same FST snapshot DVDInit
+        // will publish. Keep the arena boundary aligned for EGG's heaps.
+        g_dvdFstReservedSize = kMaxDvdFstReserveSize;
+        if (MkwGuestLayout::kLayout.playerCapacity > 32) {
+            const auto bytes = std::min<size_t>(DvdRuntime::BootFstSize(), kMaxDvdFstReserveSize);
+            g_dvdFstReservedSize = static_cast<uint32_t>((bytes + 31u) & ~size_t{31});
+        }
+        g_dvdFstReservedBase = ipcBufLo - g_dvdFstReservedSize;
         const uint32_t mem2ArenaHi = g_dvdFstReservedBase;
 
         entries.push_back({0x80003118u, mem2Size, "Physical MEM2 size", true});

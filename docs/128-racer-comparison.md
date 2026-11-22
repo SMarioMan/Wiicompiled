@@ -638,11 +638,19 @@ of an entire GP cup or the subsequent team-results presentation. A rendered
 128-player Team VS run exposed a separate six-controls-per-team limit on the
 team totals page; that page remains under investigation.
 
-### Balloon Battle round trip and Grand Prix awards
+### Battle round trips, Time Trial and Grand Prix awards
 
 The `5e654d5` Linux Balloon Battle probe on arena `0x27` finished with all
 128 racers at frame 11,031. It advanced through the original menus and reached
 frame 359 on arena `0x21` with all 128 racers present in the second battle.
+
+The `57912bd` Linux Coin Runners build completed the full round on Block Plaza
+(`0x20`) with 128 finish flags at frame 11,032. It advanced through the original
+results and scene transition, then reached frame 320 on arena `0x21` with all 128
+racers present. The executable SHA-256 is
+`f073e71d38528d60ba48898e3a3d6b1192aae40b718c90c788c8d50e3b7e46af`.
+The same executable completed a Time Trial on Luigi Circuit with the standard
+one-racer field at frame 2,106.
 
 The `2b77f8b` Grand Prix probe completed all four one-lap races (course IDs
 `0x08`, `0x01`, `0x02` and `0x04`) with 128 finish flags each. The original
@@ -653,3 +661,11 @@ the selected cards by rank, and sends the actual ranks to the original card
 formatter. The original race results pages keep the full-field standings.
 The regression fixture reproduces the out-of-range indexes in the original
 code and verifies dense cards with a local racer ranked 128th.
+
+The `c3dbc9d` Linux executable completed the same four-course cup with a mixed
+roster, one lap per course and the normal game clock. The four native finish
+frames were 2,181, 2,587, 3,184 and 3,633, with 128 finish flags on each course.
+It advanced through results into award section `0x35` and activated the original
+award page `0x3c` with vtable `0x808ba250`. The executable SHA-256 is
+`603567316af6cc5fa862084b48ac7ac6c93d55565ecb291cd242c6857f861286`.
+The run checked native finish flags and page activation in headless mode.

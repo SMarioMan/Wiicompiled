@@ -31,6 +31,7 @@ public class RootHeapBudgetTests
         var manifest=Path.Combine(root,"projects/mkwii-ntsc-u/layouts/racedata.json");
         using var document=JsonDocument.Parse(File.ReadAllText(manifest));
         var layout=new GuestLayouts(document.RootElement.GetProperty("Types").Deserialize<GuestLayoutType[]>()!,players);
+        var connectionReserve = players > 32 ? layout.Symbol("DWCConnectionTables.size") : 0;
         var plan=GuestLayoutRelocations.Read(manifest,players);
         var image=new ProgramImageBuilder().Build(Path.Combine(root,"Assets/main.dol"),Path.Combine(root,"Assets/StaticR.rel"),0x8050bf60);
         var map=FunctionMap.Load(Path.Combine(root,"projects/mkwii-ntsc-u/MAP.txt"));
@@ -59,6 +60,7 @@ public class RootHeapBudgetTests
                 #include <cstring>
                 {{declarations}}
                 constexpr uint32_t capacity={{players}},root=0x81010000,heaps=0x81020000,stack=0x81f00000;
+                constexpr uint32_t mem2ArenaLo = 0x90000800 + {{connectionReserve}}, mem2HeapStart = mem2ArenaLo + 256;
                 uint32_t created=0,subheaps=0,arenaCalls=0,current=0;
                 struct Range {uint32_t start,size;};std::array<Range,3> ranges{};
                 void init_arena(CpuContext* ctx){if(ctx->gpr[5]!=2 || ctx->gpr[3]>=ctx->gpr[4])std::abort();ctx->gpr[3]+=256;arenaCalls++;}
@@ -83,13 +85,13 @@ public class RootHeapBudgetTests
                         created=subheaps=arenaCalls=current=0;ranges={};
                         std::memset(Memory::GetPointer(root-16,128),0x55,128);Memory::Write32(root+52,1024*1024);
                         Memory::Write32(ctx.gpr[13]-29024,0x80010000);Memory::Write32(ctx.gpr[13]-25416,0x81700000);
-                        Memory::Write32(ctx.gpr[13]-29020,0x90000800);Memory::Write32(ctx.gpr[13]-25412,end);
+                        Memory::Write32(ctx.gpr[13]-29020,mem2ArenaLo);Memory::Write32(ctx.gpr[13]-25412,end);
                         ctx.gpr[3]=root;func_80241648(&ctx);
                         unsigned groups = (capacity + 31) / 32;
                         auto expectedReserve = end > 0x94000000u ? uint32_t(279871488 / (capacity * capacity * groups) * 32) : 0;
                         if(created!=(expectedReserve?3:2) || subheaps!=1 || arenaCalls!=2 || current!=1)return 4;
                         if(ranges[0].start!=0x80010100 || ranges[0].size!=0x81700000-0x80010100)return 5;
-                        if(ranges[1].start!=0x90000900 || ranges[1].size!=end-0x90000900-expectedReserve)return 6;
+                        if(ranges[1].start!=mem2HeapStart || ranges[1].size!=end-mem2HeapStart-expectedReserve)return 6;
                         if(expectedReserve && (ranges[2].start!=ranges[1].start+ranges[1].size || ranges[2].size!=expectedReserve || ranges[2].start+ranges[2].size!=end))return 7;
                         if(Memory::Read32(root+24)!=heaps || Memory::Read32(root+28)!=heaps+128 ||
                             Memory::Read32(root+32)!=(expectedReserve?heaps+256:0) || Memory::Read32(root+36)!=heaps+512)return 8;

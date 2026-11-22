@@ -454,11 +454,9 @@ these call sites.
 | `DWC_GetAidBitmap` | `800D7BDC`, `800DA730` | Match processing and match polling |
 | `DWC_GetAidBitmap` | `800E6920`, `800E6DC0` | Server-down queries and server polling |
 
-The direct-connected bitmap getter also inlines the same 32-byte AID list.
-Widening the controller's departure flags leaves both lists, the SDK connection
-table, the returned masks and the inlined consumers at their original limits.
-The LAN build guard remains at 32 capacity slots until these paths can use
-wider console state consistently.
+The direct-connected bitmap getter also inlines the AID list. The bitmap getters
+and their consumers still exchange one 32-bit word. The LAN build guard remains
+at 32 capacity slots while these paths use the original mask width.
 
 The SDK transport owns a second per-AID array, distinct from the connection
 table. The original friends-match allocation embeds it at `0xC20`, with 32
@@ -489,6 +487,8 @@ the MEM2 arena. Relocations cover the original bases, clear lengths, connection
 lookup loops and unrolled free-slot scans. Original-code fixtures at 12, 32, 33
 and 128 cover a server reset, final-slot allocation and lookup, AID enumeration,
 smaller-list reload and guard words around the relocated tables.
+The original root heap partitioner also passes with this reserved prefix at all
+thirteen offline capacity boundaries through 128.
 
 The SDK matchmaking node array is independent of these connection tables.
 Matchmaking still needs expanded node storage and connection/suspend mask

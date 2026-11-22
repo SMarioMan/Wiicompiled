@@ -152,7 +152,7 @@ public class NetworkControllerStorageTests
                     std::array<uint8_t,size> expected{};expected.fill(0x55);
                     auto word=[&](uint32_t at,uint32_t value){for(uint32_t b=0;b<4;b++)expected[at+b]=value>>(24-b*8);};
                     word(0,0x808bc224);word(4,0x808bc230);std::memset(expected.data()+8,0x33,24);word(32,privateHeap);word(36,task);word(40,0);
-                    word(disconnected,0);std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
+                    std::memset(expected.data()+disconnected,0,{{layout.Symbol("RKNetController.disconnectedAids.size")}});std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
                     std::set<uint32_t> used;
                     auto pointer=[&](uint32_t at){auto value=Memory::Read32(root+at);if(!used.insert(value).second || value<0x81100000 || value>=cursor)FAIL();word(at,value);return value;};
                     for(uint32_t p=0;p<capacity;p++){
@@ -261,7 +261,7 @@ public class NetworkControllerStorageTests
                         std::memset(expected.data()+sendIndices,0x66,capacity*4);std::memset(expected.data()+receiveIndices,0x66,capacity*32);
                         std::memset(expected.data()+times,0x77,capacity*32);std::memset(expected.data()+friends,0x88,360);
                         std::memset(expected.data()+packets,0x99,packetBytes);std::memset(expected.data()+playerAids,0x66,capacity);
-                        word(disconnected,0xffffffff);std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0xff,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
+                        std::memset(expected.data()+disconnected,0xff,{{layout.Symbol("RKNetController.disconnectedAids.size")}});std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0xff,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
                         std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                         split_packets([](uint32_t holder,uint32_t buffer,uint32_t n){Memory::Write32(holder+8,n);std::memset(Memory::GetPointer(buffer,n),0x6a,n);});
                         ctx.gpr[3]=root;ctx.gpr[4]=local;func_80651788(&ctx);
@@ -275,7 +275,7 @@ public class NetworkControllerStorageTests
                             std::memset(expected.data()+sub+{{layout.Symbol("RKNetSub.users.offset")}},0,capacity*4);expected[sub+{{layout.Symbol("RKNetSub.tail.offset")}}]=0;
                         }
                         for(uint32_t f=0;f<30;f++){std::memset(expected.data()+friends+f*12,0,9);expected[friends+f*12+9]=1;}
-                        word(disconnected,0);std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});std::memset(expected.data()+packets,0,packetBytes);
+                        std::memset(expected.data()+disconnected,0,{{layout.Symbol("RKNetController.disconnectedAids.size")}});std::memset(expected.data()+{{layout.Symbol("RKNetController.disconnectedPlayers.offset")}},0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});std::memset(expected.data()+packets,0,packetBytes);
                         for(uint32_t i=0;i<20;i++){
                             auto value=ratingMode?0x1234+i:Memory::Read16(0x808bc210+(i%10)*2);expected[range+i*2]=value>>8;expected[range+i*2+1]=value;
                         }
@@ -467,9 +467,10 @@ public class NetworkControllerStorageTests
                     constexpr uint32_t peerLimit=capacity<32?capacity:32,
                         playerAids={{layout.Symbol("RKNetController.playerAids.offset")}},
                         disconnectedPlayers={{layout.Symbol("RKNetController.disconnectedPlayers.offset")}};
-                    for(uint32_t aid : {0u,peerLimit-1}){
-                        std::memset(expected.data()+times,0x77,capacity*32);word(disconnected,0);std::memset(expected.data()+disconnectedPlayers,0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
-                        for(uint32_t p=0;p<capacity;p++)expected[playerAids+p]=p%peerLimit;
+                    for(uint32_t aid : {0u,peerLimit-1,capacity-1}){
+                        std::memset(expected.data()+times,0x77,capacity*32);std::memset(expected.data()+disconnected,0,{{layout.Symbol("RKNetController.disconnectedAids.size")}});std::memset(expected.data()+disconnectedPlayers,0,{{layout.Symbol("RKNetController.disconnectedPlayers.size")}});
+                        for(uint32_t p=0;p<capacity;p++)
+                            expected[playerAids+p]=(aid>=peerLimit && p%peerLimit==0)?aid:p%peerLimit;
                         std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                         for(uint32_t p=0;p<capacity;p++){
                             auto holder=Memory::Read32(root+full+p*4);Memory::Write32(holder+8,fullCapacity);std::memset(Memory::GetPointer(Memory::Read32(holder),fullCapacity),0x7b,fullCapacity);
@@ -480,10 +481,10 @@ public class NetworkControllerStorageTests
                         for(uint32_t first=0;first<capacity;first+=32){
                             uint32_t playerMask=0;
                             for(uint32_t p=first;p<capacity && p<first+32;p++)
-                                if(p%peerLimit==aid)playerMask|=1u<<(p-first);
+                                if(expected[playerAids+p]==aid)playerMask|=1u<<(p-first);
                             word(disconnectedPlayers+(first/32)*4,playerMask);
                         }
-                        word(disconnected,1u<<aid);
+                        word(disconnected+(aid/32)*4,1u<<(aid%32));
                         if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 50;
                         for(uint32_t p=0;p<capacity;p++){
                             auto holder=Memory::Read32(root+full+p*4);bool cleared=p==aid;

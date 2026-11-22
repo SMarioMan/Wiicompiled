@@ -53,10 +53,10 @@ public class GuestByteOperationTests
     [Fact]
     public void ByteOperationsRequireFormatThirtyOneAndRejectFutureFormats(){
         var path=Path.GetTempFileName();
-        try{foreach(var version in new[]{30,31,32,33}){
+        try{foreach(var version in new[]{30,31,32,33,34}){
             File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new{Version=version,OriginalPlayers=12,Types,References=Array.Empty<object>(),
                 ByteOperations=new[]{new{Instruction="0x80001000",ExpectedWord="0x5483063E",Kind="index32",Count="Pool.objects.count"}}}));
-            if(version is 31 or 32)Assert.Equal(128,GuestLayoutRelocations.Read(path,128).Players);
+            if(version is 31 or 32 or 33)Assert.Equal(128,GuestLayoutRelocations.Read(path,128).Players);
             else Assert.Throws<InvalidDataException>(()=>GuestLayoutRelocations.Read(path,128));
         }}finally{File.Delete(path);}
     }

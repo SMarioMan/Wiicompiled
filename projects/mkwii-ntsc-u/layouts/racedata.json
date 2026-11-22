@@ -1,5 +1,5 @@
 {
-  "Version": 32,
+  "Version": 33,
   "OriginalPlayers": 12,
   "Complete": false,
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
@@ -1872,7 +1872,9 @@
         },
         {
           "Name": "disconnectedAids",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         },
         {
           "Name": "disconnectedPlayers",
@@ -42908,15 +42910,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x80651BE0",
-      "ExpectedWord": "0x901E292C",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x80651BE4",
       "ExpectedWord": "0x387E0361",
       "Node": 0,
@@ -43345,15 +43338,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.currentSub.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80652BCC",
-      "ExpectedWord": "0x933B292C",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedAids.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -43979,24 +43963,6 @@
       "Scale": 1
     },
     {
-      "Instruction": "0x806546F0",
-      "ExpectedWord": "0x807E292C",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x806546FC",
-      "ExpectedWord": "0x901E292C",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedAids.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
       "Instruction": "0x806547E4",
       "ExpectedWord": "0x387F0361",
       "Node": 0,
@@ -44369,15 +44335,6 @@
       "Node": 0,
       "Operand": "offset",
       "Symbol": "RKNetController.lastReceivedTimes.offset",
-      "Addend": 0,
-      "Scale": 1
-    },
-    {
-      "Instruction": "0x80655758",
-      "ExpectedWord": "0x9003292C",
-      "Node": 0,
-      "Operand": "offset",
-      "Symbol": "RKNetController.disconnectedAids.offset",
       "Addend": 0,
       "Scale": 1
     },
@@ -79065,6 +79022,54 @@
   ],
   "ArrayFills": [
     {
+      "Begin": "0x80651BE0",
+      "ExpectedWords": [
+        "0x901E292C"
+      ],
+      "BaseRegister": "r30",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedAids.offset",
+          "Stride": "RKNetController.disconnectedAids.stride",
+          "Count": "RKNetController.disconnectedAids.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80652BCC",
+      "ExpectedWords": [
+        "0x933B292C"
+      ],
+      "BaseRegister": "r27",
+      "ValueRegister": "r25",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedAids.offset",
+          "Stride": "RKNetController.disconnectedAids.stride",
+          "Count": "RKNetController.disconnectedAids.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
+      "Begin": "0x80655758",
+      "ExpectedWords": [
+        "0x9003292C"
+      ],
+      "BaseRegister": "r3",
+      "ValueRegister": "r0",
+      "Arrays": [
+        {
+          "Array": "RKNetController.disconnectedAids.offset",
+          "Stride": "RKNetController.disconnectedAids.stride",
+          "Count": "RKNetController.disconnectedAids.count",
+          "Width": 4
+        }
+      ]
+    },
+    {
       "Begin": "0x80651BEC",
       "ExpectedWords": [
         "0x901E2930"
@@ -82077,6 +82082,25 @@
     }
   ],
   "BitsetStores": [
+    {
+      "Begin": "0x806546F0",
+      "ExpectedWords": [
+        "0x807E292C",
+        "0x7C00F830",
+        "0x7C600378",
+        "0x901E292C"
+      ],
+      "Base": "r30",
+      "Index": "r31",
+      "Unit": "r0",
+      "Shift": "r0",
+      "Loaded": "r3",
+      "Offset": "RKNetController.disconnectedAids.offset",
+      "Count": "RKNetController.disconnectedAids.count",
+      "WordBits": 32,
+      "WordBytes": 4,
+      "ShiftInput": "r31"
+    },
     {
       "Begin": "0x80654620",
       "ExpectedWords": [

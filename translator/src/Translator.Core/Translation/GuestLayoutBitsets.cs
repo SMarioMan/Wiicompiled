@@ -23,7 +23,8 @@ public sealed partial class GuestLayoutRelocations
         foreach(var site in _bitsetStores)
         {
             var registers=new[] {site.Base,site.Index,site.Unit,site.Shift,site.Loaded};
-            if(site.Begin%4!=0 || site.ExpectedWords.Count is <4 or >16 || registers.Distinct().Count()!=5 ||
+            bool shiftReusesUnit = site.Unit == site.Shift && site.ShiftInput == site.Index;
+            if(site.Begin%4!=0 || site.ExpectedWords.Count is <4 or >16 || registers.Distinct().Count()!=(shiftReusesUnit?4:5) ||
                 registers.Any(register=>!IsGpr(register) || register is "r1" or "r2") ||
                 (site.ShiftInput is not null && site.ShiftInput != site.Shift && site.ShiftInput != site.Index) ||
                 site.IndexBias > 0 || site.WordBytes is not (2 or 4) || site.WordBits<=0 || site.WordBits>site.WordBytes*8 ||
@@ -94,10 +95,14 @@ public sealed partial class GuestLayoutRelocations
         if (Players == OriginalPlayers) return nodes;
         if (instruction.Address == site.Begin && _original.Symbol(site.Offset) != _expanded.Symbol(site.Offset))
             return new IrInstruction[] { new IrLoad(site.Loaded, new(site.Base, _expanded.Symbol(site.Offset)), site.WordBytes) };
-        if (instruction.Address != BitsetEnd(site)-4) return nodes;
         var prefix=$"addr_layout_bitset_{site.Begin:X8}_";
         string Name(string suffix)=>prefix+suffix+"_loc";
         IrValue V(string suffix)=>IrValue.Register(Name(suffix));
+        // Some retail instructions overwrite the mask unit as part of the
+        // shift. Keep a private copy for the expanded store's own shift.
+        if (site.Unit == site.Shift && nodes is [IrBinary { Op: "ppc_slw" } shift])
+            return new IrInstruction[] { new IrAssign(Name("unit"), IrValue.Register(site.Unit)), shift };
+        if (instruction.Address != BitsetEnd(site)-4) return nodes;
         // Retain original register effects, including independent loop counters.
         // Only the store selects the current word and its usable bit range.
         return new IrInstruction[] {
@@ -108,7 +113,7 @@ public sealed partial class GuestLayoutRelocations
             new IrLoad(Name("old"),new(Name("address"),_expanded.Symbol(site.Offset)),site.WordBytes),
             new IrBinary(Name("first"),V("word"),IrValue.Imm(site.WordBits),"mul"),
             new IrBinary(Name("bit"),V("index"),V("first"),"sub"),
-            new IrBinary(Name("mask"),IrValue.Register(site.Unit),V("bit"),"shl"),
+            new IrBinary(Name("mask"),site.Unit == site.Shift ? V("unit") : IrValue.Register(site.Unit),V("bit"),"shl"),
             new IrBinary(Name("new"),V("old"),V("mask"),"or"),
             new IrStore(new(Name("address"),_expanded.Symbol(site.Offset)),V("new"),site.WordBytes)
         };

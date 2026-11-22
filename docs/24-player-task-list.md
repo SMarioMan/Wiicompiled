@@ -169,7 +169,10 @@ Constructor and reset paths clear all words, the departure callback writes each
 racer's word, and packet-manager probes keep the full racer index live while
 testing a single bit. Original-code controller and packet fixtures exercise all
 four words at 128 racers, including several racers mapped to one console.
-The separate SDK console masks retain their existing width.
+The same controller callback tracks departed console IDs in a separate packed
+field and clears the associated packet holders through ID 127 in fixtures.
+The SDK still stores 32 peers per room and exposes one-word connection and
+suspend masks. The controller callback test does not change those SDK limits.
 
 A thirteen-instance attempt additionally exposed literal twelve-player DWC setup
 and reservation admission limits. All three server setup calls (including the

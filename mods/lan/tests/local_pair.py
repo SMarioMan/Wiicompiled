@@ -310,7 +310,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--host', type=Path, required=True)
     parser.add_argument('--client', type=Path, action='append', required=True, help='Repeat for additional portable client directories')
-    parser.add_argument('--timeout', type=float, default=180)
+    parser.add_argument('--timeout', type=float, help='Deadline in seconds (default 180, or 1200 with --finish)')
     parser.add_argument('--sequential-join', action='store_true', help='Wait for every launched peer to report the expected active room before launching the next client')
     parser.add_argument('--host-first', action='store_true', help='Wait for the host room before starting all clients; client admission remains concurrent')
     parser.add_argument('--telemetry-timeout', type=float, default=3, help='Maximum age of an observation on slow multi-instance test hosts; gameplay checks still require every peer to advance')
@@ -325,6 +325,10 @@ if __name__ == '__main__':
     parser.add_argument('--visible', action='store_true', help='Run the same checks with a visible game window on each peer')
     options = parser.parse_args()
     options.race = options.race or options.finish
+    if options.timeout is None:
+        options.timeout = 1200 if options.finish else 180
+    elif not 0 < options.timeout < float('inf'):
+        parser.error('--timeout must be a positive finite number')
     try:
         raise SystemExit(run(options))
     except (OSError, ValueError, RuntimeError, TimeoutError) as error:

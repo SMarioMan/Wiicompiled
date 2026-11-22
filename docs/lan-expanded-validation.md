@@ -418,3 +418,24 @@ ID 12. This is one CPU-driven thirteen-console finish pass in the 24-capacity
 build, not a completed 24-player race, repeated-join benchmark, results-screen
 qualification or reconnection pass. The exact per-peer observations are retained
 in [the validation record](validation/lan-race-rmce01-13.json).
+
+## Controller departures and the remaining SDK limit
+
+The controller now records racer and console departures in separate packed
+fields. Native fixtures run the original callback through console ID 127 and
+check the packet holders, mapped racers, word boundaries and resets.
+
+A Linux 24-slot rebuild containing the racer-mask change (`b11b861`) completed
+two-peer SDK connection in both the headless and visible runners at normal
+timing. Both headless peers advanced on Luigi Circuit (online VS, mode 7) and
+reached lap three. The longer 680-second run ended before either reported a
+finish. Its final samples showed 7,803 host frames and 8,649 client frames.
+This run did not qualify 24 simultaneous racers, race results or reconnects.
+
+In the verified USA executable, `DWC_GetAidList` (`800D211C`) clears and fills a
+32-byte static list at `802ED160`. `DWC_GetDirectConnectedAIDBitmap` (`800D21BC`)
+scans the SDK connection table and returns a single word to
+`RKNet::Controller::UpdateSubsAndVR`. The executable's direct callers of
+`DWC_GetAidBitmap` (`800D2414`) include the controller, suspend-vote handling,
+match polling and server shutdown. These paths still need a common wider view
+of active console IDs before the LAN build can accept console IDs above 31.

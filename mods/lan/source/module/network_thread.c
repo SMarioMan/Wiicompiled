@@ -463,9 +463,51 @@ static unsigned reservation_cursor;
 /* Every contender can wait behind a serialized reservation, including while
  * an expanded room is still growing through its first twelve members. Keep
  * stock builds unchanged; never reset SDK timer origins or retry counts. */
+static uint64_t mesh_resv_wait_since;
+
+static void ensure_transport_send_split_max(struct dwc_gamedata *gamedata) {
+#if MKW_LAN_CAPACITY > 32
+    if (!gamedata) return;
+    /* DWCi_SendMatchSynPacket (type 3) sends (player_count - 1) * 24 + 8 bytes
+     * via DWCi_SendReliableSystemData and immediately frees the buffer, while
+     * DWCi_RecvCallback dispatches system payloads on the first chunk without
+     * reassembly. Stock sendSplitMax (1465) truncates SYN at 63+ peers. */
+    struct dwc_transport *transport = (struct dwc_transport *)(gamedata + 1);
+    const uint16_t required = (uint16_t)(MKW_LAN_MATCH_NODES * 24 + 64);
+    if (transport->send_split_max && transport->send_split_max < required) {
+        transport->send_split_max = required;
+    }
+#else
+    (void)gamedata;
+#endif
+}
+
 static void update_reservation_budget(struct dwc_gamedata *gamedata) {
-    if (!gamedata || gamedata->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV ||
-        gamedata->reservation_timeout_ms < 6000) return;
+    ensure_transport_send_split_max(gamedata);
+    if (!gamedata || gamedata->dwc_match_state != DWC_MATCH_STATE_CL_WAIT_RESV) {
+        mesh_resv_wait_since = 0;
+        return;
+    }
+    /* During P2P mesh building (already in room, player_count >= 2), the LAN
+     * mod's dwc_think+0x110 patch suppresses the SDK's 6s CL_WAIT_RESV timeout
+     * handler, which would otherwise leave a client permanently wedged if a
+     * single peer reservation UDP datagram was dropped or ignored. Return to
+     * CL_WAITING after 4s so the mesh retries cleanly without an error dialog. */
+    if (MKW_LAN_CAPACITY > 12 && gamedata->player_count >= 2) {
+        if (!mesh_resv_wait_since) {
+            mesh_resv_wait_since = timestamp;
+        } else if (timestamp - mesh_resv_wait_since >= BROADCAST_INTERVAL * 4) {
+            mesh_resv_wait_since = 0;
+            gamedata->resv_target_pid = 0;
+            gamedata->resv_outgoing_pid = 0;
+            gamedata->reservation_timeout_ms = 0;
+            gamedata->dwc_match_state = DWC_MATCH_STATE_CL_WAITING;
+            LOG_INFO("recovered stalled P2P CL_WAIT_RESV back to CL_WAITING");
+        }
+        return;
+    }
+    mesh_resv_wait_since = 0;
+    if (gamedata->reservation_timeout_ms < 6000) return;
     unsigned participants = 1;
     for (unsigned i = 0; i < BROADCAST_TRACK_MAX; i++)
         if (tracked_peers[i].info.status &&
@@ -771,6 +813,7 @@ static void fill_in_peer_0(struct dwc_gamedata *gamedata) {
 void network_thread_after_server_setup(struct dwc_gamedata *gamedata) {
     clear_deferred_syn();
     clear_deferred_node();
+    ensure_transport_send_split_max(gamedata);
 	LOG_INFO("network_thread_after_server_setup()");
 	fill_in_peer_0(gamedata);
 	gamedata->peers[0].peer_index = 0;
@@ -783,6 +826,7 @@ void network_thread_after_server_setup(struct dwc_gamedata *gamedata) {
 void network_thread_on_server_join(struct dwc_gamedata *gamedata) {
 	clear_deferred_syn();
     clear_deferred_node();
+    ensure_transport_send_split_max(gamedata);
 	LOG_INFO("network_thread_on_server_join()");
 	fill_in_peer_0(gamedata);
 	gamedata->peers[0].peer_index = 0xff;

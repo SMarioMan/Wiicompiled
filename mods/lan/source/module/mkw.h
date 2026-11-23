@@ -66,7 +66,11 @@ struct dwc_gamedata {
 		uint8_t _unk2c[0x30 - 0x2c];
 	} peers[MKW_LAN_MATCH_NODES]; /* +0x38 */
     /* The remaining comments give original offsets. Only the node count moves the tail. */
-    uint8_t _unk638[0x6d0 - 0x638];
+    uint8_t _unk638[0x668 - 0x638];
+    uint32_t resv_target_pid; /* +0x668; non-zero blocks mesh initiation (800D8010) and acceptance (800DE754) */
+    uint8_t _unk66c[0x698 - 0x66c];
+    uint32_t resv_outgoing_pid; /* +0x698; non-zero outgoing reservation PID checked at 800D8000 and 800DE744 */
+    uint8_t _unk69c[0x6d0 - 0x69c];
 	uint16_t public_port; /* +0x6d0 probably? */
 	uint8_t _unk6d2[0x6d4 - 0x6d2];
 	uint32_t public_ip; /* +0x6d4 probably? */
@@ -108,6 +112,19 @@ _Static_assert(sizeof(struct dwc_gamedata) == 0x8c0 + MKW_DWC_MATCH_TAIL_SHIFT +
                (MKW_LAN_MATCH_NODES / 32 - 1) * 8, "SDK matchmaking block");
 
 /* Prefix of the friends-match allocation. Transport follows gamedata. */
+struct dwc_transport {
+	uint8_t peers[MKW_LAN_MATCH_NODES * 64];
+	void *send_callback;
+	void *user_receive_callback;
+	void *receive_timeout_callback;
+	void *ping_callback;
+	uint16_t send_split_max;
+	uint16_t _pad;
+	uint32_t receive_timeout;
+};
+_Static_assert(__builtin_offsetof(struct dwc_transport, send_split_max) == MKW_LAN_MATCH_NODES * 64 + 16,
+               "SDK transport sendSplitMax offset");
+
 struct dwc_gamedata2 {
 	struct gt2_socket *socket;
 	uint8_t _unk04[0x14 - 0x04];

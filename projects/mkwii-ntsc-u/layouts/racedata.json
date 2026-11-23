@@ -85245,6 +85245,30 @@
   ],
   "ByteOperations": [
     {
+      "Instruction": "0x800DF4C8",
+      "ExpectedWord": "0x80AD970C",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E1F80",
+      "ExpectedWord": "0x7C600378",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E1FE4",
+      "ExpectedWord": "0x7C060040",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E2598",
+      "ExpectedWord": "0x7C600039",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
       "Instruction": "0x800D99A0",
       "ExpectedWord": "0x7C600378",
       "Kind": "dwc-syn-acks",

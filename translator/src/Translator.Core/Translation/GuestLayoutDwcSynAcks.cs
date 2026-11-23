@@ -15,13 +15,25 @@ public sealed partial class GuestLayoutRelocations
         {
             case 0x800d99a0 when nodes.Count == 1 && nodes[0] == new IrBinary("r0", R("r3"), R("r0"), "or"):
                 return new IrInstruction[] { new IrCall("r0", "layout_dwc_syn_record", new[] { R("r6"), R("r27"), R("r3") }) };
-            case 0x800d9a30 when nodes.Count == 1 && nodes[0] == new IrSetCrField(0, R("r6"), R("r0"), true):
+            case 0x800e1f80 when nodes.Count == 1 && nodes[0] == new IrBinary("r0", R("r3"), R("r0"), "or"):
+                return new IrInstruction[] { new IrCall("r0", "layout_dwc_syn_record", new[] { R("r5"), R("r4"), R("r3") }) };
+            case 0x800d9a30 or 0x800e1fe4 when nodes.Count == 1 &&
+                nodes[0] == new IrSetCrField(0, R("r6"), R("r0"), true):
                 var complete = "addr_layout_dwc_syn_complete_loc";
                 return new IrInstruction[] {
-                    new IrCall(complete, "layout_dwc_syn_complete", new[] { R("r5"), R("r0") }),
+                    new IrCall(complete, "layout_dwc_syn_complete", new[] {
+                        R(instruction.Address == 0x800d9a30 ? "r5" : "r8"), R("r0"),
+                        IrValue.Imm(instruction.Address == 0x800d9a30 ? 1 : 0) }),
                     compare with { Left = R(complete), Right = IrValue.Imm(1) } };
             case 0x800db07c or 0x800dfcfc when nodes.Count == 1 && nodes[0] == new IrLoad("r3", new IrAddress("r13", -0x68f4), 4):
                 return new[] { nodes[0], new IrCall("r3", "layout_dwc_syn_clear", new[] { R("r3") }) };
+            case 0x800df4c8 when nodes.Count == 1 && nodes[0] == new IrLoad("r5", new IrAddress("r13", -0x68f4), 4):
+                return new[] { nodes[0], new IrCall("r5", "layout_dwc_syn_clear", new[] { R("r5") }) };
+            case 0x800e2598 when nodes.Count == 2 &&
+                nodes[0] == new IrBinary("r0", R("r3"), R("r0"), "and") && nodes[1] == compare:
+                return new IrInstruction[] {
+                    new IrCall("r0", "layout_dwc_syn_test", new[] { R("r5"), R("r4"), R("r0"), R("r3") }),
+                    compare };
             case 0x800e1260 or 0x800e12d4 when nodes.Count == 2 &&
                 nodes[0] == new IrBinary("r0", R("r3"), R("r0"), "and") && nodes[1] == compare:
                 // The second timeout check handles the temporary reservation node.
@@ -46,7 +58,9 @@ public sealed partial class GuestLayoutRelocations
             #include "ppc_runtime.h"
             namespace {
                 constexpr uint32_t dwc_syn_nodes = {{capacity}}u, dwc_syn_tail = {{tail}}u;
-                // Bank zero remains in the original field. The indexed area
+                // Both host SYN phases clear their high banks on entry. Each
+                // phase retains its original low field, passed by the caller.
+                // The indexed area
                 // starts at the last stock timer, so only banks 1+ use it.
                 static inline uint32_t dwc_syn_ack_bank(uint32_t match, uint32_t bank) {
                     return match + (bank ? {{highWords}}u + bank * 4u : dwc_syn_tail + 0x118u);
@@ -64,7 +78,7 @@ public sealed partial class GuestLayoutRelocations
                     }
                     return low;
                 }
-                static inline uint32_t layout_dwc_syn_complete(uint32_t match, uint32_t low) {
+                static inline uint32_t layout_dwc_syn_complete(uint32_t match, uint32_t low, uint32_t joining) {
                     const uint32_t count = Memory::Read32(match + 0x30u);
                     if (count > dwc_syn_nodes) return 0;
                     uint32_t expected[dwc_syn_nodes / 32]{};
@@ -73,14 +87,15 @@ public sealed partial class GuestLayoutRelocations
                     };
                     for (uint32_t i = 1; i < count; ++i)
                         mark(Memory::Read8(match + 0x38u + i * 0x30u + 0x16u));
-                    mark(Memory::Read8(match + dwc_syn_tail + 0x16u));
+                    if (joining) mark(Memory::Read8(match + dwc_syn_tail + 0x16u));
                     if (expected[0] != low) return 0;
                     for (uint32_t bank = 1; bank < dwc_syn_nodes / 32; ++bank)
                         if (expected[bank] != Memory::Read32(dwc_syn_ack_bank(match, bank))) return 0;
                     return 1;
                 }
                 static inline uint32_t layout_dwc_syn_test(uint32_t match, uint32_t peer, uint32_t low, uint32_t legacyBit) {
-                    if (Memory::Read32(match + dwc_syn_tail + 0xe4u) != 17u) return low & legacyBit;
+                    const uint32_t state = Memory::Read32(match + dwc_syn_tail + 0xe4u);
+                    if (state < 15u || state > 17u) return low & legacyBit;
                     const uint32_t aid = Memory::Read8((peer ? peer : match + dwc_syn_tail) + 0x16u);
                     if (aid >= dwc_syn_nodes) return 0;
                     const uint32_t bits = aid < 32 ? low : Memory::Read32(dwc_syn_ack_bank(match, aid / 32));

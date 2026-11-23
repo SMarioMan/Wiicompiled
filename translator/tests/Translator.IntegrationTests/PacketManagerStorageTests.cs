@@ -100,6 +100,7 @@ public class PacketManagerStorageTests
                             func_8064ED80(&ctx);if(allocations!=1 || itemCreates!=1 || eventCreates!=1)return 5;
                         }else{func_8064F96C(&ctx);if(ctx.gpr[3]!=root || itemCreates!=2 || eventCreates!=2)return 6;}
                         expected[0]=expected[1]=0;std::memset(expected.data()+4,0,14);expected[18]=0x0b;expected[19]=0xb8;
+                        std::memset(expected.data()+{{layout.Symbol("RKNetPacketMgr.highFlags.offset")}},0,{{layout.Symbol("RKNetPacketMgr.highFlags.size")}});
                         if(!equal())return 7;
                     }
                     for(uint32_t mode : {0u,6u,7u,8u,9u,10u,11u}){
@@ -108,6 +109,7 @@ public class PacketManagerStorageTests
                         if(mode>=7 && mode<=10){
                             expected[0]=1;std::memset(expected.data()+4,0,12);std::memset(expected.data()+20,0,376);
                             std::memset(expected.data()+400,0,8);std::memset(expected.data()+timers,0,capacity*4);
+                            std::memset(expected.data()+{{layout.Symbol("RKNetPacketMgr.highFlags.offset")}},0,{{layout.Symbol("RKNetPacketMgr.highFlags.size")}});
                         }
                         if(!equal())return 8;
                     }

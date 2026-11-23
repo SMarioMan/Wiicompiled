@@ -244,6 +244,7 @@ public sealed partial class GuestLayoutRelocations
         EmitRknetUserHelpers(calls, output);
         EmitRknetSelectHelpers(calls, output);
         EmitRknetRh1Helpers(calls, output);
+        EmitRknetPktMgrHelpers(calls, output);
         return output.ToString();
     }
 }

@@ -2551,7 +2551,9 @@
         },
         {
           "Name": "flags",
-          "Type": "RKNetSelectFlags"
+          "Type": "RKNetSelectFlags",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         }
       ]
     },
@@ -85250,6 +85252,36 @@
     }
   ],
   "ByteOperations": [
+    {"Instruction": "0x8065990C", "ExpectedWord": "0x7C002839", "Kind": "room-aid-member", "Count": "DWCConnectionTables.aids.size", "Field": "r5", "Source": "r4"},
+    {"Instruction": "0x80657F8C", "ExpectedWord": "0x3C80809C", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658838", "ExpectedWord": "0x3C80809C", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658374", "ExpectedWord": "0x3BA00000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806591E8", "ExpectedWord": "0x7C00CB78", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80659320", "ExpectedWord": "0x7C00CB78", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80659690", "ExpectedWord": "0x7C00D378", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806597F8", "ExpectedWord": "0x7C00D378", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806599B8", "ExpectedWord": "0x7C00D378", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658E24", "ExpectedWord": "0x2C050000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658E94", "ExpectedWord": "0x2C050000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658F04", "ExpectedWord": "0x2C050000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806594D0", "ExpectedWord": "0x2C050000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065969C", "ExpectedWord": "0x2C040000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80659804", "ExpectedWord": "0x2C040000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806598C4", "ExpectedWord": "0x2C030000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806599C4", "ExpectedWord": "0x2C000000", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658434", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806587B0", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806592DC", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806593B4", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806595D0", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80659994", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658E80", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658EF0", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80658F64", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065952C", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806596EC", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80659858", "ExpectedWord": "0x7C030050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806598EC", "ExpectedWord": "0x7C050050", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x80660A54", "ExpectedWord": "0x7C002030", "Kind": "legacy-aid-bit", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x806606CC", "ExpectedWord": "0x98030000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x80660884", "ExpectedWord": "0x98030000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},

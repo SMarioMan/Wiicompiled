@@ -50,13 +50,13 @@ public sealed partial class GuestLayoutRelocations
                     _original.Symbol(site.Count) != 32)
                     throw new InvalidDataException("Invalid room-aid-member operation.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user") ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user" or "rknet-select") ||
                      site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
-            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user" && _original.Symbol(site.Count) != 32)
+            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user" or "rknet-select" && _original.Symbol(site.Count) != 32)
                 throw new InvalidDataException("A forwarded recipient or legacy AID bit requires a 32-bit stock mask.");
         }
     }
@@ -72,6 +72,7 @@ public sealed partial class GuestLayoutRelocations
         if (site.Kind == "dwc-syn-acks") return RewriteDwcSynAcks(instruction, nodes);
         if (site.Kind == "dwc-suspend") return RewriteDwcSuspend(instruction, nodes);
         if (site.Kind == "rknet-user") return RewriteRknetUser(instruction, nodes);
+        if (site.Kind == "rknet-select") return RewriteRknetSelect(instruction, nodes);
         if (site.Kind == "room-aid-keep")
         {
             var shiftReg = $"r{(word >> 11) & 31}";
@@ -271,7 +272,7 @@ public sealed partial class GuestLayoutRelocations
             isDerived ? _original.Symbol(site.Field!) : 0);
         var originalLimit = site.Kind switch
         {
-            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user" => 32,
+            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "room-aid-keep" or "dwc-syn-acks" or "dwc-suspend" or "rknet-user" or "rknet-select" => 32,
             "rank8" => 127,
             _ => byte.MaxValue
         };

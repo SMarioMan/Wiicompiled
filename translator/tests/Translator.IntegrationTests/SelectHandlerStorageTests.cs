@@ -93,7 +93,7 @@ public class SelectHandlerStorageTests
                             if(allocations!=1 || Memory::Read32(0x809bd930)!=root)return 4;
                             ctx.gpr[3]=3;func_80657F50(&ctx);if(allocations!=1)return 5;
                         }else{ctx.gpr[3]=root;ctx.gpr[4]=3;func_80658830(&ctx);}
-                        word(0,3);std::memset(expected.data()+flags,0,20);
+                        word(0,3);for(uint32_t b=0;b<{{layout.Symbol("RKNetSelectHandler.flags.count")}};b++)std::memset(expected.data()+flags+b*24,0,20);
                         if(!equal() || std::memcmp(expectedController.data(),Memory::GetPointer(controller,controllerSize),controllerSize))return 6;
                         Memory::Write32(controller+currentSub,1);Memory::Write8(controller+subs+subStride+32,0);
                         ctx.gpr[3]=root;func_80658068(&ctx);

@@ -2260,6 +2260,33 @@
       ]
     },
     {
+      "Name": "RKNetDwcHeapBase",
+      "Size": 634880,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetDwcHeapHighBank",
+      "Size": 1572864,
+      "Alignment": 4
+    },
+    {
+      "Name": "RKNetDwcHeap",
+      "Alignment": 4,
+      "Fields": [
+        {
+          "Name": "base",
+          "Type": "RKNetDwcHeapBase"
+        },
+        {
+          "Name": "highBanks",
+          "Type": "RKNetDwcHeapHighBank",
+          "PerPlayer": true,
+          "PlayersPerElement": 32,
+          "HighBanksOnly": true
+        }
+      ]
+    },
+    {
       "Name": "RKNetPacketMgrHeader",
       "Size": 408,
       "Alignment": 8
@@ -4010,6 +4037,7 @@
     {"Instruction": "0x800D6448", "ExpectedWord": "0x811D074C", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 276},
     {"Instruction": "0x800D6454", "ExpectedWord": "0x80FD0748", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 272},
     {"Instruction": "0x800D6470", "ExpectedWord": "0x80DB0740", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 264},
+    {"Instruction": "0x80652BC4", "ExpectedWord": "0x3863B000", "Node": 0, "Operand": "right", "Symbol": "RKNetDwcHeap.size", "Addend": -655360},
     {"Instruction": "0x800D6494", "ExpectedWord": "0x93FB0740", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 264},
     {"Instruction": "0x800D649C", "ExpectedWord": "0x88030895", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 605},
     {"Instruction": "0x800D64A8", "ExpectedWord": "0x88A30723", "Node": 0, "Operand": "offset", "Symbol": "DWCMatch.tail.offset", "Addend": 235},

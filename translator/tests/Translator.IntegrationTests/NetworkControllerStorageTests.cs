@@ -71,7 +71,7 @@ public class NetworkControllerStorageTests
                     auto n=c->gpr[3];if(n>8192)FAIL();cursor=(cursor+31)&~31u;
                     allocations.push_back({cursor,n});std::memset(Memory::GetPointer(cursor-16,n+32),0x77,n+32);c->gpr[3]=cursor;cursor+=n+64;}
                 void mutex_init(CpuContext* c){if(c->gpr[3]!=root+8 || mutexCalls++)FAIL();std::memset(Memory::GetPointer(root+8,24),0x33,24);}
-                void make_heap(CpuContext* c){if(c->gpr[3]!=0x9b000 || c->gpr[4]!=parentHeap || heapCalls++)FAIL();c->gpr[3]=privateHeap;}
+                void make_heap(CpuContext* c){if(c->gpr[3]!={{layout.Symbol("RKNetDwcHeap.size")}} || c->gpr[4]!=parentHeap || heapCalls++)FAIL();c->gpr[3]=privateHeap;}
                 void make_thread(CpuContext* c){if(threadCalls++)FAIL();c->gpr[3]=task;}
                 void end_init(CpuContext*){ends++;}
                 void sdk_init(CpuContext* c){if(c->gpr[3]!=1 || c->gpr[5]!=0x524d434a || c->gpr[6]!=0x80654078 || c->gpr[7]!=0x80654104)FAIL();c->gpr[3]=0;}

@@ -897,7 +897,8 @@ static bool negotiating_peer(enum dwc_match_state state) {
 static bool syn_client(struct dwc_gamedata *game, uint32_t aid) {
     return MKW_LAN_CAPACITY > 12 && network_thread_running && broadcast_socket >= 0 &&
         game && game->dwc_host_state == 1 && game->player_count >= 2 &&
-        game->player_count <= 32 && aid < 32 && game->peers[0].player_id &&
+        game->player_count <= MKW_LAN_MATCH_NODES && aid < MKW_LAN_MATCH_NODES &&
+        game->peers[0].player_id &&
         aid == game->peers[0].peer_index;
 }
 

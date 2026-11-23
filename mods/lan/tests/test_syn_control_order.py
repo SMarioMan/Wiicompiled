@@ -22,7 +22,7 @@ class SynControlOrder(unittest.TestCase):
 #define LOG_INFO(...) ((void)0)
 '''+states+r'''
 struct dwc_gamedata {unsigned dwc_host_state,player_count;enum dwc_match_state dwc_match_state;
-    struct {unsigned peer_index,player_id;} peers[32];};
+    struct {unsigned peer_index,player_id;} peers[MKW_LAN_MATCH_NODES];};
 static struct dwc_gamedata game,other;
 static struct dwc_gamedata *current=&game;
 static bool network_thread_running=true;
@@ -37,7 +37,7 @@ static struct dwc_gamedata *get_dwc_gamedata(void){return current;}
 static void replay_deferred_syn(struct dwc_gamedata*);
 bool network_thread_prepare_syn(uint32_t,uint32_t,const uint32_t*);
 static void DWCi_ProcessMatchSynPacket(uint32_t aid,uint32_t type,const uint32_t *packet){
-    if(aid!=0||type!=1)abort();
+    if(aid!=current->peers[0].peer_index||type!=1)abort();
     /* This is the real SDK's state gate; only its accepted path creates ACK. */
     if(current->dwc_match_state!=DWC_MATCH_STATE_CL_WAITING)return;
     unsigned words=packet[0]==__builtin_bswap32(1)?2:8;
@@ -106,10 +106,16 @@ int main(void){
     reset(3);CHECK(syn(packet));CHECK(!network_thread_prepare_syn(0,3,packet));CHECK(!deferred_syn.present);
     reset(3);CHECK(!network_thread_prepare_syn(1,1,packet)&&!polls&&!deferred_syn.present);
     reset(3);CHECK(!network_thread_prepare_syn(0,1,NULL)&&!polls&&!deferred_syn.present);
-    for(unsigned count=0;count<=33;count++)if(count<2||count>32){
+    for(unsigned count=0;count<=MKW_LAN_MATCH_NODES+1;count++)if(count<2||count>MKW_LAN_MATCH_NODES){
         reset(3);game.player_count=count;CHECK(!network_thread_prepare_syn(0,1,packet)&&!polls);
     }
-    reset(3);game.peers[0].peer_index=32;CHECK(!network_thread_prepare_syn(32,1,packet)&&!polls);
+    reset(3);game.peers[0].peer_index=MKW_LAN_MATCH_NODES;
+    CHECK(!network_thread_prepare_syn(MKW_LAN_MATCH_NODES,1,packet)&&!polls);
+    reset(3);game.peers[0].peer_index=MKW_LAN_MATCH_NODES-1;
+    game.player_count=MKW_LAN_MATCH_NODES;
+    CHECK(network_thread_prepare_syn(MKW_LAN_MATCH_NODES-1,1,packet));
+    game.dwc_match_state=DWC_MATCH_STATE_CL_WAITING;
+    replay_deferred_syn(&game);CHECK(acks==1&&received[7]==7&&!deferred_syn.present);
     reset(3);game.peers[0].player_id=0;CHECK(!network_thread_prepare_syn(0,1,packet)&&!polls);
     for(unsigned state=0;state<=20;state++){
         bool busy=false;
@@ -123,9 +129,9 @@ int main(void){
 '''
         with tempfile.TemporaryDirectory(prefix='lan-syn-order-') as directory:
             path=Path(directory);(path/'test.c').write_text(harness)
-            for capacity in (12,13,24,32):
+            for capacity, nodes in ((12,32),(13,32),(24,32),(32,32),(33,64),(128,128)):
                 result=subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Wextra','-Werror',
-                    f'-DMKW_LAN_CAPACITY={capacity}',str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
+                    f'-DMKW_LAN_CAPACITY={capacity}',f'-DMKW_LAN_MATCH_NODES={nodes}',str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
                 self.assertEqual(result.returncode,0,result.stderr)
                 subprocess.run([str(path/'test')],check=True,timeout=3)
 

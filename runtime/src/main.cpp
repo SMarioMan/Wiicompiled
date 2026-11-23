@@ -21,6 +21,9 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#if defined(__linux__)
+#include <sys/prctl.h>
+#endif
 #include <mutex>
 #include <unordered_map>
 #include <vector>
@@ -1395,6 +1398,12 @@ int RuntimeMain(int argc, char** argv) {
         if (g_headless) {
             AudioBackend::Instance().SetSilenced(true);
             g_auroraRenderHostUi.store(false, std::memory_order_relaxed);
+#if defined(__linux__)
+            // Allow Linux KSM (when enabled on the host) to deduplicate identical
+            // private anonymous pages across concurrent headless LAN instances.
+            constexpr int kPrSetMemoryMerge = 67;
+            (void)prctl(kPrSetMemoryMerge, 1, 0, 0, 0);
+#endif
         }
         RuntimeConfigFile::LogLoadedConfig();
         if (!g_headless && RuntimeConfigFile::DiscordPresenceEnabled()) {

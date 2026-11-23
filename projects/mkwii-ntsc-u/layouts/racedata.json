@@ -85316,6 +85316,8 @@
     {"Instruction": "0x8064EDD4", "ExpectedWord": "0xB0030012", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x8064F9A0", "ExpectedWord": "0xB0030012", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x8064EEA8", "ExpectedWord": "0x93DF0004", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806510BC", "ExpectedWord": "0x7C00C378", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80651298", "ExpectedWord": "0x7C00C378", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x8065134C", "ExpectedWord": "0x7CA50378", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x80651364", "ExpectedWord": "0x7CA50378", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x8065139C", "ExpectedWord": "0x7CA00378", "Kind": "rknet-pktmgr", "Count": "DWCConnectionTables.aids.size"},

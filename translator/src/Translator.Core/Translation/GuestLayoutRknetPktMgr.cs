@@ -18,6 +18,10 @@ public sealed partial class GuestLayoutRelocations
                 return new[] { nodes[0], new IrCall(discard, "layout_rknet_pktmgr_clear_all", new[] { R("r3") }) };
             case 0x8064eea8 when nodes.Count == 1 && nodes[0] == new IrStore(new IrAddress("r31", 4), R("r30"), 4):
                 return new[] { nodes[0], new IrCall(discard, "layout_rknet_pktmgr_clear_all", new[] { R("r31") }) };
+            case 0x806510bc when nodes.Count == 1 && nodes[0] == new IrBinary("r0", R("r0"), R("r24"), "or"):
+                return new IrInstruction[] { new IrCall("r0", "layout_rknet_pktmgr_set", new[] { R("r21"), R("r23"), IrValue.Imm(0), R("r0") }) };
+            case 0x80651298 when nodes.Count == 1 && nodes[0] == new IrBinary("r0", R("r0"), R("r24"), "or"):
+                return new IrInstruction[] { new IrCall("r0", "layout_rknet_pktmgr_set", new[] { R("r21"), R("r23"), IrValue.Imm(1), R("r0") }) };
             case 0x8065134c when nodes.Count == 1 && nodes[0] == new IrBinary("r5", R("r5"), R("r0"), "or"):
                 return new IrInstruction[] { new IrCall("r5", "layout_rknet_pktmgr_set", new[] { R("r3"), R("r4"), IrValue.Imm(0), R("r5") }) };
             case 0x80651364 when nodes.Count == 1 && nodes[0] == new IrBinary("r5", R("r5"), R("r0"), "or"):

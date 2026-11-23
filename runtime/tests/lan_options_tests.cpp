@@ -24,7 +24,7 @@ int main() {
     Invalid([&] { join.Parse("--lan-peers=13"); });
     Invalid([&] { join.Parse("--lan-id=2junk"); });
     Invalid([&] { join.Parse("--lan-id=-1"); });
-    for (uint32_t capacity : {12u, 13u, 24u, 32u}) {
+    for (uint32_t capacity : {12u, 13u, 24u, 32u, 33u, 64u, 128u}) {
         Options expanded{capacity};
         Check(expanded.instances == capacity && expanded.capacity == capacity);
         Check(expanded.Parse("--lan-id=" + std::to_string(capacity)));
@@ -38,7 +38,7 @@ int main() {
     }
     Invalid([] { Options invalid{0}; });
     Invalid([] { Options invalid{256}; });
-    Options future{100}; // Storage-only base builds still construct their options.
+    Options future{129}; // Capacities above 128 still construct their options.
     Invalid([&] { future.Validate(); });
     Options remote;
     Check(remote.Parse("--lan-bind=192.168.1.10"));

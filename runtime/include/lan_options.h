@@ -60,7 +60,7 @@ struct Options {
         return true;
     }
     void Validate() const {
-        if (capacity > 32) throw std::invalid_argument("The current LAN protocol supports at most 32 capacity slots");
+        if (capacity > 128) throw std::invalid_argument("The current LAN protocol supports at most 128 capacity slots");
         if (!instance || !instances || instance > capacity || instances > capacity || peers.size() > capacity)
             throw std::invalid_argument("LAN settings exceed this build's capacity");
         if (instance > instances) throw std::invalid_argument("--lan-id must not exceed --lan-peers");

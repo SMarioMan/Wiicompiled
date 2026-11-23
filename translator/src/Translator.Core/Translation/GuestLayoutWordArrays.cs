@@ -238,6 +238,7 @@ public sealed partial class GuestLayoutRelocations
                     """);
             }
         EmitCountConversionHelpers(calls,output);
+        EmitRoomPresenceHelpers(calls, output);
         return output.ToString();
     }
 }

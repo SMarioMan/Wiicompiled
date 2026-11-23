@@ -85102,6 +85102,12 @@
   ],
   "ByteOperations": [
     {
+      "Instruction": "0x8065498C",
+      "ExpectedWord": "0x2C030000",
+      "Kind": "room-members-present",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
       "Instruction": "0x800D2260",
       "ExpectedWord": "0x7FE00030",
       "Kind": "legacy-aid-bit",

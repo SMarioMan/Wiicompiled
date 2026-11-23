@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Text;
 using Translator.Core.Disassembly;
 using Translator.Core.Ir;
 using Translator.Core.Lifting;
@@ -42,13 +43,13 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit") ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present") ||
                      site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
-            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" && _original.Symbol(site.Count) != 32)
+            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" && _original.Symbol(site.Count) != 32)
                 throw new InvalidDataException("A forwarded recipient or legacy AID bit requires a 32-bit stock mask.");
         }
     }
@@ -61,6 +62,16 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
+        if (site.Kind == "room-members-present")
+        {
+            var mask = IrValue.Register("r3");
+            var compare = new IrSetCrField(0, mask, IrValue.Imm(0), false);
+            if (word != 0x2c030000 || nodes.Count != 1 || nodes[0] != compare) throw Invalid();
+            var present = $"addr_layout_room_{instruction.Address:X8}_present_loc";
+            return new IrInstruction[] {
+                new IrCall(present, RoomPresenceHelper(site), new[] { mask, IrValue.Register("r13") }),
+                compare with { Left = IrValue.Register(present) } };
+        }
         if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit")
         {
             var index = IrValue.Register($"r{(word >> 11) & 31}");
@@ -154,6 +165,31 @@ public sealed partial class GuestLayoutRelocations
         return result;
     }
 
+    private static string RoomPresenceHelper(GuestByteOperation site) => $"layout_room_present_{site.Instruction:X8}";
+
+    private void EmitRoomPresenceHelpers(HashSet<string> calls, StringBuilder output)
+    {
+        foreach (var site in _byteOperations.Where(site => site.Kind == "room-members-present"))
+        {
+            var helper = RoomPresenceHelper(site);
+            if (!calls.Contains(helper)) continue;
+            output.AppendLine($$"""
+                #ifndef WIICOMPILED_{{helper}}
+                #define WIICOMPILED_{{helper}}
+                #include "ppc_runtime.h"
+                static inline uint32_t {{helper}}(uint32_t mask, uint32_t sda) {
+                    if (mask) return mask;
+                    // DWC_GetNumConnectionHost gates its node count on the
+                    // control pointer. A high-only room has an empty low word.
+                    if (!Memory::Read32(sda - 0x6910u)) return 0;
+                    const uint32_t match = Memory::Read32(sda - 0x68f4u);
+                    return match && Memory::Read32(match + 0x30u) != 0;
+                }
+                #endif
+                """);
+        }
+    }
+
     private void ValidateByteOperationImage(ProgramImage image)
     {
         foreach (var site in _byteOperations)
@@ -173,7 +209,7 @@ public sealed partial class GuestLayoutRelocations
             site.Field is null ? 0 : _original.Symbol(site.Field));
         var originalLimit = site.Kind switch
         {
-            "recipient-aid" or "recipient-test" or "legacy-aid-bit" => 32,
+            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" => 32,
             "rank8" => 127,
             _ => byte.MaxValue
         };

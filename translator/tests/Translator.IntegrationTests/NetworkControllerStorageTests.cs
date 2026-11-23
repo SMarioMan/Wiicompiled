@@ -76,7 +76,8 @@ public class NetworkControllerStorageTests
                 void end_init(CpuContext*){ends++;}
                 void sdk_init(CpuContext* c){if(c->gpr[3]!=1 || c->gpr[5]!=0x524d434a || c->gpr[6]!=0x80654078 || c->gpr[7]!=0x80654104)FAIL();c->gpr[3]=0;}
                 uint32_t connected=0,localAid=0,suspended=0;
-                void available_aids(CpuContext* c){c->gpr[3]=connected?1:0;}
+                bool highOnlyRoom=false;
+                void available_aids(CpuContext* c){c->gpr[3]=connected&&!highOnlyRoom?1:0;}
                 void connection_count(CpuContext* c){c->gpr[3]=connected;}
                 void direct_aids(CpuContext* c){c->gpr[3]=0x10203040;}
                 void group_id(CpuContext* c){c->gpr[3]=0x12345678;}
@@ -209,6 +210,28 @@ public class NetworkControllerStorageTests
                         }
                         expected[sub+{{layout.Symbol("RKNetSub.tail.offset")}}]=suspended;
                         if(std::memcmp(expected.data(),Memory::GetPointer(root,size),size))return 17;
+                    }
+                    if (capacity > 32) {
+                        constexpr uint32_t sdk = 0x81400000, match = sdk + 0x360;
+                        constexpr uint32_t subs = {{layout.Symbol("RKNetController.subs.offset")}};
+                        constexpr uint32_t currentSub = {{layout.Symbol("RKNetController.currentSub.offset")}};
+                        highOnlyRoom=true;connected=1;localAid=capacity-1;
+                        Memory::Write32(0x80381f70,sdk);
+                        Memory::Write32(0x80381f8c,match);
+                        Memory::Write32(match+0x30,connected);
+                        for (uint32_t online=0;online<2;online++) {
+                            Memory::Write32(0x80381f70,online?sdk:0);
+                            Memory::Write32(root+currentSub,0);
+                            Memory::Write8(root+subs+{{layout.Symbol("RKNetSub.size")}}+33,localAid);
+                            ctx.gpr[3]=root;func_80654958(&ctx);
+                            if(Memory::Read32(root+subs+16)!=0 ||
+                               Memory::Read32(root+subs+8)!=online ||
+                               Memory::Read8(root+subs+33)!=(online?localAid:255))return 60;
+                        }
+                        Memory::Write32(0x80381f70,0);
+                        Memory::Write32(0x80381f8c,0);
+                        std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
+                        highOnlyRoom=false;connected=0;localAid=0;
                     }
                     for(uint32_t p=0;p<capacity;p++)for(uint32_t b=0;b<2;b++){
                         auto at={{layout.Symbol("RKNetController.sendIndices.offset")}}+p*4;word(at,b);Memory::Write32(root+at,b);

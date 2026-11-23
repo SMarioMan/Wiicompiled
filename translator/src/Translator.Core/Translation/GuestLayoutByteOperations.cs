@@ -64,12 +64,20 @@ public sealed partial class GuestLayoutRelocations
         var ra = $"r{(word >> 16) & 31}";
         if (site.Kind == "room-aid-member")
         {
-            var low = new IrBinary("r0", IrValue.Register("r3"), IrValue.Register("r0"), "and");
+            // The checked send and local-player lookup sites form the
+            // preceding single-AID mask from r4 and r8 respectively.
+            var aid = word switch
+            {
+                0x7c600039 => "r4",
+                0x7ca00039 => "r8",
+                _ => throw Invalid()
+            };
+            var low = new IrBinary("r0", IrValue.Register(rt), IrValue.Register("r0"), "and");
             var compare = new IrSetCrField(0, IrValue.Register("r0"), IrValue.Imm(0), false);
-            if (word != 0x7c600039 || nodes.Count != 2 || nodes[0] != low || nodes[1] != compare) throw Invalid();
+            if (nodes.Count != 2 || nodes[0] != low || nodes[1] != compare) throw Invalid();
             return new IrInstruction[] {
                 new IrCall("r0", RoomPresenceHelper(site), new[] {
-                    IrValue.Register("r0"), IrValue.Register("r4"), IrValue.Register("r13") }),
+                    IrValue.Register("r0"), IrValue.Register(aid), IrValue.Register("r13") }),
                 compare };
         }
         if (site.Kind == "room-members-present")

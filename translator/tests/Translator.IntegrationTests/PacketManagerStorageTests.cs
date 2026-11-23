@@ -207,9 +207,17 @@ public class PacketManagerStorageTests
                     for(uint32_t p : {capacity,capacity+1,0xffffffffu}){
                         ctx.gpr[3]=root;ctx.gpr[4]=p;func_80650398(&ctx);if(ctx.gpr[3])return 18;
                     }
-                    for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,peerCount-1}){
+                    for(uint32_t current=0;current<2;current++)for(uint32_t local : {0u,capacity-1}){
                         Memory::Write32(0x809bd790,0);Memory::Write32(controller+currentSub,current);
-                        Memory::Write32(controller+subs+current*subStride+16,1u<<local);Memory::Write8(controller+subs+current*subStride+33,local);
+                        Memory::Write32(controller+subs+current*subStride+16,local<32?1u<<local:0);
+                        Memory::Write8(controller+subs+current*subStride+33,local);
+                        constexpr uint32_t sdk=0x81500000, match=sdk+0x360;
+                        if (local>=32) {
+                            Memory::Write32(0x80381f70,sdk);
+                            Memory::Write32(0x80381f8c,match);
+                            Memory::Write32(match+0x30,1);
+                            Memory::Write8(match+0x38+0x16,local);
+                        }
                         std::memset(Memory::GetPointer(controller+aidMap,capacity),255,capacity);
                         Memory::Write8(controller+aidMap,local);Memory::Write8(controller+aidMap+capacity-1,local);
                         for(uint32_t ordinal=0;ordinal<3;ordinal++){
@@ -217,6 +225,7 @@ public class PacketManagerStorageTests
                             if(ctx.gpr[3]!=(ordinal==0?0:ordinal==1?capacity-1:0xffffffffu))return 19;
                         }
                     }
+                    Memory::Write32(0x80381f70,0);Memory::Write32(0x80381f8c,0);
                     Memory::Write32(0x809bd790,root);
                     for(uint32_t p=0;p<capacity;p++)Memory::Write32(racedata+{{layout.Symbol("Racedata.race.offset+Scenario.players.offset")}}+p*240+16,(p==0 || p==capacity-1)?0:4);
                     for(uint32_t ordinal=0;ordinal<3;ordinal++){

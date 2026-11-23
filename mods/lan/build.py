@@ -85,6 +85,15 @@ def static_patches(capacity=12):
         # race-start sync and triggering DWC timeouts. NOP the break so each
         # tick flushes all ready peer packets once.
         write('game:RKNet::Controller::TrySendNextRACEPacket+0x18C', 0x60000000)
+        # ROOMHandler, SELECTHandler, and RH1Handler each gate their 1-peer-per-call
+        # round-robin export behind a 170ms timer (cmplwi r4, 170; blt exit).
+        # At 128 players a single full sweep takes 127 * 170ms = 21.6s, and
+        # multi-round lobby/race-start handshakes exceed 60s and trip
+        # Pages::DisconnectMgr::OnUpdate's 3600-frame watchdog. NOP the 170ms
+        # gate above 12 players so they export 1 peer per 60Hz frame (~2.1s/sweep).
+        write('game:RKNet::ROOMHandler::ExportROOMandUSER+0x64', 0x60000000)
+        write('game:RKNet::SELECTHandler::PrepareAndExportSELECTandUSER+0x64', 0x60000000)
+        write('game:RKNetRH1Export+0x58', 0x60000000)
     return patches
 
 
@@ -201,7 +210,8 @@ def build(args):
                                    'DWC_GetDirectConnectedAIDBitmap': '0x800D21BC',
                                    'DWC_GetAidBitmap': '0x800D2414',
                                    'DWCi_GetGT2Connection': '0x800D2860',
-                                   'DWC_SendUnreliable': '0x800E85B4'}, indent=2) + '\n')
+                                   'DWC_SendUnreliable': '0x800E85B4',
+                                   'RKNetRH1Export': '0x8065C714'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
                     str(ROOT / 'projects/mkwii-ntsc-u/recomp.yml'), '--module', str(elf),

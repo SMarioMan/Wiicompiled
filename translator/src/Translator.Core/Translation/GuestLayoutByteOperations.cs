@@ -43,13 +43,13 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member") ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "dwc-syn-acks") ||
                      site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
-            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" && _original.Symbol(site.Count) != 32)
+            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "dwc-syn-acks" && _original.Symbol(site.Count) != 32)
                 throw new InvalidDataException("A forwarded recipient or legacy AID bit requires a 32-bit stock mask.");
         }
     }
@@ -62,6 +62,7 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
+        if (site.Kind == "dwc-syn-acks") return RewriteDwcSynAcks(instruction, nodes);
         if (site.Kind == "room-aid-member")
         {
             // The original loops retain the unshifted AID in different
@@ -251,7 +252,7 @@ public sealed partial class GuestLayoutRelocations
             site.Field is null ? 0 : _original.Symbol(site.Field));
         var originalLimit = site.Kind switch
         {
-            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" => 32,
+            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" or "dwc-syn-acks" => 32,
             "rank8" => 127,
             _ => byte.MaxValue
         };

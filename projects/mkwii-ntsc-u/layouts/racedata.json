@@ -103,9 +103,30 @@
       "Size": 48
     },
     {
+      "Name": "DWCMatchTailPrefix",
+      "Alignment": 4,
+      "Size": 644
+    },
+    {
+      "Name": "DWCSynWord",
+      "Alignment": 4,
+      "Size": 4
+    },
+    {
       "Name": "DWCMatchTail",
       "Alignment": 8,
-      "Size": 648
+      "Fields": [
+        {
+          "Name": "prefix",
+          "Type": "DWCMatchTailPrefix"
+        },
+        {
+          "Name": "timerAndSynAcks",
+          "Type": "DWCSynWord",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        }
+      ]
     },
     {
       "Name": "DWCMatch",
@@ -85223,6 +85244,42 @@
     }
   ],
   "ByteOperations": [
+    {
+      "Instruction": "0x800D99A0",
+      "ExpectedWord": "0x7C600378",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D9A30",
+      "ExpectedWord": "0x7C060040",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800DB07C",
+      "ExpectedWord": "0x806D970C",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800DFCFC",
+      "ExpectedWord": "0x806D970C",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E1260",
+      "ExpectedWord": "0x7C600039",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E12D4",
+      "ExpectedWord": "0x7C600039",
+      "Kind": "dwc-syn-acks",
+      "Count": "DWCConnectionTables.aids.size"
+    },
     {
       "Instruction": "0x80656900",
       "ExpectedWord": "0x7C600039",

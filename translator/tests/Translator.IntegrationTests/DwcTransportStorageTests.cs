@@ -52,7 +52,7 @@ public class DwcTransportStorageTests
                 constexpr uint32_t controlSize = {{layout.Symbol("DWCControl.size")}};
                 constexpr uint32_t transportSize = {{layout.Symbol("DWCTransport.size")}};
                 constexpr uint32_t controlGlobal = 0x80381f70, transportGlobal = 0x80381f98;
-                constexpr uint32_t match = root + 0x360, matchSize = 0x8c0 + (records - 32) * 48;
+                constexpr uint32_t match = root + 0x360, matchSize = 0x8c0 + (records - 32) * 48 + ((records / 32 * 4 + 3) & ~7u);
                 static_assert(transport == match + matchSize);
                 static_assert(controlSize == 0x360 + matchSize + records * 64 + 24);
                 static_assert(transportSize == records * 64 + 24);

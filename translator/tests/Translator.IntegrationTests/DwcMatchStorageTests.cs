@@ -186,7 +186,13 @@ public class DwcMatchStorageTests
                 constexpr uint32_t frame = 8 + 2 * nodes * 4 + 24, unconfirmed = stack - frame + 8 + nodes * 4;
                 constexpr uint32_t shift = (nodes - 32) * 48;
                 #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "DWC cancel line %d: %s\n", __LINE__, #x); std::abort(); } } while (false)
-                uint32_t closed = 0;
+                uint32_t closed = 0, sent = 0;
+                void sendCancel(CpuContext* c) {
+                    CHECK(c->gpr[3] == 0x10 && c->gpr[4] == 0x12340001u && c->gpr[8] == 1);
+                    CHECK(Memory::Read32(c->gpr[7]) == 0x02003412u);
+                    ++sent;
+                }
+                void sendResult(CpuContext* c) { c->gpr[3] = 0; }
                 void closePeer(CpuContext* c) { CHECK(c->gpr[3] == ++closed); }
                 void save(CpuContext* c) {
                     CHECK(c->gpr[11] == stack);
@@ -207,6 +213,9 @@ public class DwcMatchStorageTests
                     entry(0x80020a40, save);
                     entry(0x80020a8c, restore);
                     entry(0x800d1f60, closePeer);
+                    entry(0x800dbc98, sendCancel);
+                    entry(0x800e270c, sendResult);
+                    entry(0x800e28f0, sendResult);
                     Memory::Write32(0x80381f8c, match);
                     Memory::Write32(match + 0x30, nodes);
                     for (unsigned i = 0; i < nodes; ++i) {
@@ -226,6 +235,91 @@ public class DwcMatchStorageTests
                           Memory::Read32(unconfirmed - 4) == 0xa5a5a5a5 &&
                           Memory::Read32(unconfirmed + (nodes - 1) * 4) == 0xa5a5a5a5);
                     CHECK(Memory::Read8(match + 0x721 + shift) == 0);
+                    if (nodes > 32) {
+                        // Only the high AID acknowledged. Send it the missed
+                        // low peer's PID, then close that low peer.
+                        closed = 0;
+                        Memory::Write32(match + 0x30, 3);
+                        Memory::Write32(match + 0x71c + shift, 17);
+                        Memory::Write8(match + 0x38 + 48 + 22, nodes - 1);
+                        Memory::Write8(match + 0x38 + 2 * 48 + 22, 1);
+                        Memory::Write32(match + 0x8bc + shift + (nodes / 32 - 1) * 4, 0x80000000u);
+                        c.gpr[3] = 0;
+                        func_800E1200(&c);
+                        CHECK(c.gpr[1] == stack && c.gpr[3] == 1 && closed == 1 && sent == 1);
+                    }
+                }
+                """);
+            var executable = Path.Combine(scratch.FullName, "test");
+            var arguments = TranslatorCppTestHarness.BuildCompileArguments(root, scratch.FullName,
+                new[] { translated }, harness, executable, includeDataSections: false);
+            Run(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX") ?? "clang++", arguments), 60000);
+            Run(new ProcessStartInfo(executable), 10000);
+        }
+        finally { scratch.Delete(recursive: true); }
+    }
+
+    [Theory]
+    [InlineData(33, 64)]
+    [InlineData(128, 128)]
+    [Trait("Requires", "USA game assets and Clang")]
+    public void OriginalHostSynWaitsForEveryBankAndTheJoiningConsole(int capacity, int nodes)
+    {
+        var (root, manifest, image, map) = OpenGame();
+        var translator = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, capacity));
+        var scratch = Directory.CreateTempSubdirectory("mkw-dwc-syn-acks-");
+        try
+        {
+            var translated = Path.Combine(scratch.FullName, "syn.cpp");
+            File.WriteAllText(translated, translator.Translate(0x800d9648, Options(map)).CxxCode);
+            var harness = Path.Combine(scratch.FullName, "harness.cpp");
+            File.WriteAllText(harness, $$"""
+                #include "ppc_runtime.h"
+                #include "abi_bridge.h"
+                #include <cstdio>
+                #include <cstdlib>
+                extern "C" void func_800D9648(CpuContext*);
+                constexpr uint32_t match=0x81010000, packet=0x81020000, stack=0x81f00000, nodes={{nodes}};
+                constexpr uint32_t tail=match+0x38+nodes*48, highAid=nodes==128?64:32;
+                constexpr uint32_t timer=tail+0x284, low=tail+0x118;
+                #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "DWC SYN line %d: %s\n", __LINE__, #x); std::abort(); } } while (false)
+                struct Complete {};
+                void onComplete(CpuContext*) { throw Complete{}; }
+                void noOp(CpuContext*) {}
+                void entry(uint32_t pc, void (*function)(CpuContext*)) {
+                    TranslatedFunctionInfo info{};
+                    info.address=pc; info.name="DWC SYN acknowledgement fixture";
+                    info.entryPoint=reinterpret_cast<void*>(function); info.rawCpuInvoker=function;
+                    TranslatedFunctionRegistry::Register(info);
+                }
+                bool acknowledge(CpuContext& c, uint32_t aid) {
+                    c.gpr[1]=stack; c.gpr[3]=aid; c.gpr[4]=2; c.gpr[5]=packet;
+                    try { func_800D9648(&c); }
+                    catch (const Complete&) { return true; }
+                    CHECK(c.gpr[1]==stack);
+                    return false;
+                }
+                int main() {
+                    Memory::Init(32*1024*1024);
+                    entry(0x80020a3c,noOp); entry(0x80020a88,noOp);
+                    entry(0x800ccfc8,noOp); entry(0x800cde38,onComplete);
+                    Memory::Write32(0x80381f8c,match);
+                    Memory::Write32(tail+0xe4,17);
+                    Memory::Write32(match+0x30,3);
+                    Memory::Write8(match+0x38+48+22,highAid);
+                    Memory::Write8(match+0x38+2*48+22,1);
+                    Memory::Write8(tail+22,nodes-1);
+                    Memory::Write32(timer,0x11223344);
+                    CpuContext c{};
+                    CpuContextScope scope(&c);
+                    c.gpr[13]=0x80388880;
+                    CHECK(!acknowledge(c,highAid));
+                    CHECK(Memory::Read32(low)==0 && Memory::Read32(timer+highAid/32*4)==1);
+                    CHECK(!acknowledge(c,1) && Memory::Read32(low)==2);
+                    CHECK(!acknowledge(c,highAid));
+                    CHECK(acknowledge(c,nodes-1));
+                    CHECK(Memory::Read32(timer)==0x11223344);
+                    CHECK(Memory::Read32(timer+(nodes/32-1)*4)&0x80000000u);
                 }
                 """);
             var executable = Path.Combine(scratch.FullName, "test");

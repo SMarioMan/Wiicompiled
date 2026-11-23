@@ -484,7 +484,8 @@ static void clear_deferred_node(void) {
 static bool retain_next_node(struct dwc_gamedata *game, const uint32_t *packet,
                              unsigned payload, so_addr_t address) {
     if (MKW_LAN_CAPACITY <= 12 || !network_thread_running || broadcast_socket < 0 ||
-        !game || game->dwc_host_state != 1 || game->player_count < 2 || game->player_count > 32 ||
+        !game || game->dwc_host_state != 1 || game->player_count < 2 ||
+        game->player_count > MKW_LAN_MATCH_NODES ||
         game->dwc_match_state != DWC_MATCH_STATE_CL_SYN || (packet[2] >> 24) != 7 ||
         payload != 8 || !game->peers[0].player_id ||
         __builtin_bswap32(packet[4]) != game->peers[0].player_id) return false;

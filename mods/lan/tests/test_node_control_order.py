@@ -32,7 +32,7 @@ class NodeControlOrder(unittest.TestCase):
 typedef struct {uint32_t sa_addr;uint16_t sa_port;} so_addr_t;
 '''+states+r'''
 struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip,dwc_host_state,player_count;
-    struct {uint32_t player_id,peer_index;} peers[32];};
+    struct {uint32_t player_id,peer_index;} peers[MKW_LAN_MATCH_NODES];};
 static struct dwc_gamedata game,other,*current=&game;
 static bool network_thread_running=true;
 static int broadcast_socket=4;
@@ -84,11 +84,14 @@ int main(void){
         if(reason==6)current=NULL;
         network_thread_after_syn(0,3);CHECK(!controls&&!deferred_node.length);
     }
+    reset();game.player_count=MKW_LAN_MATCH_NODES;
+    packet[5]=0x0e00007f;process_status(packet,sizeof(packet),address);CHECK(!controls);
+    MyDWCi_ProcessMatchSynPacket(0,3,packet);CHECK(completed==1&&controls==1&&mesh==0);
     for(unsigned guard=0;guard<5;guard++){
         reset();
         if(guard==0)game.dwc_host_state=2;
         if(guard==1)game.player_count=1;
-        if(guard==2)game.player_count=33;
+        if(guard==2)game.player_count=MKW_LAN_MATCH_NODES+1;
         if(guard==3)game.peers[0].player_id++;
         if(guard==4)game.dwc_match_state=DWC_MATCH_STATE_CL_WAIT_RESV;
         process_status(packet,sizeof(packet),address);CHECK(controls==1);
@@ -100,9 +103,9 @@ int main(void){
 '''
         with tempfile.TemporaryDirectory(prefix='lan-node-order-') as directory:
             path=Path(directory);(path/'test.c').write_text(harness)
-            for capacity in (12,13,24,32):
+            for capacity, nodes in ((12,32),(13,32),(24,32),(32,32),(33,64),(128,128)):
                 result=subprocess.run([os.environ.get('CC','cc'),'-std=c11','-Wall','-Wextra','-Werror',
-                    '-Wno-unused-function',f'-DMKW_LAN_CAPACITY={capacity}',str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
+                    '-Wno-unused-function',f'-DMKW_LAN_CAPACITY={capacity}',f'-DMKW_LAN_MATCH_NODES={nodes}',str(path/'test.c'),'-o',str(path/'test')],capture_output=True,text=True)
                 self.assertEqual(result.returncode,0,result.stderr)
                 result=subprocess.run([str(path/'test')],capture_output=True,text=True,timeout=3)
                 self.assertEqual(result.returncode,0,result.stderr)

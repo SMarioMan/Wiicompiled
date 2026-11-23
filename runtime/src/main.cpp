@@ -1418,7 +1418,11 @@ int RuntimeMain(int argc, char** argv) {
         AuroraConfig auroraConfig = {};
         auroraConfig.appName = RuntimeProduct::Active().displayName.data();
         const auto applicationDataDirectory = RuntimeConfigFile::ApplicationDataDirectory();
-        const auto rendererCacheDirectory = applicationDataDirectory / "Cache";
+        std::filesystem::path rendererCacheDirectory = applicationDataDirectory / "Cache";
+        if (const char* sharedCacheDir = std::getenv("MKW_SHARED_CACHE_DIR");
+            sharedCacheDir != nullptr && sharedCacheDir[0] != '\0') {
+            rendererCacheDirectory = std::filesystem::path(sharedCacheDir);
+        }
         std::error_code rendererPathError;
         std::filesystem::create_directories(rendererCacheDirectory, rendererPathError);
         if (rendererPathError) {
@@ -1430,6 +1434,13 @@ int RuntimeMain(int argc, char** argv) {
         const std::string auroraCachePath = RuntimeConfigFile::PathToUtf8(rendererCacheDirectory);
         auroraConfig.userPath = auroraUserPath.c_str();
         auroraConfig.cachePath = auroraCachePath.c_str();
+        if (g_headless) {
+            // Headless runs use Dawn's Null backend and never render; point
+            // resourcesPath away from initial_pipeline_cache.db so Aurora does
+            // not eagerly prewarm ~1,100 Null pipelines (~1 GiB C++ heap/proc)
+            // while keeping the shared initial_pipeline_cache.db intact for GPU runs.
+            auroraConfig.resourcesPath = auroraCachePath.c_str();
+        }
         auroraConfig.allowCpuAdapter = allowSoftwareGpu;
         auroraConfig.logCallback = &RuntimeAuroraLogCallback;
         auroraConfig.logLevel = LOG_DEBUG;

@@ -568,6 +568,16 @@ int32_t AddWiiSocket(NativeSocket native, int af, int type, int protocol) {
                 setsockopt(native, SOL_SOCKET, SO_BROADCAST,
                            reinterpret_cast<const char*>(&enableBroadcast),
                            sizeof(enableBroadcast));
+                // Expanded LAN rooms (up to 128 peers) can burst >208 KiB of
+                // UDP datagrams per socket during scheduling jitter; request
+                // 2 MiB socket buffers (on-demand kernel limit, 0 idle RAM).
+                const int udpBufBytes = 2 * 1024 * 1024;
+                setsockopt(native, SOL_SOCKET, SO_RCVBUF,
+                           reinterpret_cast<const char*>(&udpBufBytes),
+                           sizeof(udpBufBytes));
+                setsockopt(native, SOL_SOCKET, SO_SNDBUF,
+                           reinterpret_cast<const char*>(&udpBufBytes),
+                           sizeof(udpBufBytes));
             }
             SetNonBlocking(native, true);
             // IOS keeps the host descriptor nonblocking while the guest flag starts cleared.

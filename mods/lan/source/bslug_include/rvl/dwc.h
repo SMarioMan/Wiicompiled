@@ -91,5 +91,8 @@ int dwc_init_gt2_socket(void);
 void dwc_think(int);
 void DWCi_ProcessMatchSynPacket(uint32_t aid, uint32_t type, const uint32_t *packet);
 uint64_t DWCi_GetNextMeshMakeTryTick(void);
+uint32_t DWC_GetDirectConnectedAIDBitmap(void);
+uint32_t DWC_GetAidBitmap(void);
+void *DWCi_GetGT2Connection(uint8_t aid);
 
 #endif /* _RVL_DWC_H_ */

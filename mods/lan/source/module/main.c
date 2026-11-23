@@ -277,6 +277,18 @@ static uint32_t MyServerBrowserGetMyPublicIPAddr(void *sb) {
 	return MKW_ADVERTISED_IP;
 }
 
+static uint32_t MyDWC_GetDirectConnectedAIDBitmap(void) {
+    const uint32_t direct = DWC_GetDirectConnectedAIDBitmap();
+    if (MKW_LAN_CAPACITY <= 12) return direct;
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    if (!game || game->dwc_host_state != 1 || game->player_count < 2)
+        return direct;
+    const uint8_t host_aid = game->peers[0].peer_index;
+    if (host_aid < MKW_LAN_MATCH_NODES && DWCi_GetGT2Connection(host_aid) != NULL)
+        return DWC_GetAidBitmap();
+    return direct;
+}
+
 
 
 BSLUG_MUST_REPLACE(DWC_LoginAsync, MyDWC_LoginAsync);
@@ -289,6 +301,7 @@ BSLUG_MUST_REPLACE(dwc_send_status_record, Mydwc_send_status_record);
 BSLUG_MUST_REPLACE(DWCi_ProcessMatchSynPacket, MyDWCi_ProcessMatchSynPacket);
 BSLUG_MUST_REPLACE(dwc_think, Mydwc_think);
 BSLUG_MUST_REPLACE(ServerBrowserGetMyPublicIPAddr, MyServerBrowserGetMyPublicIPAddr);
+BSLUG_MUST_REPLACE(DWC_GetDirectConnectedAIDBitmap, MyDWC_GetDirectConnectedAIDBitmap);
 
 /* Host-side sockets must bind the same per-instance identity we advertise. */
 static so_ret_t MKWBind(so_fd_t fd, const so_addr_t *address) {

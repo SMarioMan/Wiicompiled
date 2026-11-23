@@ -21,6 +21,12 @@ uint64_t LANMeshNextTick(const uint32_t *peer) {
         game->dwc_match_state != DWC_MATCH_STATE_CL_WAITING ||
         !peer[0] || peer[0] == game->my_pid)
         return DWCi_GetNextMeshMakeTryTick();
+    /* Above 12 players, use Star / Host-Relay topology: clients connect only to
+     * the host (peers[0]) and rely on DWC's native Host-Relay forwarding
+     * (DWCi_SendUnreliable / DWCs_HandleUnreliableMessage) for peer traffic,
+     * collapsing O(N^2) GT2 connections into O(N) (N-1 total). */
+    if (peer[0] != game->peers[0].player_id)
+        return INT64_MAX;
     /* SDK node +0x18 is the attempt counter tested at USA 800D80EC.
      * The existing SDK retains connection checks, retry limits and teardown. */
     const uint32_t delay = lan_mesh_delay_ms(game->my_pid, peer[0], peer[0x18/4]);

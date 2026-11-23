@@ -342,6 +342,20 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
         if (aid < 128)
             conn_words[aid / 32] |= 1u << (aid % 32);
     }
+    /* Under Star / Host-Relay topology, clients maintain a direct GT2 link to
+     * the host (peers[0]) and reach all room peers through DWC's native relay.
+     * The host still reports only its true direct GT2 client connections. */
+    if (gamedata->dwc_host_state == 1 && gamedata->player_count >= 2 &&
+        gamedata->player_count <= MKW_LAN_MATCH_NODES) {
+        const uint8_t host_aid = gamedata->peers[0].peer_index;
+        if (host_aid < 128 && (conn_words[host_aid / 32] & (1u << (host_aid % 32)))) {
+            for (unsigned i = 0; i < gamedata->player_count; i++) {
+                const uint8_t aid = gamedata->peers[i].peer_index;
+                if (aid < 128)
+                    conn_words[aid / 32] |= 1u << (aid % 32);
+            }
+        }
+    }
     const uint32_t network_status[10] = {
         0x4d4b574e, MKW_INSTANCE_ID, gamedata->dwc_host_state,
         gamedata->dwc_match_state, gamedata->player_count,

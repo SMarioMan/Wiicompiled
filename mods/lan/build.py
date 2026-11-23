@@ -197,7 +197,10 @@ def build(args):
                                    'MKWDebugReport': '0x801A2530',
                                    'MKWOriginalRoster': '0x80619D8C', 'MKWCreateRoom': '0x8061A01C',
                                    'MKWRaceInfo': '0x809B8F70', 'MKWRaceData': '0x809B8F68',
-                                   'MKWNetController': '0x809BD918'}, indent=2) + '\n')
+                                   'MKWNetController': '0x809BD918',
+                                   'DWC_GetDirectConnectedAIDBitmap': '0x800D21BC',
+                                   'DWC_GetAidBitmap': '0x800D2414',
+                                   'DWCi_GetGT2Connection': '0x800D2860'}, indent=2) + '\n')
     cli = ROOT / 'translator/src/Translator.Cli/bin/Release/net8.0/Translator.Cli.dll'
     subprocess.run([args.dotnet, str(cli), 'link-brainslug', '--project',
                     str(ROOT / 'projects/mkwii-ntsc-u/recomp.yml'), '--module', str(elf),

@@ -138,6 +138,8 @@ public class RoomPacketStorageTests
                             }
                             Memory::Write32(controller+currentSub,current);Memory::Write32(sub+16,mask);Memory::Write8(sub+33,local);
                             Memory::Write32(0x809bd958,user);Memory::Write32(user+{{layout.Symbol("RKNetUserHandler.aidBitflag.offset")}},mask);
+                            for(uint32_t b=1;b<{{layout.Symbol("RKNetUserHandler.aidBitflag.count")}};b++)
+                                Memory::Write32(user+{{layout.Symbol("RKNetUserHandler.aidBitflag.offset")}}+b*4,0xffffffffu);
                             expected.fill(0x55);expected[0]=1;
                             std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                             for(uint32_t p=0;p<capacity;p++){

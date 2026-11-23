@@ -241,6 +241,7 @@ public sealed partial class GuestLayoutRelocations
         EmitRoomPresenceHelpers(calls, output);
         EmitDwcSynAckHelpers(calls, output);
         EmitDwcSuspendHelpers(calls, output);
+        EmitRknetUserHelpers(calls, output);
         return output.ToString();
     }
 }

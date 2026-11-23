@@ -93,7 +93,11 @@ public class UserHandlerStorageTests
                             if(allocations!=1 || Memory::Read32(0x809bd958)!=root || bufferAllocations!=1)return 4;
                             func_80660694(&ctx);if(allocations!=1 || bufferAllocations!=1)return 5;
                         }else{func_80660D24(&ctx);if(ctx.gpr[3]!=root || bufferAllocations!=2)return 6;}
-                        expected[0]=0;word(aidFlags,0);word(miis,0);word(aidFlags2,0);word(bufferPtr,buffer);
+                        expected[0]=0;
+                        std::memset(expected.data()+aidFlags,0,{{layout.Symbol("RKNetUserHandler.aidBitflag.size")}});
+                        std::memset(expected.data()+miis,0,{{layout.Symbol("RKNetUserHandler.miisReceived.size")}});
+                        std::memset(expected.data()+aidFlags2,0,{{layout.Symbol("RKNetUserHandler.aidBitflag2.size")}});
+                        word(bufferPtr,buffer);
                         if(!equal()){
                             for(uint32_t b=0;b<size;b++)if(expected[b]!=Memory::Read8(root+b))
                                 std::fprintf(stderr,"ctor kind=%u byte=%u expected=%02x got=%02x\n",kind,b,expected[b],Memory::Read8(root+b));return 7;}

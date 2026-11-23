@@ -2443,15 +2443,21 @@
         },
         {
           "Name": "aidBitflag",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         },
         {
           "Name": "miisReceived",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         },
         {
           "Name": "aidBitflag2",
-          "Type": "Pointer"
+          "Type": "Pointer",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
         },
         {
           "Name": "tail",
@@ -85244,6 +85250,33 @@
     }
   ],
   "ByteOperations": [
+    {"Instruction": "0x80660A54", "ExpectedWord": "0x7C002030", "Kind": "legacy-aid-bit", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806606CC", "ExpectedWord": "0x98030000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660884", "ExpectedWord": "0x98030000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660D40", "ExpectedWord": "0x98030000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660840", "ExpectedWord": "0x981D0000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660934", "ExpectedWord": "0x981D0000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806583A0", "ExpectedWord": "0x807ED958", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660B54", "ExpectedWord": "0x38000001", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x806609AC", "ExpectedWord": "0x38000000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660F04", "ExpectedWord": "0x38000000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660A64", "ExpectedWord": "0x7CC63838", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x805C5CA8", "ExpectedWord": "0x7C800039", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80629080", "ExpectedWord": "0x7C800039", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8062AB7C", "ExpectedWord": "0x7E800039", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8062CE4C", "ExpectedWord": "0x7C600039", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8062D3F8", "ExpectedWord": "0x7C800039", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660B84", "ExpectedWord": "0x38000001", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660B8C", "ExpectedWord": "0x7C002030", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660B90", "ExpectedWord": "0x7C630038", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660E74", "ExpectedWord": "0x7C60D839", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660E7C", "ExpectedWord": "0x7C60DB78", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065699C", "ExpectedWord": "0x7C060000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660BE0", "ExpectedWord": "0x2C840000", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660BF0", "ExpectedWord": "0x7C040050", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660C18", "ExpectedWord": "0x7C040050", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660C74", "ExpectedWord": "0x7CA50079", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x80660C84", "ExpectedWord": "0x7C050050", "Kind": "rknet-user", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x805C5C78", "ExpectedWord": "0x7C800039", "Kind": "room-aid-member", "Count": "DWCConnectionTables.aids.size", "Field": "r0", "Source": "r28"},
     {"Instruction": "0x806125C0", "ExpectedWord": "0x7CA42030", "Kind": "room-aid-keep", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x806125CC", "ExpectedWord": "0x7C831839", "Kind": "room-aid-member", "Count": "DWCConnectionTables.aids.size", "Field": "r3", "Source": "r4"},

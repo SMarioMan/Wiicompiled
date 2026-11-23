@@ -94,5 +94,6 @@ uint64_t DWCi_GetNextMeshMakeTryTick(void);
 uint32_t DWC_GetDirectConnectedAIDBitmap(void);
 uint32_t DWC_GetAidBitmap(void);
 void *DWCi_GetGT2Connection(uint8_t aid);
+int DWC_SendUnreliable(uint8_t aid, const void *buf, int size);
 
 #endif /* _RVL_DWC_H_ */

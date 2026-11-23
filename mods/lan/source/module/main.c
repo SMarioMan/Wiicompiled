@@ -269,7 +269,9 @@ static void MyDWCi_ProcessMatchSynPacket(uint32_t aid, uint32_t type, const uint
 
 static void Mydwc_think(int argument) {
     network_thread_poll_sdk();
+    network_thread_poll_data();
     dwc_think(argument);
+    network_thread_poll_data();
     network_thread_poll_sdk();
 }
 
@@ -289,6 +291,14 @@ static uint32_t MyDWC_GetDirectConnectedAIDBitmap(void) {
     return direct;
 }
 
+static int MyDWC_SendUnreliable(uint8_t aid, const void *buf, int size) {
+    if (MKW_LAN_CAPACITY > 12) {
+        const int handled = network_thread_send_unreliable(aid, buf, size);
+        if (handled >= 0) return handled;
+    }
+    return DWC_SendUnreliable(aid, buf, size);
+}
+
 
 
 BSLUG_MUST_REPLACE(DWC_LoginAsync, MyDWC_LoginAsync);
@@ -302,6 +312,7 @@ BSLUG_MUST_REPLACE(DWCi_ProcessMatchSynPacket, MyDWCi_ProcessMatchSynPacket);
 BSLUG_MUST_REPLACE(dwc_think, Mydwc_think);
 BSLUG_MUST_REPLACE(ServerBrowserGetMyPublicIPAddr, MyServerBrowserGetMyPublicIPAddr);
 BSLUG_MUST_REPLACE(DWC_GetDirectConnectedAIDBitmap, MyDWC_GetDirectConnectedAIDBitmap);
+BSLUG_MUST_REPLACE(DWC_SendUnreliable, MyDWC_SendUnreliable);
 
 /* Host-side sockets must bind the same per-instance identity we advertise. */
 static so_ret_t MKWBind(so_fd_t fd, const so_addr_t *address) {

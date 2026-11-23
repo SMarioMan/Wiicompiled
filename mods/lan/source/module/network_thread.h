@@ -22,6 +22,8 @@ struct peer_info {
 
 void* network_thread_main(void *arg);
 void network_thread_poll_sdk(void);
+int network_thread_send_unreliable(uint8_t aid, const void *buf, int size);
+void network_thread_poll_data(void);
 void network_thread_after_syn(uint32_t aid, uint32_t type);
 bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *packet);
 bool network_thread_get_fake_pid_status(uint32_t pid, uint8_t *status);

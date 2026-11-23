@@ -46,6 +46,10 @@ bool network_thread_running;
 static uint64_t timestamp;
 static so_fd_t broadcast_socket = -1;
 static so_fd_t multicast_socket = -1;
+static so_fd_t data_socket = -1;
+#define LAN_DATA_PORT 27910
+#define LAN_DATA_MAGIC 0x4D4B5744u
+#define LAN_DATA_MAX_PAYLOAD 1472
 static uint64_t broadcast_timer;
 static int8_t game_state; // 1 is idling
 static uint16_t communication_port;
@@ -80,9 +84,10 @@ static struct tracked_peer {
 
 static void close_discovery(void) {
     sdk_service_ready = false;
+    if (data_socket >= 0) SOClose(data_socket);
     if (multicast_socket >= 0) SOClose(multicast_socket);
     if (broadcast_socket >= 0) SOClose(broadcast_socket);
-    multicast_socket = broadcast_socket = -1;
+    data_socket = multicast_socket = broadcast_socket = -1;
 }
 
 static bool initialise_multicast(void) {
@@ -153,6 +158,24 @@ static bool initialise(void) {
 	}
 
     if (!initialise_multicast()) return false;
+
+#if MKW_LAN_CAPACITY > 12
+    /* Direct UDP data socket for client-to-client unreliable packets under
+     * Star topology so the host GT2 link is not saturated by O(N^2) relays. */
+    data_socket = SOSocket(PF_INET, SOCK_DGRAM, PROTO_UDP);
+    if (data_socket >= 0) {
+        const so_addr_t daddr = {
+            .sa_len = sizeof(so_addr_t),
+            .sa_family = AF_INET,
+            .sa_port = LAN_DATA_PORT,
+            .sa_addr = MKW_LOCAL_IP
+        };
+        if (SOBind(data_socket, &daddr) < 0 || set_nonblock(data_socket) < 0) {
+            SOClose(data_socket);
+            data_socket = -1;
+        }
+    }
+#endif
 
 	r = dwc_init_gt2_socket();
 	if (r != 0) {
@@ -1036,4 +1059,106 @@ bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *pac
     deferred_syn.present = true;
     LOG_INFO("deferring host SYN in matching state %u", (unsigned)game->dwc_match_state);
     return true;
+}
+
+/* Phase 2 Star data plane: route client-to-client unreliable RKNet packets over
+ * a dedicated non-blocking UDP socket directly to each peer's local_ip, while
+ * keeping Host <-> Client traffic on GT2 (preserving SDK keepalive/timeout). */
+struct lan_data_header {
+    uint32_t magic;
+    uint8_t origin_aid;
+    uint8_t target_aid;
+    uint16_t payload_len;
+};
+
+static void lan_copy_bytes(uint8_t *dst, const uint8_t *src, size_t n) {
+    for (size_t i = 0; i < n; i++) dst[i] = src[i];
+}
+
+int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
+#if MKW_LAN_CAPACITY > 12
+    if (data_socket < 0 || !buf || size <= 0 || size > LAN_DATA_MAX_PAYLOAD)
+        return -1;
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    if (!game || game->dwc_host_state != 1 || game->player_count < 2 ||
+        game->player_count > MKW_LAN_MATCH_NODES)
+        return -1;
+    if (aid == game->peers[0].peer_index)
+        return -1;
+    uint8_t my_aid = 0xFF;
+    uint32_t target_ip = 0;
+    for (unsigned i = 0; i < game->player_count; i++) {
+        if (game->peers[i].player_id == game->my_pid)
+            my_aid = game->peers[i].peer_index;
+        if (game->peers[i].peer_index == aid)
+            target_ip = game->peers[i].local_ip;
+    }
+    if (my_aid >= MKW_LAN_MATCH_NODES || !target_ip ||
+        target_ip == MKW_ADVERTISED_IP || (target_ip >> 28) >= 14)
+        return -1;
+
+    static uint8_t tx_buf[sizeof(struct lan_data_header) + LAN_DATA_MAX_PAYLOAD];
+    struct lan_data_header *hdr = (struct lan_data_header *)tx_buf;
+    hdr->magic = LAN_DATA_MAGIC;
+    hdr->origin_aid = my_aid;
+    hdr->target_aid = aid;
+    hdr->payload_len = (uint16_t)size;
+    lan_copy_bytes(tx_buf + sizeof(*hdr), (const uint8_t *)buf, (size_t)size);
+
+    const so_addr_t dst = {
+        .sa_len = sizeof(so_addr_t),
+        .sa_family = AF_INET,
+        .sa_port = LAN_DATA_PORT,
+        .sa_addr = target_ip
+    };
+    SOSendTo(data_socket, tx_buf, sizeof(*hdr) + (size_t)size, 0, &dst);
+    return 1;
+#else
+    (void)aid; (void)buf; (void)size;
+    return -1;
+#endif
+}
+
+void network_thread_poll_data(void) {
+#if MKW_LAN_CAPACITY > 12
+    if (data_socket < 0) return;
+    struct dwc_gamedata *game = get_dwc_gamedata();
+    if (!game || game->dwc_host_state != 1 || game->player_count < 2 ||
+        game->player_count > MKW_LAN_MATCH_NODES)
+        return;
+    struct dwc_transport *transport = (struct dwc_transport *)(game + 1);
+    typedef void (*user_recv_fn)(uint8_t aid, uint8_t *buf, int len);
+    user_recv_fn recv_cb = (user_recv_fn)transport->user_receive_callback;
+    if (!recv_cb) return;
+
+    uint8_t my_aid = 0xFF;
+    for (unsigned i = 0; i < game->player_count; i++) {
+        if (game->peers[i].player_id == game->my_pid) {
+            my_aid = game->peers[i].peer_index;
+            break;
+        }
+    }
+    if (my_aid >= MKW_LAN_MATCH_NODES) return;
+
+    static uint8_t rx_buf[sizeof(struct lan_data_header) + LAN_DATA_MAX_PAYLOAD];
+    for (unsigned iter = 0; iter < 512; iter++) {
+        so_addr_t src = { .sa_len = sizeof(src) };
+        const so_ret_t n = SORecvFrom(data_socket, rx_buf, sizeof(rx_buf), 0, &src);
+        if (n < (so_ret_t)sizeof(struct lan_data_header)) break;
+        const struct lan_data_header *hdr = (const struct lan_data_header *)rx_buf;
+        if (hdr->magic != LAN_DATA_MAGIC || hdr->target_aid != my_aid ||
+            hdr->origin_aid >= MKW_LAN_MATCH_NODES || hdr->payload_len == 0 ||
+            (so_ret_t)(sizeof(*hdr) + hdr->payload_len) > n)
+            continue;
+        uint8_t *peer_entry = &transport->peers[(unsigned)hdr->origin_aid * 64u];
+        uint8_t *dst_buf = *(uint8_t **)(peer_entry + 4);
+        const uint32_t dst_cap = *(const uint32_t *)(peer_entry + 8);
+        if (dst_buf && hdr->payload_len <= dst_cap) {
+            lan_copy_bytes(dst_buf, rx_buf + sizeof(*hdr), hdr->payload_len);
+            recv_cb(hdr->origin_aid, dst_buf, hdr->payload_len);
+        } else {
+            recv_cb(hdr->origin_aid, rx_buf + sizeof(*hdr), hdr->payload_len);
+        }
+    }
+#endif
 }

@@ -105,7 +105,7 @@ public sealed partial class GuestLayoutRelocations
         ValidateByteOperations();
     }
 
-    public void ValidateImage(ProgramImage image)
+    public void ValidateImage(ProgramImage image, IReadOnlySet<uint>? modPatchedAddresses = null)
     {
         ValidateByteOperationImage(image);
         ValidateCountConversionImage(image);
@@ -126,6 +126,7 @@ public sealed partial class GuestLayoutRelocations
         ValidateBoundedAccesses(image);
         foreach (var (address, sites) in _references)
         {
+            if (modPatchedAddresses?.Contains(address) == true) continue;
             var word = BinaryPrimitives.ReadUInt32BigEndian(image.Memory.AsSpan(image.GetOffset(address, 4), 4));
             if (sites.Any(site => site.ExpectedWord != word))
                 throw new InvalidDataException($"Guest layout instruction mismatch at 0x{address:X8} (got 0x{word:X8}).");

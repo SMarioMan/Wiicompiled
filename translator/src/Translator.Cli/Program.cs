@@ -2544,7 +2544,11 @@ int EmitModCpp(
     var abiProvider = declaredNativeAbi.Value is { } nativeAbi
         ? new CompositeGuestFunctionAbiProvider(nativeAbi, inferredAbi)
         : new CompositeGuestFunctionAbiProvider(inferredAbi);
-    var modTranslator = new FunctionTranslator(modImage, abiProvider, layoutRelocations);
+    var modTranslator = new FunctionTranslator(
+        modImage,
+        abiProvider,
+        layoutRelocations,
+        patchPlan.ExecutablePatches.Select(p => p.CommandAddress & ~3u).ToHashSet());
     var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxThreads };
     // Each wave drains its whole queue: a wave is a barrier that publishes newly discovered
     // entries, and draining everything makes the output independent of any wave size.

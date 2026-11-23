@@ -144,6 +144,7 @@ public sealed class FunctionTranslator
     private readonly ProgramImage _image;
     private readonly IGuestFunctionAbiProvider _guestAbiProvider;
     private readonly GuestLayoutRelocations? _layoutRelocations;
+    private readonly IReadOnlySet<uint>? _modPatchedAddresses;
 
     /// <summary>
     /// Program-wide memo of speculative leaf-inline decodes, keyed by front-end context, so a
@@ -155,12 +156,14 @@ public sealed class FunctionTranslator
     public FunctionTranslator(
         ProgramImage image,
         IGuestFunctionAbiProvider? guestAbiProvider = null,
-        GuestLayoutRelocations? layoutRelocations = null)
+        GuestLayoutRelocations? layoutRelocations = null,
+        IReadOnlySet<uint>? modPatchedAddresses = null)
     {
         _image = image;
         _guestAbiProvider = guestAbiProvider ?? new InferredGuestFunctionAbiProvider(_image);
         _layoutRelocations = layoutRelocations;
-        _layoutRelocations?.ValidateImage(image);
+        _modPatchedAddresses = modPatchedAddresses;
+        _layoutRelocations?.ValidateImage(image, modPatchedAddresses);
     }
 
     /// <summary>
@@ -316,7 +319,9 @@ public sealed class FunctionTranslator
         var liftedByAddress = new Dictionary<uint, IReadOnlyList<IrInstruction>>(lifted.Count);
         foreach (var entry in lifted)
         {
-            liftedByAddress[entry.Origin.Address] = _layoutRelocations?.Apply(entry.Origin, entry.Ir) ?? entry.Ir;
+            liftedByAddress[entry.Origin.Address] = _modPatchedAddresses?.Contains(entry.Origin.Address) == true
+                ? entry.Ir
+                : _layoutRelocations?.Apply(entry.Origin, entry.Ir) ?? entry.Ir;
         }
 
         var decodedAddresses = new HashSet<uint>(instructions.Count);

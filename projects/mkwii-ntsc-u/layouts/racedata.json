@@ -85102,6 +85102,18 @@
   ],
   "ByteOperations": [
     {
+      "Instruction": "0x80656900",
+      "ExpectedWord": "0x7C600039",
+      "Kind": "room-aid-member",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x80656D54",
+      "ExpectedWord": "0x7C600039",
+      "Kind": "room-aid-member",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
       "Instruction": "0x80656C70",
       "ExpectedWord": "0x7C600039",
       "Kind": "room-aid-member",

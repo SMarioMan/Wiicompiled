@@ -64,12 +64,14 @@ public sealed partial class GuestLayoutRelocations
         var ra = $"r{(word >> 16) & 31}";
         if (site.Kind == "room-aid-member")
         {
-            // The checked send and local-player lookup sites form the
-            // preceding single-AID mask from r4 and r8 respectively.
-            var aid = word switch
+            // The original loops retain the unshifted AID in different
+            // registers when the low-word test runs.
+            var aid = (site.Instruction, word) switch
             {
-                0x7c600039 => "r4",
-                0x7ca00039 => "r8",
+                (0x80653a68 or 0x80656c70, 0x7c600039) => "r4",
+                (0x80655a14, 0x7ca00039) => "r8",
+                (0x80656900, 0x7c600039) => "r29",
+                (0x80656d54, 0x7c600039) => "r28",
                 _ => throw Invalid()
             };
             var low = new IrBinary("r0", IrValue.Register(rt), IrValue.Register("r0"), "and");

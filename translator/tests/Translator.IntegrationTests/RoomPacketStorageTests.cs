@@ -15,6 +15,7 @@ public class RoomPacketStorageTests
     [InlineData(32)]
     [InlineData(48)]
     [InlineData(100)]
+    [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void RealRoomLifecycleAndMessagesCoverEveryPeerWithoutOverwritingLocalOrAdjacentState(int players)
     {
@@ -117,13 +118,24 @@ public class RoomPacketStorageTests
                     }
                     // Execute the original per-frame importer through both ping-pong
                     // rows. Invalid lengths, absent peers and our own slot must stay intact.
-                    if(capacity<=32)for(uint32_t current=0;current<2;current++)for(uint32_t local:{0u,capacity-1})
+                    for(uint32_t current=0;current<2;current++)for(uint32_t local:{0u,capacity-1})
                         for(bool sparse:{false,true})for(uint32_t valid=0;valid<2;valid++)for(connected=0;connected<2;connected++)for(bool direct:{false,true}){
                             constexpr uint32_t rows={{layout.Symbol("RKNetController.splitReceived.offset")}},
                                 rowStride={{layout.Symbol("RKNetPointerRow.size")}},indices={{layout.Symbol("RKNetController.receiveIndices.offset")}},
                                 user=0x81080000,pool=0x81100000;
                             auto sub=controller+subs+current*subStride;
-                            uint32_t mask=sparse?((1u<<local)|(1u<<(local?0:capacity-1))):(0xffffffffu>>(32-capacity));
+                            const uint32_t remote=local?0:capacity-1;
+                            auto lowBit=[](uint32_t aid){return aid<32?1u<<aid:0u;};
+                            const uint32_t fullMask=uint32_t((uint64_t{1}<<(capacity<32?capacity:32))-1);
+                            const uint32_t mask=sparse?lowBit(local)|lowBit(remote):fullMask;
+                            if (capacity>32) {
+                                constexpr uint32_t sdk=0x81500000, match=sdk+0x360;
+                                Memory::Write32(0x80381f70,sdk);
+                                Memory::Write32(0x80381f8c,match);
+                                Memory::Write32(match+0x30,sparse?2:capacity);
+                                for(uint32_t i=0;i<(sparse?2:capacity);i++)
+                                    Memory::Write8(match+0x38+i*0x30+0x16,sparse?(i?remote:local):i);
+                            }
                             Memory::Write32(controller+currentSub,current);Memory::Write32(sub+16,mask);Memory::Write8(sub+33,local);
                             Memory::Write32(0x809bd958,user);Memory::Write32(user+{{layout.Symbol("RKNetUserHandler.aidBitflag.offset")}},mask);
                             expected.fill(0x55);expected[0]=1;
@@ -135,7 +147,7 @@ public class RoomPacketStorageTests
                                     Memory::Write32(controller+rows+row*rowStride+p*4,split);Memory::Write32(split+12,holder);
                                     Memory::Write32(holder,payload);Memory::Write32(holder+8,valid?4:3);Memory::Write32(payload,0x33440000+p+row*256);
                                 }
-                                if((connected || direct) && valid && p!=local && (mask&(1u<<p)))word(received+p*4,0x33440000+p+(p%2)*256);
+                                if((connected || direct) && valid && p!=local && (!sparse || p==remote))word(received+p*4,0x33440000+p+(p%2)*256);
                             }
                             exports=0;ctx.gpr[3]=root;if(direct)func_80656D0C(&ctx);else func_80656890(&ctx);
                             if(!equal() || exports!=(direct?0:connected)){

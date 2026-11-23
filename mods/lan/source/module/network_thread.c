@@ -477,6 +477,11 @@ static void ensure_transport_send_split_max(struct dwc_gamedata *gamedata) {
     if (transport->send_split_max && transport->send_split_max < required) {
         transport->send_split_max = required;
     }
+    /* Loading 65-128 karts concurrently can exceed the stock 20s DWC receive
+     * timeout on slower peers; allow 60s when capacity > 32. */
+    if (transport->receive_timeout && transport->receive_timeout < 60000) {
+        transport->receive_timeout = 60000;
+    }
 #else
     (void)gamedata;
 #endif

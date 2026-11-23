@@ -5,6 +5,47 @@
   "Note": "Development manifest: uniform race-data, input/controller and selected AI storage/loading/sorting, checked field consumers, initialization, bookkeeping and scoring, and reset-scoped checkpoint traversal. Items, menus/grids and network layouts still require migration; this is not a playable 24-player profile.",
   "Types": [
     {
+      "Name": "DWCSynPidBlock",
+      "Alignment": 4,
+      "Size": 128
+    },
+    {
+      "Name": "DWCSynFrameHeader",
+      "Alignment": 4,
+      "Size": 8
+    },
+    {
+      "Name": "DWCSynFrameTail",
+      "Alignment": 4,
+      "Size": 24
+    },
+    {
+      "Name": "DWCSynCancelFrame",
+      "Alignment": 16,
+      "Fields": [
+        {
+          "Name": "header",
+          "Type": "DWCSynFrameHeader"
+        },
+        {
+          "Name": "confirmed",
+          "Type": "DWCSynPidBlock",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        },
+        {
+          "Name": "unconfirmed",
+          "Type": "DWCSynPidBlock",
+          "PerPlayer": true,
+          "PlayersPerElement": 32
+        },
+        {
+          "Name": "tail",
+          "Type": "DWCSynFrameTail"
+        }
+      ]
+    },
+    {
       "Name": "DWCConnectionPointerBlock",
       "Alignment": 4,
       "Size": 32
@@ -3646,6 +3687,87 @@
     }
   ],
   "References": [
+    {
+      "Instruction": "0x800E1200",
+      "ExpectedWord": "0x9421FEE0",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCSynCancelFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x800E1200",
+      "ExpectedWord": "0x9421FEE0",
+      "Node": 1,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.size",
+      "Scale": -1
+    },
+    {
+      "Instruction": "0x800E1208",
+      "ExpectedWord": "0x90010124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCSynCancelFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x800E120C",
+      "ExpectedWord": "0x39610120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.size"
+    },
+    {
+      "Instruction": "0x800E121C",
+      "ExpectedWord": "0x39210088",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.unconfirmed.offset"
+    },
+    {
+      "Instruction": "0x800E1304",
+      "ExpectedWord": "0x38610088",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.unconfirmed.offset"
+    },
+    {
+      "Instruction": "0x800E13AC",
+      "ExpectedWord": "0x38E10088",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.unconfirmed.offset"
+    },
+    {
+      "Instruction": "0x800E1428",
+      "ExpectedWord": "0x3BA10088",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.unconfirmed.offset"
+    },
+    {
+      "Instruction": "0x800E14D8",
+      "ExpectedWord": "0x39610120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.size"
+    },
+    {
+      "Instruction": "0x800E14E0",
+      "ExpectedWord": "0x80010124",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "DWCSynCancelFrame.size",
+      "Addend": 4
+    },
+    {
+      "Instruction": "0x800E14E8",
+      "ExpectedWord": "0x38210120",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "DWCSynCancelFrame.size"
+    },
     {"Instruction": "0x800D0EDC", "ExpectedWord": "0x38650360", "Node": 0, "Operand": "right", "Symbol": "DWCControl.match.offset"},
     {"Instruction": "0x800D0EF0", "ExpectedWord": "0x38630C20", "Node": 0, "Operand": "right", "Symbol": "DWCControl.transport.offset"},
     {"Instruction": "0x800D0FAC", "ExpectedWord": "0x80630A3C", "Node": 0, "Operand": "offset", "Symbol": "DWCControl.match.offset+DWCMatch.tail.offset", "Addend": 164},

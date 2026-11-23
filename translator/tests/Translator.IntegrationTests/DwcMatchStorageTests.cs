@@ -159,6 +159,84 @@ public class DwcMatchStorageTests
         finally { scratch.Delete(recursive: true); }
     }
 
+    [Theory]
+    [InlineData(12, 32)]
+    [InlineData(33, 64)]
+    [InlineData(128, 128)]
+    [Trait("Requires", "USA game assets and Clang")]
+    public void OriginalSynCancellationKeepsEveryUnconfirmedPidInsideItsStackFrame(int capacity, int nodes)
+    {
+        var (root, manifest, image, map) = OpenGame();
+        var plan = GuestLayoutRelocations.Read(manifest, capacity);
+        var translator = new FunctionTranslator(image, layoutRelocations: plan);
+        var scratch = Directory.CreateTempSubdirectory("mkw-dwc-syn-cancel-");
+        try
+        {
+            var translated = Path.Combine(scratch.FullName, "cancel.cpp");
+            File.WriteAllText(translated, translator.Translate(0x800e1200, Options(map)).CxxCode);
+            var harness = Path.Combine(scratch.FullName, "harness.cpp");
+            File.WriteAllText(harness, $$"""
+                #include "ppc_runtime.h"
+                #include "abi_bridge.h"
+                #include <cstdio>
+                #include <cstdlib>
+                #include <cstring>
+                extern "C" void func_800E1200(CpuContext*);
+                constexpr uint32_t match = 0x81010000, stack = 0x81f00000, nodes = {{nodes}};
+                constexpr uint32_t frame = 8 + 2 * nodes * 4 + 24, unconfirmed = stack - frame + 8 + nodes * 4;
+                constexpr uint32_t shift = (nodes - 32) * 48;
+                #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "DWC cancel line %d: %s\n", __LINE__, #x); std::abort(); } } while (false)
+                uint32_t closed = 0;
+                void closePeer(CpuContext* c) { CHECK(c->gpr[3] == ++closed); }
+                void save(CpuContext* c) {
+                    CHECK(c->gpr[11] == stack);
+                    for (unsigned i = 27; i < 32; ++i) Memory::Write32(stack - (32 - i) * 4, c->gpr[i]);
+                }
+                void restore(CpuContext* c) {
+                    CHECK(c->gpr[11] == stack);
+                    for (unsigned i = 27; i < 32; ++i) c->gpr[i] = Memory::Read32(stack - (32 - i) * 4);
+                }
+                void entry(uint32_t pc, void (*function)(CpuContext*)) {
+                    TranslatedFunctionInfo info{};
+                    info.address = pc; info.name = "DWC SYN cancellation fixture";
+                    info.entryPoint = reinterpret_cast<void*>(function); info.rawCpuInvoker = function;
+                    TranslatedFunctionRegistry::Register(info);
+                }
+                int main() {
+                    Memory::Init(32 * 1024 * 1024);
+                    entry(0x80020a40, save);
+                    entry(0x80020a8c, restore);
+                    entry(0x800d1f60, closePeer);
+                    Memory::Write32(0x80381f8c, match);
+                    Memory::Write32(match + 0x30, nodes);
+                    for (unsigned i = 0; i < nodes; ++i) {
+                        Memory::Write32(match + 0x38 + i * 48, 0x12340000 + i);
+                        Memory::Write8(match + 0x38 + i * 48 + 22, i);
+                    }
+                    std::memset(Memory::GetPointer(stack - frame - 4, frame + 16), 0xa5, frame + 16);
+                    CpuContext c{};
+                    CpuContextScope scope(&c);
+                    c.gpr[1] = stack; c.gpr[13] = 0x80388880;
+                    for (unsigned i = 27; i < 32; ++i) c.gpr[i] = 0x87654300 + i;
+                    func_800E1200(&c);
+                    CHECK(c.gpr[1] == stack && c.gpr[3] == 1 && closed == nodes - 1);
+                    for (unsigned i = 27; i < 32; ++i) CHECK(c.gpr[i] == 0x87654300 + i);
+                    CHECK(Memory::Read32(stack - frame - 4) == 0xa5a5a5a5 &&
+                          Memory::Read32(stack + 8) == 0xa5a5a5a5 &&
+                          Memory::Read32(unconfirmed - 4) == 0xa5a5a5a5 &&
+                          Memory::Read32(unconfirmed + (nodes - 1) * 4) == 0xa5a5a5a5);
+                    CHECK(Memory::Read8(match + 0x721 + shift) == 0);
+                }
+                """);
+            var executable = Path.Combine(scratch.FullName, "test");
+            var arguments = TranslatorCppTestHarness.BuildCompileArguments(root, scratch.FullName,
+                new[] { translated }, harness, executable, includeDataSections: false);
+            Run(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX") ?? "clang++", arguments), 60000);
+            Run(new ProcessStartInfo(executable), 10000);
+        }
+        finally { scratch.Delete(recursive: true); }
+    }
+
     private static (string Root, string Manifest, ProgramImage Image, FunctionMap Map) OpenGame()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

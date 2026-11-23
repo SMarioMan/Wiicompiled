@@ -9,7 +9,7 @@ namespace Translator.Tests;
 public class RoomPacketExportTests
 {
     [Theory]
-    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(32)]
+    [InlineData(12)] [InlineData(13)] [InlineData(24)] [InlineData(32)] [InlineData(33)] [InlineData(128)]
     [Trait("Requires", "USA game assets and Clang")]
     public void OriginalRoomExporterVisitsEveryConnectedAidIncludingSparseHighestAid(int players)
     {
@@ -59,8 +59,18 @@ public class RoomPacketExportTests
                     for(unsigned current=0;current<2;current++)for(unsigned local:{0u,n-1})for(bool sparse:{false,true}){
                         const uint32_t sub=controller+subs+current*subStride;
                         Memory::Write32(controller+currentSub,current);Memory::Write8(sub+33,local);
-                        const uint32_t remote=local?0:n-1,mask=sparse?((1u<<local)|(1u<<remote)):(0xffffffffu>>(32-n));
-                        Memory::Write32(sub+16,mask);
+                        const uint32_t remote=local?0:n-1;
+                        auto lowBit=[](uint32_t id){return id<32?1u<<id:0u;};
+                        const uint32_t fullMask=uint32_t((uint64_t{1}<<(n<32?n:32))-1);
+                        Memory::Write32(sub+16,sparse?lowBit(local)|lowBit(remote):fullMask);
+                        if (n>32) {
+                            constexpr uint32_t sdk=0x81500000, match=sdk+0x360;
+                            Memory::Write32(0x80381f70,sdk);
+                            Memory::Write32(0x80381f8c,match);
+                            Memory::Write32(match+0x30,sparse?2:n);
+                            for(uint32_t p=0;p<(sparse?2:n);p++)
+                                Memory::Write8(match+0x38+p*0x30+0x16,sparse?(p?remote:local):p);
+                        }
                         for(uint32_t p=0;p<n;p++){
                             Memory::Write32(root+send+p*4,0x01000300+p);Memory::Write32(controller+indices+p*4,p%2);
                             Memory::Write32(controller+rows+(p%2)*rowStride+p*4,pool+p*32);Memory::Write32(pool+p*32+12,dest+p*16);

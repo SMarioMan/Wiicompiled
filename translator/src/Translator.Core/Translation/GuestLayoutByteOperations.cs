@@ -43,13 +43,13 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present") ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member") ||
                      site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
-            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" && _original.Symbol(site.Count) != 32)
+            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" && _original.Symbol(site.Count) != 32)
                 throw new InvalidDataException("A forwarded recipient or legacy AID bit requires a 32-bit stock mask.");
         }
     }
@@ -62,6 +62,16 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
+        if (site.Kind == "room-aid-member")
+        {
+            var low = new IrBinary("r0", IrValue.Register("r3"), IrValue.Register("r0"), "and");
+            var compare = new IrSetCrField(0, IrValue.Register("r0"), IrValue.Imm(0), false);
+            if (word != 0x7c600039 || nodes.Count != 2 || nodes[0] != low || nodes[1] != compare) throw Invalid();
+            return new IrInstruction[] {
+                new IrCall("r0", RoomPresenceHelper(site), new[] {
+                    IrValue.Register("r0"), IrValue.Register("r4"), IrValue.Register("r13") }),
+                compare };
+        }
         if (site.Kind == "room-members-present")
         {
             var mask = IrValue.Register("r3");
@@ -169,10 +179,32 @@ public sealed partial class GuestLayoutRelocations
 
     private void EmitRoomPresenceHelpers(HashSet<string> calls, StringBuilder output)
     {
-        foreach (var site in _byteOperations.Where(site => site.Kind == "room-members-present"))
+        foreach (var site in _byteOperations.Where(site => site.Kind is "room-members-present" or "room-aid-member"))
         {
             var helper = RoomPresenceHelper(site);
             if (!calls.Contains(helper)) continue;
+            if (site.Kind == "room-aid-member")
+            {
+                output.AppendLine($$"""
+                    #ifndef WIICOMPILED_{{helper}}
+                    #define WIICOMPILED_{{helper}}
+                    #include "ppc_runtime.h"
+                    static inline uint32_t {{helper}}(uint32_t mask, uint32_t aid, uint32_t sda) {
+                        if (aid < 32) return mask & (1u << aid);
+                        constexpr uint32_t nodes = {{_expanded.Symbol("DWCMatch.peers.count")}}u;
+                        if (aid >= nodes || !Memory::Read32(sda - 0x6910u)) return 0;
+                        const uint32_t match = Memory::Read32(sda - 0x68f4u);
+                        if (!match) return 0;
+                        const uint32_t count = Memory::Read32(match + 0x30u);
+                        if (count > nodes) return 0;
+                        for (uint32_t i = 0; i < count; ++i)
+                            if (Memory::Read8(match + 0x38u + i * 0x30u + 0x16u) == aid) return 1;
+                        return 0;
+                    }
+                    #endif
+                    """);
+                continue;
+            }
             output.AppendLine($$"""
                 #ifndef WIICOMPILED_{{helper}}
                 #define WIICOMPILED_{{helper}}
@@ -209,7 +241,7 @@ public sealed partial class GuestLayoutRelocations
             site.Field is null ? 0 : _original.Symbol(site.Field));
         var originalLimit = site.Kind switch
         {
-            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" => 32,
+            "recipient-aid" or "recipient-test" or "legacy-aid-bit" or "room-members-present" or "room-aid-member" => 32,
             "rank8" => 127,
             _ => byte.MaxValue
         };

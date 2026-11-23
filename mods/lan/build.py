@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = pathlib.Path(__file__).resolve().parent / 'source'
 
 
-def static_patches():
+def static_patches(capacity=12):
     patches = []
 
     def add(operation, address, value, *, condition=None):
@@ -78,6 +78,13 @@ def static_patches():
     add('BranchLink', 'game:Pages::MainMenu::OnButtonClick+0xD4', 'module:OnMarioKartChannelPressed')
     add('Branch', 'game:Pages::MainMenu::OnButtonClick+0xD8', 'game:Pages::MainMenu::OnButtonClick+0x3D0')
     add('Branch', 'game:Pages::RaceMenu::OnButtonClick+0x13C8', 'game:Pages::RaceMenu::OnButtonClick+0x1AEC')
+    if capacity > 12:
+        # TrySendNextRACEPacket breaks after sending a single peer's packet per
+        # 17ms tick (0x80653B34: beq loc_80653B48). Above 12 players that
+        # stretches round-robin delivery across 1-12+ seconds, staggering RH1
+        # race-start sync and triggering DWC timeouts. NOP the break so each
+        # tick flushes all ready peer packets once.
+        write('game:RKNet::Controller::TrySendNextRACEPacket+0x18C', 0x60000000)
     return patches
 
 
@@ -182,7 +189,7 @@ def build(args):
     subprocess.run([str(linker), '-m', 'elf32ppc', '-r', *map(str, objects),
                     '-T', str(script), '-o', str(elf)], check=True)
     patches = output / 'static-patches.json'
-    patches.write_text(json.dumps(static_patches(), indent=2) + '\n')
+    patches.write_text(json.dumps(static_patches(layout['capacity']), indent=2) + '\n')
     imports = output / 'imports.json'
     imports.write_text(json.dumps({'MKWOriginalControllerSet': '0x8051D0E0',
                                    'LoginResultHandler': '0x8066B6B0',  # Unnamed guest function containing the login error branch.

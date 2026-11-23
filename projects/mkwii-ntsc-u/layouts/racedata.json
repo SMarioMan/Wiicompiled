@@ -2203,6 +2203,11 @@
       ]
     },
     {
+      "Name": "RKNetRH1HighBank",
+      "Size": 12,
+      "Alignment": 4
+    },
+    {
       "Name": "RKNetRH1Handler",
       "Alignment": 8,
       "Fields": [
@@ -2216,6 +2221,13 @@
           "PerPlayer": true,
           "Count": 2,
           "PlayersPerElement": 2
+        },
+        {
+          "Name": "highFlags",
+          "Type": "RKNetRH1HighBank",
+          "PerPlayer": true,
+          "PlayersPerElement": 32,
+          "HighBanksOnly": true
         }
       ]
     },
@@ -85252,6 +85264,20 @@
     }
   ],
   "ByteOperations": [
+    {"Instruction": "0x8065B7BC", "ExpectedWord": "0x7C002030", "Kind": "legacy-aid-bit", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B188", "ExpectedWord": "0x9BE30000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B350", "ExpectedWord": "0x9BE30000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065C2F4", "ExpectedWord": "0x9BE30000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B7D4", "ExpectedWord": "0x7CE44038", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065C8E4", "ExpectedWord": "0x7C630378", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065C904", "ExpectedWord": "0x7C630378", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065C930", "ExpectedWord": "0x7C600378", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B56C", "ExpectedWord": "0x2C050000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B890", "ExpectedWord": "0x2C050000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065CA14", "ExpectedWord": "0x2C050000", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B59C", "ExpectedWord": "0x7C030050", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065B8C0", "ExpectedWord": "0x7C030050", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
+    {"Instruction": "0x8065CA44", "ExpectedWord": "0x7C030050", "Kind": "rknet-rh1", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x8065990C", "ExpectedWord": "0x7C002839", "Kind": "room-aid-member", "Count": "DWCConnectionTables.aids.size", "Field": "r5", "Source": "r4"},
     {"Instruction": "0x80657F8C", "ExpectedWord": "0x3C80809C", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},
     {"Instruction": "0x80658838", "ExpectedWord": "0x3C80809C", "Kind": "rknet-select", "Count": "DWCConnectionTables.aids.size"},

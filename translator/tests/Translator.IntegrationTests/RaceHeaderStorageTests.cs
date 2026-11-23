@@ -93,6 +93,7 @@ public class RaceHeaderStorageTests
                     for(uint32_t selected : {0u,capacity-1,capacity}){
                         expected.fill(0x55);
                         for(uint32_t p=0;p<recordCount;p++)reset_record(p);
+                        std::memset(expected.data()+{{layout.Symbol("RKNetRH1Handler.highFlags.offset")}},0,{{layout.Symbol("RKNetRH1Handler.highFlags.size")}});
                         std::memcpy(Memory::GetPointer(root,size),expected.data(),size);
                         auto populate=[&](uint32_t p){auto base=root+records+p*stride;
                             Memory::Write32(base,1);Memory::Write32(base+20,8);
@@ -133,6 +134,7 @@ public class RaceHeaderStorageTests
                         }else{ctx.gpr[3]=root;if(kind==1)func_8065B330(&ctx);else{func_8065C2D4(&ctx);expected[1]=0;} }
                         expected[0]=0;word(4,0);word(8,0);word(12,0);expected[16]=255;word(24,0);word(28,0);
                         for(uint32_t p=0;p<recordCount;p++)reset_record(p);
+                        std::memset(expected.data()+{{layout.Symbol("RKNetRH1Handler.highFlags.offset")}},0,{{layout.Symbol("RKNetRH1Handler.highFlags.size")}});
                         if(!equal()){
                             for(uint32_t at=0;at<size;at++)if(expected[at]!=Memory::Read8(root+at))std::fprintf(stderr,"kind %u offset %u actual %u expected %u\n",kind,at,Memory::Read8(root+at),expected[at]);return 6;}
                         if(clears!=1)return 7;

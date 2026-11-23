@@ -96,7 +96,7 @@ struct dwc_gamedata {
 	uint32_t players_at_console_little_endian; /* +0x8a8 */
 	uint8_t _unk8ac[0x8c0 - 0x8ac];
 #if MKW_LAN_MATCH_NODES > 32
-	uint32_t syn_ack_high[MKW_LAN_MATCH_NODES / 32 - 1];
+	uint32_t high_masks[(MKW_LAN_MATCH_NODES / 32 - 1) * 2];
 #endif
 };
 
@@ -105,7 +105,7 @@ _Static_assert(__builtin_offsetof(struct dwc_gamedata, peers) == 0x38, "SDK matc
 _Static_assert(__builtin_offsetof(struct dwc_gamedata, public_port) == 0x6d0 + MKW_DWC_MATCH_TAIL_SHIFT, "SDK public port");
 _Static_assert(__builtin_offsetof(struct dwc_gamedata, reservation_timeout_ms) == 0x740 + MKW_DWC_MATCH_TAIL_SHIFT, "SDK reservation timeout");
 _Static_assert(sizeof(struct dwc_gamedata) == 0x8c0 + MKW_DWC_MATCH_TAIL_SHIFT +
-               (((MKW_LAN_MATCH_NODES / 32 - 1) * 4 + 7) & ~7), "SDK matchmaking block");
+               (MKW_LAN_MATCH_NODES / 32 - 1) * 8, "SDK matchmaking block");
 
 /* Prefix of the friends-match allocation. Transport follows gamedata. */
 struct dwc_gamedata2 {

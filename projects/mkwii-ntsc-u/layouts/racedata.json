@@ -105,12 +105,12 @@
     {
       "Name": "DWCMatchTailPrefix",
       "Alignment": 4,
-      "Size": 644
+      "Size": 640
     },
     {
       "Name": "DWCSynWord",
       "Alignment": 4,
-      "Size": 4
+      "Size": 8
     },
     {
       "Name": "DWCMatchTail",
@@ -85244,6 +85244,96 @@
     }
   ],
   "ByteOperations": [
+    {
+      "Instruction": "0x800D389C",
+      "ExpectedWord": "0x7C800078",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800DB344",
+      "ExpectedWord": "0x93E3001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D7BE0",
+      "ExpectedWord": "0x907C001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D7BEC",
+      "ExpectedWord": "0x901C001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D49CC",
+      "ExpectedWord": "0x7FC01A79",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D49E0",
+      "ExpectedWord": "0x7FC01839",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E6F44",
+      "ExpectedWord": "0x80E6001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E6F54",
+      "ExpectedWord": "0x7CE00378",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E6F68",
+      "ExpectedWord": "0x7CE00078",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E6F74",
+      "ExpectedWord": "0x8104001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E7188",
+      "ExpectedWord": "0x39000004",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E7194",
+      "ExpectedWord": "0x90010024",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E7264",
+      "ExpectedWord": "0x90010024",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800E72A0",
+      "ExpectedWord": "0x39000004",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800DE584",
+      "ExpectedWord": "0x9283001C",
+      "Kind": "dwc-suspend",
+      "Count": "DWCConnectionTables.aids.size"
+    },
     {
       "Instruction": "0x800DF4C8",
       "ExpectedWord": "0x80AD970C",

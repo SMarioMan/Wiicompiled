@@ -243,7 +243,7 @@ public class DwcMatchStorageTests
                         Memory::Write32(match + 0x71c + shift, 17);
                         Memory::Write8(match + 0x38 + 48 + 22, nodes - 1);
                         Memory::Write8(match + 0x38 + 2 * 48 + 22, 1);
-                        Memory::Write32(match + 0x8bc + shift + (nodes / 32 - 1) * 4, 0x80000000u);
+                        Memory::Write32(match + 0x8b8 + shift + (nodes / 32 - 1) * 8, 0x80000000u);
                         c.gpr[3] = 0;
                         func_800E1200(&c);
                         CHECK(c.gpr[1] == stack && c.gpr[3] == 1 && closed == 1 && sent == 1);
@@ -283,7 +283,7 @@ public class DwcMatchStorageTests
                 extern "C" void func_800E1C0C(CpuContext*);
                 constexpr uint32_t match=0x81010000, packet=0x81020000, stack=0x81f00000, nodes={{nodes}};
                 constexpr uint32_t tail=match+0x38+nodes*48, highAid=nodes==128?64:32;
-                constexpr uint32_t timer=tail+0x284, low=tail+0x118;
+                constexpr uint32_t bankBase=tail+0x280, timer=tail+0x284, low=tail+0x118;
                 #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "DWC SYN line %d: %s\n", __LINE__, #x); std::abort(); } } while (false)
                 struct Complete {};
                 void onComplete(CpuContext*) { throw Complete{}; }
@@ -330,22 +330,144 @@ public class DwcMatchStorageTests
                     CpuContextScope scope(&c);
                     c.gpr[13]=0x80388880;
                     CHECK(!acknowledge(c,highAid));
-                    CHECK(Memory::Read32(low)==0 && Memory::Read32(timer+highAid/32*4)==1);
+                    CHECK(Memory::Read32(low)==0 && Memory::Read32(bankBase+highAid/32*8)==1);
                     CHECK(!acknowledge(c,1) && Memory::Read32(low)==2);
                     CHECK(!acknowledge(c,highAid));
                     CHECK(acknowledge(c,nodes-1));
                     CHECK(Memory::Read32(timer)==0x11223344);
-                    CHECK(Memory::Read32(timer+(nodes/32-1)*4)&0x80000000u);
+                    CHECK(Memory::Read32(bankBase+(nodes/32-1)*8)&0x80000000u);
                     // The cancellation phase has its own low word and waits
                     // only for the established peers, excluding the joiner.
-                    for (unsigned bank=1; bank<nodes/32; ++bank) Memory::Write32(timer+bank*4,0);
+                    for (unsigned bank=1; bank<nodes/32; ++bank) Memory::Write32(bankBase+bank*8,0);
                     Memory::Write32(tail+0xe4,15);
                     Memory::Write32(match+0x38+48,0x12001);
                     Memory::Write32(match+0x38+2*48,0x12002);
                     CHECK(!acknowledgeCancel(c,0x12001));
-                    CHECK(Memory::Read32(low+4)==0 && Memory::Read32(timer+highAid/32*4)==1);
+                    CHECK(Memory::Read32(low+4)==0 && Memory::Read32(bankBase+highAid/32*8)==1);
                     CHECK(acknowledgeCancel(c,0x12002));
                     CHECK(Memory::Read32(low+4)==2 && Memory::Read32(timer)==0x11223344);
+                }
+                """);
+            var executable = Path.Combine(scratch.FullName, "test");
+            var arguments = TranslatorCppTestHarness.BuildCompileArguments(root, scratch.FullName,
+                new[] { translated }, harness, executable, includeDataSections: false);
+            Run(new ProcessStartInfo(Environment.GetEnvironmentVariable("MKW_TEST_CXX") ?? "clang++", arguments), 60000);
+            Run(new ProcessStartInfo(executable), 10000);
+        }
+        finally { scratch.Delete(recursive: true); }
+    }
+
+    [Theory]
+    [InlineData(33, 64)]
+    [InlineData(128, 128)]
+    [Trait("Requires", "USA game assets and Clang")]
+    public void OriginalSuspendVotesTrackHighAidsAndWireFormat(int capacity, int nodes)
+    {
+        var (root, manifest, image, map) = OpenGame();
+        var translator = new FunctionTranslator(image, layoutRelocations: GuestLayoutRelocations.Read(manifest, capacity));
+        var scratch = Directory.CreateTempSubdirectory("mkw-dwc-suspend-");
+        try
+        {
+            uint[] entries = [0x800d4914, 0x800e6f00, 0x800dc194];
+            var translated = Path.Combine(scratch.FullName, "suspend.cpp");
+            File.WriteAllText(translated, string.Join("\n", entries.Select(pc => translator.Translate(pc, Options(map)).CxxCode)));
+            var harness = Path.Combine(scratch.FullName, "harness.cpp");
+            File.WriteAllText(harness, $$"""
+                #include "ppc_runtime.h"
+                #include "abi_bridge.h"
+                #include <cstdio>
+                #include <cstdlib>
+                #include <cstring>
+                extern "C" void func_800D4914(CpuContext*);
+                extern "C" void func_800E6F00(CpuContext*);
+                extern "C" void func_800DC194(CpuContext*);
+                constexpr uint32_t control=0x81010000, match=control+0x360, stack=0x81f00000, nodes={{nodes}};
+                constexpr uint32_t banks=nodes/32, tail=match+0x38+nodes*48, bankBase=tail+0x280;
+                constexpr uint32_t highAid=nodes-1, midAid=32, rxBuf=0x81020000;
+                #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "DWC suspend line %d: %s\n", __LINE__, #x); std::abort(); } } while (false)
+                static inline uint32_t bswap32(uint32_t v) { return __builtin_bswap32(v); }
+                uint32_t sentCmds=0, lastLen=0, lastWords[8]{}, statusUpdates=0;
+                void noOp(CpuContext*) {}
+                void zeroRet(CpuContext* c) { c->gpr[3]=0; }
+                void oneRet(CpuContext* c) { c->gpr[3]=1; }
+                void setGpStatus(CpuContext*) { ++statusUpdates; }
+                void aidBitmap(CpuContext* c) { c->gpr[3]=1u; }
+                void myAidFn(CpuContext* c) { c->gpr[3]=0u; }
+                void isServer(CpuContext* c) { c->gpr[3]=Memory::Read8(match+0x16u)==2u?1u:0u; }
+                void sendCmd(CpuContext* c) {
+                    CHECK(c->gpr[3]==0x82u);
+                    lastLen=c->gpr[8];
+                    CHECK(lastLen<=8u);
+                    for (uint32_t i=0;i<lastLen;++i) lastWords[i]=Memory::Read32(c->gpr[7]+i*4u);
+                    ++sentCmds;
+                    c->gpr[3]=0;
+                }
+                void save26(CpuContext* c) { for (unsigned r=26;r<32;++r) Memory::Write32(c->gpr[11]-(32-r)*4,c->gpr[r]); }
+                void rest26(CpuContext* c) { for (unsigned r=26;r<32;++r) c->gpr[r]=Memory::Read32(c->gpr[11]-(32-r)*4); }
+                void save20(CpuContext* c) { for (unsigned r=20;r<32;++r) Memory::Write32(c->gpr[11]-(32-r)*4,c->gpr[r]); }
+                void rest20(CpuContext* c) { for (unsigned r=20;r<32;++r) c->gpr[r]=Memory::Read32(c->gpr[11]-(32-r)*4); }
+                void entry(uint32_t pc, void (*fn)(CpuContext*)) {
+                    TranslatedFunctionInfo info{};
+                    info.address=pc; info.name="DWC suspend fixture";
+                    info.entryPoint=reinterpret_cast<void*>(fn); info.rawCpuInvoker=fn;
+                    TranslatedFunctionRegistry::Register(info);
+                }
+                int main() {
+                    Memory::Init(32*1024*1024);
+                    entry(0x80020a3c,save26); entry(0x80020a88,rest26);
+                    entry(0x80020a24,save20); entry(0x80020a70,rest20);
+                    entry(0x800ccfc8,noOp); entry(0x80010dd8,zeroRet);
+                    entry(0x800cdbf8,noOp); entry(0x800cdc50,noOp);
+                    entry(0x800cebd4,setGpStatus); entry(0x800d2414,aidBitmap);
+                    entry(0x800d20d0,myAidFn); entry(0x800d26c0,isServer);
+                    entry(0x800dbc98,sendCmd); entry(0x800e28f0,zeroRet);
+                    entry(0x800e270c,zeroRet); entry(0x8010f1a0,noOp);
+                    entry(0x800d262c,oneRet); entry(0x800d4914,func_800D4914);
+                    Memory::Write32(0x80381f70,control);
+                    Memory::Write32(0x80381f8c,match);
+                    Memory::Write32(control+0x64,0x1000u);
+                    Memory::Write8(match+0x0d,1);
+                    Memory::Write8(match+0x16,2);
+                    Memory::Write32(tail+0xe4,0x0cu);
+                    Memory::Write32(match+0x30,3u);
+                    // Peers: AID 0 (host), AID 32, AID nodes-1
+                    Memory::Write32(match+0x38+0*48,0x1000u); Memory::Write8(match+0x38+0*48+0x16,0);
+                    Memory::Write32(match+0x38+1*48,0x1001u); Memory::Write8(match+0x38+1*48+0x16,midAid);
+                    Memory::Write32(match+0x38+2*48,0x1002u); Memory::Write8(match+0x38+2*48+0x16,highAid);
+                    Memory::Write32(tail+0x140,0x1000u);
+                    CpuContext c{}; CpuContextScope scope(&c);
+                    c.gpr[13]=0x80388880;
+                    // Vote from AID 0 -> mixed, suspend stays 0
+                    c.gpr[1]=stack; c.gpr[3]=0; c.gpr[4]=1; c.gpr[5]=0; func_800E6F00(&c);
+                    CHECK(Memory::Read32(match+0x1c)==1u && statusUpdates==1);
+                    c.gpr[1]=stack; func_800D4914(&c); CHECK(c.gpr[3]==0);
+                    // Vote from AID 32 -> high bank 1 bit 0 set, bank 0 unchanged, still mixed
+                    c.gpr[1]=stack; c.gpr[3]=midAid; c.gpr[4]=1; c.gpr[5]=0; func_800E6F00(&c);
+                    CHECK(Memory::Read32(match+0x1c)==1u && Memory::Read32(bankBase+1*8+4)==1u && statusUpdates==2);
+                    c.gpr[1]=stack; func_800D4914(&c); CHECK(c.gpr[3]==0);
+                    // Vote from AID nodes-1 -> all voted, suspend becomes 1, broadcast carries all banks!
+                    sentCmds=0;
+                    c.gpr[1]=stack; c.gpr[3]=highAid; c.gpr[4]=1; c.gpr[5]=0; func_800E6F00(&c);
+                    CHECK(Memory::Read32(bankBase+(banks-1)*8+4)&(1u<<(highAid%32)));
+                    CHECK(statusUpdates==3 && sentCmds==2 && lastLen==3+banks);
+                    CHECK(bswap32(lastWords[3])==1u);
+                    CHECK((bswap32(lastWords[4])&1u)==1u);
+                    CHECK(bswap32(lastWords[3+banks-1])&(1u<<(highAid%32)));
+                    c.gpr[1]=stack; func_800D4914(&c); CHECK(c.gpr[3]==1);
+                    // Client receives expanded command 0x82 -> commits all high banks and settles suspend=1
+                    Memory::Write8(match+0x16,1);
+                    Memory::Write32(match+0x1c,0); Memory::Write32(match+0x28,0);
+                    for (uint32_t b=1;b<banks;++b) Memory::Write32(bankBase+b*8+4,0);
+                    for (uint32_t i=0;i<lastLen;++i) Memory::Write32(rxBuf+i*4,lastWords[i]);
+                    c.gpr[1]=stack; c.gpr[3]=0x82; c.gpr[4]=0x1000; c.gpr[5]=0x7f000001; c.gpr[6]=1234; c.gpr[7]=rxBuf; c.gpr[8]=lastLen;
+                    func_800DC194(&c);
+                    CHECK(Memory::Read32(match+0x1c)==1u && (Memory::Read32(bankBase+1*8+4)&1u)==1u);
+                    CHECK(Memory::Read32(bankBase+(banks-1)*8+4)&(1u<<(highAid%32)));
+                    CHECK(Memory::Read32(match+0x28)==1u);
+                    // Truncated 4-word command 0x82 zeroes high banks safely
+                    c.gpr[1]=stack; c.gpr[3]=0x82; c.gpr[4]=0x1000; c.gpr[5]=0x7f000001; c.gpr[6]=1234; c.gpr[7]=rxBuf; c.gpr[8]=4;
+                    func_800DC194(&c);
+                    for (uint32_t b=1;b<banks;++b) CHECK(Memory::Read32(bankBase+b*8+4)==0u);
                 }
                 """);
             var executable = Path.Combine(scratch.FullName, "test");

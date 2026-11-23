@@ -63,7 +63,7 @@ public sealed partial class GuestLayoutRelocations
                 // The indexed area
                 // starts at the last stock timer, so only banks 1+ use it.
                 static inline uint32_t dwc_syn_ack_bank(uint32_t match, uint32_t bank) {
-                    return match + (bank ? {{highWords}}u + bank * 4u : dwc_syn_tail + 0x118u);
+                    return match + (bank ? {{highWords}}u + bank * 8u : dwc_syn_tail + 0x118u);
                 }
                 static inline uint32_t layout_dwc_syn_clear(uint32_t match) {
                     for (uint32_t bank = 1; bank < dwc_syn_nodes / 32; ++bank)

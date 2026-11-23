@@ -240,6 +240,7 @@ public sealed partial class GuestLayoutRelocations
         EmitCountConversionHelpers(calls,output);
         EmitRoomPresenceHelpers(calls, output);
         EmitDwcSynAckHelpers(calls, output);
+        EmitDwcSuspendHelpers(calls, output);
         return output.ToString();
     }
 }

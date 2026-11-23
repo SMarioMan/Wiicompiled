@@ -268,7 +268,7 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
             (unsigned)gamedata->dwc_suspend, (unsigned)gamedata->dwc_match_state);
         MKWDebugReport("LAN controller sub=%u active=%x local_aid=%u\n",(unsigned)current,
             (unsigned)active,sub ? (unsigned)sub[33] : 255);
-        if(previous_count!=gamedata->player_count && gamedata->player_count<=32)
+        if(previous_count!=gamedata->player_count && gamedata->player_count<=MKW_LAN_MATCH_NODES)
             for(unsigned i=0;i<gamedata->player_count;i++)
                 MKWDebugReport("LAN SDK node %u pid=%x aid=%u\n",i,
                     (unsigned)gamedata->peers[i].player_id,(unsigned)gamedata->peers[i].peer_index);
@@ -330,11 +330,31 @@ static bool compute_and_broadcast_status(so_fd_t fd) {
     SOSendTo(fd, status, sizeof(status), 0, &monitor);
     /* Visible room membership can precede the SDK's remaining mesh joins.
      * Export readiness separately so test clients do not suspend those joins. */
+#if MKW_LAN_CAPACITY > 32
+    uint32_t conn_words[4] = { sub ? *(const uint32_t *)(sub+20) : 0, 0, 0, 0 };
+    if (sub && sub[33] < 128)
+        conn_words[sub[33] / 32] |= 1u << (sub[33] % 32);
+    const uint32_t *conn_ptrs = (const uint32_t *)0x90000800u;
+    const uint8_t *conn_meta = (const uint8_t *)(0x90000800u + MKW_LAN_MATCH_NODES * 4u);
+    for (unsigned i = 0; i < MKW_LAN_MATCH_NODES; i++) {
+        if (!conn_ptrs[i]) continue;
+        const uint8_t aid = conn_meta[i * 8u + 1u];
+        if (aid < 128)
+            conn_words[aid / 32] |= 1u << (aid % 32);
+    }
+    const uint32_t network_status[10] = {
+        0x4d4b574e, MKW_INSTANCE_ID, gamedata->dwc_host_state,
+        gamedata->dwc_match_state, gamedata->player_count,
+        conn_words[0], gamedata->dwc_suspend,
+        conn_words[1], conn_words[2], conn_words[3]
+    };
+#else
     const uint32_t network_status[7] = {
         0x4d4b574e, MKW_INSTANCE_ID, gamedata->dwc_host_state,
         gamedata->dwc_match_state, gamedata->player_count,
         sub ? *(const uint32_t *)(sub+20) : 0, gamedata->dwc_suspend
     };
+#endif
     SOSendTo(fd, network_status, sizeof(network_status), 0, &monitor);
     if (status[4] >= 0x70 && status[4] <= 0x77 && MKWRaceInfo && MKWRaceData) {
         const uint32_t race_status[7] = {
@@ -453,7 +473,6 @@ static void update_reservation_budget(struct dwc_gamedata *gamedata) {
             participants++;
     if (participants < gamedata->player_count) participants = gamedata->player_count;
     if (participants > MKW_LAN_CAPACITY) participants = MKW_LAN_CAPACITY;
-    if (participants > 32) participants = 32;
     unsigned budget = 6000;
     if (MKW_LAN_CAPACITY > 12) budget += (participants - 1) * 2000;
     /* Stay below the existing 65-second friend-room join watchdog. */

@@ -32,8 +32,8 @@ dotnet build translator/src/Translator.Cli/Translator.Cli.csproj -c Release
 layout_args=()
 module_layout_args=()
 layout_players=${WIICOMPILED_LAYOUT_PLAYERS:-12}
-[[ "$layout_players" =~ ^(1[2-9]|2[0-9]|3[0-2])$ ]] || {
-    echo 'WIICOMPILED_LAYOUT_PLAYERS must be an integer from 12 to 32.' >&2; exit 2;
+[[ "$layout_players" =~ ^[0-9]+$ ]] && (( layout_players >= 12 && layout_players <= 128 )) || {
+    echo 'WIICOMPILED_LAYOUT_PLAYERS must be an integer from 12 to 128.' >&2; exit 2;
 }
 if (( layout_players != 12 )); then
     [[ ${WIICOMPILED_EXPERIMENTAL_LAYOUTS:-0} == 1 ]] || {

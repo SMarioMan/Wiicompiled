@@ -23,9 +23,16 @@ def write_pad(path, buttons=0, x=0, y=0):
 
 
 def decode_observation(packet, peer, ids):
-    if len(packet) != 28:
+    if len(packet) == 28:
+        words = struct.unpack('>7I', packet)
+    elif len(packet) == 40:
+        ext = struct.unpack('>10I', packet)
+        if ext[0] != 0x4d4b574e:
+            return None
+        connected = ext[5] | (ext[7] << 32) | (ext[8] << 64) | (ext[9] << 96)
+        words = (*ext[:5], connected, ext[6])
+    else:
         return None
-    words = struct.unpack('>7I', packet)
     magic, instance = words[:2]
     if magic not in (0x4d4b574c, 0x4d4b5752, 0x4d4b574e) or instance not in ids:
         return None

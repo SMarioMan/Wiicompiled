@@ -56,6 +56,17 @@ class SdkReadiness(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             decode_observation(packet, ('127.0.0.2', 27900), self.ids)
 
+    def test_expanded_network_telemetry_decodes_128_bit_connected_mask(self):
+        packet = struct.pack('>10I', 0x4d4b574e, 23, 1, 1, 3, 1, 0, 1, 0, 1 << 31)
+        obs = decode_observation(packet, ('127.0.0.23', 27900), self.ids)
+        self.assertIsNotNone(obs)
+        self.assertEqual(obs[5], (1 << 0) | (1 << 32) | (1 << 127))
+        for record, _ in self.network.values():
+            record['connected'] = obs[5]
+        self.assertTrue(self.ready())
+        wrong_magic = struct.pack('>10I', 0x4d4b574c, 23, 1, 1, 3, 1, 0, 1, 0, 0)
+        self.assertIsNone(decode_observation(wrong_magic, ('127.0.0.23', 27900), self.ids))
+
 
 if __name__ == '__main__':
     unittest.main()

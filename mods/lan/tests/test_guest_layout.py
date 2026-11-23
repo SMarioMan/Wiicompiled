@@ -82,7 +82,16 @@ class GuestLayoutTests(unittest.TestCase):
         self.assertEqual(self.resolve(context)[0]['capacity'], 24)
 
     def test_context_versions_capacity_and_offsets_fail_before_compilation(self):
-        for capacity in [0, 33, 100, True, '24']:
+        for capacity in [33, 64, 128]:
+            with self.subTest(valid_capacity=capacity):
+                context = self.context(capacity)
+                nodes = ((capacity + 31) // 32) * 32
+                context['Layout']['Types']['DWCMatch'] = {
+                    'Fields': {'peers': {'Count': nodes, 'Offset': 0x38, 'Stride': 0x30},
+                               'tail': {'Offset': 0x38 + 0x30 * nodes}}}
+                values, _ = self.resolve(context, True)
+                self.assertEqual((values['capacity'], values['match_nodes']), (capacity, nodes))
+        for capacity in [0, 129, 256, True, '24']:
             with self.subTest(capacity=capacity), self.assertRaises(ValueError):
                 self.resolve(self.context(capacity) if type(capacity) is int else
                              {**self.context(), 'Layout': {**self.context()['Layout'], 'Players': capacity}}, True)

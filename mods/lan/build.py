@@ -98,8 +98,8 @@ def guest_layout(context_path=None, allow_experimental=False):
     if (context.get('Experimental') or not layout.get('Complete')) and not allow_experimental:
         raise ValueError('Incomplete guest layouts require --experimental-guest-layouts')
     capacity = layout.get('Players')
-    if type(capacity) is not int or not 1 <= capacity <= 32:
-        raise ValueError('The current LAN protocol requires 1 to 32 capacity slots')
+    if type(capacity) is not int or not 1 <= capacity <= 128:
+        raise ValueError('The current LAN protocol requires 1 to 128 capacity slots')
     types = layout['Types']
     def offset(owner, field):
         value = types[owner]['Fields'][field]['Offset']

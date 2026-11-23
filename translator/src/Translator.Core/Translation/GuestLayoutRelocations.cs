@@ -299,8 +299,8 @@ public sealed partial class GuestLayoutRelocations
         var file = JsonSerializer.Deserialize<LayoutFile>(json)
             ?? throw new InvalidDataException("Empty guest layout file.");
         if (file.Version is < 1 or > CurrentFormatVersion) throw new InvalidDataException("Unsupported guest layout format.");
-        if (file.Version < 35 && file.ByteOperations?.Any(site => site.Kind is "recipient-aid" or "recipient-test") == true)
-            throw new InvalidDataException("Direct forwarding recipients require layout format version 35.");
+        if (file.Version < 35 && file.ByteOperations?.Any(site => site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit") == true)
+            throw new InvalidDataException("DWC recipient and AID operations require layout format version 35.");
         if (file.Version < 34 && file.References.Any(site => site.ResizedAddend is not null))
             throw new InvalidDataException("Resized operand addends require layout format version 34.");
         if (file.Version < 33 && (file.BitsetLoads?.Any(site => site.ExpectedShiftWord is not null) == true ||

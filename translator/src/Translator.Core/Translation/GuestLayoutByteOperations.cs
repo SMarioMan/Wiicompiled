@@ -42,14 +42,14 @@ public sealed partial class GuestLayoutRelocations
                     _expanded.Symbol(site.Count) > ushort.MaxValue)
                     throw new InvalidDataException("Wide local ordinal storage exceeds its proven range or scratch bounds.");
             }
-            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test") ||
+            else if (site.Kind is not ("index32" or "offset32" or "rank8" or "recipient-aid" or "recipient-test" or "legacy-aid-bit") ||
                      site.Field is not null || site.Source is not null ||
                      site.Factor != 1 || site.Elements != 0 || site.AvailableBytes != 0)
                 throw new InvalidDataException("Invalid byte-domain index operation.");
             if (site.Kind == "rank8" && _expanded.Symbol(site.Count) > 254)
                 throw new InvalidDataException("Unsigned byte ranks retain 0xFF as the none sentinel.");
-            if (site.Kind is "recipient-aid" or "recipient-test" && _original.Symbol(site.Count) != 32)
-                throw new InvalidDataException("A forwarding recipient replaces a 32-bit mask.");
+            if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit" && _original.Symbol(site.Count) != 32)
+                throw new InvalidDataException("A forwarded recipient or legacy AID bit requires a 32-bit stock mask.");
         }
     }
 
@@ -61,15 +61,24 @@ public sealed partial class GuestLayoutRelocations
         var word = instruction.Word;
         var rt = $"r{(word >> 21) & 31}";
         var ra = $"r{(word >> 16) & 31}";
-        if (site.Kind is "recipient-aid" or "recipient-test")
+        if (site.Kind is "recipient-aid" or "recipient-test" or "legacy-aid-bit")
         {
             var index = IrValue.Register($"r{(word >> 11) & 31}");
             var source = IrValue.Register(rt);
-            if (site.Kind == "recipient-aid")
+            if (site.Kind is "recipient-aid" or "legacy-aid-bit")
             {
                 if (word >> 26 != 31 || (word & 2047) != 48 ||
                     nodes.Count != 1 || nodes[0] != new IrBinary(ra, source, index, "ppc_slw")) throw Invalid();
-                return new IrInstruction[] { new IrAssign(ra, index) };
+                if (site.Kind == "recipient-aid") return new IrInstruction[] { new IrAssign(ra, index) };
+                // PPC slw ignores shift bits above bit 5. Reject high IDs before
+                // using the low word so AID 64 cannot alias AID 0.
+                var valid = $"addr_layout_aid_{instruction.Address:X8}_valid_loc";
+                return new IrInstruction[] {
+                    new IrBinary(valid, index, IrValue.Imm(5), "shr"),
+                    new IrCall(valid, "PPC_Cntlzw", new[] { IrValue.Register(valid) }),
+                    new IrBinary(valid, IrValue.Register(valid), IrValue.Imm(5), "shr"),
+                    new IrBinary(valid, source, IrValue.Register(valid), "mul"),
+                    new IrBinary(ra, IrValue.Register(valid), index, "ppc_slw") };
             }
             var condition = new IrSetCrField(0, IrValue.Register(ra), IrValue.Imm(0), false);
             if (word >> 26 != 31 || (word & 2047) != 57 || nodes.Count != 2 ||
@@ -164,7 +173,7 @@ public sealed partial class GuestLayoutRelocations
             site.Field is null ? 0 : _original.Symbol(site.Field));
         var originalLimit = site.Kind switch
         {
-            "recipient-aid" or "recipient-test" => 32,
+            "recipient-aid" or "recipient-test" or "legacy-aid-bit" => 32,
             "rank8" => 127,
             _ => byte.MaxValue
         };

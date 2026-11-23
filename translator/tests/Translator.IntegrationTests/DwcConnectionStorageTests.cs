@@ -30,7 +30,7 @@ public class DwcConnectionStorageTests
         var scratch = Directory.CreateTempSubdirectory("mkw-dwc-connections-");
         try
         {
-            uint[] entries = [0x800d18e4, 0x800d211c, 0x800d2860, 0x800d2930, 0x800d29d4, 0x800d29e8, 0x800d2a70, 0x800d2a84];
+            uint[] entries = [0x800d18e4, 0x800d211c, 0x800d21bc, 0x800d2414, 0x800d2860, 0x800d2930, 0x800d29d4, 0x800d29e8, 0x800d2a70, 0x800d2a84];
             var translated = Path.Combine(scratch.FullName, "connections.cpp");
             File.WriteAllText(translated, string.Join("\n", entries.Select(pc => translator.Translate(pc, options).CxxCode)));
             var header = Path.Combine(scratch.FullName, "layout.h");
@@ -87,6 +87,8 @@ public class DwcConnectionStorageTests
                     entry(0x800ccbb4, noError);
                     entry(0x80006038, clear);
                     entry(0x8010ac6c, getUserData);
+                    entry(0x800e7d5c, noError);
+                    entry(0x80020a80, noOp);
                     entry(0x800e7b88, hostCount);
                     entry(0x800e7dcc, hostByIndex);
                     CpuContext c{};
@@ -122,6 +124,21 @@ public class DwcConnectionStorageTests
                     CHECK(Memory::Read8(aids) == high && Memory::Read8(aids + high) == 0 && clears == 4);
                     CHECK(Memory::Read32(pointers - 4) == 0x5a5a5a5a && Memory::Read32(aids + slots) == 0x5a5a5a5a);
                     if (slots > 32) CHECK(Memory::Read32(stockBase) == 0xdeadbeef);
+                    for (uint32_t i = 0; i < slots; ++i) {
+                        Memory::Write8(nodes + 22, i);
+                        func_800D2414(&c); CHECK(c.gpr[3] == (i < 32 ? 1u << i : 0));
+                    }
+                    for (uint32_t i = 0; i < slots; ++i) {
+                        Memory::Write8(metadata + high * 8 + 1, i);
+                        Memory::Write8(nodes + 22, i);
+                        func_800D21BC(&c); CHECK(c.gpr[3] == (i < 32 ? 1u << i : 0));
+                    }
+                    count = slots;
+                    if (slots > 32) {
+                        for (uint32_t i = 0; i < count; ++i) Memory::Write8(nodes + i * 48 + 22, 64 + i % 32);
+                        Memory::Write8(nodes + (slots - 1) * 48 + 22, 31);
+                        func_800D2414(&c); CHECK(c.gpr[3] == 0x80000000u);
+                    }
                 }
                 """);
             var executable = Path.Combine(scratch.FullName, "test");

@@ -85102,6 +85102,126 @@
   ],
   "ByteOperations": [
     {
+      "Instruction": "0x800D2260",
+      "ExpectedWord": "0x7FE00030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2290",
+      "ExpectedWord": "0x7C001830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2370",
+      "ExpectedWord": "0x7D672830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2380",
+      "ExpectedWord": "0x7D663030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D238C",
+      "ExpectedWord": "0x7D6A2830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2398",
+      "ExpectedWord": "0x7D694830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D23A4",
+      "ExpectedWord": "0x7D684030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D23AC",
+      "ExpectedWord": "0x7D673830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D23B4",
+      "ExpectedWord": "0x7D663030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D23BC",
+      "ExpectedWord": "0x7D652830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D23EC",
+      "ExpectedWord": "0x7CE31830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2500",
+      "ExpectedWord": "0x7D462030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2510",
+      "ExpectedWord": "0x7D452830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D251C",
+      "ExpectedWord": "0x7D492030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2528",
+      "ExpectedWord": "0x7D484030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2534",
+      "ExpectedWord": "0x7D473830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D253C",
+      "ExpectedWord": "0x7D463030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D2544",
+      "ExpectedWord": "0x7D452830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D254C",
+      "ExpectedWord": "0x7D442030",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
+      "Instruction": "0x800D257C",
+      "ExpectedWord": "0x7CC31830",
+      "Kind": "legacy-aid-bit",
+      "Count": "DWCConnectionTables.aids.size"
+    },
+    {
       "Instruction": "0x800E8E44",
       "ExpectedWord": "0x7C07C830",
       "Kind": "recipient-aid",

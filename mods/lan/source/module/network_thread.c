@@ -503,21 +503,24 @@ static unsigned reservation_cursor;
 static uint64_t mesh_resv_wait_since;
 
 static void ensure_transport_send_split_max(struct dwc_gamedata *gamedata) {
-#if MKW_LAN_CAPACITY > 32
+#if MKW_LAN_CAPACITY > 12
     if (!gamedata) return;
+    struct dwc_transport *transport = (struct dwc_transport *)(gamedata + 1);
+#if MKW_LAN_CAPACITY > 32
     /* DWCi_SendMatchSynPacket (type 3) sends (player_count - 1) * 24 + 8 bytes
      * via DWCi_SendReliableSystemData and immediately frees the buffer, while
      * DWCi_RecvCallback dispatches system payloads on the first chunk without
      * reassembly. Stock sendSplitMax (1465) truncates SYN at 63+ peers. */
-    struct dwc_transport *transport = (struct dwc_transport *)(gamedata + 1);
     const uint16_t required = (uint16_t)(MKW_LAN_MATCH_NODES * 24 + 64);
     if (transport->send_split_max && transport->send_split_max < required) {
         transport->send_split_max = required;
     }
-    /* Loading 65-128 karts concurrently can exceed the stock 20s DWC receive
-     * timeout on slower peers; allow 60s when capacity > 32. */
-    if (transport->receive_timeout && transport->receive_timeout < 60000) {
-        transport->receive_timeout = 60000;
+#endif
+    /* Under Star + direct LAN UDP data plane, all unreliable RKNet traffic
+     * bypasses GT2; raise GT2's idle receive_timeout to 1 hour (non-zero) so
+     * active peers are never dropped for GT2 silence. */
+    if (data_socket >= 0 && transport->receive_timeout && transport->receive_timeout < 3600000) {
+        transport->receive_timeout = 3600000;
     }
 #else
     (void)gamedata;
@@ -1080,10 +1083,10 @@ int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
     if (data_socket < 0 || !buf || size <= 0 || size > LAN_DATA_MAX_PAYLOAD)
         return -1;
     struct dwc_gamedata *game = get_dwc_gamedata();
-    if (!game || game->dwc_host_state != 1 || game->player_count < 2 ||
-        game->player_count > MKW_LAN_MATCH_NODES)
-        return -1;
-    if (aid == game->peers[0].peer_index)
+    if (!game || (game->dwc_host_state != 1 && game->dwc_host_state != 2) ||
+        (game->dwc_match_state != DWC_MATCH_STATE_CL_WAITING &&
+         game->dwc_match_state != DWC_MATCH_STATE_SV_WAITING) ||
+        game->player_count < 2 || game->player_count > MKW_LAN_MATCH_NODES)
         return -1;
     uint8_t my_aid = 0xFF;
     uint32_t target_ip = 0;
@@ -1123,8 +1126,8 @@ void network_thread_poll_data(void) {
 #if MKW_LAN_CAPACITY > 12
     if (data_socket < 0) return;
     struct dwc_gamedata *game = get_dwc_gamedata();
-    if (!game || game->dwc_host_state != 1 || game->player_count < 2 ||
-        game->player_count > MKW_LAN_MATCH_NODES)
+    if (!game || (game->dwc_host_state != 1 && game->dwc_host_state != 2) ||
+        game->player_count < 2 || game->player_count > MKW_LAN_MATCH_NODES)
         return;
     struct dwc_transport *transport = (struct dwc_transport *)(game + 1);
     typedef void (*user_recv_fn)(uint8_t aid, uint8_t *buf, int len);

@@ -58,6 +58,7 @@ function Resolve-ReleaseDir([string]$hint) {
     if ($hint) { $candidates += $hint }
     $candidates += $PSScriptRoot
     $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+    $candidates += (Join-Path $repoRoot 'release-lan-128-win64')
     $candidates += (Join-Path $repoRoot 'release-lan-win64')
     foreach ($dir in $candidates) {
         if ($dir -and (Test-Path -LiteralPath (Join-Path $dir 'WiiCompiledLAN.exe')) -and
@@ -303,6 +304,12 @@ try {
         }
         $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
             -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
+        if ($Count -ge 32) {
+            try {
+                if ($i -eq 1) { $proc.PriorityClass = 'AboveNormal' }
+                elseif ($Headless) { $proc.PriorityClass = 'BelowNormal' }
+            } catch {}
+        }
         $launched += [pscustomobject]@{ Id = $i; Process = $proc; Directory = $instDir }
     }
 
@@ -422,8 +429,9 @@ try {
 
         if (($now - $lastPrint).TotalSeconds -ge 2.0) {
             $lastPrint = $now
-            Write-Host ("[{0,5:F1}s] reporting={1}/{2}  in-lobby={3}/{2}  sdk-connected={4}/{2}" -f `
-                $elapsed, $roomStatus.Count, $Count, $inLobby, $sdkReady)
+            $hostPlayers = if ($roomStatus.ContainsKey(1)) { $roomStatus[1].Players } else { 0 }
+            Write-Host ("[{0,5:F1}s] reporting={1}/{2}  host-room={5}/{2}  in-lobby={3}/{2}  sdk-connected={4}/{2}" -f `
+                $elapsed, $roomStatus.Count, $Count, $inLobby, $sdkReady, $hostPlayers)
         }
 
         Start-Sleep -Milliseconds 100

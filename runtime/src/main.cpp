@@ -1420,9 +1420,11 @@ int RuntimeMain(int argc, char** argv) {
         auroraConfig.appName = RuntimeProduct::Active().displayName.data();
         const auto applicationDataDirectory = RuntimeConfigFile::ApplicationDataDirectory();
         std::filesystem::path rendererCacheDirectory = applicationDataDirectory / "Cache";
-        if (const char* sharedCacheDir = std::getenv("MKW_SHARED_CACHE_DIR");
-            sharedCacheDir != nullptr && sharedCacheDir[0] != '\0') {
-            rendererCacheDirectory = std::filesystem::path(sharedCacheDir);
+        if (!g_headless) {
+            if (const char* sharedCacheDir = std::getenv("MKW_SHARED_CACHE_DIR");
+                sharedCacheDir != nullptr && sharedCacheDir[0] != '\0') {
+                rendererCacheDirectory = std::filesystem::path(sharedCacheDir);
+            }
         }
         std::error_code rendererPathError;
         std::filesystem::create_directories(rendererCacheDirectory, rendererPathError);
@@ -1501,59 +1503,64 @@ int RuntimeMain(int argc, char** argv) {
             return "unknown";
         };
 
-        const std::string backend = RuntimeConfigFile::GraphicsApi("auto");
-        for (const auto& entry : kGraphicsBackends) {
-            if (backend == entry.configName) {
-                auroraConfig.desiredBackend = entry.backend;
-                break;
+        const std::string backend = g_headless ? "null" : RuntimeConfigFile::GraphicsApi("auto");
+        if (g_headless) {
+            auroraConfig.desiredBackend = BACKEND_NULL;
+        } else {
+            for (const auto& entry : kGraphicsBackends) {
+                if (backend == entry.configName) {
+                    auroraConfig.desiredBackend = entry.backend;
+                    break;
+                }
             }
         }
         const AuroraBackend requestedBackend = auroraConfig.desiredBackend;
 
-        // SDL reads its device hints when the joystick subsystem starts, which
-        // aurora_initialize does.
-        Wiimote::ConfigureSdlHints(RuntimeConfigFile::WiiRemotesEnabled());
-
-        const AuroraInfo auroraInfo = aurora_initialize(0, nullptr, &auroraConfig);
-        if (auroraInfo.initializationStatus != AURORA_INITIALIZATION_SUCCESS) {
-            throw std::runtime_error(auroraInfo.initializationError != nullptr
-                ? auroraInfo.initializationError : "No supported graphics backend is available");
-        }
-        if (requestedBackend != BACKEND_AUTO && auroraInfo.backend != requestedBackend) {
-            RT_LOG(RT_TAG_RUNTIME) << "graphics_api=\"" << backend
-                      << "\" is not available on this system; aurora fell back to \""
-                      << backendDisplayName(auroraInfo.backend)
-                      << "\". See the [aurora::gpu] lines above for the reason." << std::endl;
+        if (g_headless) {
+            UpdateMkwDynamicAspectSurface(auroraConfig.windowWidth, auroraConfig.windowHeight);
+            RT_LOG(RT_TAG_RUNTIME) << "graphics backend: headless (aurora skipped)" << std::endl;
         } else {
-            RT_LOG(RT_TAG_RUNTIME) << "graphics backend: " << backendDisplayName(auroraInfo.backend)
-                      << std::endl;
-        }
-        aurora_set_frame_worker_wait_callback(ServiceGuestTimingDuringAuroraFrameWait);
-        Wiimote::Initialize();
-        GxGuestWrite::InstallAuroraHooks();
-        UpdateMkwDynamicAspectSurface(auroraInfo.windowSize.native_fb_width,
-                                      auroraInfo.windowSize.native_fb_height);
-        settings_overlay::InitializeRuntimeSettings();
-        if (!g_headless) {
+            // SDL reads its device hints when the joystick subsystem starts, which
+            // aurora_initialize does.
+            Wiimote::ConfigureSdlHints(RuntimeConfigFile::WiiRemotesEnabled());
+
+            const AuroraInfo auroraInfo = aurora_initialize(0, nullptr, &auroraConfig);
+            if (auroraInfo.initializationStatus != AURORA_INITIALIZATION_SUCCESS) {
+                throw std::runtime_error(auroraInfo.initializationError != nullptr
+                    ? auroraInfo.initializationError : "No supported graphics backend is available");
+            }
+            if (requestedBackend != BACKEND_AUTO && auroraInfo.backend != requestedBackend) {
+                RT_LOG(RT_TAG_RUNTIME) << "graphics_api=\"" << backend
+                          << "\" is not available on this system; aurora fell back to \""
+                          << backendDisplayName(auroraInfo.backend)
+                          << "\". See the [aurora::gpu] lines above for the reason." << std::endl;
+            } else {
+                RT_LOG(RT_TAG_RUNTIME) << "graphics backend: " << backendDisplayName(auroraInfo.backend)
+                          << std::endl;
+            }
+            aurora_set_frame_worker_wait_callback(ServiceGuestTimingDuringAuroraFrameWait);
+            Wiimote::Initialize();
+            GxGuestWrite::InstallAuroraHooks();
+            UpdateMkwDynamicAspectSurface(auroraInfo.windowSize.native_fb_width,
+                                          auroraInfo.windowSize.native_fb_height);
+            settings_overlay::InitializeRuntimeSettings();
             SteamInputLayout::Initialize(RuntimeConfigFile::SteamInputOverrideEnabled(),
                                          RuntimeConfigFile::SteamInputAppId());
-        }
-        if (BootRace::Requested()) {
-            aurora_set_skip_unready_pipelines(false);
-        }
-        RT_LOG(RT_TAG_CONFIG) << "video.widescreen=" << (configWidescreen ? "true" : "false")
-                  << " force_aspect=" << (forceAspect ? "true" : "false")
-                  << " SCGetAspectRatio=" << (configWidescreen ? 1 : 0)
-                  << " resolutionMultiplier=" << resolutionMultiplier
-                  << " window=" << auroraInfo.windowSize.width << "x" << auroraInfo.windowSize.height
-                  << " native=" << auroraInfo.windowSize.native_fb_width << "x"
-                  << auroraInfo.windowSize.native_fb_height
-                  << " viewportPolicy=" << (forceAspect ? (configWidescreen ? "16:9" : "fit") : "stretch")
-                  << " presentAspect="
-                  << (forceAspect ? (configWidescreen ? "16:9" : "4:3") : "surface (dynamic EGG canvas)")
-                  << std::endl;
-        g_auroraInitialized.store(true, std::memory_order_release);
-        if (!g_headless) {
+            if (BootRace::Requested()) {
+                aurora_set_skip_unready_pipelines(false);
+            }
+            RT_LOG(RT_TAG_CONFIG) << "video.widescreen=" << (configWidescreen ? "true" : "false")
+                      << " force_aspect=" << (forceAspect ? "true" : "false")
+                      << " SCGetAspectRatio=" << (configWidescreen ? 1 : 0)
+                      << " resolutionMultiplier=" << resolutionMultiplier
+                      << " window=" << auroraInfo.windowSize.width << "x" << auroraInfo.windowSize.height
+                      << " native=" << auroraInfo.windowSize.native_fb_width << "x"
+                      << auroraInfo.windowSize.native_fb_height
+                      << " viewportPolicy=" << (forceAspect ? (configWidescreen ? "16:9" : "fit") : "stretch")
+                      << " presentAspect="
+                      << (forceAspect ? (configWidescreen ? "16:9" : "4:3") : "surface (dynamic EGG canvas)")
+                      << std::endl;
+            g_auroraInitialized.store(true, std::memory_order_release);
             GxWorker::SetWaitCallback(ServiceGuestTimingDuringAuroraFrameWait);
             GxWorker::Start();
         }
@@ -1583,11 +1590,13 @@ int RuntimeMain(int argc, char** argv) {
         
         // Shutdown fiber system
         Fiber::GuestFiberManager::Shutdown();
-        WindowPlacementPersistence::Flush(true);
-        Wiimote::Shutdown();
-        SteamInputLayout::Release();
-        GxWorker::Stop();
-        aurora_shutdown();
+        if (g_auroraInitialized.load(std::memory_order_acquire)) {
+            WindowPlacementPersistence::Flush(true);
+            Wiimote::Shutdown();
+            SteamInputLayout::Release();
+            GxWorker::Stop();
+            aurora_shutdown();
+        }
         DiscordPresence::Shutdown();
         SetRuntimeExitCodeImpl(0);
         LayoutAccessAudit::WriteReport();

@@ -29,7 +29,9 @@ extern "C" uint32_t GX__Init_8016b850(uint32_t fifoBase, uint32_t fifoSize)
     const uint32_t kGXDataAddr = MKW_GADDR(803437C0);
     constexpr uint32_t kGXDataSize = 0x600u;
 
-    GXInit(GuestToHostPtr(fifoBase, fifoSize), fifoSize);
+    if (!g_headless) {
+        GXInit(GuestToHostPtr(fifoBase, fifoSize), fifoSize);
+    }
 
     // Initialize GXData structure in guest memory
     try {

@@ -635,10 +635,6 @@ void VI_HLE_PresentFrame(bool presentedXfb, bool paceToRetrace) {
             g_vi.hasValidXfb = false;
             g_vi.readyXfb = 0;
         }
-        static uint32_t s_headlessEventTick = 0;
-        if ((++s_headlessEventTick & 31u) == 0u) {
-            UpdateAuroraAndProcessEvents();
-        }
         return;
     }
 

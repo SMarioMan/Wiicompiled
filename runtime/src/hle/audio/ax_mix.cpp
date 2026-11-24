@@ -12,6 +12,8 @@
 #include "runtime_config.h"
 #include "runtime_log.h"
 
+extern bool g_headless;
+
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -70,7 +72,7 @@ public:
         JoinMix();
         RefreshMixMemoryMap();
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_mixWorkerEnabled = RuntimeConfigFile::AudioMixWorkerEnabled(true);
+        m_mixWorkerEnabled = !::g_headless && RuntimeConfigFile::AudioMixWorkerEnabled(true);
         MarkDspInitialized();
         ResetDspTaskGlobals();
         m_mailState = MailState::WaitingForCmdListSize;

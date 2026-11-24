@@ -12,7 +12,11 @@ bool RetroRewindProfileActive();
 
 static std::mutex g_mutex;
 static std::map<int32_t, DeviceKind> g_devices;
-static int32_t g_nextDeviceFd = 2000;
+static constexpr int32_t kDeviceFdBase = 2000;
+static constexpr size_t kDeviceFastCacheSize = 256;
+// 0 = absent, otherwise static_cast<uint8_t>(DeviceKind) + 1.
+static std::array<std::atomic<uint8_t>, kDeviceFastCacheSize> g_deviceKindCache{};
+static int32_t g_nextDeviceFd = kDeviceFdBase;
 
 const std::array<uint8_t, 6>& RuntimeMacAddress() {
     return RuntimeConsoleIdentity::Current().mac;
@@ -88,7 +92,7 @@ bool WriteReturn(uint32_t outBuf, uint32_t outLen, int32_t value) {
     return true;
 }
 
-bool WriteVectorReturn(const std::vector<IoVector>& out, size_t index, int32_t value) {
+bool WriteVectorReturn(std::span<const IoVector> out, size_t index, int32_t value) {
     if (index >= out.size() || out[index].size < 4 || !out[index].address) {
         return false;
     }
@@ -100,12 +104,27 @@ static int32_t AllocateDevice(DeviceKind kind) {
     std::lock_guard<std::mutex> lock(g_mutex);
     const int32_t fd = g_nextDeviceFd++;
     g_devices.emplace(fd, kind);
+    const int32_t slot = fd - kDeviceFdBase;
+    if (slot >= 0 && static_cast<size_t>(slot) < kDeviceFastCacheSize) {
+        g_deviceKindCache[static_cast<size_t>(slot)].store(
+            static_cast<uint8_t>(kind) + 1u, std::memory_order_release);
+    }
     return fd;
 }
 
 std::optional<DeviceKind> GetDeviceKind(uint32_t fd) {
+    const int32_t sfd = static_cast<int32_t>(fd);
+    const int32_t slot = sfd - kDeviceFdBase;
+    if (slot >= 0 && static_cast<size_t>(slot) < kDeviceFastCacheSize) {
+        const uint8_t cached =
+            g_deviceKindCache[static_cast<size_t>(slot)].load(std::memory_order_acquire);
+        if (cached == 0) {
+            return std::nullopt;
+        }
+        return static_cast<DeviceKind>(cached - 1u);
+    }
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_devices.find(static_cast<int32_t>(fd));
+    auto it = g_devices.find(sfd);
     if (it == g_devices.end()) {
         return std::nullopt;
     }
@@ -114,7 +133,12 @@ std::optional<DeviceKind> GetDeviceKind(uint32_t fd) {
 
 static bool RemoveDevice(uint32_t fd) {
     std::lock_guard<std::mutex> lock(g_mutex);
-    return g_devices.erase(static_cast<int32_t>(fd)) != 0;
+    const int32_t sfd = static_cast<int32_t>(fd);
+    const int32_t slot = sfd - kDeviceFdBase;
+    if (slot >= 0 && static_cast<size_t>(slot) < kDeviceFastCacheSize) {
+        g_deviceKindCache[static_cast<size_t>(slot)].store(0u, std::memory_order_release);
+    }
+    return g_devices.erase(sfd) != 0;
 }
 
 void NetFail(const char* format, ...) {
@@ -737,9 +761,12 @@ extern "C" int32_t Network_HLE_Ioctlv(uint32_t fd, uint32_t cmd, uint32_t numIn,
         return -SO_EINVAL;
     }
 
-    const std::vector<IoVector> vectors = ReadVectors(vectorPtr, static_cast<uint32_t>(vectorCount));
-    const std::vector<IoVector> in(vectors.begin(), vectors.begin() + numIn);
-    const std::vector<IoVector> out(vectors.begin() + numIn, vectors.end());
+    std::array<IoVector, kMaxIoVectors> vectors{};
+    for (uint32_t i = 0; i < static_cast<uint32_t>(vectorCount); ++i) {
+        vectors[i] = RuntimeHle::ReadIoVector(vectorPtr, i);
+    }
+    const std::span<const IoVector> in(vectors.data(), numIn);
+    const std::span<const IoVector> out(vectors.data() + numIn, numOut);
 
     switch (*device) {
     case DeviceKind::NcdManage:

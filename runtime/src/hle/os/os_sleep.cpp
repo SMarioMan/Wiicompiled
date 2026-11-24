@@ -22,6 +22,7 @@
 namespace OsHleInternal {
 std::mutex gSleepTimerMutex;
 std::vector<SleepTimerEntry> gSleepTimers;
+std::atomic<size_t> gSleepTimerCount{0};
 
 void CancelSleepTimer(uint32_t threadPtr)
 {
@@ -29,6 +30,7 @@ void CancelSleepTimer(uint32_t threadPtr)
     std::erase_if(gSleepTimers, [threadPtr](const SleepTimerEntry& entry) {
         return entry.threadPtr == threadPtr;
     });
+    gSleepTimerCount.store(gSleepTimers.size(), std::memory_order_release);
 }
 
 bool SleepTimerIsPending(uint32_t threadPtr)
@@ -72,6 +74,7 @@ void ScheduleSleepTimer(uint32_t threadPtr, uint64_t ticks)
         return entry.threadPtr == threadPtr;
     });
     gSleepTimers.push_back({threadPtr, deadline});
+    gSleepTimerCount.store(gSleepTimers.size(), std::memory_order_release);
 }
 
 bool ProcessSleepTimers(CpuContext* cpu)
@@ -90,7 +93,8 @@ bool ProcessSleepTimers(CpuContext* cpu)
     constexpr size_t kMaxTimersPerCall = 64;
     size_t processedCount = 0;
     const auto now = Clock::now();
-    while (processedCount < kMaxTimersPerCall) {
+    while (processedCount < kMaxTimersPerCall &&
+           gSleepTimerCount.load(std::memory_order_acquire) != 0) {
         SleepTimerEntry timer{0, {}};
         bool found = false;
         {
@@ -99,6 +103,7 @@ bool ProcessSleepTimers(CpuContext* cpu)
                 if (it->deadline <= now) {
                     timer = *it;
                     gSleepTimers.erase(it);
+                    gSleepTimerCount.store(gSleepTimers.size(), std::memory_order_release);
                     found = true;
                     break;
                 }

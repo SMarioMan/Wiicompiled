@@ -234,7 +234,7 @@ int32_t HandleKdIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t out
     }
 }
 
-int32_t HandleKdIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const std::vector<IoVector>& out) {
+int32_t HandleKdIoctlv(uint32_t cmd, std::span<const IoVector> in, std::span<const IoVector> out) {
     const uint32_t inBuf = in.empty() ? 0 : in[0].address;
     const uint32_t inLen = in.empty() ? 0 : in[0].size;
     const uint32_t outBuf = out.empty() ? 0 : out[0].address;
@@ -242,8 +242,8 @@ int32_t HandleKdIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const std:
     return HandleKdIoctl(cmd, inBuf, inLen, outBuf, outLen);
 }
 
-int32_t HandleNcdIoctlv(uint32_t cmd, const std::vector<IoVector>& in,
-                               const std::vector<IoVector>& out) {
+int32_t HandleNcdIoctlv(uint32_t cmd, std::span<const IoVector> in,
+                        std::span<const IoVector> out) {
     (void)in;
     switch (cmd) {
     case 1: // LOCKWIRELESSDRIVER

@@ -47,7 +47,10 @@ static uint64_t timestamp;
 static so_fd_t broadcast_socket = -1;
 static so_fd_t multicast_socket = -1;
 static so_fd_t data_socket = -1;
+static so_fd_t data_mcast_socket = -1;
 #define LAN_DATA_PORT 27910
+#define LAN_DATA_MCAST_PORT 27911
+#define LAN_DATA_MCAST_GROUP 0xefff4d4cu /* 239.255.77.76 */
 #define LAN_DATA_MAGIC 0x4D4B5744u
 #define LAN_DATA_MAX_PAYLOAD 1472
 static uint64_t broadcast_timer;
@@ -84,10 +87,11 @@ static struct tracked_peer {
 
 static void close_discovery(void) {
     sdk_service_ready = false;
+    if (data_mcast_socket >= 0) SOClose(data_mcast_socket);
     if (data_socket >= 0) SOClose(data_socket);
     if (multicast_socket >= 0) SOClose(multicast_socket);
     if (broadcast_socket >= 0) SOClose(broadcast_socket);
-    data_socket = multicast_socket = broadcast_socket = -1;
+    data_mcast_socket = data_socket = multicast_socket = broadcast_socket = -1;
 }
 
 static bool initialise_multicast(void) {
@@ -160,8 +164,8 @@ static bool initialise(void) {
     if (!initialise_multicast()) return false;
 
 #if MKW_LAN_CAPACITY > 12
-    /* Direct UDP data socket for client-to-client unreliable packets under
-     * Star topology so the host GT2 link is not saturated by O(N^2) relays. */
+    /* Direct UDP data socket for unreliable RKNet packets under Star topology,
+     * plus a multicast receiver for coalescing identical RACE packets O(N^2)->O(N). */
     data_socket = SOSocket(PF_INET, SOCK_DGRAM, PROTO_UDP);
     if (data_socket >= 0) {
         const so_addr_t daddr = {
@@ -173,6 +177,27 @@ static bool initialise(void) {
         if (SOBind(data_socket, &daddr) < 0 || set_nonblock(data_socket) < 0) {
             SOClose(data_socket);
             data_socket = -1;
+        } else {
+            const uint32_t enabled = 1;
+            const uint32_t iface = (local_ip >> 24) == 127 ? 0x7f000001 : local_ip;
+            const uint32_t membership[2] = { LAN_DATA_MCAST_GROUP, iface };
+            const so_addr_t maddr = {
+                .sa_len = sizeof(so_addr_t), .sa_family = AF_INET,
+                .sa_port = LAN_DATA_MCAST_PORT, .sa_addr = 0
+            };
+            data_mcast_socket = SOSocket(PF_INET, SOCK_DGRAM, PROTO_UDP);
+            if (data_mcast_socket >= 0) {
+                if (SOSetSockOpt(data_mcast_socket, SOL_SOCKET, SO_REUSEADDR, &enabled, sizeof(enabled)) < 0 ||
+                    SOBind(data_mcast_socket, &maddr) < 0 ||
+                    SOSetSockOpt(data_mcast_socket, SOL_IP, IP_ADD_MEMBERSHIP, membership, sizeof(membership)) < 0 ||
+                    set_nonblock(data_mcast_socket) < 0 ||
+                    SOSetSockOpt(data_socket, SOL_IP, IP_MULTICAST_IF, &iface, sizeof(iface)) < 0 ||
+                    SOSetSockOpt(data_socket, SOL_IP, IP_MULTICAST_TTL, &enabled, sizeof(enabled)) < 0 ||
+                    SOSetSockOpt(data_socket, SOL_IP, IP_MULTICAST_LOOP, &enabled, sizeof(enabled)) < 0) {
+                    SOClose(data_mcast_socket);
+                    data_mcast_socket = -1;
+                }
+            }
         }
     }
 #endif
@@ -1092,23 +1117,74 @@ bool network_thread_prepare_syn(uint32_t aid, uint32_t type, const uint32_t *pac
     return true;
 }
 
-/* Phase 2 Star data plane: route client-to-client unreliable RKNet packets over
- * a dedicated non-blocking UDP socket directly to each peer's local_ip, while
- * keeping Host <-> Client traffic on GT2 (preserving SDK keepalive/timeout). */
+/* Phase 2 Star data plane: route unreliable RKNet packets over a dedicated
+ * non-blocking UDP socket with O(1) AID->IP caching, word-wide copies, and
+ * byte-verified multicast coalescing (reducing N-1 identical sends to 2). */
 struct lan_data_header {
     uint32_t magic;
     uint8_t origin_aid;
     uint8_t target_aid;
+    uint8_t skip_aid;
+    uint8_t reserved;
     uint16_t payload_len;
+    uint16_t pad;
 };
 
 static void lan_copy_bytes(uint8_t *dst, const uint8_t *src, size_t n) {
-    for (size_t i = 0; i < n; i++) dst[i] = src[i];
+    size_t i = 0;
+    if ((((uintptr_t)dst | (uintptr_t)src) & 3u) == 0) {
+        for (; i + 4 <= n; i += 4)
+            *(uint32_t *)(dst + i) = *(const uint32_t *)(src + i);
+    }
+    for (; i < n; i++) dst[i] = src[i];
 }
+
+static bool lan_bytes_equal(const uint8_t *a, const uint8_t *b, size_t n) {
+    size_t i = 0;
+    if ((((uintptr_t)a | (uintptr_t)b) & 3u) == 0) {
+        for (; i + 4 <= n; i += 4)
+            if (*(const uint32_t *)(a + i) != *(const uint32_t *)(b + i)) return false;
+    }
+    for (; i < n; i++)
+        if (a[i] != b[i]) return false;
+    return true;
+}
+
+#if MKW_LAN_CAPACITY > 12
+static uint32_t lan_aid_ip_cache[MKW_LAN_MATCH_NODES];
+static uint8_t lan_cached_my_aid = 0xFF;
+static uint32_t lan_cache_player_count;
+static uint32_t lan_cache_my_pid;
+static uint32_t lan_cache_first_pid;
+static uint32_t lan_cache_last_pid;
+
+static void lan_refresh_aid_cache(struct dwc_gamedata *game) {
+    const uint32_t count = game->player_count;
+    const uint32_t first_pid = count ? game->peers[0].player_id : 0;
+    const uint32_t last_pid = count ? game->peers[count - 1].player_id : 0;
+    if (count == lan_cache_player_count && game->my_pid == lan_cache_my_pid &&
+        first_pid == lan_cache_first_pid && last_pid == lan_cache_last_pid &&
+        lan_cached_my_aid < MKW_LAN_MATCH_NODES) {
+        return;
+    }
+    for (unsigned i = 0; i < MKW_LAN_MATCH_NODES; i++) lan_aid_ip_cache[i] = 0;
+    lan_cached_my_aid = 0xFF;
+    for (unsigned i = 0; i < count; i++) {
+        const uint8_t idx = game->peers[i].peer_index;
+        if (game->peers[i].player_id == game->my_pid) lan_cached_my_aid = idx;
+        if (idx < MKW_LAN_MATCH_NODES) lan_aid_ip_cache[idx] = game->peers[i].local_ip;
+    }
+    lan_cache_player_count = count;
+    lan_cache_my_pid = game->my_pid;
+    lan_cache_first_pid = first_pid;
+    lan_cache_last_pid = last_pid;
+}
+#endif
 
 int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
 #if MKW_LAN_CAPACITY > 12
-    if (data_socket < 0 || !buf || size <= 0 || size > LAN_DATA_MAX_PAYLOAD)
+    if (data_socket < 0 || !buf || size <= 0 || size > LAN_DATA_MAX_PAYLOAD ||
+        aid >= MKW_LAN_MATCH_NODES)
         return -1;
     struct dwc_gamedata *game = get_dwc_gamedata();
     if (!game || (game->dwc_host_state != 1 && game->dwc_host_state != 2) ||
@@ -1116,24 +1192,63 @@ int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
          game->dwc_match_state != DWC_MATCH_STATE_SV_WAITING) ||
         game->player_count < 2 || game->player_count > MKW_LAN_MATCH_NODES)
         return -1;
-    uint8_t my_aid = 0xFF;
-    uint32_t target_ip = 0;
-    for (unsigned i = 0; i < game->player_count; i++) {
-        if (game->peers[i].player_id == game->my_pid)
-            my_aid = game->peers[i].peer_index;
-        if (game->peers[i].peer_index == aid)
-            target_ip = game->peers[i].local_ip;
+    lan_refresh_aid_cache(game);
+    const uint8_t my_aid = lan_cached_my_aid;
+    uint32_t target_ip = lan_aid_ip_cache[aid];
+    if (!target_ip) {
+        /* Force one refresh if a newly admitted peer isn't in cache yet. */
+        lan_cache_player_count = 0;
+        lan_refresh_aid_cache(game);
+        target_ip = lan_aid_ip_cache[aid];
     }
     if (my_aid >= MKW_LAN_MATCH_NODES || !target_ip ||
         target_ip == MKW_ADVERTISED_IP || (target_ip >> 28) >= 14)
         return -1;
 
     static uint8_t tx_buf[sizeof(struct lan_data_header) + LAN_DATA_MAX_PAYLOAD];
+    static uint8_t last_tx_buf[LAN_DATA_MAX_PAYLOAD];
+    static uint64_t last_tx_ticks;
+    static uint16_t last_tx_len;
+    static uint8_t last_tx_first_aid = 0xFF;
+    static bool last_tx_mcast_sent;
+
+    const bool can_mcast = (data_mcast_socket >= 0 && mkw_lan_config.peer_count == 0 &&
+                            game->player_count > 2);
+    const uint64_t now = can_mcast ? OSGetTime() : 0;
+    const bool same_tick = can_mcast && last_tx_len == (uint16_t)size &&
+                           (now - last_tx_ticks) <= (uint64_t)millisecs_to_ticks(2);
+    if (same_tick && lan_bytes_equal((const uint8_t *)buf, last_tx_buf, (size_t)size)) {
+        if (last_tx_mcast_sent) {
+            return 1; /* Already delivered to all peers by the multicast packet. */
+        }
+        struct lan_data_header *hdr = (struct lan_data_header *)tx_buf;
+        hdr->magic = LAN_DATA_MAGIC;
+        hdr->origin_aid = my_aid;
+        hdr->target_aid = 0xFF;
+        hdr->skip_aid = last_tx_first_aid;
+        hdr->reserved = 0;
+        hdr->payload_len = (uint16_t)size;
+        hdr->pad = 0;
+        lan_copy_bytes(tx_buf + sizeof(*hdr), (const uint8_t *)buf, (size_t)size);
+        const so_addr_t mcast = {
+            .sa_len = sizeof(so_addr_t),
+            .sa_family = AF_INET,
+            .sa_port = LAN_DATA_MCAST_PORT,
+            .sa_addr = LAN_DATA_MCAST_GROUP
+        };
+        SOSendTo(data_socket, tx_buf, sizeof(*hdr) + (size_t)size, 0, &mcast);
+        last_tx_mcast_sent = true;
+        return 1;
+    }
+
     struct lan_data_header *hdr = (struct lan_data_header *)tx_buf;
     hdr->magic = LAN_DATA_MAGIC;
     hdr->origin_aid = my_aid;
     hdr->target_aid = aid;
+    hdr->skip_aid = 0xFF;
+    hdr->reserved = 0;
     hdr->payload_len = (uint16_t)size;
+    hdr->pad = 0;
     lan_copy_bytes(tx_buf + sizeof(*hdr), (const uint8_t *)buf, (size_t)size);
 
     const so_addr_t dst = {
@@ -1143,12 +1258,50 @@ int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
         .sa_addr = target_ip
     };
     SOSendTo(data_socket, tx_buf, sizeof(*hdr) + (size_t)size, 0, &dst);
+
+    if (can_mcast && (!same_tick || !last_tx_mcast_sent)) {
+        last_tx_ticks = now;
+        last_tx_len = (uint16_t)size;
+        last_tx_first_aid = aid;
+        last_tx_mcast_sent = false;
+        lan_copy_bytes(last_tx_buf, (const uint8_t *)buf, (size_t)size);
+    }
     return 1;
 #else
     (void)aid; (void)buf; (void)size;
     return -1;
 #endif
 }
+
+#if MKW_LAN_CAPACITY > 12
+static void lan_drain_data_socket(so_fd_t fd, uint8_t my_aid, struct dwc_transport *transport,
+                                  void (*recv_cb)(uint8_t aid, uint8_t *buf, int len)) {
+    static uint8_t rx_buf[sizeof(struct lan_data_header) + LAN_DATA_MAX_PAYLOAD];
+    for (unsigned iter = 0; iter < 512; iter++) {
+        so_addr_t src = { .sa_len = sizeof(src) };
+        const so_ret_t n = SORecvFrom(fd, rx_buf, sizeof(rx_buf), 0, &src);
+        if (n < (so_ret_t)sizeof(struct lan_data_header)) break;
+        const struct lan_data_header *hdr = (const struct lan_data_header *)rx_buf;
+        if (hdr->magic != LAN_DATA_MAGIC || hdr->origin_aid >= MKW_LAN_MATCH_NODES ||
+            hdr->payload_len == 0 || (so_ret_t)(sizeof(*hdr) + hdr->payload_len) > n)
+            continue;
+        if (hdr->target_aid == 0xFF) {
+            if (hdr->origin_aid == my_aid || hdr->skip_aid == my_aid) continue;
+        } else if (hdr->target_aid != my_aid) {
+            continue;
+        }
+        uint8_t *peer_entry = &transport->peers[(unsigned)hdr->origin_aid * 64u];
+        uint8_t *dst_buf = *(uint8_t **)(peer_entry + 4);
+        const uint32_t dst_cap = *(const uint32_t *)(peer_entry + 8);
+        if (dst_buf && hdr->payload_len <= dst_cap) {
+            lan_copy_bytes(dst_buf, rx_buf + sizeof(*hdr), hdr->payload_len);
+            recv_cb(hdr->origin_aid, dst_buf, hdr->payload_len);
+        } else {
+            recv_cb(hdr->origin_aid, rx_buf + sizeof(*hdr), hdr->payload_len);
+        }
+    }
+}
+#endif
 
 void network_thread_poll_data(void) {
 #if MKW_LAN_CAPACITY > 12
@@ -1162,34 +1315,13 @@ void network_thread_poll_data(void) {
     user_recv_fn recv_cb = (user_recv_fn)transport->user_receive_callback;
     if (!recv_cb) return;
 
-    uint8_t my_aid = 0xFF;
-    for (unsigned i = 0; i < game->player_count; i++) {
-        if (game->peers[i].player_id == game->my_pid) {
-            my_aid = game->peers[i].peer_index;
-            break;
-        }
-    }
+    lan_refresh_aid_cache(game);
+    const uint8_t my_aid = lan_cached_my_aid;
     if (my_aid >= MKW_LAN_MATCH_NODES) return;
 
-    static uint8_t rx_buf[sizeof(struct lan_data_header) + LAN_DATA_MAX_PAYLOAD];
-    for (unsigned iter = 0; iter < 512; iter++) {
-        so_addr_t src = { .sa_len = sizeof(src) };
-        const so_ret_t n = SORecvFrom(data_socket, rx_buf, sizeof(rx_buf), 0, &src);
-        if (n < (so_ret_t)sizeof(struct lan_data_header)) break;
-        const struct lan_data_header *hdr = (const struct lan_data_header *)rx_buf;
-        if (hdr->magic != LAN_DATA_MAGIC || hdr->target_aid != my_aid ||
-            hdr->origin_aid >= MKW_LAN_MATCH_NODES || hdr->payload_len == 0 ||
-            (so_ret_t)(sizeof(*hdr) + hdr->payload_len) > n)
-            continue;
-        uint8_t *peer_entry = &transport->peers[(unsigned)hdr->origin_aid * 64u];
-        uint8_t *dst_buf = *(uint8_t **)(peer_entry + 4);
-        const uint32_t dst_cap = *(const uint32_t *)(peer_entry + 8);
-        if (dst_buf && hdr->payload_len <= dst_cap) {
-            lan_copy_bytes(dst_buf, rx_buf + sizeof(*hdr), hdr->payload_len);
-            recv_cb(hdr->origin_aid, dst_buf, hdr->payload_len);
-        } else {
-            recv_cb(hdr->origin_aid, rx_buf + sizeof(*hdr), hdr->payload_len);
-        }
+    lan_drain_data_socket(data_socket, my_aid, transport, recv_cb);
+    if (data_mcast_socket >= 0) {
+        lan_drain_data_socket(data_mcast_socket, my_aid, transport, recv_cb);
     }
 #endif
 }

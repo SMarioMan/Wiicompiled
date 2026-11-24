@@ -169,6 +169,8 @@ private:
 
 extern const char* const kMkwSetupVersion;
 
+bool g_headless = false;
+
 namespace {
 
 std::string g_lastEntryLabel;
@@ -176,7 +178,6 @@ std::atomic_bool g_auroraInitialized{false};
 std::atomic_flag g_abortSignalHandled = ATOMIC_FLAG_INIT;
 std::atomic_bool g_fatalErrorReported{false};
 std::atomic_bool g_fatalPopupShown{false};
-bool g_headless = false;
 std::atomic<int> g_lastExitCode{0};
 std::atomic_bool g_exitCodeSet{false};
 

@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <span>
+#include <atomic>
 #include <charconv>
 #include <cassert>
 #include <cctype>
@@ -197,7 +199,7 @@ std::string Lower(std::string_view text);
 bool StartsWith(std::string_view text, std::string_view prefix);
 std::vector<IoVector> ReadVectors(uint32_t vectorPtr, uint32_t count);
 bool WriteReturn(uint32_t outBuf, uint32_t outLen, int32_t value);
-bool WriteVectorReturn(const std::vector<IoVector>& out, size_t index, int32_t value);
+bool WriteVectorReturn(std::span<const IoVector> out, size_t index, int32_t value);
 std::optional<DeviceKind> GetDeviceKind(uint32_t fd);
 // Always-on product logging, reserved for failures a player can act on: a
 // connect/auth/DNS/SSL failure or a socket error that aborts a connection.
@@ -247,24 +249,24 @@ sockaddr_in ReadWiiSockAddr(uint32_t addr);
 in_addr ResolveDefaultInterfaceIp(in_addr fallback);
 int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t outBuf,
                          uint32_t outLen);
-int32_t HandleIpTopIoctlv(uint32_t cmd, const std::vector<IoVector>& in,
-                          const std::vector<IoVector>& out);
+int32_t HandleIpTopIoctlv(uint32_t cmd, std::span<const IoVector> in,
+                          std::span<const IoVector> out);
 
 // network_ssl.cpp
 void ClearSslSessionsForSocket(uint32_t fd);
 NasSslWriteAction PreparePlainNasTcpWrite(WiiSocket& socket, const uint8_t* data,
                                          uint32_t size, std::vector<uint8_t>& patched);
-int32_t HandleSslIoctlv(uint32_t cmd, const std::vector<IoVector>& in,
-                        const std::vector<IoVector>& out);
+int32_t HandleSslIoctlv(uint32_t cmd, std::span<const IoVector> in,
+                        std::span<const IoVector> out);
 
 // network_config.cpp
 int32_t HandleKdTimeIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t outBuf,
                           uint32_t outLen);
 int32_t HandleKdIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t outBuf,
                       uint32_t outLen);
-int32_t HandleKdIoctlv(uint32_t cmd, const std::vector<IoVector>& in,
-                       const std::vector<IoVector>& out);
-int32_t HandleNcdIoctlv(uint32_t cmd, const std::vector<IoVector>& in,
-                        const std::vector<IoVector>& out);
+int32_t HandleKdIoctlv(uint32_t cmd, std::span<const IoVector> in,
+                       std::span<const IoVector> out);
+int32_t HandleNcdIoctlv(uint32_t cmd, std::span<const IoVector> in,
+                        std::span<const IoVector> out);
 
 }  // namespace NetworkHle

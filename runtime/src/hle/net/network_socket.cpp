@@ -348,7 +348,7 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
     }
 }
 
-static int32_t HandleGetInterfaceOpt(const std::vector<IoVector>& in, const std::vector<IoVector>& out) {
+static int32_t HandleGetInterfaceOpt(std::span<const IoVector> in, std::span<const IoVector> out) {
     if (in.empty() || out.empty() || in[0].size < 8) {
         return -SO_EINVAL;
     }
@@ -425,7 +425,7 @@ static int32_t HandleGetInterfaceOpt(const std::vector<IoVector>& in, const std:
     }
 }
 
-int32_t HandleIpTopIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const std::vector<IoVector>& out) {
+int32_t HandleIpTopIoctlv(uint32_t cmd, std::span<const IoVector> in, std::span<const IoVector> out) {
     switch (cmd) {
     case IOCTLV_SO_STARTUP:
         EnsureSocketRuntime();

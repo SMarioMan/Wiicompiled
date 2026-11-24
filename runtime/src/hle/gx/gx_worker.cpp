@@ -25,6 +25,8 @@
 void GxWorkerReplayFifoWrite(uint32_t value, uint32_t sizeBytes);
 void GxWorkerReplayFifoBurst(const uint8_t* data, uint32_t sizeBytes);
 
+extern bool g_headless;
+
 namespace GxWorker {
 namespace detail {
 std::atomic<bool> g_active{false};
@@ -191,7 +193,7 @@ void WorkerMain() {
     uint64_t tail = g_tail.load(std::memory_order_relaxed);
     for (;;) {
         uint64_t head = g_head.load(std::memory_order_acquire);
-        if (head == tail) {
+        if (head == tail && !g_headless) {
             const auto spinUntil = std::chrono::steady_clock::now() + kIdleSpin;
             while (head == tail) {
                 for (int spin = 0; spin < 64 && head == tail; ++spin) {

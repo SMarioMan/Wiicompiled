@@ -222,7 +222,7 @@ NasSslWriteAction PreparePlainNasTcpWrite(WiiSocket& socket, const uint8_t* data
     return AccumulateNasRequest(socket.nasWriteBuffer, data, size, patched);
 }
 
-static bool WriteSslReturn(const std::vector<IoVector>& in, int32_t value) {
+static bool WriteSslReturn(std::span<const IoVector> in, int32_t value) {
     if (in.empty() || !in[0].address || in[0].size < 4) {
         return false;
     }
@@ -230,7 +230,7 @@ static bool WriteSslReturn(const std::vector<IoVector>& in, int32_t value) {
     return true;
 }
 
-static int ReadSslId(const std::vector<IoVector>& out) {
+static int ReadSslId(std::span<const IoVector> out) {
     if (out.empty() || !out[0].address || out[0].size < 4) {
         return -1;
     }
@@ -872,7 +872,7 @@ void ClearSslSessionsForSocket(uint32_t fd) {
     }
 }
 
-int32_t HandleSslIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const std::vector<IoVector>& out) {
+int32_t HandleSslIoctlv(uint32_t cmd, std::span<const IoVector> in, std::span<const IoVector> out) {
 
     switch (cmd) {
     case IOCTLV_NET_SSL_NEW: {

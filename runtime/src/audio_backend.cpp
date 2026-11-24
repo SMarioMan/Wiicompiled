@@ -52,6 +52,16 @@ bool AudioBackend::EnsureInitializedLocked(uint32_t sampleRate, uint32_t channel
         m_stream = nullptr;
     }
 
+    // Headless/silenced instances do not need a live host audio device (e.g.
+    // 128 WASAPI playback streams on Windows). Record the format and drop
+    // pushed samples at zero cost while keeping guest audio timing intact.
+    if (m_silenced) {
+        m_sampleRate = sampleRate;
+        m_channels = channels;
+        m_initialized = true;
+        return true;
+    }
+
     if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
         RT_LOG(RT_TAG_AUDIO) << "SDL_InitSubSystem(SDL_INIT_AUDIO) failed: " << SDL_GetError() << std::endl;
         return false;
@@ -149,6 +159,9 @@ bool AudioBackend::PushWiiAiSamplesBE16(const uint8_t* data, size_t bytes) {
     }
 
     std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_silenced) {
+        return true;
+    }
     if (!m_initialized || !m_stream) {
         return false;
     }
@@ -192,6 +205,9 @@ bool AudioBackend::PushSamplesLE16(const int16_t* samples, size_t sampleCount) {
     }
 
     std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_silenced) {
+        return true;
+    }
     if (!m_initialized || !m_stream) {
         return false;
     }

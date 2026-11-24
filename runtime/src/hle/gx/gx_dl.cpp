@@ -502,9 +502,75 @@ struct DlScanCacheRecord {
     std::vector<uint8_t> flattened{};
 };
 
+constexpr size_t kDlScanCacheTableSize = 16384; // power of 2, >= 2 * kDlScanCacheMaxEntries
+static_assert((kDlScanCacheTableSize & (kDlScanCacheTableSize - 1)) == 0);
+static_assert(kDlScanCacheTableSize >= kDlScanCacheMaxEntries * 2);
+
 struct DlScanCacheState {
-    std::unordered_map<uint64_t, DlScanCacheRecord> entries{};
+    static constexpr uint32_t kEmptySlot = UINT32_MAX;
+    struct Slot {
+        uint64_t key = 0;
+        uint32_t recordIndex = kEmptySlot;
+    };
+
+    std::vector<Slot> slots{};
+    std::vector<DlScanCacheRecord> records{};
     size_t storedCommandBytes = 0;
+
+    static size_t BucketFor(uint64_t key) noexcept {
+        return static_cast<size_t>((key ^ (key >> 33)) & (kDlScanCacheTableSize - 1));
+    }
+
+    void EnsureInitialized() {
+        if (slots.empty()) {
+            slots.resize(kDlScanCacheTableSize);
+        }
+    }
+
+    DlScanCacheRecord* Find(uint64_t key) noexcept {
+        if (slots.empty()) {
+            return nullptr;
+        }
+        size_t idx = BucketFor(key);
+        while (true) {
+            const Slot& slot = slots[idx];
+            if (slot.recordIndex == kEmptySlot) {
+                return nullptr;
+            }
+            if (slot.key == key) {
+                return &records[slot.recordIndex];
+            }
+            idx = (idx + 1) & (kDlScanCacheTableSize - 1);
+        }
+    }
+
+    void Clear() {
+        if (!slots.empty()) {
+            std::fill(slots.begin(), slots.end(), Slot{});
+        }
+        records.clear();
+        storedCommandBytes = 0;
+    }
+
+    DlScanCacheRecord& InsertOrAssign(uint64_t key, DlScanCacheRecord&& record) {
+        EnsureInitialized();
+        size_t idx = BucketFor(key);
+        while (true) {
+            Slot& slot = slots[idx];
+            if (slot.recordIndex == kEmptySlot) {
+                const uint32_t recIdx = static_cast<uint32_t>(records.size());
+                records.push_back(std::move(record));
+                slot.key = key;
+                slot.recordIndex = recIdx;
+                return records[recIdx];
+            }
+            if (slot.key == key) {
+                records[slot.recordIndex] = std::move(record);
+                return records[slot.recordIndex];
+            }
+            idx = (idx + 1) & (kDlScanCacheTableSize - 1);
+        }
+    }
 };
 
 static uint64_t HashScanLayoutState() {
@@ -560,9 +626,8 @@ static DlScanCacheProbe ProbeDlScanCache(const uint8_t* list, uint32_t listAddr,
 
     auto& s_cache = DlScanCache();
     const uint64_t key = DlScanCacheKey(listAddr, nbytes, layoutHash);
-    const auto it = s_cache.entries.find(key);
-    if (it != s_cache.entries.end()) {
-        auto& record = it->second;
+    if (DlScanCacheRecord* found = s_cache.Find(key); found != nullptr) {
+        auto& record = *found;
         const auto& entry = record.result;
         const bool identityMatches = entry.listAddr == CanonicalizeGxMainRamAddress(listAddr) &&
                                      entry.nbytes == nbytes && entry.layoutHash == layoutHash;
@@ -600,15 +665,14 @@ static void StoreDlScanCache(uint32_t listAddr, uint32_t nbytes, uint64_t layout
                              uint32_t flattenedBytes) {
     auto& s_cache = DlScanCache();
     const uint64_t key = DlScanCacheKey(listAddr, nbytes, layoutHash);
-    auto old = s_cache.entries.find(key);
-    bool replacing = old != s_cache.entries.end();
-    size_t replacedBytes = replacing ? DlScanCacheRecordBytes(old->second) : 0;
+    DlScanCacheRecord* old = s_cache.Find(key);
+    bool replacing = old != nullptr;
+    size_t replacedBytes = replacing ? DlScanCacheRecordBytes(*old) : 0;
     const size_t incomingBytes = static_cast<size_t>(flattenedBytes) +
                                  cpWrites.size() * sizeof(DlCpWrite);
-    if ((!replacing && s_cache.entries.size() >= kDlScanCacheMaxEntries) ||
+    if ((!replacing && s_cache.records.size() >= kDlScanCacheMaxEntries) ||
         s_cache.storedCommandBytes - replacedBytes + incomingBytes > kDlScanCacheMaxStoredBytes) {
-        s_cache.entries.clear();
-        s_cache.storedCommandBytes = 0;
+        s_cache.Clear();
         replacing = false;
         replacedBytes = 0;
     }
@@ -626,9 +690,8 @@ static void StoreDlScanCache(uint32_t listAddr, uint32_t nbytes, uint64_t layout
     if (flattened != nullptr && flattenedBytes != 0) {
         record.flattened.assign(flattened, flattened + flattenedBytes);
     }
-    auto [it, inserted] = s_cache.entries.insert_or_assign(key, std::move(record));
-    (void)inserted;
-    s_cache.storedCommandBytes += DlScanCacheRecordBytes(it->second);
+    auto& stored = s_cache.InsertOrAssign(key, std::move(record));
+    s_cache.storedCommandBytes += DlScanCacheRecordBytes(stored);
     if (replacing) {
         s_cache.storedCommandBytes -= replacedBytes;
     }
@@ -1339,9 +1402,18 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
             SyncAppliedVtxStateFromHleReal();
             return;
         }
-        std::array<uint32_t, GX_VA_MAX_ATTR> maxIdx{}; std::array<bool, GX_VA_MAX_ATTR> sawIdx{};
-        std::array<uint32_t, GX_VA_MAX_ATTR> maxXfIdx{}; std::array<uint32_t, GX_VA_MAX_ATTR> maxXfBytes{};
-        std::array<bool, GX_VA_MAX_ATTR> sawXfIdx{};
+        // Leave local scan arrays uninitialized on the cache-hit fast path to avoid
+        // zero-initializing and copying 360 bytes per GXCallDisplayList hit.
+        std::array<uint32_t, GX_VA_MAX_ATTR> localMaxIdx;
+        std::array<bool, GX_VA_MAX_ATTR> localSawIdx;
+        std::array<uint32_t, GX_VA_MAX_ATTR> localMaxXfIdx;
+        std::array<uint32_t, GX_VA_MAX_ATTR> localMaxXfBytes;
+        std::array<bool, GX_VA_MAX_ATTR> localSawXfIdx;
+        const std::array<uint32_t, GX_VA_MAX_ATTR>* pMaxIdx = nullptr;
+        const std::array<bool, GX_VA_MAX_ATTR>* pSawIdx = nullptr;
+        const std::array<uint32_t, GX_VA_MAX_ATTR>* pMaxXfIdx = nullptr;
+        const std::array<uint32_t, GX_VA_MAX_ATTR>* pMaxXfBytes = nullptr;
+        const std::array<bool, GX_VA_MAX_ATTR>* pSawXfIdx = nullptr;
         GXVtxFmt dlVtxFmt = GX_MAX_VTXFMT; bool dlVtxFmtMixed = false;
         bool dlHasNestedDl = false;
         bool dlHasArrayStateWrites = false;
@@ -1358,11 +1430,11 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
         if (cached != nullptr) {
             const auto& entry = cached->result;
             scanOk = entry.scanOk;
-            maxIdx = entry.maxIdx;
-            sawIdx = entry.sawIdx;
-            maxXfIdx = entry.maxXfIdx;
-            maxXfBytes = entry.maxXfBytes;
-            sawXfIdx = entry.sawXfIdx;
+            pMaxIdx = &entry.maxIdx;
+            pSawIdx = &entry.sawIdx;
+            pMaxXfIdx = &entry.maxXfIdx;
+            pMaxXfBytes = &entry.maxXfBytes;
+            pSawXfIdx = &entry.sawXfIdx;
             dlVtxFmt = entry.dlVtxFmt;
             dlVtxFmtMixed = entry.dlVtxFmtMixed;
             dlHasNestedDl = entry.dlHasNestedDl;
@@ -1390,12 +1462,23 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
                 }
             }
         } else {
+            localMaxIdx.fill(0);
+            localSawIdx.fill(false);
+            localMaxXfIdx.fill(0);
+            localMaxXfBytes.fill(0);
+            localSawXfIdx.fill(false);
+            pMaxIdx = &localMaxIdx;
+            pSawIdx = &localSawIdx;
+            pMaxXfIdx = &localMaxXfIdx;
+            pMaxXfBytes = &localMaxXfBytes;
+            pSawXfIdx = &localSawXfIdx;
             std::vector<DlCpWrite> cpWrites{};
             // The scan discovers the list's CP writes as it walks, so this path
             // cannot narrow the snapshot the way the cached one does.
             stateBeforeScan = CaptureGxVertexState();
             haveStateBeforeScan = true;
-            scanOk = ScanDisplayListMaxIndices(list, nbytes, maxIdx, sawIdx, maxXfIdx, maxXfBytes, sawXfIdx,
+            scanOk = ScanDisplayListMaxIndices(list, nbytes, localMaxIdx, localSawIdx, localMaxXfIdx,
+                                               localMaxXfBytes, localSawXfIdx,
                                                &dlVtxFmt, &dlVtxFmtMixed, &dlHasNestedDl,
                                                &dlHasArrayStateWrites, &dlHasCpWrites, &cpWrites);
             needsFlatten = dlHasNestedDl || dlHasArrayStateWrites || dlHasCpWrites;
@@ -1424,11 +1507,11 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
                 entry.listAddr = CanonicalizeGxMainRamAddress(listAddr);
                 entry.nbytes = nbytes;
                 entry.layoutHash = scanLayoutHash;
-                entry.maxIdx = maxIdx;
-                entry.sawIdx = sawIdx;
-                entry.maxXfIdx = maxXfIdx;
-                entry.maxXfBytes = maxXfBytes;
-                entry.sawXfIdx = sawXfIdx;
+                entry.maxIdx = localMaxIdx;
+                entry.sawIdx = localSawIdx;
+                entry.maxXfIdx = localMaxXfIdx;
+                entry.maxXfBytes = localMaxXfBytes;
+                entry.sawXfIdx = localSawXfIdx;
                 entry.dlVtxFmt = dlVtxFmt;
                 entry.dlVtxFmtMixed = dlVtxFmtMixed;
                 entry.dlHasNestedDl = dlHasNestedDl;
@@ -1455,9 +1538,9 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
                 ApplyAuroraVtxDesc();
                 ApplyAuroraVtxAttrFmtForDisplayList(dlVtxFmt, dlVtxFmtMixed);
                 const bool flattenArraysOk =
-                    ApplyAuroraArraysForDisplayList(maxIdx, sawIdx, dlVtxFmt, dlVtxFmtMixed);
+                    ApplyAuroraArraysForDisplayList(*pMaxIdx, *pSawIdx, dlVtxFmt, dlVtxFmtMixed);
                 const bool flattenXfOk =
-                    ApplyAuroraIndexedXFArraysForDisplayList(maxXfIdx, maxXfBytes, sawXfIdx);
+                    ApplyAuroraIndexedXFArraysForDisplayList(*pMaxXfIdx, *pMaxXfBytes, *pSawXfIdx);
                 flattenApplyOk = flattenArraysOk && flattenXfOk;
             }
             if (flattenApplyOk) {
@@ -1476,8 +1559,8 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
             if (scanOk) {
                 ApplyAuroraVtxDesc();
                 ApplyAuroraVtxAttrFmtForDisplayList(dlVtxFmt, dlVtxFmtMixed);
-                arraysOk = ApplyAuroraArraysForDisplayList(maxIdx, sawIdx, dlVtxFmt, dlVtxFmtMixed);
-                xfOk = ApplyAuroraIndexedXFArraysForDisplayList(maxXfIdx, maxXfBytes, sawXfIdx);
+                arraysOk = ApplyAuroraArraysForDisplayList(*pMaxIdx, *pSawIdx, dlVtxFmt, dlVtxFmtMixed);
+                xfOk = ApplyAuroraIndexedXFArraysForDisplayList(*pMaxXfIdx, *pMaxXfBytes, *pSawXfIdx);
                 applyOk = arraysOk && xfOk;
             }
             if (applyOk) {

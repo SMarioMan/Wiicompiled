@@ -462,3 +462,262 @@ extern "C" void KartCollision_CheckKartCollision_Expanded(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x8056F7F0, KartCollision_CheckKartCollision_Expanded,
                            "KartCollision_CheckKartCollision_Expanded");
+
+// ---------------------------------------------------------------------------
+// 9. EntityManager::Update (PAL 0x807859B0 / USA 0x80781580) &
+//    EntityManager::FindEntitiesCloseToEntity (PAL 0x807868C0 / USA 0x80782490)
+// ---------------------------------------------------------------------------
+// Native C++ equivalents of the hot 1D sweep-and-prune spatial broadphase
+// loops. Bit-identical to the PowerPC originals (same tie-breaking, same
+// insertion sort order, same result order and 256-entry cap) while avoiding
+// per-iteration PPC register/CR/rotl/layout-audit emulation overhead.
+namespace {
+inline float ReadGuestFloat(uint32_t addr) {
+    const uint32_t bits = Memory::Read32(addr);
+    float v;
+    std::memcpy(&v, &bits, sizeof(v));
+    return v;
+}
+inline void WriteGuestFloat(uint32_t addr, float v) {
+    uint32_t bits;
+    std::memcpy(&bits, &v, sizeof(bits));
+    Memory::Write32(addr, bits);
+}
+} // namespace
+
+extern "C" void EntityManager_Update_Native(CpuContext* ctx) {
+    const uint32_t mgr = ctx->gpr[3];
+    Memory::Write32(mgr + 1064u, 256u);
+    Memory::Write32(mgr + 1068u, 256u);
+    Memory::Write32(mgr + 1072u, 256u);
+    Memory::Write32(mgr + 1076u, 256u);
+    Memory::Write32(mgr + 1080u, 0u);
+    Memory::Write32(mgr + 1084u, 0u);
+    WriteGuestFloat(mgr + 1100u, 0.0f);
+    Memory::Write32(mgr + 1104u, 0u);
+
+    const uint32_t zMaxArr = Memory::Read32(mgr + 16u);
+    const uint32_t zMinArr = Memory::Read32(mgr + 20u);
+    const uint32_t entities = Memory::Read32(mgr + 24u);
+    const int32_t count = static_cast<int32_t>(Memory::Read32(mgr + 1056u));
+
+    int32_t activeSeen = 0;
+    uint32_t entOff = 0u;
+    while (activeSeen < count) {
+        const uint32_t ent = entities + entOff;
+        const uint32_t flags = Memory::Read32(ent + 12u);
+        if ((flags & 1024u) != 0u) {
+            ++activeSeen;
+            if ((flags & 2304u) != 0u) {
+                const uint32_t posPtr = Memory::Read32(ent);
+                const float radius = ReadGuestFloat(ent + 8u);
+                const float x = ReadGuestFloat(posPtr);
+                const float z = ReadGuestFloat(posPtr + 8u);
+                WriteGuestFloat(ent + 24u, x + radius);
+                WriteGuestFloat(ent + 28u, x - radius);
+                const int32_t zMaxIdx = static_cast<int16_t>(Memory::Read16(ent + 20u));
+                WriteGuestFloat(zMaxArr + static_cast<uint32_t>(zMaxIdx) * 8u, z + radius);
+                const int32_t zMinIdx = static_cast<int16_t>(Memory::Read16(ent + 22u));
+                WriteGuestFloat(zMinArr + static_cast<uint32_t>(zMinIdx) * 8u, z - radius);
+                Memory::Write32(ent + 12u, flags & ~2048u);
+            }
+        }
+        entOff += 32u;
+    }
+
+    for (int32_t i = 1; i < count; ++i) {
+        for (int32_t j = i; j >= 1; --j) {
+            const uint32_t prevAddr = zMaxArr + static_cast<uint32_t>(j - 1) * 8u;
+            const uint32_t currAddr = zMaxArr + static_cast<uint32_t>(j) * 8u;
+            const float prevVal = ReadGuestFloat(prevAddr);
+            const float currVal = ReadGuestFloat(currAddr);
+            if (!(prevVal > currVal)) {
+                break;
+            }
+            const uint8_t currB4 = Memory::Read8(currAddr + 4u);
+            const uint8_t currB5 = Memory::Read8(currAddr + 5u);
+            const uint8_t prevB4 = Memory::Read8(prevAddr + 4u);
+            const uint8_t prevB5 = Memory::Read8(prevAddr + 5u);
+            WriteGuestFloat(currAddr, prevVal);
+            Memory::Write8(currAddr + 4u, prevB4);
+            Memory::Write8(currAddr + 5u, prevB5);
+            WriteGuestFloat(prevAddr, currVal);
+            Memory::Write8(prevAddr + 4u, currB4);
+            Memory::Write8(prevAddr + 5u, currB5);
+
+            const uint32_t zMinA = zMinArr + static_cast<uint32_t>(prevB4) * 8u;
+            const uint32_t zMinB = zMinArr + static_cast<uint32_t>(currB4) * 8u;
+            Memory::Write8(zMinA + 4u, static_cast<uint8_t>(Memory::Read8(zMinA + 4u) + 1u));
+            Memory::Write8(zMinB + 4u, static_cast<uint8_t>(Memory::Read8(zMinB + 4u) - 1u));
+
+            const uint32_t entA = entities + static_cast<uint32_t>(Memory::Read8(zMinA + 5u)) * 32u;
+            const uint32_t entB = entities + static_cast<uint32_t>(Memory::Read8(zMinB + 5u)) * 32u;
+            Memory::Write16(entA + 20u,
+                            static_cast<uint16_t>(static_cast<int16_t>(Memory::Read16(entA + 20u)) + 1));
+            Memory::Write16(entB + 20u,
+                            static_cast<uint16_t>(static_cast<int16_t>(Memory::Read16(entB + 20u)) - 1));
+
+            if (prevB5 == currB4) {
+                uint8_t k = prevB5;
+                do {
+                    ++k;
+                } while (static_cast<int32_t>(Memory::Read8(zMinArr + static_cast<uint32_t>(k) * 8u + 4u)) < j);
+                Memory::Write8(currAddr + 5u, k);
+            }
+            if (currB5 > prevB4) {
+                Memory::Write8(prevAddr + 5u, prevB4);
+            }
+        }
+    }
+
+    for (int32_t i = 1; i < count; ++i) {
+        for (int32_t j = i; j >= 1; --j) {
+            const uint32_t prevAddr = zMinArr + static_cast<uint32_t>(j - 1) * 8u;
+            const uint32_t currAddr = zMinArr + static_cast<uint32_t>(j) * 8u;
+            const float prevVal = ReadGuestFloat(prevAddr);
+            const float currVal = ReadGuestFloat(currAddr);
+            if (!(prevVal > currVal)) {
+                break;
+            }
+            const uint8_t currB4 = Memory::Read8(currAddr + 4u);
+            const uint8_t currB5 = Memory::Read8(currAddr + 5u);
+            const uint8_t prevB4 = Memory::Read8(prevAddr + 4u);
+            const uint8_t prevB5 = Memory::Read8(prevAddr + 5u);
+            WriteGuestFloat(currAddr, prevVal);
+            Memory::Write8(currAddr + 4u, prevB4);
+            Memory::Write8(currAddr + 5u, prevB5);
+            WriteGuestFloat(prevAddr, currVal);
+            Memory::Write8(prevAddr + 4u, currB4);
+            Memory::Write8(prevAddr + 5u, currB5);
+
+            const uint32_t zMaxA = zMaxArr + static_cast<uint32_t>(prevB4) * 8u;
+            const uint32_t zMaxB = zMaxArr + static_cast<uint32_t>(currB4) * 8u;
+            Memory::Write8(zMaxA + 4u, static_cast<uint8_t>(Memory::Read8(zMaxA + 4u) + 1u));
+            Memory::Write8(zMaxB + 4u, static_cast<uint8_t>(Memory::Read8(zMaxB + 4u) - 1u));
+
+            const uint32_t entA = entities + static_cast<uint32_t>(prevB5) * 32u;
+            const uint32_t entB = entities + static_cast<uint32_t>(currB5) * 32u;
+            Memory::Write16(entA + 22u,
+                            static_cast<uint16_t>(static_cast<int16_t>(Memory::Read16(entA + 22u)) + 1));
+            Memory::Write16(entB + 22u,
+                            static_cast<uint16_t>(static_cast<int16_t>(Memory::Read16(entB + 22u)) - 1));
+
+            if (prevB4 > currB4) {
+                for (int32_t k = prevB4; k > static_cast<int32_t>(currB4); --k) {
+                    const uint32_t slot = zMaxArr + static_cast<uint32_t>(k) * 8u;
+                    const uint8_t h = Memory::Read8(slot + 5u);
+                    if (static_cast<int32_t>(h) != j - 1) {
+                        break;
+                    }
+                    Memory::Write8(slot + 5u, static_cast<uint8_t>(h + 1u));
+                }
+            } else {
+                for (int32_t k = currB4; k > static_cast<int32_t>(prevB4); --k) {
+                    const uint32_t slot = zMaxArr + static_cast<uint32_t>(k) * 8u;
+                    const uint8_t h = Memory::Read8(slot + 5u);
+                    if (static_cast<int32_t>(h) != j) {
+                        break;
+                    }
+                    Memory::Write8(slot + 5u, static_cast<uint8_t>(h - 1u));
+                }
+            }
+        }
+    }
+}
+REGISTER_NATIVE_REPLACEMENT_AS(0x807859B0, EntityManager_Update_Native,
+                               "EntityManager_Update_Native");
+
+extern "C" void EntityManager_FindEntitiesCloseToEntity_Native(CpuContext* ctx) {
+    const uint32_t mgr = ctx->gpr[3];
+    const uint32_t entity = ctx->gpr[4];
+    const uint32_t mask = ctx->gpr[5];
+
+    if ((Memory::Read32(entity + 12u) & 1024u) == 0u) {
+        return;
+    }
+
+    const int32_t zMinIdx = static_cast<int16_t>(Memory::Read16(entity + 22u));
+    int32_t zMaxIdx = static_cast<int16_t>(Memory::Read16(entity + 20u));
+    const uint32_t posPtr = Memory::Read32(entity);
+    const uint32_t zMaxArr = Memory::Read32(mgr + 16u);
+    const uint32_t zMinArr = Memory::Read32(mgr + 20u);
+    const int32_t lastIdx = static_cast<int32_t>(Memory::Read32(mgr + 1056u)) - 1;
+
+    const float radius = ReadGuestFloat(entity + 4u);
+    const float posZ = ReadGuestFloat(posPtr + 8u);
+    const float posX = ReadGuestFloat(posPtr);
+    const float queryZMax = ReadGuestFloat(zMaxArr + static_cast<uint32_t>(zMaxIdx) * 8u);
+    const float zPlusR = posZ + radius;
+    const float zMinusR = posZ - radius;
+    const float queryZMin = ReadGuestFloat(zMinArr + static_cast<uint32_t>(zMinIdx) * 8u);
+    const float xPlusR = posX + radius;
+    const float queryXMax = ReadGuestFloat(entity + 24u);
+    const float queryXMin = ReadGuestFloat(entity + 28u);
+    const float xMinusR = posX - radius;
+
+    Memory::Write32(mgr + 1080u, 0u);
+    Memory::Write32(mgr + 1084u, entity);
+    WriteGuestFloat(mgr + 1100u, 0.0f);
+    Memory::Write32(mgr + 1104u, mask);
+
+    while (zMaxIdx > 7 && ReadGuestFloat(zMaxArr + static_cast<uint32_t>(zMaxIdx - 8) * 8u) >= queryZMin) {
+        zMaxIdx -= 8;
+    }
+    while (zMaxIdx > 0 && ReadGuestFloat(zMaxArr + static_cast<uint32_t>(zMaxIdx - 1) * 8u) >= queryZMin) {
+        --zMaxIdx;
+    }
+
+    int32_t scanIdx = zMinIdx;
+    const int32_t lastMinus7 = lastIdx - 7;
+    while (scanIdx < lastMinus7 && ReadGuestFloat(zMinArr + static_cast<uint32_t>(scanIdx + 8) * 8u) <= queryZMax) {
+        scanIdx += 8;
+    }
+    while (scanIdx < lastIdx && ReadGuestFloat(zMinArr + static_cast<uint32_t>(scanIdx + 1) * 8u) <= queryZMax) {
+        ++scanIdx;
+    }
+
+    const int32_t minScan = static_cast<int32_t>(Memory::Read8(zMaxArr + static_cast<uint32_t>(zMaxIdx) * 8u + 5u));
+    if (scanIdx < minScan) {
+        return;
+    }
+
+    const uint32_t entities = Memory::Read32(mgr + 24u);
+    const uint32_t outArr = Memory::Read32(mgr + 28u);
+    uint32_t foundCount = 0u;
+
+    for (int32_t k = scanIdx; k >= minScan; --k) {
+        const uint32_t zMinEntry = zMinArr + static_cast<uint32_t>(k) * 8u;
+        if (static_cast<int32_t>(Memory::Read8(zMinEntry + 4u)) < zMaxIdx || k == zMinIdx) {
+            if (k == 0) {
+                break;
+            }
+            continue;
+        }
+        const uint32_t cand = entities + static_cast<uint32_t>(Memory::Read8(zMinEntry + 5u)) * 32u;
+        if (ReadGuestFloat(cand + 24u) < queryXMin || ReadGuestFloat(cand + 28u) > queryXMax) {
+            continue;
+        }
+        const uint32_t candFlags = Memory::Read32(cand + 12u);
+        if ((candFlags & mask) == 0u || (candFlags & 512u) != 0u) {
+            continue;
+        }
+        const uint32_t candPos = Memory::Read32(cand);
+        const float candR = ReadGuestFloat(cand + 4u);
+        const float candZ = ReadGuestFloat(candPos + 8u);
+        if (candZ + candR < zMinusR || candZ - candR > zPlusR) {
+            continue;
+        }
+        const float candX = ReadGuestFloat(candPos);
+        if (candX + candR < xMinusR || candX - candR > xPlusR) {
+            continue;
+        }
+        Memory::Write32(outArr + foundCount * 4u, cand);
+        ++foundCount;
+        Memory::Write32(mgr + 1080u, foundCount);
+        if (foundCount == 256u || k == 0) {
+            break;
+        }
+    }
+}
+REGISTER_NATIVE_REPLACEMENT_AS(0x807868C0, EntityManager_FindEntitiesCloseToEntity_Native,
+                               "EntityManager_FindEntitiesCloseToEntity_Native");

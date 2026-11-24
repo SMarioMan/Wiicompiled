@@ -1,58 +1,64 @@
-# 128-player LAN handoff
+# 128-player LAN status
 
 The Linux 128-capacity build has completed offline VS, Team VS, Grand Prix,
-Balloon Battle, Coin Runners and Time Trial validation. Time Trial retains
-its single-racer rules. The live LAN build rejects capacities above 32. Live
-LAN testing has observed 13 peers finish a race, and a later two-peer
-regression run finished on both peers. See [offline results](128-racer-comparison.md)
-and [LAN results](lan-expanded-validation.md).
+Balloon Battle, Coin Runners, and Time Trial validation, as well as **live
+128-console LAN multiplayer** (`IDs 1..128`, `AIDs 0..127`). Time Trial retains
+its single-racer rules. See [offline results](128-racer-comparison.md) and
+[LAN results](lan-expanded-validation.md).
 
-## Published code
+## 128-player LAN architecture & fixes
 
-- `3b1ac4b` grows the SDK matchmaking node list in groups of 32 through
-  AID 127. The native translated fixtures initialize the list, exhaust free IDs,
-  look up the last node by AID, PID and index, compact the list, and clear it
-  with guards around the allocation. The relocation audit checks 1,414
-  executable operands. A full translation emitted 29,456 functions.
-- `3193efc` makes LAN address overrides and mesh scheduling use the expanded
-  matchmaking node count. The host fixtures cover entries through index 127
-  and check that inactive and out-of-range entries are ignored.
-- Static connection pointers, connection metadata, transport records and
-  one-recipient forwarding already have translated-code fixtures above AID 31.
-  Authored LAN branches use symbols. Original guest executable addresses
-  remain the stable reference points for translation and patches.
+- **Expanded SDK & RKNet storage (`3b1ac4b`..`a4a4e26`)**: Widened `DWCMatch`
+  nodes (128 slots), `DWCTransport` records, connection pointer/metadata tables,
+  128-bit `suspend_votes` and `RKNetSub` / `RKNetSELECT` / `RKNetRH1` /
+  `RKNetRACE` bitfields, and raised `DWCTransport::send_split_max` so 128-peer
+  SYN packets are never truncated.
+- **O(N) Star / Host-Relay topology + direct LAN UDP data plane (`f725ab8`,
+  `81e058b`, `5fec2a4`)**:
+  - Above 12 players, `LANMeshNextTick` (`mods/lan/source/module/mesh_schedule.c`)
+    defers client-to-client GT2 connections (`INT64_MAX`), collapsing 8,128
+    $O(N^2)$ GT2 links into 127 $O(N)$ host-client links (128-console room join
+    dropped from ~475 s to ~99 s).
+  - `DWC_GetDirectConnectedAIDBitmap` (`0x800D21BC`) reports `DWC_GetAidBitmap()`
+    for clients with a live host GT2 link while the host continues reporting its
+    true direct GT2 bitmap.
+  - `DWC_SendUnreliable` (`0x800E85B4`) routes all unreliable RKNet traffic over
+    a dedicated non-blocking UDP `data_socket` on port `27910` directly to each
+    peer's `local_ip`, with GT2's idle `receive_timeout` raised to 1 hour.
+- **Lobby, Track Roulette, and 128th-place race fixes (`411c0eb`, `278558c`,
+  `6aa93cd`)**:
+  - Bypassed the 170 ms per-peer export gate in `RKNet::ROOMHandler::ExportROOMandUSER`
+    (`0x80656BC0`), `RKNet::SELECTHandler::PrepareAndExportSELECTandUSER`
+    (`0x80658FE0`), and the `RKNet::RH1Handler` export (`0x8065C714`) above 12
+    players so full 128-peer sweeps finish in ~2.1 s instead of 21.6 s.
+  - Eliminated the up to 70.6 s per-console roulette crawl in
+    `Pages::Vote::BeforeControlUpdate` (`0x806123C8`) above 12 players by
+    populating all vote cards immediately and snapping to `winningVoteControlIdx`
+    once the 4.17 s deceleration spin finishes.
+  - NOPped `extsb r7, r7` at `GMDataOnlineVS::HandlePositionTracking+0x19C`
+    (`0x8053A100`) so 128th place (`0x80`) stays zero-extended (`128`) rather
+    than sign-extending to `-128`.
+  - NOPped `RaceinfoPlayer::EndLap+0x254` (`0x805300C4`) above 12 players
+    (`bb5d650`) so remote online racers (`playerIdx >= 13`, beyond RH2's 13-bit
+    finish-consensus mask) fall through into `RaceinfoPlayer::EndRace` when
+    crossing the lap-3 finish line.
+- **Runtime & Windows lab scaling (`e77f8fd`, `6f533ab`, `bf26430`, `9ac4d1c`)**:
+  - Raised `SOCK_DGRAM` `SO_RCVBUF`/`SO_SNDBUF` to 2 MiB in `network_core.cpp`,
+    skipped Null-backend shader prewarm in headless mode, and wired
+    `MKW_SHARED_CACHE_DIR` into `mods/lan/lab/make-lab.ps1` and `run-lab.ps1`
+    (capacity range raised to 128).
+  - Fixed `SelectThread` in `runtime/src/hle/os/os_scheduler.cpp` to re-enter
+    idle/selection when the run queue drains or a switched-to worker fiber exits.
 
-## Remaining LAN work
+## Verified live LAN runs (capacity 128)
 
-The SDK tracks suspend votes in the word at `DWCMatch+0x1c`. The primary
-paths to widen together are:
+| Consoles | Timing (`MKW_TEST_CLOCK_DIVISOR`) | Check | Result | Elapsed |
+| --- | --- | --- | --- | ---: |
+| 3 sparse (`1, 33, 128`) | Normal (`1`) | `--race` | **PASS** | 73.72 s |
+| 3 sparse (`1, 33, 128`) | Normal (`1`) | `--race --finish` | **PASS** | 205.72 s |
+| 33 (`1..33`, AIDs `0..32`) | Normal (`1`) | `--race` | **PASS** | 158.48 s |
+| 65 (`1..65`, AIDs `0..64`) | Functional (`2`) | `--race` | **PASS** | 408.25 s |
+| **128 (`1..128`, AIDs `0..127`)** | **Functional (`4`)** | **`--race`** | **PASS** | **565.68 s** |
 
-- `800D3894/800D38A0` clear departed peers. `800D7BE0/800D7BEC`
-  update vote state while processing the match. `800DB344` resets it.
-- `800D4968` reads it in `DWC_GetSuspendMatch`. It intersects votes
-  with membership, conditionally excludes the local AID from the vote,
-  and keeps the last settled state while votes are mixed.
-- `800E6F44–800E6F7C` tests whether an individual vote changed.
-  `800E7048` reads the mask for transmission. One sender path for
-  command `0x82` uses four words when broadcasting a state change
-  (`800E715C–800E7194`). Review the separate path at `800E71DC`.
-  The receiver commits the fourth word at `800DE584`. Extend both
-  directions and validate packet lengths before reading additional words.
-
-The SDK membership and direct-connection getters also return one word.
-Their audited callers are listed in the LAN results. In the game, start
-with `RKNet::Controller::UpdateSubsAndVR` at `80654988` and `806549EC`
-and follow the masks at `RKNetSub+0x10/+0x14/+0x18` into room controls,
-race startup, departure and synchronization. The LAN deferred-SYN path
-copies either two or eight words according to the pinned original protocol.
-Coordinate any size change with that buffer and its replay path.
-
-The first live boundary case is 33 independent consoles. Check that AID 32
-can join, vote, race, finish, return to the room and rejoin without changing
-AID 0's state. Repeat across 63/64 and 95/96, then exercise a 128-console
-room. Keep the build guard until the room and race paths support the
-expanded field.
-
-Use the SMarioMan commit identity and the requested
-`Co-Authored-By: GPT-6.2 Sol (Light) <codex@users.noreply.github.com>` trailer
-for subsequent commits.
+All 992 `Translator.Tests` and all 30 LAN Python unit tests pass with zero
+regressions.

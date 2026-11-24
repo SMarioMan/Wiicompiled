@@ -521,3 +521,59 @@ Through capacity 32 it retains the one-hot recipient mask. Fixtures at 32,
 and 127, and check that another ID sharing the same low five bits receives
 nothing. The separate matchmaking and suspend packets retain their current
 32-bit masks.
+
+## 128-player Star topology, direct LAN UDP, and live race validation
+
+Above 12 players, the LAN module now uses an $O(N)$ Star / Host-Relay GT2
+control topology (`LANMeshNextTick` defers non-host client-to-client GT2 links
+with `INT64_MAX`; `DWC_GetDirectConnectedAIDBitmap` reports `DWC_GetAidBitmap()`
+for clients with a live host link) paired with a dedicated non-blocking direct
+LAN UDP data plane (`data_socket` on port `27910`, `LAN_DATA_MAGIC = 0x4D4B5744`)
+for all unreliable RKNet traffic (`f725ab8`, `81e058b`, `5fec2a4`).
+
+Three additional 128-player bottlenecks were resolved in `mods/lan/build.py`
+and `runtime/src/hle/os/os_scheduler.cpp`:
+
+1. **170 ms lobby/race-start export gates (`411c0eb`)**: `RKNet::ROOMHandler::ExportROOMandUSER`
+   (`0x80656BC0`), `RKNet::SELECTHandler::PrepareAndExportSELECTandUSER`
+   (`0x80658FE0`), and the `RKNet::RH1Handler` export (`0x8065C714`) each gated
+   their 1-peer-per-call round-robin export behind a 170 ms timer (`21.6 s` per
+   128-peer sweep). NOPping the 170 ms branch above 12 players reduced sweeps to
+   `~2.1 s`, eliminating 60-second `Pages::DisconnectMgr::OnUpdate` watchdogs.
+2. **Track Roulette 70.6 s crawl (`278558c`)**: `Pages::Vote::BeforeControlUpdate`
+   (`0x806123C8`) populated 1 vote card every 5 frames (`10.7 s`) and then
+   crawled at `0.03` cards/frame waiting for `currentIdx == winningVoteControlIdx`.
+   Above 12 players, all vote cards now populate immediately and snap to
+   `winningVoteControlIdx` once the 4.17 s deceleration spin completes.
+3. **128th-place signed-byte overflow (`6aa93cd`)**: `GMDataOnlineVS::HandlePositionTracking`
+   (`0x80539F64`) sign-extended `RaceinfoPlayer::position` (`1..128`) via
+   `extsb r7, r7` (`0x8053A100`), turning 128th place (`0x80`) into `-128` and
+   indexing `-129` into its stack arrays. NOPping the `extsb` preserves the
+   zero-extended `lbz` value.
+4. **Remote race finish above 13 players (`bb5d650`)**: Stock RH2 finish
+   consensus uses 13-bit masks (`0x8053276C`) and 4-bit player indices
+   (`0x80532ABC`), so remote finishes for `playerIdx >= 13` never confirmed.
+   Above 12 players, NOPping `RaceinfoPlayer::EndLap+0x254` (`0x805300C4`) lets
+   remote online players fall through into `RaceinfoPlayer::EndRace` upon
+   completing lap 3 so races transition cleanly to `stage=4` / results.
+5. **Runtime scheduler & socket buffers (`e77f8fd`, `bf26430`, `9ac4d1c`)**:
+   Raised UDP `SO_RCVBUF`/`SO_SNDBUF` to 2 MiB, skipped Null-backend pipeline
+   prewarm in headless mode, wired `MKW_SHARED_CACHE_DIR` into the Windows lab
+   scripts (capacity up to 128), and updated `SelectThread` to retry selection
+   whenever the run queue drains or a switched-to worker fiber terminates.
+
+### Live 128-capacity LAN validation summary
+
+| Source | Consoles | Timing | Check | Result | Elapsed |
+| --- | --- | --- | --- | --- | ---: |
+| `411c0eb` | 3 sparse (`1, 33, 128`) | Normal (`divisor=1`) | `--race` | PASS | 73.72 s |
+| `bb5d650` | 3 sparse (`1, 33, 128`) | Normal (`divisor=1`) | `--race --finish` | PASS | 205.72 s |
+| `a4a4e26` | 33 (`1..33`, AIDs `0..32`) | Normal (`divisor=1`) | `--race` | PASS | 158.48 s |
+| `8a51874` | 65 (`1..65`, AIDs `0..64`) | Functional (`divisor=2`) | `--race` | PASS | 408.25 s |
+| `bf26430` | **128 (`1..128`, AIDs `0..127`)** | **Functional (`divisor=4`)** | **`--race`** | **PASS** | **565.68 s** |
+
+In the 128-console pass (`bf26430`), all 128 independent consoles completed full
+`2^128 - 1` Star connectivity, voted, loaded Luigi Circuit (`course: 8`,
+`players: 128`, `mode: 7`), completed countdown, and advanced together in
+`stage: 2` (`frames: 382..749`) with zero disconnects and zero guest faults.
+All 992 `Translator.Tests` and all 30 LAN Python unit tests pass.

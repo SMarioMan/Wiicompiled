@@ -16,6 +16,28 @@ namespace {
 uint32_t gBattleRespawnOwner = 0u;
 std::array<int16_t, 128> gBattleRespawnSeconds{};
 
+// Host-side 128-player kart-to-kart collision pair bitset. Vanilla MKW stores
+// only a uint16_t checkedKartBitmask at Kart::Status+0x84 (1 << otherPlayerIdx),
+// which overflows for players >= 16 and causes every colliding pair involving
+// players 16..127 to be evaluated twice per frame (double impulse + 2x CPU).
+std::array<std::array<uint64_t, 2>, 128> gCheckedKartPairs{};
+
+inline bool TestAndSetKartPair(uint8_t a, uint8_t b) noexcept {
+    if (a >= 128u || b >= 128u) {
+        return false;
+    }
+    const uint64_t maskB = uint64_t{1} << (b & 63u);
+    const uint32_t wordB = (b >> 6u) & 1u;
+    if ((gCheckedKartPairs[a][wordB] & maskB) != 0u) {
+        return true;
+    }
+    gCheckedKartPairs[a][wordB] |= maskB;
+    const uint64_t maskA = uint64_t{1} << (a & 63u);
+    const uint32_t wordA = (a >> 6u) & 1u;
+    gCheckedKartPairs[b][wordA] |= maskA;
+    return false;
+}
+
 inline float ReadGuestFloat32(uint32_t addr) {
     const uint32_t bits = Memory::Read32(addr);
     float value = 0.0f;
@@ -394,3 +416,49 @@ extern "C" void WiFiVSResults_Fill_Expanded(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x806465E0, WiFiVSResults_Fill_Expanded,
                            "WiFiVSResults_Fill_Expanded");
+
+// ---------------------------------------------------------------------------
+// 8. Kart::Manager::Update (PAL 0x8058FFE8 / USA 0x805897C4) &
+//    Kart::Collision::CheckKartCollision (PAL 0x8056F7F0 / USA 0x8056A9A0)
+// ---------------------------------------------------------------------------
+// Clear the host-side 128x128 collision-pair bitset once per frame before
+// Kart::Manager::Update, and deduplicate colliding kart pairs for players 16..127
+// where vanilla's 16-bit checkedKartBitmask (+0x84) overflows to 0.
+extern "C" void KartManager_Update_Expanded(CpuContext* ctx) {
+    if (MkwGuestLayout::kLayout.playerCapacity > 16) {
+        for (auto& row : gCheckedKartPairs) {
+            row[0] = 0u;
+            row[1] = 0u;
+        }
+    }
+    MKW_GUEST_NEXT(8058FFE8)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8058FFE8, KartManager_Update_Expanded,
+                           "KartManager_Update_Expanded");
+
+extern "C" void KartCollision_CheckKartCollision_Expanded(CpuContext* ctx) {
+    if (MkwGuestLayout::kLayout.playerCapacity <= 16) {
+        MKW_GUEST_NEXT(8056F7F0)(ctx);
+        return;
+    }
+    const uint32_t selfColl = ctx->gpr[3];
+    const uint32_t otherPlayer = ctx->gpr[4];
+    if (selfColl && otherPlayer) {
+        const uint32_t selfPtrs = Memory::Read32(selfColl + 0u);
+        const uint32_t otherPtrs = Memory::Read32(otherPlayer + 0u);
+        if (selfPtrs && otherPtrs) {
+            const uint32_t selfVals = Memory::Read32(selfPtrs + 0u);
+            const uint32_t otherVals = Memory::Read32(otherPtrs + 0u);
+            if (selfVals && otherVals) {
+                const uint8_t idxA = Memory::Read8(selfVals + 16u);
+                const uint8_t idxB = Memory::Read8(otherVals + 16u);
+                if (idxA != idxB && TestAndSetKartPair(idxA, idxB)) {
+                    return;
+                }
+            }
+        }
+    }
+    MKW_GUEST_NEXT(8056F7F0)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8056F7F0, KartCollision_CheckKartCollision_Expanded,
+                           "KartCollision_CheckKartCollision_Expanded");

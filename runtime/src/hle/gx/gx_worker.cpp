@@ -219,6 +219,7 @@ void WorkerMain() {
             }
             continue;
         }
+        uint64_t publishedTail = tail;
         while (tail != head) {
             if (g_abandon.load(std::memory_order_acquire)) {
                 return;
@@ -235,6 +236,17 @@ void WorkerMain() {
                 }
             }
             tail += header->size;
+            if (tail - publishedTail >= kPublishBytes ||
+                g_producerWaiting.load(std::memory_order_relaxed)) {
+                publishedTail = tail;
+                g_tail.store(tail, std::memory_order_seq_cst);
+                if (g_producerWaiting.load(std::memory_order_seq_cst)) {
+                    std::lock_guard lock{g_tailMutex};
+                    g_tailCv.notify_all();
+                }
+            }
+        }
+        if (tail != publishedTail) {
             g_tail.store(tail, std::memory_order_seq_cst);
             if (g_producerWaiting.load(std::memory_order_seq_cst)) {
                 std::lock_guard lock{g_tailMutex};

@@ -1163,6 +1163,10 @@ static uint32_t GetIndexedAttrElementSizeBytes(GXAttr attr, const VtxAttrFmt& fm
 }
 
 static void ApplyAuroraVtxAttrFmt(GXVtxFmt fmt) {
+    if (s_appliedVtxAttrFmtValid && s_appliedVtxStateMatchesHle &&
+        s_appliedVtxStateGeneration == g_hleGxState.vtxStateGeneration) {
+        return;
+    }
     const bool hadValidState = s_appliedVtxAttrFmtValid;
     // Rows other than `fmt` keep their contents and every write below copies
     // g_hleGxState, so an already-matching mirror still matches. Only the rebuild

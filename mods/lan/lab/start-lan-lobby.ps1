@@ -211,7 +211,7 @@ for ($i = 1; $i -le $Count; $i++) {
         Set-Content -LiteralPath $portablePath -Value '' -Encoding Ascii -NoNewline
     }
 
-    $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif (-not $Headless) { 'd3d12' } else { '' }
+    $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } elseif (-not $Headless) { 'd3d12' } else { '' }
     $effectiveRes = if ($ResolutionMultiplier -gt 0.0) { $ResolutionMultiplier } else { 0.0 }
     $configPath = Join-Path $instDir 'UserData\Config.toml'
     if (-not $Headless -or $RebuildLab -or -not (Test-Path -LiteralPath $configPath) -or $effectiveApi -or $effectiveRes -gt 0.0) {
@@ -431,7 +431,7 @@ if ($ClockDivisor -gt 1) {
 # - Explicit -GraphicsApi vulkan still supports multi-GPU distribution via VK_LAYER_MKW_gpu_select.
 $gpuSchedule = @()
 $useVkGpuLayer = $false
-$effectiveApiGlobal = if ($GraphicsApi) { $GraphicsApi } elseif (-not $Headless) { 'd3d12' } else { '' }
+$effectiveApiGlobal = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } elseif (-not $Headless) { 'd3d12' } else { '' }
 if (-not $Headless -and $effectiveApiGlobal -eq 'd3d12' -and -not $prevGpuIndex) {
     try {
         if (-not ('MkwDxgiAdapterPicker' -as [type])) {

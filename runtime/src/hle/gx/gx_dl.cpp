@@ -1290,11 +1290,12 @@ static bool ApplyAuroraIndexedXFArraysForDisplayList(const std::array<uint32_t, 
 } // namespace
 
 extern "C" void GxNotifyDisplayListMemoryWrite(uint32_t addr, uint32_t size) {
+    if (g_headless) return;
     GxGuestWrite::NotifyWrite(addr, size);
 }
 
 extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes) {
-    if (nbytes == 0 || listAddr == 0) return;
+    if (g_headless || nbytes == 0 || listAddr == 0) return;
     // List bytes and the arrays it indexes are GPU-side reads, so they are read when the worker runs.
     if (GxWorker::ShouldDefer()) {
         EnsureAuroraFrameActive();
@@ -1496,6 +1497,7 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
 PPC_NATIVE_OVERRIDE_VOID(80172F64, GX__CallDisplayList_80172f64, (uint32_t listAddr, uint32_t nbytes), (listAddr, nbytes));
 
 extern "C" void nw4r__lyt__detail__DrawQuad_800847c0(CpuContext* ctx) {
+    if (g_headless) return;
     uint32_t colors[4];
     const uint32_t colorAddr = ctx->gpr[7];
     const uint32_t* colorPtr = nullptr;
@@ -1513,6 +1515,7 @@ extern "C" void nw4r__lyt__detail__DrawQuad_800847c0(CpuContext* ctx) {
 REGISTER_NATIVE_FUNCTION(0x800847C0, nw4r__lyt__detail__DrawQuad_800847c0);
 
 extern "C" void nw4r__lyt__detail__DrawQuad_80084d20(CpuContext* ctx) {
+    if (g_headless) return;
     uint32_t colors[4];
     const uint32_t colorAddr = ctx->gpr[7];
     const uint32_t* colorPtr = nullptr;

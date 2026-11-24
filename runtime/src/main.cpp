@@ -1553,8 +1553,10 @@ int RuntimeMain(int argc, char** argv) {
                   << (forceAspect ? (configWidescreen ? "16:9" : "4:3") : "surface (dynamic EGG canvas)")
                   << std::endl;
         g_auroraInitialized.store(true, std::memory_order_release);
-        GxWorker::SetWaitCallback(ServiceGuestTimingDuringAuroraFrameWait);
-        GxWorker::Start();
+        if (!g_headless) {
+            GxWorker::SetWaitCallback(ServiceGuestTimingDuringAuroraFrameWait);
+            GxWorker::Start();
+        }
 
         auto entry = ResolveEntry();
         InitializePersistentCpuContext();

@@ -28,6 +28,12 @@ static int32_t NewWiiSocket(uint32_t af, uint32_t type, uint32_t protocol) {
         return -SO_EINVAL;
     }
     NativeSocket s = ::socket(nativeAf, nativeType, protocol);
+    if (s != kInvalidSocket && nativeType == SOCK_DGRAM) {
+        const int rcvBuf = 4 * 1024 * 1024;
+        const int sndBuf = 1 * 1024 * 1024;
+        ::setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<const char*>(&rcvBuf), sizeof(rcvBuf));
+        ::setsockopt(s, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<const char*>(&sndBuf), sizeof(sndBuf));
+    }
     const int hostError = s == kInvalidSocket ? NativeLastError() : 0;
     const int32_t wiiFd = AddWiiSocket(s, nativeAf, nativeType, static_cast<int>(protocol));
     if (wiiFd < 0) {

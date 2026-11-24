@@ -88,6 +88,9 @@ void BeginNextAuroraFrameWithRetry(std::chrono::milliseconds timeout) {
 }
 
 void EnsureAuroraFrameForFifo() {
+    if (g_headless) {
+        return;
+    }
     // The game thread can't see where draws start in recorded FIFO bytes, so any write may begin the
     // frame. A failed begin is only retried once the next frame is presented.
     static int s_attemptedFrame = -1;
@@ -102,6 +105,9 @@ void EnsureAuroraFrameForFifo() {
 }
 
 void EnsureAuroraFrameActive() {
+    if (g_headless) {
+        return;
+    }
     // The game thread begins frames before it records work for the GX worker.
     if (GxWorker::OnWorker()) {
         return;

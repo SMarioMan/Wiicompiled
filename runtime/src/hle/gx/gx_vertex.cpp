@@ -318,6 +318,9 @@ extern "C" void GX__Begin_8016f0f0(uint32_t t, uint32_t vf, uint32_t nv) {
         WriteDisplayListData((u16)nv, 2);
         return;
     }
+    if (g_headless) {
+        return;
+    }
     ServiceDeferredTimingDuringGxWork();
     GX_DEFER_CALL(GxBeginImpl, t, vf, nv);
     GxBeginImpl(t, vf, nv);
@@ -333,6 +336,7 @@ static void GxBeginImpl(uint32_t t, uint32_t vf, uint32_t nv) {
 PPC_NATIVE_OVERRIDE_VOID(8016f0f0, GX__Begin_8016f0f0, (uint32_t t, uint32_t vf, uint32_t nv), (t, vf, nv));
 
 extern "C" void GX__End_80044b30() {
+    if (g_headless) return;
     GX_DEFER_CALL0(GX__End_80044b30); g_hleGxState.inBegin=false; GXEnd(); }
 PPC_NATIVE_OVERRIDE_VOID(80044b30, GX__End_80044b30, (), ());
 
@@ -340,6 +344,9 @@ extern "C" void GX__End_80048c30() { GX__End_80044b30(); }
 PPC_NATIVE_OVERRIDE_VOID(80048c30, GX__End_80048c30, (), ());
 
 extern "C" void GX__DrawSphere_80172a30(uint32_t numMajor, uint32_t numMinor) {
+    if (g_headless) {
+        return;
+    }
     if (GxWorker::ShouldDefer()) {
         EnsureAuroraFrameActive();
         GxWorker::Submit([=] { GX__DrawSphere_80172a30(numMajor, numMinor); });

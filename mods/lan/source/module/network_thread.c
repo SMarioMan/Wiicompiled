@@ -1215,8 +1215,9 @@ int network_thread_send_unreliable(uint8_t aid, const void *buf, int size) {
     const bool can_mcast = (data_mcast_socket >= 0 && mkw_lan_config.peer_count == 0 &&
                             game->player_count > 2);
     const uint64_t now = can_mcast ? OSGetTime() : 0;
-    const bool same_tick = can_mcast && last_tx_len == (uint16_t)size &&
-                           (now - last_tx_ticks) <= (uint64_t)millisecs_to_ticks(2);
+    const bool same_tick = can_mcast && aid != last_tx_first_aid &&
+                           last_tx_len == (uint16_t)size &&
+                           (now - last_tx_ticks) <= (uint64_t)millisecs_to_ticks(1);
     if (same_tick && lan_bytes_equal((const uint8_t *)buf, last_tx_buf, (size_t)size)) {
         if (last_tx_mcast_sent) {
             return 1; /* Already delivered to all peers by the multicast packet. */

@@ -55,14 +55,14 @@ struct HleTlutObj {
 };
 
 std::mutex g_texObjMutex;
-std::map<uint32_t, std::unique_ptr<HleTlutObj>> g_HostTlutObjMap;
+std::unordered_map<uint32_t, std::unique_ptr<HleTlutObj>> g_HostTlutObjMap;
 std::mutex g_tlutObjMutex;
 
 // The texobj table. One slot per guest GXTexObj address holds both the decoded
 // metadata and the Aurora object, so GXLoadTexObj resolves everything it needs
 // with a single hash lookup instead of six tree descents across two maps.
 std::unordered_map<uint32_t, TexObjSlot> g_TexObjMeta;
-std::map<uint32_t, TlutObjMeta> g_TlutObjMeta;
+std::unordered_map<uint32_t, TlutObjMeta> g_TlutObjMeta;
 std::array<BoundTexInfo, 8> g_boundTexMaps{};
 
 namespace {

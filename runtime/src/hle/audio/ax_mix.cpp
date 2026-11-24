@@ -349,6 +349,10 @@ private:
             PushMail(kDspSync);
         }
 
+        if (::g_headless) {
+            return;
+        }
+
         const bool deferred = m_mixWorkerEnabled && EnsureMixWorker();
         m_deferredAux = deferred;
         m_auxInCount = 0;

@@ -77,6 +77,7 @@ extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes)
 
 extern std::atomic_bool g_auroraFrameActive;
 extern std::atomic_bool g_auroraFrameHadWork;
+extern bool g_headless;
 
 inline void GXMarkFrameWork() {
     g_auroraFrameHadWork.store(true, std::memory_order_release);
@@ -404,4 +405,4 @@ extern std::mutex g_tlutObjMutex;
 // that happens on another key: unordered_map keeps references valid across a
 // rehash, an open-addressed table would not.
 extern std::unordered_map<uint32_t, TexObjSlot> g_TexObjMeta;
-extern std::map<uint32_t, TlutObjMeta> g_TlutObjMeta;
+extern std::unordered_map<uint32_t, TlutObjMeta> g_TlutObjMeta;

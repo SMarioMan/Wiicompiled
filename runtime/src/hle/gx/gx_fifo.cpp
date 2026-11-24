@@ -351,6 +351,9 @@ void HleFifoWrite(u32 val, uint32_t sizeBytes) {
         WriteDisplayListData(val, sizeBytes);
         return;
     }
+    if (g_headless) {
+        return;
+    }
 
     auto resetFifoBuffer = [&]() {
         g_hleGxState.fifoReadOffset = 0;
@@ -802,6 +805,9 @@ void GxWorkerReplayFifoBurst(const uint8_t* data, uint32_t sizeBytes) { FifoWrit
 
 static void FifoWriteBurstImpl(const uint8_t* data, uint32_t sizeBytes) {
     if (IsDisplayListActive() && WriteDisplayListBurst(data, sizeBytes)) {
+        return;
+    }
+    if (g_headless && !IsDisplayListActive()) {
         return;
     }
 

@@ -24,6 +24,9 @@ struct Clock {
 Clock::time_point Clock::current{};
 struct { bool initialized = true; Clock::time_point lastRetrace{};
     std::chrono::microseconds retraceInterval{16666}; } g_vi;
+std::chrono::microseconds EffectiveRetraceIntervalLocked(Clock::time_point) {
+    return g_vi.retraceInterval;
+}
 std::mutex g_viMutex;
 std::vector<Clock::time_point> delivered;
 bool slowCallback = false;

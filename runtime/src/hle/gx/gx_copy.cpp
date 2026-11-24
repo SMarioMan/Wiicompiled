@@ -35,7 +35,7 @@ void RememberEfbCopyDestination(uint32_t addr, uint32_t size) {
 } // namespace
 
 void InvalidateEfbCopyDestinationsForRange(uint32_t addr, uint32_t size) {
-    if (size == 0) {
+    if (g_headless || size == 0) {
         return;
     }
 
@@ -123,6 +123,12 @@ PPC_NATIVE_OVERRIDE_VOID(8016fc24, GX__SetDispCopyGamma_8016fc24, (uint32_t g), 
 // ============================================================================
 
 extern "C" void GX__CopyDisp_8016fc38(uint32_t da, uint32_t c) {
+    if (g_headless) {
+        ++g_gxFrameCount;
+        VI_HLE_SetXfbReady(da);
+        VI_HLE_PresentFrame(/*presentedXfb=*/true, /*paceToRetrace=*/true);
+        return;
+    }
     EnsureAuroraFrameActive();
     if (GxWorker::ShouldDefer()) {
         // The worker drains like the inline path; EndAuroraFrame joins it before the next frame.
@@ -152,6 +158,9 @@ PPC_NATIVE_OVERRIDE_VOID(8016fc38, GX__CopyDisp_8016fc38, (uint32_t da, uint32_t
 
 
 extern "C" void GX__CopyTex_8016fd74(uint32_t da, uint32_t c) {
+    if (g_headless) {
+        return;
+    }
     // Begin the frame before going inline so a deferred begin reaches the worker first.
     EnsureAuroraFrameActive();
     GX_SYNC_INLINE();

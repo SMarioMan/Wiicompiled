@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <utility>
 
+extern bool g_headless;
+
 // Dedicated GX thread (Dolphin "dual core"): the game thread records GX HLE calls in order and
 // the worker executes them. While active, GX work runs on the worker except inside inline scopes,
 // which run on the game thread after the worker has caught up.
@@ -59,6 +61,9 @@ void Submit(F&& fn) {
 // Records fn when deferring, otherwise runs it now. Read call-time guest memory before calling.
 template <typename F>
 void Run(F&& fn) {
+    if (::g_headless) {
+        return;
+    }
     if (ShouldDefer()) {
         Submit(std::forward<F>(fn));
     } else {
@@ -96,6 +101,9 @@ public:
 // here (worker thread, inline scope, worker disabled).
 #define GX_DEFER_CALL(fn, ...)                                                                     \
     do {                                                                                           \
+        if (::g_headless) {                                                                        \
+            return;                                                                                \
+        }                                                                                          \
         if (GxWorker::ShouldDefer()) {                                                             \
             GxWorker::Submit([=] { fn(__VA_ARGS__); });                                            \
             return;                                                                                \
@@ -104,6 +112,9 @@ public:
 
 #define GX_DEFER_CALL0(fn)                                                                         \
     do {                                                                                           \
+        if (::g_headless) {                                                                        \
+            return;                                                                                \
+        }                                                                                          \
         if (GxWorker::ShouldDefer()) {                                                             \
             GxWorker::Submit([] { fn(); });                                                        \
             return;                                                                                \

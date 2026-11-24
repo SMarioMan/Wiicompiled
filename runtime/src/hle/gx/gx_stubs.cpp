@@ -46,9 +46,14 @@ extern "C" void GX__FinishInterruptHandler_8016ed94() {
 PPC_NATIVE_OVERRIDE_VOID(8016ed94, GX__FinishInterruptHandler_8016ed94, (), ());
 
 extern "C" void GX__DrawDone_8016eab0() {
-    GX_SYNC_INLINE();
+    if (!g_headless) {
+        GX_SYNC_INLINE();
+    }
     try { Memory::Write8(kGxDrawDoneFlagAddr, 0); } catch (...) {}
-    GXDrawDone(); GX__FinishInterruptHandler_8016ed94();
+    if (!g_headless) {
+        GXDrawDone();
+    }
+    GX__FinishInterruptHandler_8016ed94();
 }
 PPC_NATIVE_OVERRIDE_VOID(8016eab0, GX__DrawDone_8016eab0, (), ());
 

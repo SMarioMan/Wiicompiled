@@ -494,6 +494,9 @@ static void BindUnloadableTexturePlaceholder(uint32_t tid) {
 }
 
 static void LoadTexObjImpl(uint32_t oa, uint32_t tid) {
+    if (g_headless) {
+        return;
+    }
     static uint32_t s_invalidMetaLogCount = 0;
     static uint32_t s_invalidTidLogCount = 0;
     static uint32_t s_invalidDimLogCount = 0;

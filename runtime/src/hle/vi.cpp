@@ -353,7 +353,7 @@ void AdvanceRetrace(CpuContext* ctx, Clock::time_point retraceStamp, bool servic
         OSWakeupThread_HLE_801aaaa4(ctx);
     }
 
-    if (serviceAurora) {
+    if (serviceAurora && !g_headless) {
         // Process window events (but don't present - that happens in GXCopyDisp)
         UpdateAuroraAndProcessEvents();
 
@@ -383,7 +383,7 @@ void AdvanceRetrace(CpuContext* ctx, Clock::time_point retraceStamp, bool servic
     // VISetBlack(TRUE) keeps frame submission running but shows only the clear color: GX render work is
     // skipped and Aurora's end_frame() clears to black, matching the hardware manual's "signal continues,
     // pixels go black" behavior. When not black, submission waits for hasXfbReady (GXCopyDisp done).
-    if (serviceAurora && !s_presentSequenceActive.load(std::memory_order_acquire)) {
+    if (serviceAurora && !g_headless && !s_presentSequenceActive.load(std::memory_order_acquire)) {
         const bool frameActive = g_auroraFrameActive.load(std::memory_order_acquire);
         const bool xfbMatches = (readyXfb != 0 && readyXfb == currentFb);
         const bool shouldPresentXfb = hasXfbReady && !isBlack && xfbMatches;
@@ -608,6 +608,40 @@ void VI_HLE_PresentFrame(bool presentedXfb, bool paceToRetrace) {
     struct SequenceGuard {
         ~SequenceGuard() { s_presentSequenceActive.store(false, std::memory_order_release); }
     } sequenceGuard;
+    if (g_headless) {
+        if (paceToRetrace) {
+            Clock::time_point paceDeadline{};
+            bool paceThisFrame = false;
+            {
+                std::lock_guard<std::mutex> lock(g_viMutex);
+                EnsureInitializedLocked();
+                const auto interval = EffectiveRetraceIntervalLocked(Clock::now());
+                paceDeadline = g_vi.lastRetrace + interval;
+                const uint32_t retracesElapsed = g_vi.retraceCount - s_lastPacedRetraceCount;
+                paceThisFrame = retracesElapsed == 0;
+                s_lastPacedRetraceCount = g_vi.retraceCount;
+            }
+            if (paceThisFrame) {
+                PaceToRetraceBoundary(paceDeadline);
+                std::lock_guard<std::mutex> lock(g_viMutex);
+                s_lastPacedRetraceCount = g_vi.retraceCount;
+            }
+        }
+        PerfStats::OnFramePresented();
+        g_auroraFrameActive.store(false, std::memory_order_release);
+        g_auroraFrameHadWork.store(false, std::memory_order_release);
+        if (presentedXfb) {
+            std::lock_guard<std::mutex> lock(g_viMutex);
+            g_vi.hasValidXfb = false;
+            g_vi.readyXfb = 0;
+        }
+        static uint32_t s_headlessEventTick = 0;
+        if ((++s_headlessEventTick & 31u) == 0u) {
+            UpdateAuroraAndProcessEvents();
+        }
+        return;
+    }
+
     Clock::time_point paceDeadline{};
     bool paceThisFrame = false;
     if (paceToRetrace) {

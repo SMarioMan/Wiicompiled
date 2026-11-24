@@ -57,6 +57,8 @@ struct Config {
     bool enabled = false;
     bool isMaster = false;
     uint32_t slot = 0; // 0..127 (0 = master)
+    std::atomic<bool> inRace{false};
+    std::atomic<float> masterSfxGain{1.0f};
 };
 
 inline Config& State() noexcept {
@@ -74,6 +76,9 @@ inline void Configure(bool enabled, bool isMaster, uint32_t instanceId) noexcept
 inline bool IsEnabled() noexcept { return State().enabled; }
 inline bool IsMaster() noexcept { return State().enabled && State().isMaster; }
 inline bool IsSecondary() noexcept { return State().enabled && !State().isMaster; }
+inline void SetInRace(bool inRace) noexcept { State().inRace.store(inRace, std::memory_order_relaxed); }
+inline bool IsInRace() noexcept { return State().inRace.load(std::memory_order_relaxed); }
+inline float MasterSfxGain() noexcept { return State().masterSfxGain.load(std::memory_order_relaxed); }
 
 #ifdef _WIN32
 
@@ -127,6 +132,11 @@ inline bool ShouldMixVoice(bool isStream, uint32_t loopAddr, uint32_t endAddr,
                            uint16_t sampleFormat, uint32_t srcRatio) noexcept {
     if (!IsEnabled()) {
         return true;
+    }
+    // Outside of an active race (menus, lobby, character select, voting), only Master
+    // plays audio so sequenced lobby/menu music never overlaps out-of-phase.
+    if (IsSecondary() && !IsInRace()) {
+        return false;
     }
     SharedAudioArena* arena = GetArena();
     if (!arena) {
@@ -330,19 +340,23 @@ inline void MixIntoMasterBlock(int16_t* masterStereo, size_t frameCount) noexcep
     processMask(mask1, 64);
 
     if (audibleContributors == 0) {
+        State().masterSfxGain.store(1.0f, std::memory_order_relaxed);
         return;
     }
 
-    // Constant-power RMS normalization for secondary SFX bus, keeping Master's Stage Music
-    // clear and prioritized (akin to native 4-player split-screen balance).
-    const float secGain = 0.72f / std::sqrt(static_cast<float>(audibleContributors));
-    constexpr float kMasterGain = 0.92f;
+    // Constant-power RMS normalization across ALL active players (Master + secondaries).
+    // Master's own non-stream SFX is scaled by the exact same per-player gain in ax_mix.cpp
+    // so Player 1 never dominates Players 2..N, while Master's Stage Music stays prioritized.
+    const float totalPlayers = static_cast<float>(audibleContributors + 1u);
+    const float perPlayerSfxGain = 0.85f / std::sqrt(totalPlayers);
+    State().masterSfxGain.store(perPlayerSfxGain, std::memory_order_relaxed);
+    constexpr float kMasterBusGain = 0.94f;
 
     for (size_t i = 0; i < frameCount; ++i) {
         const float ml = static_cast<float>(masterStereo[i * 2]) * (1.0f / 32768.0f);
         const float mr = static_cast<float>(masterStereo[i * 2 + 1]) * (1.0f / 32768.0f);
-        const float outL = SoftLimit(ml * kMasterGain + s_secL[i] * secGain);
-        const float outR = SoftLimit(mr * kMasterGain + s_secR[i] * secGain);
+        const float outL = SoftLimit(ml * kMasterBusGain + s_secL[i] * perPlayerSfxGain);
+        const float outR = SoftLimit(mr * kMasterBusGain + s_secR[i] * perPlayerSfxGain);
         masterStereo[i * 2] = static_cast<int16_t>(std::clamp(std::lround(outL * 32767.0f), -32768l, 32767l));
         masterStereo[i * 2 + 1] = static_cast<int16_t>(std::clamp(std::lround(outR * 32767.0f), -32768l, 32767l));
     }

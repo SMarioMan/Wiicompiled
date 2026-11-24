@@ -7,6 +7,7 @@
 #include "input_bindings.h"
 #include "motion_trick.h"
 #include "runtime_product.h"
+#include "shared_audio_mix.h"
 #include "test_pad_input.h"
 
 #include <algorithm>
@@ -76,9 +77,41 @@ void FillTriggersHeldByButtons(PADStatus* statuses) {
     }
 }
 
-// Skip the 90-frame ESRB notice screen (PageId 0x01, Pages::ESRBNotice) by
-// advancing its active duration counter past the 90-frame hold threshold immediately.
+// Skip the ESRB notice screen ("Online interactions are not rated by the ESRB",
+// PageId 0x01, Pages::ESRBNotice) by advancing its active hold timer past 90 frames
+// immediately (and redirecting nextSectionId 0x16 -> 0x40 when possible).
 void SkipEsrbNoticePage() {
+    try {
+        const uint32_t manager = Memory::Read32(MKW_GADDR(809C1E38));
+        if (!manager) return;
+        const uint32_t section = Memory::Read32(manager);
+        const uint32_t count = section ? Memory::Read32(section + 0x37Cu) : 0;
+        if (count == 0 || count > 11) {
+            return;
+        }
+        for (uint32_t i = 0; i < count; ++i) {
+            const uint32_t page = Memory::Read32(section + 0x354u + i * 4u);
+            if (page != 0 && Memory::Read32(page + 4u) == 0x01u) {
+                // Hide the ESRB notice LayoutUIControl (page + 84) so it never flashes
+                // during section fade-in/fade-out, and advance duration past 90 frames.
+                Memory::Write8(page + 84u + 96u, 0u);
+                Memory::Write8(page + 84u + 128u, 1u);
+                if (Memory::Read32(page + 32u) <= 90u) {
+                    Memory::Write32(page + 32u, 91u);
+                }
+            }
+        }
+    } catch (const Memory::AccessViolation&) {
+    }
+}
+
+// Skip the online "Check Members" / VR screen (Pages::VR, PageId 0x90) straight
+// to the Course Vote screen by zeroing its countdown timer immediately.
+void SkipCheckMembersPage() {
+    const auto& layout = MkwGuestLayout::kLayout;
+    if (layout.playerCapacity != 128u) {
+        return;
+    }
     try {
         const uint32_t manager = Memory::Read32(MKW_GADDR(809C1E38));
         const uint32_t section = manager ? Memory::Read32(manager) : 0;
@@ -88,13 +121,26 @@ void SkipEsrbNoticePage() {
         }
         for (uint32_t i = 0; i < count; ++i) {
             const uint32_t page = Memory::Read32(section + 0x354u + i * 4u);
-            if (page != 0 && Memory::Read32(page + 4u) == 0x01u) {
-                if (Memory::Read32(page + 32u) <= 90u) {
-                    Memory::Write32(page + 32u, 91u);
+            if (page != 0 && Memory::Read32(page + 4u) == 0x90u) {
+                const uint32_t countdown = Memory::Read32(page + 49592u);
+                if (countdown != 0u) {
+                    Memory::WriteFloat32(countdown, 0.0f);
                 }
             }
         }
     } catch (const Memory::AccessViolation&) {
+    }
+}
+
+void UpdateSharedAudioRaceState() {
+    if (!SharedAudioMix::IsEnabled()) {
+        return;
+    }
+    try {
+        const uint32_t raceinfo = Memory::Read32(MKW_GADDR(809BD730));
+        SharedAudioMix::SetInRace(raceinfo != 0u);
+    } catch (const Memory::AccessViolation&) {
+        SharedAudioMix::SetInRace(false);
     }
 }
 
@@ -260,10 +306,10 @@ void ApplyLanMenuInput(PADStatus& pad, uint32_t& rumbleMask) {
              (options.automation == LanRuntime::Automation::Host && id == 0x8D) ||
              (options.automation == LanRuntime::Automation::Join && (id == 0x96 || id == 0x97)));
         if (select) {
-            const unsigned phase = pulse++ % 120;
+            const unsigned phase = pulse++ % 30;
             if (id == 0x86) {
                 if (phase < 4) pad.button |= PAD_BUTTON_LEFT | PAD_BUTTON_UP;
-                else if (phase >= 12 && phase < 16) pad.button |= PAD_BUTTON_A;
+                else if (phase >= 8 && phase < 12) pad.button |= PAD_BUTTON_A;
             } else if (phase < 4) pad.button |= PAD_BUTTON_A;
         } else pulse = 0;
     } catch (const Memory::AccessViolation&) {
@@ -320,6 +366,8 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     InputBindings::Apply(statuses);
     MotionTrick::Apply(statuses);
     SkipEsrbNoticePage();
+    SkipCheckMembersPage();
+    UpdateSharedAudioRaceState();
     UnlockAllContent();
     SeedDefaultCharacterHighlight();
     LayoutExpandedVotePage();

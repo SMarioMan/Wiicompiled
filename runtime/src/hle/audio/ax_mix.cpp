@@ -1025,6 +1025,14 @@ private:
                 Hilo(pb.src.ratio_hi, pb.src.ratio_lo))) {
             return;
         }
+        if (SharedAudioMix::IsMaster() && SharedAudioMix::IsInRace() && pb.is_stream == 0) {
+            const float sfxGain = SharedAudioMix::MasterSfxGain();
+            if (sfxGain < 0.99f) {
+                for (uint32_t i = 0; i < count; ++i) {
+                    samples[i] = static_cast<int16_t>(static_cast<float>(samples[i]) * sfxGain);
+                }
+            }
+        }
         // Same wrapping 16-bit ramp as MixAdd, minus the accumulate. The two's
         // complement wrap of the int16 envelope is bit-identical to the uint16
         // wrap the kernel performs, so the value stored back is unchanged.

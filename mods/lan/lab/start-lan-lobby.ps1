@@ -161,6 +161,7 @@ if ($GridCols -le 0) {
 $gridRows = [int][math]::Ceiling($Count / [double]$GridCols)
 if ($CellWidth -le 0) { $CellWidth = [math]::Max(120, [int][math]::Floor($ScreenWidth / [double]$GridCols)) }
 if ($CellHeight -le 0) { $CellHeight = [math]::Max(90, [int][math]::Floor($ScreenHeight / [double]$gridRows)) }
+$useWidescreen = ($CellWidth / [double]$CellHeight) -gt (4.0 / 3.0 + 0.001)
 
 # --- 2. Prepare / expand portable instance directories via NTFS hard links ---
 $dvdRoot = (Resolve-Path -LiteralPath (Join-Path $Release 'DATA')).Path -replace '\\', '/'
@@ -224,6 +225,7 @@ for ($i = 1; $i -le $Count; $i++) {
             ''
             '[video]'
             'display_mode = "windowed"'
+            ('widescreen = {0}' -f $(if ($useWidescreen) { 'true' } else { 'false' }))
         )
         if ($effectiveApi) { $cfgLines += ('graphics_api = "{0}"' -f $effectiveApi) }
         if ($effectiveRes -gt 0.0) { $cfgLines += ('resolution_multiplier = {0}' -f $effectiveRes.ToString('0.##', [Globalization.CultureInfo]::InvariantCulture)) }
@@ -322,6 +324,55 @@ foreach ($instDir in $instanceDirs) {
 }
 if ($seededCount -gt 0) {
     Write-Host "Seeded license 0 NAND into $seededCount instance(s)."
+}
+
+# Ensure each instance's License 0 Mii name in rksys.dat is "Player N" (UTF-16BE at 0x1C..0x2F)
+# with a valid big-endian CRC32 at 0x27FFC so player labels show player numbers everywhere.
+if (-not ('MkwRksysCrc' -as [type])) {
+    Add-Type -TypeDefinition @'
+public static class MkwRksysCrc {
+    public static uint Compute(byte[] data, int len) {
+        uint crc = 0xFFFFFFFFu;
+        for (int i = 0; i < len; i++) {
+            crc ^= data[i];
+            for (int k = 0; k < 8; k++) {
+                crc = (crc & 1u) != 0 ? (crc >> 1) ^ 0xEDB88320u : (crc >> 1);
+            }
+        }
+        return ~crc;
+    }
+}
+'@
+}
+
+$renamedCount = 0
+for ($i = 1; $i -le $Count; $i++) {
+    $saveFile = Join-Path $instanceDirs[$i - 1] $saveRelPath
+    if (-not (Test-Path -LiteralPath $saveFile)) { continue }
+    $bytes = [IO.File]::ReadAllBytes($saveFile)
+    if ($bytes.Length -lt 0x28000) { continue }
+    $desiredName = "Player $i"
+    if ($desiredName.Length -gt 10) { $desiredName = "P$i" }
+    $nameBytes = New-Object byte[] 20
+    $encoded = [Text.Encoding]::BigEndianUnicode.GetBytes($desiredName)
+    [Array]::Copy($encoded, 0, $nameBytes, 0, [Math]::Min(20, $encoded.Length))
+    $matches = $true
+    for ($k = 0; $k -lt 20; $k++) {
+        if ($bytes[0x1C + $k] -ne $nameBytes[$k]) { $matches = $false; break }
+    }
+    if (-not $matches) {
+        [Array]::Copy($nameBytes, 0, $bytes, 0x1C, 20)
+        $crc = [MkwRksysCrc]::Compute($bytes, 0x27FFC)
+        $bytes[0x27FFC] = [byte](($crc -shr 24) -band 0xFF)
+        $bytes[0x27FFD] = [byte](($crc -shr 16) -band 0xFF)
+        $bytes[0x27FFE] = [byte](($crc -shr 8) -band 0xFF)
+        $bytes[0x27FFF] = [byte]($crc -band 0xFF)
+        [IO.File]::WriteAllBytes($saveFile, $bytes)
+        $renamedCount++
+    }
+}
+if ($renamedCount -gt 0) {
+    Write-Host "Set unique 'Player N' license names in $renamedCount instance(s)."
 }
 
 # --- 4. Bind UDP monitor on 127.0.0.254:27900 before launching ---
@@ -456,7 +507,8 @@ try {
         }
     }
 
-    $modeLabel = if ($Headless) { 'headless' } else { ('windowed {0}x{1} @ {2}x{3}' -f $GridCols, $gridRows, $CellWidth, $CellHeight) }
+    $aspectTag = if ($useWidescreen) { '16:9' } else { '4:3' }
+    $modeLabel = if ($Headless) { 'headless' } else { ('windowed {0}x{1} @ {2}x{3} ({4})' -f $GridCols, $gridRows, $CellWidth, $CellHeight, $aspectTag) }
     if ($AutoDrive) { $modeLabel += ', auto-drive' }
     if ($SharedAudioMix -and -not $Headless) { $modeLabel += ', shared-audio-mix' }
     if ($GameCubeAdapterUnlimited -and -not $Headless) { $modeLabel += ', gc-adapter-unlimited (1:1)' }
@@ -487,13 +539,41 @@ try {
         }
         $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
             -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
-        if ($Count -ge 32) {
+        if ($Count -ge 16) {
             try {
                 if ($i -eq 1) { $proc.PriorityClass = 'AboveNormal' }
                 elseif ($Headless) { $proc.PriorityClass = 'BelowNormal' }
             } catch {}
         }
         $launched += [pscustomobject]@{ Id = $i; Process = $proc; Directory = $instDir }
+
+        # Wait for Host (instance 1) to open the LAN Friend Room (page 0x9D) before
+        # launching clients so clients discover the room on their very first probe.
+        if ($i -eq 1 -and $Count -gt 1) {
+            $hostWaitStart = Get-Date
+            $hostReady = $false
+            $hostEp = New-Object Net.IPEndPoint ([Net.IPAddress]::Any, 0)
+            while (-not $hostReady -and ((Get-Date) - $hostWaitStart).TotalSeconds -lt 25) {
+                if ($proc.HasExited) {
+                    throw "Host instance 1 (PID $($proc.Id)) exited unexpectedly with code $($proc.ExitCode); check $instDir\UserData\Logs."
+                }
+                while ($udp.Available -gt 0) {
+                    $pkt = $udp.Receive([ref]$hostEp)
+                    if ($pkt.Length -eq 28 -and (Read-Be32 $pkt 0) -eq 0x4D4B574C -and [int](Read-Be32 $pkt 4) -eq 1) {
+                        $hPage = [int](Read-Be32 $pkt 20)
+                        if ($hPage -eq 0x9D) {
+                            $hostReady = $true
+                            break
+                        }
+                    }
+                }
+                if (-not $hostReady) { Start-Sleep -Milliseconds 100 }
+            }
+            if ($hostReady) {
+                $hs = ((Get-Date) - $hostWaitStart).TotalSeconds
+                Write-Host ("Host p01 opened LAN room (page 0x9D) in {0:F1}s; launching {1} client(s)..." -f $hs, ($Count - 1))
+            }
+        }
     }
 
     # --- 6. Monitor UDP telemetry until all Count instances are in the lobby ---

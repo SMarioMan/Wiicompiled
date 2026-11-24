@@ -44,6 +44,8 @@ param(
     [switch]$GameCubeAdapterUnlimited,
     [string]$GcuPath = 'E:\Projects\mario-kart-multiplayer\0-Global\GameCubeAdapterUnlimited.exe',
     [switch]$SingleGpu,
+    [switch]$HighCountOpt,
+    [ValidateRange(0, 128)][int]$KartCullCap = 0,
     [Alias('CpuDrive')]
     [switch]$AutoDrive,
     [switch]$Headless,
@@ -408,6 +410,8 @@ $prevVkLayers = $env:VK_INSTANCE_LAYERS
 $prevVkGpuIndex = $env:MKW_VK_GPU_INDEX
 $prevGpuIndex = $env:MKW_GPU_INDEX
 $prevHighCount = $env:MKW_HIGH_COUNT
+$prevHighCountOpt = $env:MKW_HIGH_COUNT_OPT
+$prevKartCullCap = $env:MKW_OPT_KART_CULL
 $prevLauncherPriority = $null
 try {
     $selfProc = [System.Diagnostics.Process]::GetCurrentProcess()
@@ -592,6 +596,16 @@ try {
         $env:MKW_HIGH_COUNT = '1'
     } else {
         Remove-Item Env:MKW_HIGH_COUNT -ErrorAction SilentlyContinue
+    }
+    if ($HighCountOpt -and -not $Headless) {
+        $env:MKW_HIGH_COUNT_OPT = '1'
+    } else {
+        Remove-Item Env:MKW_HIGH_COUNT_OPT -ErrorAction SilentlyContinue
+    }
+    if ($KartCullCap -gt 0 -and -not $Headless) {
+        $env:MKW_OPT_KART_CULL = "$KartCullCap"
+    } else {
+        Remove-Item Env:MKW_OPT_KART_CULL -ErrorAction SilentlyContinue
     }
 
     for ($i = 1; $i -le $Count; $i++) {
@@ -793,6 +807,10 @@ try {
     else { $env:MKW_GPU_INDEX = $prevGpuIndex }
     if ($null -eq $prevHighCount) { Remove-Item Env:MKW_HIGH_COUNT -ErrorAction SilentlyContinue }
     else { $env:MKW_HIGH_COUNT = $prevHighCount }
+    if ($null -eq $prevHighCountOpt) { Remove-Item Env:MKW_HIGH_COUNT_OPT -ErrorAction SilentlyContinue }
+    else { $env:MKW_HIGH_COUNT_OPT = $prevHighCountOpt }
+    if ($null -eq $prevKartCullCap) { Remove-Item Env:MKW_OPT_KART_CULL -ErrorAction SilentlyContinue }
+    else { $env:MKW_OPT_KART_CULL = $prevKartCullCap }
     if ($null -ne $prevLauncherPriority) {
         try { [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = $prevLauncherPriority } catch {}
     }

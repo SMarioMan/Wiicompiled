@@ -6,7 +6,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 
 namespace {
@@ -43,6 +45,235 @@ inline float ReadGuestFloat32(uint32_t addr) {
     float value = 0.0f;
     std::memcpy(&value, &bits, sizeof(value));
     return value;
+}
+
+// ---------------------------------------------------------------------------
+// Runtime-toggleable high-player-count visual culling optimizations (#1-#4).
+// All OFF by default; enabled via MKW_HIGH_COUNT_OPT=1 or per-feature env vars:
+//   MKW_OPT_KART_CULL=<N>         (#1: nearest N karts drawn; default 20, 0=off)
+//   MKW_OPT_EFFECTS_CULL=<0|1>    (#2: cull distant/off-screen effects & shadows)
+//   MKW_OPT_NAMEBALLOON_CULL=<N>  (#3: nearest N nameplates; default 12, 0=off)
+//   MKW_OPT_SKELETAL_CULL=<0|1>   (#4: skip transforms/bones for culled karts)
+// Zero physics or gameplay changes; 100% uniform parity across all instances;
+// only active when playerCount > 12.
+// ---------------------------------------------------------------------------
+struct HighCountOptConfig {
+    uint32_t kartDrawCap = 0;
+    bool cullEffectsAndShadows = false;
+    uint32_t nameBalloonCap = 0;
+    bool cullSkeletal = false;
+
+    bool AnyEnabled() const noexcept {
+        return kartDrawCap > 0 || cullEffectsAndShadows || nameBalloonCap > 0 || cullSkeletal;
+    }
+};
+
+const HighCountOptConfig& GetHighCountOptConfig() noexcept {
+    static const HighCountOptConfig cfg = []() {
+        HighCountOptConfig c{};
+        auto readEnvInt = [](const char* name, int fallback) -> int {
+            const char* val = std::getenv(name);
+            if (!val || !*val) {
+                return fallback;
+            }
+            return std::atoi(val);
+        };
+        const bool master = readEnvInt("MKW_HIGH_COUNT_OPT", 0) != 0;
+        const int kartCap = readEnvInt("MKW_OPT_KART_CULL", master ? 20 : 0);
+        c.kartDrawCap = kartCap > 0 ? static_cast<uint32_t>(kartCap) : 0u;
+        c.cullEffectsAndShadows = readEnvInt("MKW_OPT_EFFECTS_CULL", master ? 1 : 0) != 0;
+        const int nameCap = readEnvInt("MKW_OPT_NAMEBALLOON_CULL", master ? 12 : 0);
+        c.nameBalloonCap = nameCap > 0 ? static_cast<uint32_t>(nameCap) : 0u;
+        c.cullSkeletal = readEnvInt("MKW_OPT_SKELETAL_CULL", master ? 1 : 0) != 0;
+        return c;
+    }();
+    return cfg;
+}
+
+uint32_t gLastCullKartMgr = 0u;
+bool gHighCountCullActive = false;
+std::array<bool, 128> gKartDrawVisible{};
+std::array<bool, 128> gPrevKartDrawVisible{};
+std::array<bool, 128> gKartEffectsVisible{};
+std::array<bool, 128> gPrevShadowVisible{};
+std::array<bool, 128> gPrevEffectsCulled{};
+std::array<bool, 128> gKartNameVisible{};
+
+inline uint8_t ReadKartLinkPlayerIdx(uint32_t linkAddr) {
+    if (!linkAddr) {
+        return 255u;
+    }
+    const uint32_t ptrs = Memory::Read32(linkAddr);
+    if (!ptrs) {
+        return 255u;
+    }
+    const uint32_t vals = Memory::Read32(ptrs);
+    if (!vals) {
+        return 255u;
+    }
+    return Memory::Read8(vals + 0x10u);
+}
+
+void ResetHighCountCullState(uint32_t kartMgr) {
+    gLastCullKartMgr = kartMgr;
+    gHighCountCullActive = false;
+    gKartDrawVisible.fill(true);
+    gPrevKartDrawVisible.fill(true);
+    gKartEffectsVisible.fill(true);
+    gPrevShadowVisible.fill(true);
+    gPrevEffectsCulled.fill(false);
+    gKartNameVisible.fill(true);
+}
+
+void UpdateHighCountCullClassification(uint32_t kartMgr) {
+    const auto& cfg = GetHighCountOptConfig();
+    if (!cfg.AnyEnabled() || !kartMgr) {
+        gHighCountCullActive = false;
+        return;
+    }
+    if (kartMgr != gLastCullKartMgr) {
+        ResetHighCountCullState(kartMgr);
+    }
+    const uint32_t playersArr = Memory::Read32(kartMgr + 0x20u);
+    const uint8_t playerCount = Memory::Read8(kartMgr + 0x24u);
+    if (!playersArr || playerCount <= 12u || playerCount > 128u) {
+        gHighCountCullActive = false;
+        return;
+    }
+    const uint32_t camMgr = Memory::Read32(MKW_GADDR(809C19B8));
+    if (!camMgr) {
+        gHighCountCullActive = false;
+        return;
+    }
+    const uint32_t activeCams = Memory::Read32(camMgr + 0x18u);
+    const uint32_t cam = activeCams ? Memory::Read32(activeCams) : 0u;
+    if (!cam) {
+        gHighCountCullActive = false;
+        return;
+    }
+    const uint8_t focusedIdx = Memory::Read8(camMgr + 0x27u);
+    const float camX = ReadGuestFloat32(cam + 0x64u);
+    const float camY = ReadGuestFloat32(cam + 0x68u);
+    const float camZ = ReadGuestFloat32(cam + 0x6Cu);
+    float fwdX = ReadGuestFloat32(cam + 0x70u) - camX;
+    float fwdY = ReadGuestFloat32(cam + 0x74u) - camY;
+    float fwdZ = ReadGuestFloat32(cam + 0x78u) - camZ;
+    const float fwdLenSq = fwdX * fwdX + fwdY * fwdY + fwdZ * fwdZ;
+    const bool hasFwd = fwdLenSq > 1e-6f;
+    if (hasFwd) {
+        const float invLen = 1.0f / std::sqrt(fwdLenSq);
+        fwdX *= invLen;
+        fwdY *= invLen;
+        fwdZ *= invLen;
+    }
+
+    struct RankEntry {
+        uint8_t idx;
+        bool behind;
+        float distSq;
+        float score;
+    };
+    std::array<RankEntry, 128> ranked{};
+    constexpr float kNearKeepDistSq = 1500.0f * 1500.0f;   // ~15m: always keep even if behind
+    constexpr float kBehindCheckDistSq = 2000.0f * 2000.0f; // ~20m: frustum-cull behind camera
+    constexpr float kEffectsDistSq = 4000.0f * 4000.0f;    // ~40m: effects/shadow cutoff
+
+    for (uint8_t i = 0; i < playerCount; ++i) {
+        RankEntry e{i, false, 0.0f, 0.0f};
+        const uint32_t player = Memory::Read32(playersArr + static_cast<uint32_t>(i) * 4u);
+        const uint32_t ptrs = player ? Memory::Read32(player) : 0u;
+        const uint32_t body = ptrs ? Memory::Read32(ptrs + 0x08u) : 0u;
+        const uint32_t bodySub = body ? Memory::Read32(body + 0x90u) : 0u;
+        const uint32_t phys = bodySub ? Memory::Read32(bodySub + 0x04u) : 0u;
+        if (i == focusedIdx) {
+            e.distSq = 0.0f;
+            e.score = -1.0f;
+        } else if (phys) {
+            const float dx = ReadGuestFloat32(phys + 0x68u) - camX;
+            const float dy = ReadGuestFloat32(phys + 0x6Cu) - camY;
+            const float dz = ReadGuestFloat32(phys + 0x70u) - camZ;
+            const float dSq = dx * dx + dy * dy + dz * dz;
+            e.distSq = dSq;
+            if (hasFwd && dSq > kBehindCheckDistSq) {
+                const float dotFwd = dx * fwdX + dy * fwdY + dz * fwdZ;
+                if (dotFwd < -0.25f * std::sqrt(dSq)) {
+                    e.behind = true;
+                }
+            }
+            e.score = e.behind ? (dSq + 1e18f) : dSq;
+        }
+        ranked[i] = e;
+    }
+
+    std::sort(ranked.begin(), ranked.begin() + playerCount,
+              [](const RankEntry& a, const RankEntry& b) { return a.score < b.score; });
+
+    for (uint8_t rank = 0; rank < playerCount; ++rank) {
+        const auto& e = ranked[rank];
+        const bool isFocused = (e.idx == focusedIdx);
+        const bool drawVis = (cfg.kartDrawCap == 0u)
+                                 ? true
+                                 : (isFocused || e.distSq < kNearKeepDistSq ||
+                                    (!e.behind && rank < cfg.kartDrawCap));
+        gKartDrawVisible[e.idx] = drawVis;
+        gKartEffectsVisible[e.idx] = !cfg.cullEffectsAndShadows
+                                         ? true
+                                         : (isFocused || (drawVis && e.distSq < kEffectsDistSq));
+        gKartNameVisible[e.idx] = (cfg.nameBalloonCap == 0u)
+                                      ? true
+                                      : (drawVis && (isFocused || rank < cfg.nameBalloonCap));
+    }
+    gHighCountCullActive = true;
+}
+
+void ApplyHighCountCullVisibility(CpuContext* ctx, uint32_t kartMgr) {
+    if (!gHighCountCullActive || !kartMgr) {
+        return;
+    }
+    const auto& cfg = GetHighCountOptConfig();
+    const uint32_t playersArr = Memory::Read32(kartMgr + 0x20u);
+    const uint8_t playerCount = Memory::Read8(kartMgr + 0x24u);
+    if (!playersArr || playerCount <= 12u || playerCount > 128u) {
+        return;
+    }
+    for (uint8_t i = 0; i < playerCount; ++i) {
+        const bool drawChanged = (cfg.kartDrawCap > 0u) && (gKartDrawVisible[i] != gPrevKartDrawVisible[i]);
+        const bool shadowChanged = cfg.cullEffectsAndShadows && (gKartEffectsVisible[i] != gPrevShadowVisible[i]);
+        if (!drawChanged && !shadowChanged) {
+            continue;
+        }
+        const uint32_t player = Memory::Read32(playersArr + static_cast<uint32_t>(i) * 4u);
+        const uint32_t ptrs = player ? Memory::Read32(player) : 0u;
+        if (!ptrs) {
+            continue;
+        }
+        if (drawChanged) {
+            const uint32_t modelsVis = Memory::Read32(ptrs + 0x58u);
+            if (modelsVis) {
+                CpuContext sub = *ctx;
+                sub.gpr[3] = modelsVis;
+                if (!gKartDrawVisible[i]) {
+                    const uint8_t orig = Memory::Read8(modelsVis + 0x12u);
+                    Memory::Write8(modelsVis + 0x12u, 0u);
+                    MKW_GUEST_NEXT(8056A470)(&sub);
+                    Memory::Write8(modelsVis + 0x12u, orig);
+                } else {
+                    MKW_GUEST_NEXT(8056A470)(&sub);
+                }
+            }
+            gPrevKartDrawVisible[i] = gKartDrawVisible[i];
+        }
+        if (shadowChanged) {
+            const uint32_t shadowMdl = Memory::Read32(ptrs + 0x20u);
+            if (shadowMdl) {
+                CpuContext sub = *ctx;
+                sub.gpr[3] = shadowMdl;
+                sub.gpr[4] = gKartEffectsVisible[i] ? 1u : 0u;
+                MKW_GUEST_FUNC(8055CB08)(&sub);
+            }
+            gPrevShadowVisible[i] = gKartEffectsVisible[i];
+        }
+    }
 }
 
 } // namespace
@@ -431,7 +662,10 @@ extern "C" void KartManager_Update_Expanded(CpuContext* ctx) {
             row[1] = 0u;
         }
     }
+    const uint32_t kartMgr = ctx->gpr[3];
+    UpdateHighCountCullClassification(kartMgr);
     MKW_GUEST_NEXT(8058FFE8)(ctx);
+    ApplyHighCountCullVisibility(ctx, kartMgr);
 }
 REGISTER_NATIVE_WRAPPER_AS(0x8058FFE8, KartManager_Update_Expanded,
                            "KartManager_Update_Expanded");
@@ -721,3 +955,84 @@ extern "C" void EntityManager_FindEntitiesCloseToEntity_Native(CpuContext* ctx) 
 }
 REGISTER_NATIVE_REPLACEMENT_AS(0x807868C0, EntityManager_FindEntitiesCloseToEntity_Native,
                                "EntityManager_FindEntitiesCloseToEntity_Native");
+
+// ---------------------------------------------------------------------------
+// 10. Runtime-flagged high-player-count visual culling hooks (#1-#4)
+// ---------------------------------------------------------------------------
+extern "C" void KartModelsVisibility_Update_HighCountOpt(CpuContext* ctx) {
+    if (gHighCountCullActive && GetHighCountOptConfig().kartDrawCap > 0u) {
+        const uint32_t modelsVis = ctx->gpr[3];
+        const uint8_t playerIdx = ReadKartLinkPlayerIdx(modelsVis);
+        if (playerIdx < 128u && !gKartDrawVisible[playerIdx]) {
+            const uint8_t orig = Memory::Read8(modelsVis + 0x12u);
+            Memory::Write8(modelsVis + 0x12u, 0u);
+            MKW_GUEST_NEXT(8056A470)(ctx);
+            Memory::Write8(modelsVis + 0x12u, orig);
+            return;
+        }
+    }
+    MKW_GUEST_NEXT(8056A470)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8056A470, KartModelsVisibility_Update_HighCountOpt,
+                           "KartModelsVisibility_Update_HighCountOpt");
+
+extern "C" void KartSub_UpdateTransforms_HighCountOpt(CpuContext* ctx) {
+    if (gHighCountCullActive && GetHighCountOptConfig().cullSkeletal) {
+        const uint8_t playerIdx = ReadKartLinkPlayerIdx(ctx->gpr[3]);
+        if (playerIdx < 128u && !gKartDrawVisible[playerIdx]) {
+            return;
+        }
+    }
+    MKW_GUEST_NEXT(8059783C)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8059783C, KartSub_UpdateTransforms_HighCountOpt,
+                           "KartSub_UpdateTransforms_HighCountOpt");
+
+extern "C" void DriverController_Update_HighCountOpt(CpuContext* ctx) {
+    if (gHighCountCullActive && GetHighCountOptConfig().cullSkeletal) {
+        const uint8_t playerIdx = ReadKartLinkPlayerIdx(ctx->gpr[3]);
+        if (playerIdx < 128u && !gKartDrawVisible[playerIdx]) {
+            return;
+        }
+    }
+    MKW_GUEST_NEXT(807CB360)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x807CB360, DriverController_Update_HighCountOpt,
+                           "DriverController_Update_HighCountOpt");
+
+extern "C" void EffectsPlayer_Update_HighCountOpt(CpuContext* ctx) {
+    if (gHighCountCullActive && GetHighCountOptConfig().cullEffectsAndShadows) {
+        const uint32_t effPlayer = ctx->gpr[3];
+        const uint8_t playerIdx = effPlayer ? Memory::Read8(effPlayer + 0x12Eu) : 255u;
+        if (playerIdx < 128u) {
+            if (!gKartEffectsVisible[playerIdx]) {
+                if (!gPrevEffectsCulled[playerIdx]) {
+                    gPrevEffectsCulled[playerIdx] = true;
+                    CpuContext sub = *ctx;
+                    sub.gpr[3] = effPlayer;
+                    sub.gpr[4] = 1u;
+                    MKW_GUEST_FUNC(806958F4)(&sub);
+                }
+                return;
+            }
+            gPrevEffectsCulled[playerIdx] = false;
+        }
+    }
+    MKW_GUEST_NEXT(80693D84)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80693D84, EffectsPlayer_Update_HighCountOpt,
+                           "EffectsPlayer_Update_HighCountOpt");
+
+extern "C" void CtrlRaceNameBalloon_OnUpdate_HighCountOpt(CpuContext* ctx) {
+    if (gHighCountCullActive && GetHighCountOptConfig().nameBalloonCap > 0u) {
+        const uint32_t ctrl = ctx->gpr[3];
+        const int32_t playerId = ctrl ? static_cast<int32_t>(Memory::Read32(ctrl + 0x178u)) : -1;
+        if (playerId >= 0 && playerId < 128 && !gKartNameVisible[static_cast<size_t>(playerId)]) {
+            Memory::Write8(ctrl + 0x80u, 1u);
+            return;
+        }
+    }
+    MKW_GUEST_NEXT(807F06E8)(ctx);
+}
+REGISTER_NATIVE_WRAPPER_AS(0x807F06E8, CtrlRaceNameBalloon_OnUpdate_HighCountOpt,
+                           "CtrlRaceNameBalloon_OnUpdate_HighCountOpt");

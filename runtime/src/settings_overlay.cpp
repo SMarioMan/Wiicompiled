@@ -1290,6 +1290,17 @@ void DrawGraphicsSettings() {
 }
 
 void DrawFpsOverlay() {
+    static const bool s_noImGuiFps = []() {
+        auto envFlag = [](const char* name, int fallback) -> bool {
+            const char* v = std::getenv(name);
+            return (v && *v) ? (std::atoi(v) != 0) : (fallback != 0);
+        };
+        const int master = envFlag("MKW_HIGH_COUNT_OPT", 0) ? 1 : 0;
+        return envFlag("MKW_OPT_NO_IMGUI_FPS", master);
+    }();
+    if (s_noImGuiFps) {
+        return;
+    }
     AuroraPresentTiming presentTiming{};
     aurora_get_present_timing(&presentTiming);
     const uint32_t targetFps = kFrameInterpolationTargetFps[static_cast<size_t>(g_frameInterpolationMode)];

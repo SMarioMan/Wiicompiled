@@ -217,6 +217,7 @@ extern "C" void SelectThread_801a9c08(CpuContext* ctx)
     uint32_t nextThread = 0;
     uint32_t pendingMask = 0;
 
+select_next_thread:
     while (true) {
         // Check if there are any runnable threads
         uint32_t reschedPending = ::Memory::Read32(kSchedulerPendingFlagAddr);
@@ -359,11 +360,22 @@ extern "C" void SelectThread_801a9c08(CpuContext* ctx)
         // we can't do a proper fiber switch. Just return and let the caller handle it.
         if (currentGuestThread == 0) {
             Fiber::GuestFiberManager::SwitchToThread(nextThread, cpu);
+            if (::Memory::Read32(kOSRunningContextAddr) == 0 &&
+                ::Memory::Read32(kOSCurrentContextAddr) == 0) {
+                goto select_next_thread;
+            }
             return;
         }
         
         // Perform the fiber switch!
         Fiber::GuestFiberManager::SwitchToThread(nextThread, cpu);
+        // When a guest fiber exits cleanly, it clears both running/current
+        // contexts and switches back to the host scheduler fiber. Do not
+        // return to a still-WAITING caller; loop to select the next thread.
+        if (::Memory::Read32(kOSRunningContextAddr) == 0 &&
+            ::Memory::Read32(kOSCurrentContextAddr) == 0) {
+            goto select_next_thread;
+        }
         // When we return here, we've been switched back
         return;
     }

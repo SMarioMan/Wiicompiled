@@ -1387,17 +1387,50 @@ int RuntimeMain(int argc, char** argv) {
         [](const char* arg) { return std::string_view(arg) == "--lan-cpu"; });
     const bool sharedAudioMix = std::any_of(argv + 1, argv + argc,
         [](const char* arg) { return std::string_view(arg) == "--shared-audio-mix"; });
+    const bool gcAdapterUnlimited = std::any_of(argv + 1, argv + argc,
+        [](const char* arg) { return std::string_view(arg) == "--gc-adapter-unlimited"; });
+    uint32_t controllerSlot = 0;
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && std::string_view(argv[i]) != "--lan-cpu" && std::string_view(argv[i]) != "--shared-audio-mix" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
+            const std::string_view arg(argv[i]);
+            if (arg.rfind("--controller-slot=", 0) == 0) {
+                const long parsed = std::strtol(argv[i] + 18, nullptr, 10);
+                if (parsed < 1 || parsed > 128) {
+                    throw std::invalid_argument("--controller-slot requires a 1-based controller number in 1..128");
+                }
+                controllerSlot = static_cast<uint32_t>(parsed);
+                continue;
+            }
+            if (arg != "--headless" && arg != "--no-audio" && arg != "--allow-software-gpu" && arg != "--lan-cpu" && arg != "--shared-audio-mix" && arg != "--gc-adapter-unlimited" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP, --lan-peer=IP, --lan-cpu and --shared-audio-mix.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio --allow-software-gpu --gc-adapter-unlimited and --controller-slot=N, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP, --lan-peer=IP, --lan-cpu and --shared-audio-mix.");
             }
         }
         LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
         LayoutAccessAudit::SetPhase("startup");
         LanRuntime::Validate();
+        if (gcAdapterUnlimited && controllerSlot == 0) {
+            const uint32_t instId = LanRuntime::Settings().instance;
+            controllerSlot = instId > 0 ? instId : 1u;
+        }
+        if (gcAdapterUnlimited) {
+#if defined(_WIN32)
+            _putenv_s("MKW_GC_ADAPTER_UNLIMITED", "1");
+#else
+            setenv("MKW_GC_ADAPTER_UNLIMITED", "1", 1);
+#endif
+        }
+        if (controllerSlot > 0) {
+            const std::string slotStr = std::to_string(controllerSlot);
+#if defined(_WIN32)
+            _putenv_s("MKW_CONTROLLER_SLOT", slotStr.c_str());
+#else
+            setenv("MKW_CONTROLLER_SLOT", slotStr.c_str(), 1);
+#endif
+            RT_LOGF("input", "controller slot pinned 1:1 to controller #%u (gc_adapter_unlimited=%s)\n",
+                    controllerSlot, gcAdapterUnlimited ? "true" : "false");
+        }
         if (sharedAudioMix && !g_headless && !g_noAudio) {
             const uint32_t instId = LanRuntime::Settings().instance;
             const bool isMaster = (instId <= 1);
@@ -1498,7 +1531,10 @@ int RuntimeMain(int argc, char** argv) {
         auroraConfig.hasWindowPosition = RuntimeConfigFile::WindowPosition(
             auroraConfig.windowPosX, auroraConfig.windowPosY);
         const bool secondaryLocalInstance = g_multiInstance && LanRuntime::Settings().instance > 1;
-        auroraConfig.allowJoystickBackgroundEvents = !g_headless && !secondaryLocalInstance;
+        // Multi-controller local play requires background joystick events on every
+        // window since only one of the N tiled windows has Windows OS focus at a time.
+        auroraConfig.allowJoystickBackgroundEvents =
+            !g_headless && (!secondaryLocalInstance || gcAdapterUnlimited || controllerSlot > 0);
         auroraConfig.startHidden = g_headless;
         auroraConfig.disableCopyFilter = RuntimeConfigFile::DisableCopyFilter(true);
         // Dolphin-style custom textures. Aurora indexes <userPath>/texture_replacements

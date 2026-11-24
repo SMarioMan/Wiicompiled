@@ -37,6 +37,9 @@ param(
     [ValidateRange(0.0, 4.0)][double]$ResolutionMultiplier = 0.0,
     [switch]$AllAudio,
     [switch]$SharedAudioMix,
+    [Alias('GCUnlimited')]
+    [switch]$GameCubeAdapterUnlimited,
+    [string]$GcuPath = 'E:\Projects\mario-kart-multiplayer\0-Global\GameCubeAdapterUnlimited.exe',
     [switch]$SingleGpu,
     [Alias('CpuDrive')]
     [switch]$AutoDrive,
@@ -374,9 +377,25 @@ $success = $false
 $startedAt = Get-Date
 
 try {
+    if ($GameCubeAdapterUnlimited -and -not $Headless) {
+        $gcuProc = @(Get-Process -Name 'GameCubeAdapterUnlimited' -ErrorAction SilentlyContinue)
+        if ($gcuProc.Count -eq 0) {
+            if ($GcuPath -and (Test-Path -LiteralPath $GcuPath)) {
+                Write-Host "Starting GameCubeAdapterUnlimited from $GcuPath ..."
+                Start-Process -FilePath $GcuPath -WorkingDirectory (Split-Path -Parent $GcuPath) | Out-Null
+                Start-Sleep -Milliseconds 1500
+            } else {
+                Write-Warning "GameCubeAdapterUnlimited.exe is not running and was not found at '$GcuPath'. Controllers will bind 1:1 once it is started."
+            }
+        } else {
+            Write-Host "GameCubeAdapterUnlimited is already running (1:1 controller mapping enabled: Player N -> Controller N)."
+        }
+    }
+
     $modeLabel = if ($Headless) { 'headless' } else { 'windowed' }
     if ($AutoDrive) { $modeLabel += ', auto-drive' }
     if ($SharedAudioMix -and -not $Headless) { $modeLabel += ', shared-audio-mix' }
+    if ($GameCubeAdapterUnlimited -and -not $Headless) { $modeLabel += ', gc-adapter-unlimited (1:1)' }
     Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
         $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
@@ -390,6 +409,10 @@ try {
         elseif ($SharedAudioMix) { $argsList += '--shared-audio-mix' }
         elseif ($i -gt 1 -and -not $AllAudio) { $argsList += '--no-audio' }
         if ($AutoDrive) { $argsList += '--lan-cpu' }
+        if ($GameCubeAdapterUnlimited -and -not $Headless) {
+            $argsList += '--gc-adapter-unlimited'
+            $argsList += "--controller-slot=$i"
+        }
         $argsList += '--lan-local'
         $argsList += "--lan-id=$i"
         $argsList += "--lan-peers=$Peers"

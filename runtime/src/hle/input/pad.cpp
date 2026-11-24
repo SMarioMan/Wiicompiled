@@ -2,6 +2,7 @@
 #include "guest_abi/guest_region.h"
 #include "hle_stubs.h"
 #include "memory.h"
+#include "mkw_guest_layout.h"
 #include "hle/controller_status_contract.h"
 #include "input_bindings.h"
 #include "motion_trick.h"
@@ -10,6 +11,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <bit>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -90,6 +92,130 @@ void SkipEsrbNoticePage() {
                 if (Memory::Read32(page + 32u) <= 90u) {
                     Memory::Write32(page + 32u, 91u);
                 }
+            }
+        }
+    } catch (const Memory::AccessViolation&) {
+    }
+}
+
+// Unlock all characters, vehicles, cups, and race classes (50cc/100cc/150cc/Mirror)
+// on every valid license in SaveDataManager::sInstance (PAL 0x809BD748 / USA 0x809B8F88).
+void UnlockAllContent() {
+    try {
+        const uint32_t mgr = Memory::Read32(MKW_GADDR(809BD748));
+        if (!mgr) return;
+        const uint32_t raw = Memory::Read32(mgr + 20u);
+        if (!raw) return;
+        for (uint32_t lic = 0; lic < 4u; ++lic) {
+            if (Memory::Read32(raw + 8u + lic * 0x8CC0u) != 0x524B5044u) { // 'RKPD'
+                continue;
+            }
+            const uint32_t unlockBase = mgr + 56u + lic * 0x93F0u + 0x8FFCu;
+            for (uint32_t w = 0; w < 4u; ++w) {
+                if (Memory::Read32(unlockBase + w * 4u) != 0xFFFFFFFFu) {
+                    Memory::Write32(unlockBase + w * 4u, 0xFFFFFFFFu);
+                }
+            }
+        }
+    } catch (const Memory::AccessViolation&) {
+    }
+}
+
+// Seed SectionParams->characters[0] before Character Select (PageId 0x6B) opens
+// so each LAN instance highlights a unique non-Mii character (0..23) by default.
+void SeedDefaultCharacterHighlight() {
+    static bool seededForCharSelect = false;
+    if (seededForCharSelect) return;
+    const auto& options = LanRuntime::Settings();
+    if (options.instance == 0) return;
+    try {
+        const uint32_t manager = Memory::Read32(MKW_GADDR(809C1E38));
+        if (!manager) return;
+        const uint32_t section = Memory::Read32(manager);
+        const uint32_t globalContext = Memory::Read32(manager + 0x98u);
+        if (!globalContext) return;
+        if (section) {
+            const uint32_t count = Memory::Read32(section + 0x37Cu);
+            if (count > 0 && count <= 11) {
+                for (uint32_t i = 0; i < count; ++i) {
+                    const uint32_t page = Memory::Read32(section + 0x354u + i * 4u);
+                    if (page != 0 && Memory::Read32(page + 4u) == 0x6Bu) {
+                        seededForCharSelect = true;
+                        return;
+                    }
+                }
+            }
+        }
+        const uint32_t targetChar = (options.instance - 1u) % 24u;
+        Memory::Write32(globalContext + 0x12Cu, targetChar);
+    } catch (const Memory::AccessViolation&) {
+    }
+}
+
+// Arrange expanded Course Voting cards (Pages::Vote, PageId 0x92) in a balanced,
+// dynamically scaled grid so >12 votes never pile up at the center of the screen.
+void LayoutExpandedVotePage() {
+    const auto& layout = MkwGuestLayout::kLayout;
+    if (layout.playerCapacity <= 12) return;
+    try {
+        const uint32_t manager = Memory::Read32(MKW_GADDR(809C1E38));
+        const uint32_t section = manager ? Memory::Read32(manager) : 0;
+        const uint32_t count = section ? Memory::Read32(section + 0x37Cu) : 0;
+        if (count == 0 || count > 11) return;
+
+        uint32_t votePage = 0;
+        for (uint32_t i = 0; i < count; ++i) {
+            const uint32_t page = Memory::Read32(section + 0x354u + i * 4u);
+            if (page != 0 && Memory::Read32(page + 4u) == 0x92u) {
+                votePage = page;
+                break;
+            }
+        }
+        if (!votePage) return;
+
+        constexpr uint32_t kVotesOffset = 1224u;
+        constexpr uint32_t kVoteStride = 376u;
+        const uint32_t voteCountOffset =
+            kVotesOffset + layout.playerCapacity * kVoteStride + layout.playerCapacity * 4u + 8u;
+        const uint32_t voteCount = Memory::Read32(votePage + voteCountOffset);
+        if (voteCount <= 12 || voteCount > layout.playerCapacity) return;
+
+        constexpr float kAvailW = 740.f;
+        constexpr float kAvailH = 290.f;
+        constexpr float kCenterY = -8.f;
+        constexpr float kBaseCardW = 205.f;
+        constexpr float kBaseCardH = 52.f;
+
+        uint32_t bestRows = 4;
+        float bestScale = 0.f;
+        const uint32_t maxRows = std::min<uint32_t>(voteCount, 16u);
+        for (uint32_t r = 1; r <= maxRows; ++r) {
+            const uint32_t maxCols = (voteCount + r - 1) / r;
+            const float sx = kAvailW / (static_cast<float>(maxCols) * kBaseCardW);
+            const float sy = kAvailH / (static_cast<float>(r) * kBaseCardH);
+            const float s = std::min(0.95f, std::min(sx, sy));
+            if (s > bestScale) {
+                bestScale = s;
+                bestRows = r;
+            }
+        }
+        const float scale = std::clamp(bestScale, 0.24f, 0.95f);
+        const uint32_t rows = bestRows;
+        const uint32_t maxCols = (voteCount + rows - 1) / rows;
+        const float cellW = std::min(kBaseCardW * scale * 1.06f, kAvailW / static_cast<float>(maxCols));
+        const float cellH = std::min(kBaseCardH * scale * 1.06f, kAvailH / static_cast<float>(rows));
+
+        uint32_t index = 0;
+        for (uint32_t row = 0; row < rows; ++row) {
+            const uint32_t cols = voteCount / rows + (row < voteCount % rows ? 1u : 0u);
+            for (uint32_t col = 0; col < cols; ++col, ++index) {
+                const uint32_t control = votePage + kVotesOffset + index * kVoteStride;
+                const float x = cellW * (static_cast<float>(col) - (static_cast<float>(cols) - 1.f) * 0.5f);
+                const float y = kCenterY + cellH * ((static_cast<float>(rows) - 1.f) * 0.5f - static_cast<float>(row));
+                Memory::Write32(control + 76u, std::bit_cast<uint32_t>(x));
+                Memory::Write32(control + 80u, std::bit_cast<uint32_t>(y));
+                Memory::Write32(control + 88u, std::bit_cast<uint32_t>(scale));
+                Memory::Write32(control + 92u, std::bit_cast<uint32_t>(scale));
             }
         }
     } catch (const Memory::AccessViolation&) {
@@ -194,6 +320,9 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     InputBindings::Apply(statuses);
     MotionTrick::Apply(statuses);
     SkipEsrbNoticePage();
+    UnlockAllContent();
+    SeedDefaultCharacterHighlight();
+    LayoutExpandedVotePage();
     ApplyLanMenuInput(statuses[0], rumbleMask);
     if (const auto input = TestPadInput::ReadConfigured()) {
         statuses[0].err = PAD_ERR_NONE;

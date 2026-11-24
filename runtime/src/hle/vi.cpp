@@ -127,6 +127,14 @@ struct ViState {
     
     // Set by VIFlush(); cleared after commit in AdvanceRetrace
     bool flushArmed = false;
+
+    // Multiplayer VI clock-skew servo state (bounded [-5%, +3%] rate nudge).
+    int32_t clockSkewFrames = 0;
+    Clock::time_point lastSkewUpdate{};
+    bool hasHostSync = false;
+    uint32_t hostSyncStage = 0;
+    uint32_t hostSyncFrame = 0;
+    Clock::time_point hostSyncTime{};
 };
 
 std::mutex g_viMutex;
@@ -246,8 +254,26 @@ void EnsureInitializedLocked() {
     }
     g_vi.initialized = true;
     g_vi.retraceInterval = IntervalForFormat(g_vi.tvFormat);
-    g_vi.lastRetrace = Clock::now();
+    // Align initial VI phase to the host monotonic clock epoch so multiple
+    // instances on the same machine start on the same retrace grid.
+    const auto now = Clock::now();
+    if (g_vi.retraceInterval.count() > 0) {
+        const auto sinceEpoch =
+            std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch());
+        g_vi.lastRetrace = now - (sinceEpoch % g_vi.retraceInterval);
+    } else {
+        g_vi.lastRetrace = now;
+    }
     WriteGuestStateLocked();
+}
+
+std::chrono::microseconds EffectiveRetraceIntervalLocked(Clock::time_point now) {
+    if (g_vi.clockSkewFrames == 0 ||
+        (now - g_vi.lastSkewUpdate) > std::chrono::seconds(2)) {
+        return g_vi.retraceInterval;
+    }
+    return std::chrono::microseconds(
+        VI_HLE_ComputeServoIntervalUs(g_vi.retraceInterval.count(), g_vi.clockSkewFrames));
 }
 
 // GXRenderModeObj::viTVmode encodes the output family (0 NTSC, 1 PAL, 2 MPAL,
@@ -387,13 +413,14 @@ bool AdvanceDueRetraces(CpuContext* ctx, int maxToProcess, bool serviceAurora)
     {
         std::lock_guard<std::mutex> lock(g_viMutex);
         if (!g_vi.initialized) return false;
-        target = g_vi.lastRetrace + g_vi.retraceInterval;
+        const auto interval = EffectiveRetraceIntervalLocked(now);
+        target = g_vi.lastRetrace + interval;
         if (now < target) return false;
         // VI's pending interrupt coalesces while the CPU cannot service it.
         // Replaying every missed field leaves a slow host permanently behind
         // and repeatedly wakes high-priority threads ahead of network work.
         // Keep the display phase, but deliver just the latest pending edge.
-        target += ((now - target) / g_vi.retraceInterval) * g_vi.retraceInterval;
+        target += ((now - target) / interval) * interval;
     }
     AdvanceRetrace(ctx, target, serviceAurora);
     return true;
@@ -449,12 +476,70 @@ void VI_HLE_ProcessRetracesDeferred(int maxToProcess) {
     OS_HLE_EndDeferredGuestCallbacks();
 }
 
+int64_t VI_HLE_ComputeServoIntervalUs(int64_t nominalUs, int32_t deltaFrames) {
+    if (nominalUs <= 0) return nominalUs;
+    // Deadband of +/-2 frames absorbs normal LAN jitter without perturbing cadence;
+    // deltas beyond +/-600 frames (10s) are ignored as mismatched/stale race states.
+    if (deltaFrames >= -2 && deltaFrames <= 2) return nominalUs;
+    if (deltaFrames < -600 || deltaFrames > 600) return nominalUs;
+    int64_t adjusted = nominalUs;
+    if (deltaFrames > 2) {
+        // Behind host: tighten interval by 0.5% per frame beyond deadband, capped at -5%.
+        const int64_t permille = std::min<int64_t>(50, static_cast<int64_t>(deltaFrames - 2) * 5);
+        adjusted = (nominalUs * (1000 - permille)) / 1000;
+    } else {
+        // Ahead of host: relax interval by 0.5% per frame beyond deadband, capped at +3%.
+        const int64_t permille = std::min<int64_t>(30, static_cast<int64_t>(-deltaFrames - 2) * 5);
+        adjusted = (nominalUs * (1000 + permille)) / 1000;
+    }
+    return std::max<int64_t>(1000, adjusted);
+}
+
+void VI_HLE_OnHostRaceSync(uint32_t stage, uint32_t hostFrame) {
+    if (stage != 1u && stage != 2u) return;
+    std::lock_guard<std::mutex> lock(g_viMutex);
+    g_vi.hostSyncStage = stage;
+    g_vi.hostSyncFrame = hostFrame;
+    g_vi.hostSyncTime = Clock::now();
+    g_vi.hasHostSync = true;
+}
+
+void VI_HLE_OnLocalRaceFrame(uint32_t stage, uint32_t localFrame) {
+    std::lock_guard<std::mutex> lock(g_viMutex);
+    if (stage != 1u && stage != 2u) {
+        g_vi.clockSkewFrames = 0;
+        g_vi.hasHostSync = false;
+        return;
+    }
+    if (!g_vi.hasHostSync || g_vi.hostSyncStage != stage) {
+        return;
+    }
+    const auto now = Clock::now();
+    const auto age = now - g_vi.hostSyncTime;
+    if (age > std::chrono::milliseconds(1500)) {
+        g_vi.clockSkewFrames = 0;
+        g_vi.hasHostSync = false;
+        return;
+    }
+    const int64_t nominalUs = std::max<int64_t>(1, g_vi.retraceInterval.count());
+    const int64_t ageUs = std::max<int64_t>(
+        0, std::chrono::duration_cast<std::chrono::microseconds>(age).count());
+    const int64_t estimatedHostFrame =
+        static_cast<int64_t>(g_vi.hostSyncFrame) + (ageUs / nominalUs);
+    const int64_t delta = estimatedHostFrame - static_cast<int64_t>(localFrame);
+    if (delta >= -600 && delta <= 600) {
+        g_vi.clockSkewFrames = static_cast<int32_t>(delta);
+        g_vi.lastSkewUpdate = now;
+    }
+}
+
 void VI_HLE_WaitForNextRetracePoll() {
     Clock::time_point retraceDeadline;
+    const auto nowBeforeLock = Clock::now();
     {
         std::lock_guard<std::mutex> lock(g_viMutex);
         EnsureInitializedLocked();
-        retraceDeadline = g_vi.lastRetrace + g_vi.retraceInterval;
+        retraceDeadline = g_vi.lastRetrace + EffectiveRetraceIntervalLocked(nowBeforeLock);
     }
 
     const auto now = Clock::now();
@@ -527,14 +612,15 @@ void VI_HLE_PresentFrame(bool presentedXfb, bool paceToRetrace) {
         {
             std::lock_guard<std::mutex> lock(g_viMutex);
             EnsureInitializedLocked();
-            paceDeadline = g_vi.lastRetrace + g_vi.retraceInterval;
+            const auto interval = EffectiveRetraceIntervalLocked(Clock::now());
+            paceDeadline = g_vi.lastRetrace + interval;
             retraceCount = g_vi.retraceCount;
             baseNanos = static_cast<uint64_t>(
                 std::chrono::duration_cast<std::chrono::nanoseconds>(
                     g_vi.lastRetrace.time_since_epoch())
                     .count());
             intervalNanos = static_cast<uint64_t>(
-                std::chrono::duration_cast<std::chrono::nanoseconds>(g_vi.retraceInterval)
+                std::chrono::duration_cast<std::chrono::nanoseconds>(interval)
                     .count());
         }
         // Hold the frame to its boundary only when no retrace elapsed during
@@ -918,7 +1004,7 @@ extern "C" void VIWaitForRetrace_HLE_801b99ec(CpuContext* ctx)
         {
             std::lock_guard<std::mutex> lock(g_viMutex);
             EnsureInitializedLocked();
-            interval = g_vi.retraceInterval;
+            interval = EffectiveRetraceIntervalLocked(Clock::now());
             target = g_vi.lastRetrace + interval;
         }
 

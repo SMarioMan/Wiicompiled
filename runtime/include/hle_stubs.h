@@ -18,6 +18,9 @@ void VI_HLE_WaitForNextRetracePoll();
 void VI_HLE_PresentFrame(bool presentedXfb, bool paceToRetrace);
 bool VI_HLE_IsAdvancingRetrace();
 void VI_HLE_SetXfbReady(uint32_t xfbAddr); // Called by GXCopyDisp to signal EFB→XFB copy
+void VI_HLE_OnHostRaceSync(uint32_t stage, uint32_t hostFrame);
+void VI_HLE_OnLocalRaceFrame(uint32_t stage, uint32_t localFrame);
+int64_t VI_HLE_ComputeServoIntervalUs(int64_t nominalUs, int32_t deltaFrames);
 void Audio_HLE_Tick(CpuContext* ctx, uint32_t deltaMicros);
 void Audio_HLE_Poll(CpuContext* ctx);
 // Deferred twin of Audio_HLE_Poll for the long host waits that already service

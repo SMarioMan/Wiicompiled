@@ -49,6 +49,10 @@ its single-racer rules. See [offline results](128-racer-comparison.md) and
     (capacity range raised to 128).
   - Fixed `SelectThread` in `runtime/src/hle/os/os_scheduler.cpp` to re-enter
     idle/selection when the run queue drains or a switched-to worker fiber exits.
+  - Added host-epoch VI phase alignment (`vi.cpp`) and a bounded `[-5%, +3%]`
+    VI `retraceInterval` clock-skew servo (`±2`-frame deadband, automatic 2 s
+    staleness reset) driven by a 16-byte host `MKWS` race-frame multicast beacon
+    every ~10 frames (`network_thread.c`, `network_socket.cpp`, `boot_race.cpp`).
 
 ## Verified live LAN runs (capacity 128)
 
@@ -60,5 +64,5 @@ its single-racer rules. See [offline results](128-racer-comparison.md) and
 | 65 (`1..65`, AIDs `0..64`) | Functional (`2`) | `--race` | **PASS** | 408.25 s |
 | **128 (`1..128`, AIDs `0..127`)** | **Functional (`4`)** | **`--race`** | **PASS** | **565.68 s** |
 
-All 992 `Translator.Tests` and all 30 LAN Python unit tests pass with zero
-regressions.
+All 992 `Translator.Tests` and all 31 LAN Python unit tests (including
+`test_vi_clock_servo.py`) pass with zero regressions.

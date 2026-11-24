@@ -710,6 +710,8 @@ static void receive_packets(so_fd_t socket, bool allow_status) {
 		} else if (buffer[0] == BROADCAST_MAGIC) {
 			if (r != sizeof(struct broadcast_packet)) continue;
 			process_broadcast(*(const struct broadcast_packet *)buffer, raddr);
+		} else if (buffer[0] == 0x4D4B5753u) {
+			/* Host race-frame clock-sync beacon; consumed by native VI servo. */
 		} else {
 			LOG_ERROR("received unknown message. %u length %x header", (unsigned)r, (unsigned)buffer[0]);
 		}
@@ -818,10 +820,36 @@ void* network_thread_main(void *arg) {
         }
     }
 	mkw_net_state->connection_state = 5;
+	unsigned sync_ticks = 0;
 	while (1) {
 		if (broadcast_due()) {
 			if (!compute_and_broadcast_status(broadcast_socket))
 				break;
+		}
+		if (++sync_ticks >= 10) {
+			sync_ticks = 0;
+			struct dwc_gamedata *gd = get_dwc_gamedata();
+			if (gd && gd->dwc_host_state == 2 && MKWRaceInfo) {
+				const uint32_t stage = *(const uint32_t *)(MKWRaceInfo + 0x28);
+				if (stage == 1 || stage == 2) {
+					const uint32_t frame = *(const uint32_t *)(MKWRaceInfo + 0x20);
+					const uint32_t sync_pkt[4] = { 0x4D4B5753u, my_fake_pid, stage, frame };
+					const so_addr_t mcast = {
+						.sa_len = sizeof(so_addr_t), .sa_family = AF_INET,
+						.sa_port = DISCOVERY_PORT, .sa_addr = DISCOVERY_GROUP
+					};
+					SOSendTo(broadcast_socket, sync_pkt, sizeof(sync_pkt), 0, &mcast);
+					for (unsigned i = 0; i < mkw_lan_config.peer_count; i++) {
+						if (mkw_lan_config.peers[i] != local_ip) {
+							const so_addr_t ucast = {
+								.sa_len = sizeof(so_addr_t), .sa_family = AF_INET,
+								.sa_port = BROADCAST_PORT, .sa_addr = mkw_lan_config.peers[i]
+							};
+							SOSendTo(broadcast_socket, sync_pkt, sizeof(sync_pkt), 0, &ucast);
+						}
+					}
+				}
+			}
 		}
 		service_network_thread();
 		VIWaitForRetrace();

@@ -1,4 +1,5 @@
 #include "boot_race.h"
+#include "hle_stubs.h"
 
 #include "abi_bridge.h"
 #include "guest_abi/guest_region.h"
@@ -406,6 +407,10 @@ REGISTER_NATIVE_FUNCTION_AS(0x8061B9BC, SectionPad_GetFirstDeactivatedPad_8061b9
 extern "C" void Raceinfo_Update_805331b4(CpuContext* ctx) {
     const uint32_t raceinfo = ctx->gpr[3];
     MKW_GUEST_NEXT(805331B4)(ctx);
+    if (raceinfo && Memory::Contains(raceinfo + 0x20u, 12u)) {
+        VI_HLE_OnLocalRaceFrame(Memory::Read32(raceinfo + 0x28u),
+                                Memory::Read32(raceinfo + 0x20u));
+    }
     if (!g_cpuDriven && !g_lanCpuDriven) return;
     static uint32_t previous = 0, lastStage = std::numeric_limits<uint32_t>::max(), ticks = 0;
     const auto progress = BootRace::ReadProgress(raceinfo);

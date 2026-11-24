@@ -1,7 +1,22 @@
 #include "network_internal.h"
 #include "hle/socket_option_contract.h"
+#include "hle_stubs.h"
+
+#include <atomic>
 
 namespace NetworkHle {
+
+namespace {
+constexpr uint32_t kLanSyncMagic = 0x4D4B5753u;  // "MKWS"
+std::atomic<uint32_t> g_lastSentSyncPid{0};
+
+uint32_t ReadBe32(const uint8_t* p) {
+    return (static_cast<uint32_t>(p[0]) << 24) |
+           (static_cast<uint32_t>(p[1]) << 16) |
+           (static_cast<uint32_t>(p[2]) << 8) |
+           static_cast<uint32_t>(p[3]);
+}
+}  // namespace
 
 static int32_t NewWiiSocket(uint32_t af, uint32_t type, uint32_t protocol) {
     if (!EnsureSocketRuntime()) {
@@ -457,6 +472,9 @@ int32_t HandleIpTopIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const s
         const bool patchedWrite = nasAction == NasSslWriteAction::Ready;
         const uint8_t* sendData = patchedWrite ? patched.data() : data;
         const uint32_t sendSize = patchedWrite ? static_cast<uint32_t>(patched.size()) : in[0].size;
+        if (sendSize == 16 && sendData && ReadBe32(sendData) == kLanSyncMagic) {
+            g_lastSentSyncPid.store(ReadBe32(sendData + 4), std::memory_order_relaxed);
+        }
         const int ret = sendto(s->native, reinterpret_cast<const char*>(sendData), static_cast<int>(sendSize),
                                static_cast<int>(flags), destPtr, destLen);
         const int hostError = ret < 0 ? NativeLastError() : 0;
@@ -508,6 +526,15 @@ int32_t HandleIpTopIoctlv(uint32_t cmd, const std::vector<IoVector>& in, const s
 
         if (ret >= 0 && fromPtr) {
             WriteWiiSockAddr(out[1].address, from, static_cast<uint32_t>(fromLen));
+        }
+        if (ret == 16 && data) {
+            const auto* bytes = reinterpret_cast<const uint8_t*>(data);
+            if (ReadBe32(bytes) == kLanSyncMagic) {
+                const uint32_t senderPid = ReadBe32(bytes + 4);
+                if (senderPid != g_lastSentSyncPid.load(std::memory_order_relaxed)) {
+                    VI_HLE_OnHostRaceSync(ReadBe32(bytes + 8), ReadBe32(bytes + 12));
+                }
+            }
         }
         const int32_t result = ret >= 0 ? SocketResult(ret) : SocketErrorResult(nativeErr);
         if (ret < 0 && result != -SO_EAGAIN && result != s->lastLoggedRecvError) {

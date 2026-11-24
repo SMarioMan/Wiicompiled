@@ -104,6 +104,12 @@ def static_patches(capacity=12):
         write('game:Pages::Vote::BeforeControlUpdate+0x35C', 0x60000000)
         write('game:Pages::Vote::BeforeControlUpdate+0x450', 0x7C030378)  # mr r3, r0
         write('game:Pages::Vote::BeforeControlUpdate+0x454', 0x60000000)
+        # GMDataOnlineVS::HandlePositionTracking (0x80539F64) loads
+        # RaceinfoPlayer::position (1..capacity) via lbz and then sign-extends
+        # it via extsb r7, r7 (+0x19C / 0x8053A100). At 128 players, 128th
+        # place (0x80) sign-extends to -128, indexing -129 into the stack
+        # arrays and corrupting ids[]. NOP the extsb so r7 stays zero-extended.
+        write('game:GMDataOnlineVS::HandlePositionTracking+0x19C', 0x60000000)
     return patches
 
 

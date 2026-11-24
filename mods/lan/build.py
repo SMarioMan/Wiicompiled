@@ -94,6 +94,16 @@ def static_patches(capacity=12):
         write('game:RKNet::ROOMHandler::ExportROOMandUSER+0x64', 0x60000000)
         write('game:RKNet::SELECTHandler::PrepareAndExportSELECTandUSER+0x64', 0x60000000)
         write('game:RKNetRH1Export+0x58', 0x60000000)
+        # Pages::Vote::BeforeControlUpdate (page 146) populates 1 vote card
+        # every 5 frames (10.7s at 128p) and then crawls at 0.03 cards/frame
+        # (up to +70.6s divergence per console) waiting for currentIdx to match
+        # winningVoteControlIdx. Above 12 players, populate all vote cards
+        # immediately and snap to winningVoteControlIdx once the 4.17s
+        # deceleration spin finishes (rouletteSpeed < 0.05f).
+        write('game:Pages::Vote::BeforeControlUpdate+0x344', 0x60000000)
+        write('game:Pages::Vote::BeforeControlUpdate+0x35C', 0x60000000)
+        write('game:Pages::Vote::BeforeControlUpdate+0x450', 0x7C030378)  # mr r3, r0
+        write('game:Pages::Vote::BeforeControlUpdate+0x454', 0x60000000)
     return patches
 
 

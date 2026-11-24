@@ -110,6 +110,13 @@ def static_patches(capacity=12):
         # place (0x80) sign-extends to -128, indexing -129 into the stack
         # arrays and corrupting ids[]. NOP the extsb so r7 stays zero-extended.
         write('game:GMDataOnlineVS::HandlePositionTracking+0x19C', 0x60000000)
+        # Stock RH2 finish consensus uses 13-bit masks (0x8053276C) and 4-bit
+        # player indices (0x80532ABC), so remote finishes for playerIdx >= 13
+        # never confirm and GMDataOnlineVS::CanRaceEnd stays 0 forever. Above
+        # 12 players, NOP the skip branch at RaceinfoPlayer::EndLap+0x254
+        # (0x805300C4) so remote players fall through into RaceinfoPlayer::EndRace
+        # when they cross the lap-3 finish line.
+        write('game:RaceinfoPlayer::EndLap+0x254', 0x60000000)
     return patches
 
 

@@ -14,7 +14,7 @@
 
 .EXAMPLE
     .\start-lan-lobby.ps1 -Count 4
-    .\start-lan-lobby.ps1 -Count 12 -GridCols 4 -CellWidth 480 -CellHeight 270
+    .\start-lan-lobby.ps1 -Count 12 -GridCols 4 -CellWidth 480 -CellHeight 270 -AutoDrive
     .\start-lan-lobby.ps1 -Count 128 -Headless -ClockDivisor 4
     .\start-lan-lobby.ps1 -Stop
 #>
@@ -37,6 +37,8 @@ param(
     [ValidateRange(0.0, 4.0)][double]$ResolutionMultiplier = 0.0,
     [switch]$AllAudio,
     [switch]$SingleGpu,
+    [Alias('CpuDrive')]
+    [switch]$AutoDrive,
     [switch]$Headless,
     [switch]$RebuildLab,
     [switch]$StopAfterReady,
@@ -371,8 +373,10 @@ $success = $false
 $startedAt = Get-Date
 
 try {
+    $modeLabel = if ($Headless) { 'headless' } else { 'windowed' }
+    if ($AutoDrive) { $modeLabel += ', auto-drive' }
     Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
-        $Count, $Release, $capacity, $(if ($Headless) { 'headless' } else { 'windowed' }), $SharedCacheDir)
+        $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
     for ($i = 1; $i -le $Count; $i++) {
         $instDir = $instanceDirs[$i - 1]
@@ -382,6 +386,7 @@ try {
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
         elseif ($i -gt 1 -and -not $AllAudio) { $argsList += '--no-audio' }
+        if ($AutoDrive) { $argsList += '--lan-cpu' }
         $argsList += '--lan-local'
         $argsList += "--lan-id=$i"
         $argsList += "--lan-peers=$Peers"

@@ -1382,18 +1382,26 @@ int RuntimeMain(int argc, char** argv) {
 
     const bool allowSoftwareGpu = std::any_of(argv + 1, argv + argc,
         [](const char* arg) { return std::string_view(arg) == "--allow-software-gpu"; });
+    const bool lanAutoDrive = std::any_of(argv + 1, argv + argc,
+        [](const char* arg) { return std::string_view(arg) == "--lan-cpu"; });
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && std::string_view(argv[i]) != "--lan-cpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP, --lan-peer=IP and --lan-cpu.");
             }
         }
         LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
         LayoutAccessAudit::SetPhase("startup");
         LanRuntime::Validate();
-        if (const auto value=std::getenv("MKW_TEST_LAN_CPU")) {
+        if (lanAutoDrive) {
+            if (BootRace::Requested() || RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
+                throw std::invalid_argument("--lan-cpu requires the LAN product without direct --race boot");
+            }
+            BootRace::EnableLanTestDriving();
+            RT_LOGF("test-driving", "LAN auto-drive: CPU drives local racers; remote ownership, RNG and race settings are preserved\n");
+        } else if (const auto value=std::getenv("MKW_TEST_LAN_CPU")) {
             if (std::string_view(value)!="1" || !g_headless || BootRace::Requested() || RuntimeProduct::Active().kind!=RuntimeProduct::Kind::Lan)
                 throw std::invalid_argument("MKW_TEST_LAN_CPU=1 requires headless LAN menu automation without direct race boot");
             BootRace::EnableLanTestDriving();

@@ -14,7 +14,8 @@
 
 .EXAMPLE
     .\start-lan-lobby.ps1 -Count 4
-    .\start-lan-lobby.ps1 -Count 12 -GridCols 4 -CellWidth 480 -CellHeight 270 -AutoDrive
+    .\start-lan-lobby.ps1 -Count 32 -AutoDrive -SharedAudioMix -GameCubeAdapterUnlimited
+    .\start-lan-lobby.ps1 -Count 32 -GridCols 8 -AutoDrive
     .\start-lan-lobby.ps1 -Count 128 -Headless -ClockDivisor 4
     .\start-lan-lobby.ps1 -Stop
 #>
@@ -25,9 +26,11 @@ param(
     [string]$LabDir = '',
     [string]$SharedCacheDir = '',
     [int]$Peers = 0,
-    [ValidateRange(1, 128)][int]$GridCols = 4,
-    [ValidateRange(120, 8192)][int]$CellWidth = 640,
-    [ValidateRange(90, 8192)][int]$CellHeight = 480,
+    [ValidateRange(0, 128)][int]$GridCols = 0,
+    [ValidateRange(0, 8192)][int]$CellWidth = 0,
+    [ValidateRange(0, 8192)][int]$CellHeight = 0,
+    [ValidateRange(0, 16384)][int]$ScreenWidth = 0,
+    [ValidateRange(0, 16384)][int]$ScreenHeight = 0,
     [int]$OriginX = 0,
     [int]$OriginY = 0,
     [double]$Gap = 0.3,
@@ -98,6 +101,67 @@ if ($Peers -lt $Count) {
     throw "-Peers $Peers must be at least -Count $Count."
 }
 
+# --- 1b. Resolve display size, grid columns, and cell dimensions automatically when omitted ---
+function Get-PrimaryDisplaySize {
+    if (-not ('MkwDisplayInfo' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class MkwDisplayInfo {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct DEVMODE {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName;
+        public short dmSpecVersion, dmDriverVersion, dmSize, dmDriverExtra;
+        public int dmFields, dmPositionX, dmPositionY, dmDisplayOrientation, dmDisplayFixedOutput;
+        public short dmColor, dmDuplex, dmYResolution, dmTTOption, dmCollate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName;
+        public short dmLogPixels;
+        public int dmBitsPerPel, dmPelsWidth, dmPelsHeight, dmDisplayFlags, dmDisplayFrequency;
+    }
+    [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+    private static extern bool EnumDisplaySettings(string dev, int mode, ref DEVMODE dm);
+    public static int[] PrimarySize() {
+        var dm = new DEVMODE();
+        dm.dmSize = (short)Marshal.SizeOf(dm);
+        if (EnumDisplaySettings(null, -1, ref dm) && dm.dmPelsWidth > 0 && dm.dmPelsHeight > 0)
+            return new[] { dm.dmPelsWidth, dm.dmPelsHeight };
+        return new[] { 1920, 1080 };
+    }
+}
+'@
+    }
+    return [MkwDisplayInfo]::PrimarySize()
+}
+
+if ($ScreenWidth -le 0 -or $ScreenHeight -le 0) {
+    $primarySize = Get-PrimaryDisplaySize
+    if ($ScreenWidth -le 0) { $ScreenWidth = $primarySize[0] }
+    if ($ScreenHeight -le 0) { $ScreenHeight = $primarySize[1] }
+}
+
+if ($GridCols -le 0) {
+    # Pick the grid (cols x rows) that keeps cells closest to 4:3..16:9 with minimal empty slots.
+    $targetAspect = 1.3333
+    $bestCols = 1
+    $bestScore = [double]::PositiveInfinity
+    for ($r = 1; $r -le $Count; $r++) {
+        $c = [int][math]::Ceiling($Count / [double]$r)
+        $cellAspect = ($ScreenWidth / [double]$c) / ($ScreenHeight / [double]$r)
+        $wasteRatio = ($c * $r - $Count) / [double]$Count
+        $score = [math]::Abs([math]::Log($cellAspect / $targetAspect)) + 4.0 * $wasteRatio
+        if ($c * $r -eq $Count) { $score -= 0.35 }
+        if ($score -lt $bestScore) {
+            $bestScore = $score
+            $bestCols = $c
+        }
+    }
+    $GridCols = $bestCols
+}
+
+$gridRows = [int][math]::Ceiling($Count / [double]$GridCols)
+if ($CellWidth -le 0) { $CellWidth = [math]::Max(120, [int][math]::Floor($ScreenWidth / [double]$GridCols)) }
+if ($CellHeight -le 0) { $CellHeight = [math]::Max(90, [int][math]::Floor($ScreenHeight / [double]$gridRows)) }
+
 # --- 2. Prepare / expand portable instance directories via NTFS hard links ---
 $dvdRoot = (Resolve-Path -LiteralPath (Join-Path $Release 'DATA')).Path -replace '\\', '/'
 $skipNames = @('portable.txt', 'VC_redist.x64.exe', 'make-lab.ps1', 'run-lab.ps1',
@@ -149,7 +213,7 @@ for ($i = 1; $i -le $Count; $i++) {
     $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } else { '' }
     $effectiveRes = if ($ResolutionMultiplier -gt 0.0) { $ResolutionMultiplier } else { 0.0 }
     $configPath = Join-Path $instDir 'UserData\Config.toml'
-    if ($RebuildLab -or -not (Test-Path -LiteralPath $configPath) -or $effectiveApi -or $effectiveRes -gt 0.0) {
+    if (-not $Headless -or $RebuildLab -or -not (Test-Path -LiteralPath $configPath) -or $effectiveApi -or $effectiveRes -gt 0.0) {
         $col = ($i - 1) % $GridCols
         $row = [math]::Floor(($i - 1) / $GridCols)
         $x = $OriginX + $col * $CellWidth
@@ -392,7 +456,7 @@ try {
         }
     }
 
-    $modeLabel = if ($Headless) { 'headless' } else { 'windowed' }
+    $modeLabel = if ($Headless) { 'headless' } else { ('windowed {0}x{1} @ {2}x{3}' -f $GridCols, $gridRows, $CellWidth, $CellHeight) }
     if ($AutoDrive) { $modeLabel += ', auto-drive' }
     if ($SharedAudioMix -and -not $Headless) { $modeLabel += ', shared-audio-mix' }
     if ($GameCubeAdapterUnlimited -and -not $Headless) { $modeLabel += ', gc-adapter-unlimited (1:1)' }

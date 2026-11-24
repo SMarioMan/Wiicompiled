@@ -211,7 +211,7 @@ for ($i = 1; $i -le $Count; $i++) {
         Set-Content -LiteralPath $portablePath -Value '' -Encoding Ascii -NoNewline
     }
 
-    $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } else { '' }
+    $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif (-not $Headless) { 'd3d12' } else { '' }
     $effectiveRes = if ($ResolutionMultiplier -gt 0.0) { $ResolutionMultiplier } else { 0.0 }
     $configPath = Join-Path $instDir 'UserData\Config.toml'
     if (-not $Headless -or $RebuildLab -or -not (Test-Path -LiteralPath $configPath) -or $effectiveApi -or $effectiveRes -gt 0.0) {
@@ -406,6 +406,7 @@ $prevClockDiv = $env:MKW_TEST_CLOCK_DIVISOR
 $prevVkLayerPath = $env:VK_ADD_LAYER_PATH
 $prevVkLayers = $env:VK_INSTANCE_LAYERS
 $prevVkGpuIndex = $env:MKW_VK_GPU_INDEX
+$prevGpuIndex = $env:MKW_GPU_INDEX
 if (-not $SharedCacheDir) {
     $SharedCacheDir = if ($prevSharedCache) { $prevSharedCache } else { Join-Path $LabDir 'SharedCache' }
 }
@@ -417,10 +418,93 @@ if ($ClockDivisor -gt 1) {
     Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue
 }
 
-# Detect multi-GPU Vulkan setup so visible instances spread across all discrete GPUs by free VRAM.
+# Detect GPU assignment:
+# - Default visible launches use DX12 pinned to the highest-VRAM discrete GPU via MKW_GPU_INDEX
+#   (avoids NVIDIA Blackwell >24-instance Vulkan context throttling and uses ~35% less VRAM).
+# - Explicit -GraphicsApi vulkan still supports multi-GPU distribution via VK_LAYER_MKW_gpu_select.
 $gpuSchedule = @()
 $useVkGpuLayer = $false
-$effectiveApiGlobal = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } else { '' }
+$effectiveApiGlobal = if ($GraphicsApi) { $GraphicsApi } elseif (-not $Headless) { 'd3d12' } else { '' }
+if (-not $Headless -and $effectiveApiGlobal -eq 'd3d12' -and -not $prevGpuIndex) {
+    try {
+        if (-not ('MkwDxgiAdapterPicker' -as [type])) {
+            Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public class MkwDxgiAdapterPicker {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct DXGI_ADAPTER_DESC1 {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string Description;
+        public uint VendorId, DeviceId, SubSysId, Revision;
+        public UIntPtr DedicatedVideoMemory, DedicatedSystemMemory, SharedSystemMemory;
+        public long AdapterLuid;
+        public uint Flags;
+    }
+    [ComImport, Guid("770aae78-f26f-4dba-a829-253c83d1b387"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IDXGIFactory1 {
+        int SetPrivateData(ref Guid Name, uint DataSize, IntPtr pData);
+        int SetPrivateDataInterface(ref Guid Name, IntPtr pUnknown);
+        int GetPrivateData(ref Guid Name, ref uint pDataSize, IntPtr pData);
+        int GetParent(ref Guid riid, out IntPtr ppParent);
+        int EnumAdapters(uint Adapter, out IntPtr ppAdapter);
+        int MakeWindowAssociation(IntPtr WindowHandle, uint Flags);
+        int GetWindowAssociation(out IntPtr pWindowHandle);
+        int CreateSwapChain(IntPtr pDevice, IntPtr pDesc, out IntPtr ppSwapChain);
+        int CreateSoftwareAdapter(IntPtr Module, out IntPtr ppAdapter);
+        [PreserveSig] int EnumAdapters1(uint Adapter, out IDXGIAdapter1 ppAdapter);
+    }
+    [ComImport, Guid("29038f61-3839-4626-91fd-086879011a05"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IDXGIAdapter1 {
+        int SetPrivateData(ref Guid Name, uint DataSize, IntPtr pData);
+        int SetPrivateDataInterface(ref Guid Name, IntPtr pUnknown);
+        int GetPrivateData(ref Guid Name, ref uint pDataSize, IntPtr pData);
+        int GetParent(ref Guid riid, out IntPtr ppParent);
+        int EnumOutputs(uint Output, out IntPtr ppOutput);
+        int GetDesc(out IntPtr pDesc);
+        int CheckInterfaceSupport(ref Guid InterfaceName, out long pUMDVersion);
+        [PreserveSig] int GetDesc1(out DXGI_ADAPTER_DESC1 pDesc);
+    }
+    [DllImport("dxgi.dll")]
+    static extern int CreateDXGIFactory1(ref Guid riid, out IDXGIFactory1 ppFactory);
+    public static string PickBest() {
+        Guid g = new Guid("770aae78-f26f-4dba-a829-253c83d1b387");
+        IDXGIFactory1 fac;
+        if (CreateDXGIFactory1(ref g, out fac) != 0 || fac == null) return "";
+        int hwIdx = 0, bestIdx = -1;
+        ulong bestVram = 0;
+        string bestName = "";
+        for (uint i = 0; ; i++) {
+            IDXGIAdapter1 adp;
+            if (fac.EnumAdapters1(i, out adp) != 0) break;
+            DXGI_ADAPTER_DESC1 d;
+            if (adp.GetDesc1(out d) == 0 && (d.Flags & 2) == 0) {
+                ulong vram = (ulong)d.DedicatedVideoMemory;
+                if (bestIdx < 0 || vram > bestVram) {
+                    bestIdx = hwIdx;
+                    bestVram = vram;
+                    bestName = d.Description;
+                }
+                hwIdx++;
+            }
+            Marshal.ReleaseComObject(adp);
+        }
+        Marshal.ReleaseComObject(fac);
+        if (bestIdx < 0) return "";
+        return bestIdx + "|" + bestName + "|" + (bestVram / (1024UL * 1024UL));
+    }
+}
+"@
+        }
+        $picked = [MkwDxgiAdapterPicker]::PickBest()
+        if ($picked) {
+            $parts = $picked -split '\|'
+            if ($parts.Count -ge 3) {
+                $env:MKW_GPU_INDEX = $parts[0]
+                Write-Host ("DX12 GPU selected: MKW_GPU_INDEX={0} ({1}, {2} MiB VRAM)" -f $parts[0], $parts[1], $parts[2])
+            }
+        }
+    } catch {}
+}
 if (-not $Headless -and -not $SingleGpu -and $effectiveApiGlobal -eq 'vulkan' -and
     (Test-Path -LiteralPath (Join-Path $Release 'vk_layer_mkw_gpu_select.dll')) -and
     (Test-Path -LiteralPath (Join-Path $Release 'vk_layer_mkw_gpu_select.json'))) {
@@ -711,6 +795,8 @@ try {
     else { $env:VK_INSTANCE_LAYERS = $prevVkLayers }
     if ($null -eq $prevVkGpuIndex) { Remove-Item Env:MKW_VK_GPU_INDEX -ErrorAction SilentlyContinue }
     else { $env:MKW_VK_GPU_INDEX = $prevVkGpuIndex }
+    if ($null -eq $prevGpuIndex) { Remove-Item Env:MKW_GPU_INDEX -ErrorAction SilentlyContinue }
+    else { $env:MKW_GPU_INDEX = $prevGpuIndex }
 
     if (-not $success -or $StopAfterReady) {
         foreach ($entry in $launched) {

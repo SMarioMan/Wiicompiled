@@ -13,6 +13,7 @@
 #include "runtime_log.h"
 
 extern bool g_headless;
+extern bool g_noAudio;
 
 #include <algorithm>
 #include <array>
@@ -72,7 +73,7 @@ public:
         JoinMix();
         RefreshMixMemoryMap();
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_mixWorkerEnabled = !::g_headless && RuntimeConfigFile::AudioMixWorkerEnabled(true);
+        m_mixWorkerEnabled = !(::g_headless || ::g_noAudio) && RuntimeConfigFile::AudioMixWorkerEnabled(true);
         MarkDspInitialized();
         ResetDspTaskGlobals();
         m_mailState = MailState::WaitingForCmdListSize;
@@ -349,7 +350,7 @@ private:
             PushMail(kDspSync);
         }
 
-        if (::g_headless) {
+        if (::g_headless || ::g_noAudio) {
             return;
         }
 

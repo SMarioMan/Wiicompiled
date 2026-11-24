@@ -26,13 +26,17 @@ param(
     [string]$SharedCacheDir = '',
     [int]$Peers = 0,
     [ValidateRange(1, 128)][int]$GridCols = 4,
-    [ValidateRange(160, 8192)][int]$CellWidth = 640,
+    [ValidateRange(120, 8192)][int]$CellWidth = 640,
     [ValidateRange(90, 8192)][int]$CellHeight = 480,
     [int]$OriginX = 0,
     [int]$OriginY = 0,
     [double]$Gap = 0.3,
     [ValidateRange(15, 3600)][int]$TimeoutSec = 300,
     [ValidateRange(1, 64)][int]$ClockDivisor = 1,
+    [ValidateSet('', 'auto', 'd3d12', 'vulkan')][string]$GraphicsApi = '',
+    [ValidateRange(0.0, 4.0)][double]$ResolutionMultiplier = 0.0,
+    [switch]$AllAudio,
+    [switch]$SingleGpu,
     [switch]$Headless,
     [switch]$RebuildLab,
     [switch]$StopAfterReady,
@@ -136,23 +140,30 @@ for ($i = 1; $i -le $Count; $i++) {
         Set-Content -LiteralPath $portablePath -Value '' -Encoding Ascii -NoNewline
     }
 
+    $effectiveApi = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } else { '' }
+    $effectiveRes = if ($ResolutionMultiplier -gt 0.0) { $ResolutionMultiplier } else { 0.0 }
     $configPath = Join-Path $instDir 'UserData\Config.toml'
-    if ($RebuildLab -or -not (Test-Path -LiteralPath $configPath)) {
+    if ($RebuildLab -or -not (Test-Path -LiteralPath $configPath) -or $effectiveApi -or $effectiveRes -gt 0.0) {
         $col = ($i - 1) % $GridCols
         $row = [math]::Floor(($i - 1) / $GridCols)
         $x = $OriginX + $col * $CellWidth
         $y = $OriginY + $row * $CellHeight
-        $cfg = @(
+        $cfgLines = @(
             '[paths]'
             ('dvd_root = "{0}"' -f $dvdRoot)
             ''
             '[video]'
             'display_mode = "windowed"'
+        )
+        if ($effectiveApi) { $cfgLines += ('graphics_api = "{0}"' -f $effectiveApi) }
+        if ($effectiveRes -gt 0.0) { $cfgLines += ('resolution_multiplier = {0}' -f $effectiveRes.ToString('0.##', [Globalization.CultureInfo]::InvariantCulture)) }
+        $cfgLines += @(
             ('window_x = {0}' -f $x)
             ('window_y = {0}' -f $y)
             ('window_width = {0}' -f $CellWidth)
             ('window_height = {0}' -f $CellHeight)
-        ) -join "`n"
+        )
+        $cfg = $cfgLines -join "`n"
         Set-Content -LiteralPath $configPath -Value $cfg -Encoding Ascii -NoNewline
     }
 }
@@ -268,9 +279,12 @@ function Get-PopCount([uint32]$v) {
     return $c
 }
 
-# --- 5. Configure shared Aurora pipeline cache & launch instances ---
+# --- 5. Configure shared Aurora pipeline cache, multi-GPU Vulkan distribution & launch instances ---
 $prevSharedCache = $env:MKW_SHARED_CACHE_DIR
 $prevClockDiv = $env:MKW_TEST_CLOCK_DIVISOR
+$prevVkLayerPath = $env:VK_ADD_LAYER_PATH
+$prevVkLayers = $env:VK_INSTANCE_LAYERS
+$prevVkGpuIndex = $env:MKW_VK_GPU_INDEX
 if (-not $SharedCacheDir) {
     $SharedCacheDir = if ($prevSharedCache) { $prevSharedCache } else { Join-Path $LabDir 'SharedCache' }
 }
@@ -280,6 +294,76 @@ if ($ClockDivisor -gt 1) {
     $env:MKW_TEST_CLOCK_DIVISOR = "$ClockDivisor"
 } else {
     Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue
+}
+
+# Detect multi-GPU Vulkan setup so visible instances spread across all discrete GPUs by free VRAM.
+$gpuSchedule = @()
+$useVkGpuLayer = $false
+$effectiveApiGlobal = if ($GraphicsApi) { $GraphicsApi } elseif ($Count -ge 16 -and -not $Headless) { 'vulkan' } else { '' }
+if (-not $Headless -and -not $SingleGpu -and $effectiveApiGlobal -eq 'vulkan' -and
+    (Test-Path -LiteralPath (Join-Path $Release 'vk_layer_mkw_gpu_select.dll')) -and
+    (Test-Path -LiteralPath (Join-Path $Release 'vk_layer_mkw_gpu_select.json'))) {
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $vkLines = @(& 'vulkaninfo.exe' '--summary' 2>&1 | ForEach-Object { "$_" })
+        $vkGpus = @()
+        $curIdx = -1
+        foreach ($line in $vkLines) {
+            if ($line -match '^\s*GPU(\d+):') { $curIdx = [int]$Matches[1] }
+            elseif ($curIdx -ge 0 -and $line -match 'deviceName\s*=\s*(.+)$') {
+                $vkGpus += [pscustomobject]@{ VkIndex = $curIdx; Name = $Matches[1].Trim(); FreeMiB = 4096 }
+                $curIdx = -1
+            }
+        }
+        if ($vkGpus.Count -ge 2) {
+            $nvLines = @(& 'nvidia-smi' '--query-gpu=name,memory.free' '--format=csv,noheader,nounits' 2>$null)
+            foreach ($nv in $nvLines) {
+                $parts = $nv -split ','
+                if ($parts.Count -ge 2) {
+                    $nvName = $parts[0].Trim()
+                    $nvFree = [int]($parts[1].Trim())
+                    foreach ($g in $vkGpus) {
+                        if ($g.Name -eq $nvName) { $g.FreeMiB = [math]::Max(512, $nvFree) }
+                    }
+                }
+            }
+            # Sort largest free VRAM first so Host (p01) always lands on the primary high-VRAM GPU.
+            $sortedGpus = @($vkGpus | Sort-Object -Property FreeMiB -Descending)
+            $totalFree = ($sortedGpus | Measure-Object -Property FreeMiB -Sum).Sum
+            # Build weighted proportional schedule for 1..Count.
+            $remaining = @{}
+            $assignedTotal = 0
+            for ($g = 0; $g -lt $sortedGpus.Count; $g++) {
+                $share = if ($g -eq $sortedGpus.Count - 1) { $Count - $assignedTotal }
+                         else { [math]::Max(1, [int][math]::Round($Count * ($sortedGpus[$g].FreeMiB / $totalFree))) }
+                if ($assignedTotal + $share -gt $Count) { $share = $Count - $assignedTotal }
+                $remaining[$sortedGpus[$g].VkIndex] = $share
+                $assignedTotal += $share
+            }
+            # Interleave across GPUs (starting with largest GPU for instance 1).
+            while ($gpuSchedule.Count -lt $Count) {
+                foreach ($sg in $sortedGpus) {
+                    if ($remaining[$sg.VkIndex] -gt 0 -and $gpuSchedule.Count -lt $Count) {
+                        $gpuSchedule += $sg.VkIndex
+                        $remaining[$sg.VkIndex]--
+                    }
+                }
+            }
+            $useVkGpuLayer = $true
+            $env:VK_ADD_LAYER_PATH = $Release
+            $env:VK_INSTANCE_LAYERS = if ($prevVkLayers) { "$prevVkLayers;VK_LAYER_MKW_gpu_select" } else { 'VK_LAYER_MKW_gpu_select' }
+            $summary = ($sortedGpus | ForEach-Object {
+                $idx = $_.VkIndex
+                $cnt = @($gpuSchedule | Where-Object { $_ -eq $idx }).Count
+                "GPU$idx=$($_.Name) ($cnt inst, $($_.FreeMiB) MiB free)"
+            }) -join ', '
+            Write-Host "Multi-GPU Vulkan distribution enabled: $summary"
+        }
+    } catch {} finally {
+        $ErrorActionPreference = $prevEap
+        $global:LASTEXITCODE = 0
+    }
 }
 
 $launched = @()
@@ -292,8 +376,12 @@ try {
 
     for ($i = 1; $i -le $Count; $i++) {
         $instDir = $instanceDirs[$i - 1]
+        if ($useVkGpuLayer) {
+            $env:MKW_VK_GPU_INDEX = "$($gpuSchedule[$i - 1])"
+        }
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
+        elseif ($i -gt 1 -and -not $AllAudio) { $argsList += '--no-audio' }
         $argsList += '--lan-local'
         $argsList += "--lan-id=$i"
         $argsList += "--lan-peers=$Peers"
@@ -442,6 +530,12 @@ try {
     else { $env:MKW_SHARED_CACHE_DIR = $prevSharedCache }
     if ($null -eq $prevClockDiv) { Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue }
     else { $env:MKW_TEST_CLOCK_DIVISOR = $prevClockDiv }
+    if ($null -eq $prevVkLayerPath) { Remove-Item Env:VK_ADD_LAYER_PATH -ErrorAction SilentlyContinue }
+    else { $env:VK_ADD_LAYER_PATH = $prevVkLayerPath }
+    if ($null -eq $prevVkLayers) { Remove-Item Env:VK_INSTANCE_LAYERS -ErrorAction SilentlyContinue }
+    else { $env:VK_INSTANCE_LAYERS = $prevVkLayers }
+    if ($null -eq $prevVkGpuIndex) { Remove-Item Env:MKW_VK_GPU_INDEX -ErrorAction SilentlyContinue }
+    else { $env:MKW_VK_GPU_INDEX = $prevVkGpuIndex }
 
     if (-not $success -or $StopAfterReady) {
         foreach ($entry in $launched) {

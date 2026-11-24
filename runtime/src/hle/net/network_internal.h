@@ -140,6 +140,15 @@ struct WiiSocket {
     // fd is recycled, so a new socket reports its own failures again.
     int32_t lastLoggedSendError = 0;
     int32_t lastLoggedRecvError = 0;
+#ifdef _WIN32
+    uint32_t shmBoundIp = 0;
+    uint16_t shmBoundPort = 0;
+    int8_t shmMcastChannel = -1;
+    uint8_t shmMcastScanCursor = 0;
+    bool shmInitialized = false;
+    uint64_t shmUnicastReadSeq = 0;
+    uint64_t shmMcastReadSeq[128]{};
+#endif
 };
 
 extern std::array<WiiSocket, kWiiSocketMax> g_sockets;

@@ -170,6 +170,8 @@ private:
 extern const char* const kMkwSetupVersion;
 
 bool g_headless = false;
+bool g_noAudio = false;
+bool g_multiInstance = false;
 
 namespace {
 
@@ -1359,7 +1361,11 @@ int RuntimeMain(int argc, char** argv) {
 #else
     InstallPosixMemoryFaultHandler();
 #endif
-    InitializeProcessTranscript(argc, argv);
+    const bool isLocalLan = std::any_of(argv + 1, argv + argc,
+                                        [](const char* arg) { return std::string_view(arg) == "--lan-local"; });
+    if (!isLocalLan) {
+        InitializeProcessTranscript(argc, argv);
+    }
     std::signal(SIGABRT, AbortSignalHandler);
     // Install exit/terminate handlers to ensure we get crash info
     std::atexit(AtExitHandler);
@@ -1370,15 +1376,18 @@ int RuntimeMain(int argc, char** argv) {
     // `--headless`: boot races and automated LAN instances run without sound or dialogs.
     g_headless = std::any_of(argv + 1, argv + argc,
                              [](const char* arg) { return std::string_view(arg) == "--headless"; });
+    g_noAudio = g_headless || std::any_of(argv + 1, argv + argc,
+                             [](const char* arg) { return std::string_view(arg) == "--no-audio"; });
+    g_multiInstance = isLocalLan;
 
     const bool allowSoftwareGpu = std::any_of(argv + 1, argv + argc,
         [](const char* arg) { return std::string_view(arg) == "--allow-software-gpu"; });
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP and --lan-peer=IP.");
             }
         }
         LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
@@ -1396,8 +1405,23 @@ int RuntimeMain(int argc, char** argv) {
         if (g_headless && !BootRace::Requested() && RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
             throw std::invalid_argument("--headless needs a boot race or the LAN product");
         }
-        if (g_headless) {
+        if (g_noAudio) {
             AudioBackend::Instance().SetSilenced(true);
+        }
+        if (g_multiInstance) {
+#if defined(_WIN32)
+            _putenv_s("MKW_MULTI_INSTANCE", "1");
+            if (LanRuntime::Settings().instance > 1) {
+                _putenv_s("MKW_SHARED_CACHE_READONLY", "1");
+            }
+#else
+            setenv("MKW_MULTI_INSTANCE", "1", 1);
+            if (LanRuntime::Settings().instance > 1) {
+                setenv("MKW_SHARED_CACHE_READONLY", "1", 1);
+            }
+#endif
+        }
+        if (g_headless) {
             g_auroraRenderHostUi.store(false, std::memory_order_relaxed);
 #if defined(__linux__)
             // Allow Linux KSM (when enabled on the host) to deduplicate identical
@@ -1407,7 +1431,7 @@ int RuntimeMain(int argc, char** argv) {
 #endif
         }
         RuntimeConfigFile::LogLoadedConfig();
-        if (!g_headless && RuntimeConfigFile::DiscordPresenceEnabled()) {
+        if (!g_headless && !g_multiInstance && RuntimeConfigFile::DiscordPresenceEnabled()) {
             DiscordPresence::Initialize(RuntimeConfigFile::DiscordClientId(), "Mario Kart Wii");
         }
         SystemBridge::Initialize();
@@ -1437,11 +1461,10 @@ int RuntimeMain(int argc, char** argv) {
         const std::string auroraCachePath = RuntimeConfigFile::PathToUtf8(rendererCacheDirectory);
         auroraConfig.userPath = auroraUserPath.c_str();
         auroraConfig.cachePath = auroraCachePath.c_str();
-        if (g_headless) {
-            // Headless runs use Dawn's Null backend and never render; point
-            // resourcesPath away from initial_pipeline_cache.db so Aurora does
-            // not eagerly prewarm ~1,100 Null pipelines (~1 GiB C++ heap/proc)
-            // while keeping the shared initial_pipeline_cache.db intact for GPU runs.
+        if (g_headless || g_multiInstance) {
+            // Headless and multi-instance local LAN runs avoid eager prewarming of
+            // ~1,100 pipelines (~1 GiB C++ heap + DXC threads per instance); visible
+            // instances compile needed pipelines lazily on demand.
             auroraConfig.resourcesPath = auroraCachePath.c_str();
         }
         auroraConfig.allowCpuAdapter = allowSoftwareGpu;
@@ -1456,7 +1479,8 @@ int RuntimeMain(int argc, char** argv) {
         auroraConfig.windowHeight = RuntimeConfigFile::WindowHeight(auroraConfig.windowHeight);
         auroraConfig.hasWindowPosition = RuntimeConfigFile::WindowPosition(
             auroraConfig.windowPosX, auroraConfig.windowPosY);
-        auroraConfig.allowJoystickBackgroundEvents = !g_headless;
+        const bool secondaryLocalInstance = g_multiInstance && LanRuntime::Settings().instance > 1;
+        auroraConfig.allowJoystickBackgroundEvents = !g_headless && !secondaryLocalInstance;
         auroraConfig.startHidden = g_headless;
         auroraConfig.disableCopyFilter = RuntimeConfigFile::DisableCopyFilter(true);
         // Dolphin-style custom textures. Aurora indexes <userPath>/texture_replacements
@@ -1539,13 +1563,17 @@ int RuntimeMain(int argc, char** argv) {
                           << std::endl;
             }
             aurora_set_frame_worker_wait_callback(ServiceGuestTimingDuringAuroraFrameWait);
-            Wiimote::Initialize();
+            if (!secondaryLocalInstance) {
+                Wiimote::Initialize();
+            }
             GxGuestWrite::InstallAuroraHooks();
             UpdateMkwDynamicAspectSurface(auroraInfo.windowSize.native_fb_width,
                                           auroraInfo.windowSize.native_fb_height);
             settings_overlay::InitializeRuntimeSettings();
-            SteamInputLayout::Initialize(RuntimeConfigFile::SteamInputOverrideEnabled(),
-                                         RuntimeConfigFile::SteamInputAppId());
+            if (!secondaryLocalInstance) {
+                SteamInputLayout::Initialize(RuntimeConfigFile::SteamInputOverrideEnabled(),
+                                             RuntimeConfigFile::SteamInputAppId());
+            }
             if (BootRace::Requested()) {
                 aurora_set_skip_unready_pipelines(false);
             }
@@ -1561,8 +1589,10 @@ int RuntimeMain(int argc, char** argv) {
                       << (forceAspect ? (configWidescreen ? "16:9" : "4:3") : "surface (dynamic EGG canvas)")
                       << std::endl;
             g_auroraInitialized.store(true, std::memory_order_release);
-            GxWorker::SetWaitCallback(ServiceGuestTimingDuringAuroraFrameWait);
-            GxWorker::Start();
+            if (!g_multiInstance) {
+                GxWorker::SetWaitCallback(ServiceGuestTimingDuringAuroraFrameWait);
+                GxWorker::Start();
+            }
         }
 
         auto entry = ResolveEntry();

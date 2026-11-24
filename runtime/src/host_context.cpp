@@ -52,7 +52,10 @@ void ShutdownScheduler(Handle scheduler)
 
 Handle Create(std::size_t stackSize, Entry entry, void* argument)
 {
-    return CreateFiber(stackSize, entry, argument);
+    // Commit 64 KiB upfront and grow on demand up to stackSize instead of
+    // committing the full 1 MiB stack for every guest OSThread fiber.
+    const std::size_t initialCommit = stackSize < 65536 ? stackSize : 65536;
+    return CreateFiberEx(initialCommit, stackSize, 0, entry, argument);
 }
 
 void Destroy(Handle context)

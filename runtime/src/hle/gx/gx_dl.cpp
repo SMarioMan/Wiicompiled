@@ -1126,6 +1126,10 @@ static bool AuroraVtxDescMatchesLive(GXAttr attr, GXAttrType expected) {
 
 
 static void ApplyAuroraVtxDesc() {
+    if (s_appliedVtxDescValid && s_appliedVtxStateMatchesHle &&
+        s_appliedVtxStateGeneration == g_hleGxState.vtxStateGeneration) {
+        return;
+    }
     const bool hadValidState = s_appliedVtxDescValid;
     if (!hadValidState) {
         s_appliedVtxStateMatchesHle = false;

@@ -1,4 +1,5 @@
 #include "network_internal.h"
+#include "network_shm_win.h"
 #include "hle/socket_option_contract.h"
 #include "hle_stubs.h"
 
@@ -28,7 +29,11 @@ static int32_t NewWiiSocket(uint32_t af, uint32_t type, uint32_t protocol) {
         return -SO_EINVAL;
     }
     NativeSocket s = ::socket(nativeAf, nativeType, protocol);
-    if (s != kInvalidSocket && nativeType == SOCK_DGRAM) {
+    if (s != kInvalidSocket && nativeType == SOCK_DGRAM
+#ifdef _WIN32
+        && !ShmLan::IsEnabled()
+#endif
+    ) {
         const int rcvBuf = 4 * 1024 * 1024;
         const int sndBuf = 1 * 1024 * 1024;
         ::setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<const char*>(&rcvBuf), sizeof(rcvBuf));
@@ -198,6 +203,11 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
             s->peerAddr = addr;
             s->hasPeerAddr = true;
         }
+#ifdef _WIN32
+        if (cmd == IOCTL_SO_BIND && result == 0) {
+            ShmLan::OnBind(*s, addr);
+        }
+#endif
         return result;
     }
     case IOCTL_SO_FCNTL: {
@@ -261,6 +271,17 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
             return SocketResult(setsockopt(s->native, level, optname,
                 reinterpret_cast<const char*>(&value), sizeof(value)), false);
         }
+#ifdef _WIN32
+        if (ShmLan::IsEnabled() && level == IPPROTO_IP && optname == IP_ADD_MEMBERSHIP && optLen >= 4) {
+            uint32_t groupNet = 0;
+            std::memcpy(&groupNet, optVal, 4);
+            const uint32_t groupHost = ntohl(groupNet);
+            if (ShmLan::McastChannelForIp(groupHost) >= 0) {
+                ShmLan::OnJoinMulticast(*s, groupHost);
+                return 0;
+            }
+        }
+#endif
         return SocketResult(setsockopt(s->native, level, optname, optVal, static_cast<int>(optLen)), false);
     }
     case IOCTL_SO_LISTEN: {
@@ -317,6 +338,28 @@ int32_t HandleIpTopIoctl(uint32_t cmd, uint32_t inBuf, uint32_t inLen, uint32_t 
         // serviced by the scheduler queue instead.
         std::vector<NetworkPollContract::CopiedDescriptor> descriptors =
             CopyPollDescriptors(outBuf, descriptorCount);
+#ifdef _WIN32
+        if (ShmLan::IsEnabled()) {
+            bool allShm = !descriptors.empty();
+            int readyCount = 0;
+            for (auto& d : descriptors) {
+                WiiSocket* s = GetWiiSocket(d.wiiFd);
+                if (!s || !s->shmInitialized) {
+                    allShm = false;
+                    break;
+                }
+                short revents = 0;
+                if ((d.events & POLLRDNORM) && ShmLan::HasReadable(*s)) revents |= POLLRDNORM;
+                if (d.events & POLLWRNORM) revents |= POLLWRNORM;
+                d.revents = revents;
+                if (revents != 0) ++readyCount;
+            }
+            if (allShm) {
+                WritePollResults(outBuf, descriptors);
+                return readyCount;
+            }
+        }
+#endif
         const int nativeResult =
             NetworkPollContract::ProbeNow(descriptors, CopiedPollSocketIsStillValid);
         const int32_t result = nativeResult < 0 ? SocketResult(nativeResult, false) : nativeResult;
@@ -481,6 +524,14 @@ int32_t HandleIpTopIoctlv(uint32_t cmd, std::span<const IoVector> in, std::span<
         if (sendSize == 16 && sendData && ReadBe32(sendData) == kLanSyncMagic) {
             g_lastSentSyncPid.store(ReadBe32(sendData + 4), std::memory_order_relaxed);
         }
+#ifdef _WIN32
+        if (destPtr) {
+            const int32_t shmSent = ShmLan::TrySendTo(*s, sendData, sendSize, &dest);
+            if (shmSent >= 0) {
+                return shmSent;
+            }
+        }
+#endif
         const int ret = sendto(s->native, reinterpret_cast<const char*>(sendData), static_cast<int>(sendSize),
                                static_cast<int>(flags), destPtr, destLen);
         const int hostError = ret < 0 ? NativeLastError() : 0;
@@ -510,7 +561,26 @@ int32_t HandleIpTopIoctlv(uint32_t cmd, std::span<const IoVector> in, std::span<
         socklen_t fromLen = sizeof(from);
         sockaddr* fromPtr = out.size() > 1 && out[1].address && out[1].size >= 8 ? reinterpret_cast<sockaddr*>(&from) : nullptr;
         int ret = 0;
-
+#ifdef _WIN32
+        const int32_t shmRecv = ShmLan::TryRecvFrom(*s, data, out[0].size, fromPtr ? &from : nullptr);
+        if (shmRecv != -1) {
+            if (shmRecv >= 0) {
+                if (fromPtr) {
+                    WriteWiiSockAddr(out[1].address, from, sizeof(from));
+                }
+                if (shmRecv == 16 && data) {
+                    const auto* bytes = reinterpret_cast<const uint8_t*>(data);
+                    if (ReadBe32(bytes) == kLanSyncMagic) {
+                        const uint32_t senderPid = ReadBe32(bytes + 4);
+                        if (senderPid != g_lastSentSyncPid.load(std::memory_order_relaxed)) {
+                            VI_HLE_OnHostRaceSync(ReadBe32(bytes + 8), ReadBe32(bytes + 12));
+                        }
+                    }
+                }
+            }
+            return shmRecv;
+        }
+#endif
         ret = recvfrom(s->native, data, static_cast<int>(out[0].size), static_cast<int>(flags), fromPtr,
                        fromPtr ? &fromLen : nullptr);
         int nativeErr = ret < 0 ? NativeLastError() : 0;

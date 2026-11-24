@@ -38,6 +38,7 @@ extern "C" void OSWakeupThread_HLE_801aaaa4(CpuContext* ctx);
 extern "C" void OSSleepThread_HLE_801aa9b8(CpuContext* cpu);
 extern "C" int g_gxFrameCount;
 extern bool g_headless;
+extern bool g_multiInstance;
 extern "C" int32_t OS__DisableInterrupts_801a65ac();
 extern "C" int32_t OS__RestoreInterrupts_801a65d4(int32_t level);
 
@@ -172,7 +173,7 @@ constexpr std::chrono::microseconds kFinalSpinWindow{500};
 void SleepPreciselyUntil(Clock::time_point deadline, bool finishWithSpin = false,
                          std::chrono::microseconds spinWindow = 750us) {
     PerfStats::WaitScope wait;
-    if (g_headless) {
+    if (g_headless || g_multiInstance) {
         finishWithSpin = false;
     }
     const auto now = Clock::now();
@@ -553,7 +554,7 @@ void VI_HLE_WaitForNextRetracePoll() {
     // Audio DMA and alarm queues still need regular service even when the VI
     // deadline is farther away. The high-resolution wait removes the 1 ms
     // scheduler overshoot when retrace is the next event.
-    const auto serviceSlice = g_headless ? 3ms : 1ms;
+    const auto serviceSlice = (g_headless || g_multiInstance) ? 3ms : 1ms;
     const bool retraceIsNext = retraceDeadline <= now + serviceSlice;
     SleepPreciselyUntil(retraceIsNext ? retraceDeadline : now + serviceSlice, retraceIsNext,
                         kFinalSpinWindow);
@@ -574,7 +575,7 @@ uint64_t s_lastPresentAnchorNanos = 0;
 // Sleeps to the same VI retrace boundary VIWaitForRetrace targets, servicing alarms every 1 ms so audio
 // DMA and timers keep running, then delivers that retrace so guest logic starts exactly on the grid.
 void PaceToRetraceBoundary(Clock::time_point deadline) {
-    const auto kServiceSlice = g_headless ? 3ms : 1ms;
+    const auto kServiceSlice = (g_headless || g_multiInstance) ? 3ms : 1ms;
     for (;;) {
         const auto now = Clock::now();
         if (now >= deadline) {

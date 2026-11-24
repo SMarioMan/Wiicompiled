@@ -1,0 +1,15 @@
+{
+    "file_format_version": "1.2.0",
+    "layer": {
+        "name": "VK_LAYER_MKW_gpu_select",
+        "type": "GLOBAL",
+        "library_path": ".\\vk_layer_mkw_gpu_select.dll",
+        "api_version": "1.4.0",
+        "implementation_version": "1",
+        "description": "Pins Vulkan physical device selection to MKW_VK_GPU_INDEX for multi-GPU LAN sessions",
+        "functions": {
+            "vkNegotiateLoaderLayerInterfaceVersion": "vkNegotiateLoaderLayerInterfaceVersion",
+            "vkGetInstanceProcAddr": "vkGetInstanceProcAddr"
+        }
+    }
+}

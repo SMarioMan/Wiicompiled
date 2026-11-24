@@ -212,100 +212,99 @@ extern "C" void SelectThread_801a9c08(CpuContext* ctx)
         }
     }
 
-    // Check if there are any runnable threads
-    uint32_t reschedPending = ::Memory::Read32(kSchedulerPendingFlagAddr);
-    if (reschedPending == 0) {
-        // No threads to run - enter idle loop
-        TryInvokeSwitchCallback(runningContext, 0, cpu);
-        ::Memory::Write32(kOSRunningContextAddr, 0);
-        
-        // Set current context to idle thread context
-        OS__SetCurrentContext_801a1e70(kIdleThreadContextAddr);
-        
-        while (true) {
-            // Enable interrupts and idle until something becomes runnable.
-            OS__EnableInterrupts_801a65c0();
-
-            while (::Memory::Read32(kSchedulerPendingFlagAddr) == 0) {
-                ProcessSleepTimers(cpu);
-                // Dolphin models DSP audio DMA as an independent 4 kHz timing
-                // event.  Poll it from the guest scheduler instead of batching
-                // completed 3 ms DMA blocks at VI retrace cadence.  A completed
-                // block wakes SoundThread and sets the scheduler pending mask.
-                Audio_HLE_Poll(cpu);
-                if (::Memory::Read32(kSchedulerPendingFlagAddr) != 0) {
-                    break;
-                }
-                VI_HLE_PollRetrace(cpu);
-                if (Fiber::GuestFiberManager::IsInitialized()) {
-                    Fiber::GuestFiberManager::ProcessTimerEvents(cpu);
-                }
-                ProcessAlarmQueue(cpu, 8);
-                if (::Memory::Read32(kSchedulerPendingFlagAddr) != 0) {
-                    break;
-                }
-                VI_HLE_WaitForNextRetracePoll();
-            }
-
-            OS__DisableInterrupts_801a65ac();
-            reschedPending = ::Memory::Read32(kSchedulerPendingFlagAddr);
-            if (reschedPending != 0) {
-                break;
-            }
-        }
-
-        OS__ClearContext_801a2098(kIdleThreadContextAddr);
-    }
-
-    // Clear reschedule counter
-    ::Memory::Write32(kSchedulerReschedCounterAddr, 0);
-
-    // Note: When the current thread is already in WAITING state (not RUNNING),
-    // we skip the preemptibility check entirely, matching the original OS behavior.
-    // The preemptibility check only applies when the thread is RUNNING and we're
-    // deciding whether to preempt it.
-
-    // Find highest priority thread
-    uint32_t pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
-    
-    if (pendingMask == 0) {
-        // No runnable threads in the run queue at this point
-        cpu->gpr[3] = 0;
-        return;
-    }
-    
     uint32_t priorityLevel = 0;
     uint32_t queueEntry = 0;
     uint32_t nextThread = 0;
+    uint32_t pendingMask = 0;
+
     while (true) {
-        priorityLevel = PPC_Cntlzw(pendingMask);
-        queueEntry = kThreadQueueArrayAddr + (priorityLevel * 8);
-        nextThread = ::Memory::Read32(queueEntry);
+        // Check if there are any runnable threads
+        uint32_t reschedPending = ::Memory::Read32(kSchedulerPendingFlagAddr);
+        if (reschedPending == 0) {
+            // No threads to run - enter idle loop
+            TryInvokeSwitchCallback(runningContext, 0, cpu);
+            ::Memory::Write32(kOSRunningContextAddr, 0);
+            
+            // Set current context to idle thread context
+            OS__SetCurrentContext_801a1e70(kIdleThreadContextAddr);
+            
+            while (true) {
+                // Enable interrupts and idle until something becomes runnable.
+                OS__EnableInterrupts_801a65c0();
 
-        if (nextThread == 0) {
-            RT_LOG(RT_TAG_OS) << "SelectThread: ERROR - pending bit set but no thread in queue!" << std::endl;
-            const uint32_t mask = ~(1u << (31 - priorityLevel));
-            ::Memory::Write32(kSchedulerPendingFlagAddr, pendingMask & mask);
-            pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
-            if (pendingMask == 0) {
-                cpu->gpr[3] = 0;
-                return;
+                while (::Memory::Read32(kSchedulerPendingFlagAddr) == 0) {
+                    ProcessSleepTimers(cpu);
+                    // Dolphin models DSP audio DMA as an independent 4 kHz timing
+                    // event.  Poll it from the guest scheduler instead of batching
+                    // completed 3 ms DMA blocks at VI retrace cadence.  A completed
+                    // block wakes SoundThread and sets the scheduler pending mask.
+                    Audio_HLE_Poll(cpu);
+                    if (::Memory::Read32(kSchedulerPendingFlagAddr) != 0) {
+                        break;
+                    }
+                    VI_HLE_PollRetrace(cpu);
+                    if (Fiber::GuestFiberManager::IsInitialized()) {
+                        Fiber::GuestFiberManager::ProcessTimerEvents(cpu);
+                    }
+                    ProcessAlarmQueue(cpu, 8);
+                    if (::Memory::Read32(kSchedulerPendingFlagAddr) != 0) {
+                        break;
+                    }
+                    VI_HLE_WaitForNextRetracePoll();
+                }
+
+                OS__DisableInterrupts_801a65ac();
+                reschedPending = ::Memory::Read32(kSchedulerPendingFlagAddr);
+                if (reschedPending != 0) {
+                    break;
+                }
             }
+
+            OS__ClearContext_801a2098(kIdleThreadContextAddr);
+        }
+
+        // Clear reschedule counter
+        ::Memory::Write32(kSchedulerReschedCounterAddr, 0);
+
+        // Note: When the current thread is already in WAITING state (not RUNNING),
+        // we skip the preemptibility check entirely, matching the original OS behavior.
+        // The preemptibility check only applies when the thread is RUNNING and we're
+        // deciding whether to preempt it.
+
+        // Find highest priority thread
+        pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
+        if (pendingMask == 0) {
             continue;
         }
 
-        const uint16_t state = ::Memory::Read16(nextThread + kThreadStateOffset);
-        if (ThreadStateIsTerminated(state) || Fiber::GuestFiberManager::IsTerminated(nextThread)) {
-            RemoveThreadFromQueue(nextThread);
-            pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
-            if (pendingMask == 0) {
-                cpu->gpr[3] = 0;
-                return;
+        nextThread = 0;
+        while (pendingMask != 0) {
+            priorityLevel = PPC_Cntlzw(pendingMask);
+            queueEntry = kThreadQueueArrayAddr + (priorityLevel * 8);
+            nextThread = ::Memory::Read32(queueEntry);
+
+            if (nextThread == 0) {
+                RT_LOG(RT_TAG_OS) << "SelectThread: ERROR - pending bit set but no thread in queue!" << std::endl;
+                const uint32_t mask = ~(1u << (31 - priorityLevel));
+                ::Memory::Write32(kSchedulerPendingFlagAddr, pendingMask & mask);
+                pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
+                continue;
             }
-            continue;
+
+            const uint16_t state = ::Memory::Read16(nextThread + kThreadStateOffset);
+            if (ThreadStateIsTerminated(state) || Fiber::GuestFiberManager::IsTerminated(nextThread)) {
+                RemoveThreadFromQueue(nextThread);
+                pendingMask = ::Memory::Read32(kSchedulerPendingFlagAddr);
+                nextThread = 0;
+                continue;
+            }
+
+            break;
         }
 
-        break;
+        if (nextThread != 0) {
+            break;
+        }
     }
 
     // Remove thread from queue head

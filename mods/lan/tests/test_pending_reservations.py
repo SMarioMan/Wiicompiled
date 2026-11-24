@@ -30,7 +30,10 @@ class PendingReservations(unittest.TestCase):
 typedef struct { uint32_t sa_addr; uint16_t sa_port; } so_addr_t;
 '''
         harness += states + r'''
-static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;uint32_t player_count;} game;
+#define BROADCAST_INTERVAL 60
+static struct dwc_gamedata {enum dwc_match_state dwc_match_state;uint32_t public_ip;uint32_t reservation_timeout_ms;uint32_t player_count;uint32_t resv_target_pid;uint32_t resv_outgoing_pid;} game;
+static int data_socket = -1;
+struct dwc_transport { uint8_t peers[64]; uint32_t cb[4]; uint16_t send_split_max; uint32_t receive_timeout; };
 static void replay_deferred_syn(struct dwc_gamedata *g){(void)g;}
 static bool retain_next_node(struct dwc_gamedata *g,const uint32_t *p,unsigned n,so_addr_t a){(void)g;(void)p;(void)n;(void)a;return false;}
 static bool have_game=true;

@@ -30,6 +30,7 @@ static struct {uint64_t last_update;struct {unsigned status;} info;} tracked_pee
 static unsigned sdk_state=18,sdk_checks,discovery,updates,event_count,events[4];
 static bool pending=true,reenter;
 void network_thread_poll_sdk(void);
+static void network_thread_poll_data(void){}
 static void service_network_thread(void);
 static void check_for_status_or_broadcast(void){
     sdk_checks++;

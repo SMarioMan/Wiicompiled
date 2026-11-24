@@ -11,7 +11,7 @@ class SynControlOrder(unittest.TestCase):
     def test_original_sdk_receives_owned_syn_after_actual_mesh_cancellation(self):
         module = Path(__file__).parents[1] / 'source/module'
         source = (module / 'network_thread.c').read_text()
-        helper = source[source.index('static struct {\n    bool present;'):]
+        helper = source[source.index('static struct {\n    bool present;'):source.index('/* Phase 2 Star data plane:')]
         states = re.search(r'enum dwc_match_state \{.*?\};', (module/'mkw.h').read_text(), re.S)[0]
         harness = r'''
 #include <stdbool.h>

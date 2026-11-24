@@ -19,7 +19,7 @@ class MeshSchedule(unittest.TestCase):
 #include "mesh_schedule.h"
 #define DWC_MATCH_STATE_CL_WAITING 1
 #define millisecs_to_ticks(n) ((n)*60750u)
-static struct dwc_gamedata {unsigned player_count,dwc_match_state;uint32_t my_pid;} game;
+static struct dwc_gamedata {unsigned player_count,dwc_match_state;uint32_t my_pid;struct {uint32_t player_id;} peers[1];} game;
 static unsigned originals,clocks;
 static int have_game=1;
 static struct dwc_gamedata *get_dwc_gamedata(void){return have_game?&game:NULL;}
@@ -42,13 +42,20 @@ int main(void){
     unsigned jitter_mask=0;
     for(uint32_t peer=2;peer<=32;peer++)jitter_mask|=1u<<((lan_mesh_delay_ms(0x7f000001,0x7f000000+peer,0)-125)/4);
     CHECK(__builtin_popcount(jitter_mask)>=8);
-    uint32_t peer[12]={0};peer[0]=0x7f000002;game.my_pid=0x7f000001;game.dwc_match_state=1;
+    uint32_t peer[12]={0};peer[0]=0x7f000002;game.my_pid=0x7f000001;game.peers[0].player_id=0x7f000002;game.dwc_match_state=1;
     for(unsigned count=1;count<=MKW_LAN_MATCH_NODES+1;count++){
         game.player_count=count;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
         if(MKW_LAN_CAPACITY<=12 || count<=2 || count>MKW_LAN_MATCH_NODES)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
         else CHECK(next==10000000000ULL+(uint64_t)millisecs_to_ticks(lan_mesh_delay_ms(game.my_pid,peer[0],0)) && !originals && clocks==1);
     }
-    game.player_count=24;
+    // Under Star topology (>12), non-host client-to-client peers return INT64_MAX.
+    game.player_count=24;game.peers[0].player_id=0x7f000099;originals=clocks=0;
+    {
+        uint64_t next=LANMeshNextTick(peer);
+        if(MKW_LAN_CAPACITY<=12)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);
+        else CHECK(next==INT64_MAX && !originals && !clocks);
+    }
+    game.peers[0].player_id=0x7f000002;
     for(unsigned attempt=0;attempt<8;attempt++){
         peer[6]=attempt;originals=clocks=0;uint64_t next=LANMeshNextTick(peer);
         if(MKW_LAN_CAPACITY<=12)CHECK(next==0x123456789abcdef0ULL && originals==1 && !clocks);

@@ -16,11 +16,16 @@ class ReservationBudget(unittest.TestCase):
 #include <string.h>
 #include <stdio.h>
 #define BROADCAST_TRACK_MAX 32
+#define BROADCAST_INTERVAL 60
 #define BROADCAST_TIMEOUT 300
+#define DWC_MATCH_STATE_CL_WAITING 1
 #define DWC_MATCH_STATE_CL_WAIT_RESV 3
+#define LOG_INFO(...) ((void)0)
 static uint64_t timestamp=1000;
+static uint64_t mesh_resv_wait_since;
 static struct {uint64_t last_update;struct {unsigned status;} info;} tracked_peers[32];
-struct dwc_gamedata {unsigned dwc_match_state,reservation_timeout_ms;uint64_t origin;unsigned retries,player_count;};
+struct dwc_gamedata {unsigned dwc_match_state,reservation_timeout_ms;uint64_t origin;unsigned retries,player_count,resv_target_pid,resv_outgoing_pid;};
+static void ensure_transport_send_split_max(struct dwc_gamedata *g){(void)g;}
 '''+policy+r'''
 #define CHECK(x) do{if(!(x)){fprintf(stderr,"budget capacity=%u line=%u: %s\n",MKW_LAN_CAPACITY,__LINE__,#x);abort();}}while(0)
 unsigned expected_budget(unsigned count){
@@ -49,8 +54,14 @@ int main(void){
     g.reservation_timeout_ms=90000;update_reservation_budget(&g);CHECK(g.reservation_timeout_ms==90000);
     for(unsigned i=0;i<32;i++)tracked_peers[i].info.status=0;
     g.player_count=24;g.reservation_timeout_ms=6000;update_reservation_budget(&g);
-    unsigned known=24<MKW_LAN_CAPACITY?24:MKW_LAN_CAPACITY;
-    CHECK(g.reservation_timeout_ms==expected_budget(known));
+    if (MKW_LAN_CAPACITY > 12) {
+        CHECK(g.dwc_match_state == DWC_MATCH_STATE_CL_WAIT_RESV && g.reservation_timeout_ms == 6000);
+        timestamp += BROADCAST_INTERVAL * 4;
+        update_reservation_budget(&g);
+        CHECK(g.dwc_match_state == DWC_MATCH_STATE_CL_WAITING && g.reservation_timeout_ms == 0);
+    } else {
+        CHECK(g.reservation_timeout_ms == expected_budget(12));
+    }
     update_reservation_budget(NULL);
 }
 '''

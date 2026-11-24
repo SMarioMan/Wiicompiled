@@ -540,37 +540,18 @@ if (-not $Headless -and -not $SingleGpu -and $effectiveApiGlobal -eq 'vulkan' -a
                     }
                 }
             }
-            # Sort largest free VRAM first so Host (p01) always lands on the primary high-VRAM GPU.
+            # Sort largest free VRAM first and pin all Vulkan instances to the primary high-VRAM GPU
+            # (keeps all instances on the fastest GPU, e.g. RTX 5080, avoiding slower secondary GPU bottlenecks).
             $sortedGpus = @($vkGpus | Sort-Object -Property FreeMiB -Descending)
-            $totalFree = ($sortedGpus | Measure-Object -Property FreeMiB -Sum).Sum
-            # Build weighted proportional schedule for 1..Count.
-            $remaining = @{}
-            $assignedTotal = 0
-            for ($g = 0; $g -lt $sortedGpus.Count; $g++) {
-                $share = if ($g -eq $sortedGpus.Count - 1) { $Count - $assignedTotal }
-                         else { [math]::Max(1, [int][math]::Round($Count * ($sortedGpus[$g].FreeMiB / $totalFree))) }
-                if ($assignedTotal + $share -gt $Count) { $share = $Count - $assignedTotal }
-                $remaining[$sortedGpus[$g].VkIndex] = $share
-                $assignedTotal += $share
-            }
-            # Interleave across GPUs (starting with largest GPU for instance 1).
-            while ($gpuSchedule.Count -lt $Count) {
-                foreach ($sg in $sortedGpus) {
-                    if ($remaining[$sg.VkIndex] -gt 0 -and $gpuSchedule.Count -lt $Count) {
-                        $gpuSchedule += $sg.VkIndex
-                        $remaining[$sg.VkIndex]--
-                    }
-                }
+            $bestGpu = $sortedGpus[0]
+            for ($k = 0; $k -lt $Count; $k++) {
+                $gpuSchedule += $bestGpu.VkIndex
             }
             $useVkGpuLayer = $true
             $env:VK_ADD_LAYER_PATH = $Release
             $env:VK_INSTANCE_LAYERS = if ($prevVkLayers) { "$prevVkLayers;VK_LAYER_MKW_gpu_select" } else { 'VK_LAYER_MKW_gpu_select' }
-            $summary = ($sortedGpus | ForEach-Object {
-                $idx = $_.VkIndex
-                $cnt = @($gpuSchedule | Where-Object { $_ -eq $idx }).Count
-                "GPU$idx=$($_.Name) ($cnt inst, $($_.FreeMiB) MiB free)"
-            }) -join ', '
-            Write-Host "Multi-GPU Vulkan distribution enabled: $summary"
+            Write-Host ("Vulkan GPU selected: GPU{0}={1} (all {2} inst, {3} MiB free)" -f `
+                $bestGpu.VkIndex, $bestGpu.Name, $Count, $bestGpu.FreeMiB)
         }
     } catch {} finally {
         $ErrorActionPreference = $prevEap

@@ -660,7 +660,7 @@ static void LoadTexObjImpl(uint32_t oa, uint32_t tid) {
             oldBound, newBound, needsInit, tlutChanged, textureDataUploaded);
 
         g_boundTexMaps[tid] = newBound;
-        if (!canSkipHostLoad || textureDataUploaded || needsInit || tlutChanged) {
+        if (textureDataUploaded || needsInit || tlutChanged) {
             GetTexObjMeta(oa) = meta;
         }
         if (!canSkipHostLoad) {

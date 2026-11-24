@@ -1,4 +1,5 @@
 #include "lan_runtime.h"
+#include "guest_abi/guest_region.h"
 #include "hle_stubs.h"
 #include "memory.h"
 #include "hle/controller_status_contract.h"
@@ -70,6 +71,28 @@ void FillTriggersHeldByButtons(PADStatus* statuses) {
         scan(PADGetButtonMappings(port, &count), count);
         count = 0;
         scan(PADGetAltButtonMappings(port, &count), count);
+    }
+}
+
+// Skip the 90-frame ESRB notice screen (PageId 0x01, Pages::ESRBNotice) by
+// advancing its active duration counter past the 90-frame hold threshold immediately.
+void SkipEsrbNoticePage() {
+    try {
+        const uint32_t manager = Memory::Read32(MKW_GADDR(809C1E38));
+        const uint32_t section = manager ? Memory::Read32(manager) : 0;
+        const uint32_t count = section ? Memory::Read32(section + 0x37Cu) : 0;
+        if (count == 0 || count > 11) {
+            return;
+        }
+        for (uint32_t i = 0; i < count; ++i) {
+            const uint32_t page = Memory::Read32(section + 0x354u + i * 4u);
+            if (page != 0 && Memory::Read32(page + 4u) == 0x01u) {
+                if (Memory::Read32(page + 32u) <= 90u) {
+                    Memory::Write32(page + 32u, 91u);
+                }
+            }
+        }
+    } catch (const Memory::AccessViolation&) {
     }
 }
 
@@ -170,6 +193,7 @@ extern "C" uint32_t PAD__Read_HLE(uint32_t statusPtr)
     FillTriggersHeldByButtons(statuses);
     InputBindings::Apply(statuses);
     MotionTrick::Apply(statuses);
+    SkipEsrbNoticePage();
     ApplyLanMenuInput(statuses[0], rumbleMask);
     if (const auto input = TestPadInput::ReadConfigured()) {
         statuses[0].err = PAD_ERR_NONE;

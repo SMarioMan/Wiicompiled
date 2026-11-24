@@ -64,6 +64,7 @@
 
 #include "abi_bridge.h"
 #include "audio_backend.h"
+#include "shared_audio_mix.h"
 #include "boot_race.h"
 #include "guest_abi/guest_region.h"
 #include "guest_flat_memory.h"
@@ -1384,17 +1385,26 @@ int RuntimeMain(int argc, char** argv) {
         [](const char* arg) { return std::string_view(arg) == "--allow-software-gpu"; });
     const bool lanAutoDrive = std::any_of(argv + 1, argv + argc,
         [](const char* arg) { return std::string_view(arg) == "--lan-cpu"; });
+    const bool sharedAudioMix = std::any_of(argv + 1, argv + argc,
+        [](const char* arg) { return std::string_view(arg) == "--shared-audio-mix"; });
 
     try {
         for (int i = 1; i < argc; ++i) {
-            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && std::string_view(argv[i]) != "--lan-cpu" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
+            if (std::string_view(argv[i]) != "--headless" && std::string_view(argv[i]) != "--no-audio" && std::string_view(argv[i]) != "--allow-software-gpu" && std::string_view(argv[i]) != "--lan-cpu" && std::string_view(argv[i]) != "--shared-audio-mix" && !BootRace::ParseArgument(argv[i]) && !LanRuntime::ParseArgument(argv[i]) && !LayoutAccessAudit::ParseArgument(argv[i])) {
                 throw std::invalid_argument(std::string("Unknown command-line option '") + argv[i] +
-                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP, --lan-peer=IP and --lan-cpu.");
+                                            "'; the game runtime only accepts --race[=<course id>], --race-cpu, --race-cpu-menu-input, --race-players=N, --race-laps=N, --race-mode=MODE, --race-roster=standard|diverse --headless --no-audio and --allow-software-gpu, LAN products also accept --lan-local, --lan-id=N, --lan-peers=N, --lan-host, --lan-join, --lan-bind=IP, --lan-peer=IP, --lan-cpu and --shared-audio-mix.");
             }
         }
         LayoutAccessAudit::SetExecutionContextProvider(&Fiber::GuestFiberManager::GetCurrentGuestThread);
         LayoutAccessAudit::SetPhase("startup");
         LanRuntime::Validate();
+        if (sharedAudioMix && !g_headless && !g_noAudio) {
+            const uint32_t instId = LanRuntime::Settings().instance;
+            const bool isMaster = (instId <= 1);
+            SharedAudioMix::Configure(true, isMaster, instId == 0 ? 1u : instId);
+            RT_LOGF("audio", "shared audio mix enabled (role=%s, slot=%u)\n",
+                    isMaster ? "master" : "secondary", instId == 0 ? 1u : instId);
+        }
         if (lanAutoDrive) {
             if (BootRace::Requested() || RuntimeProduct::Active().kind != RuntimeProduct::Kind::Lan) {
                 throw std::invalid_argument("--lan-cpu requires the LAN product without direct --race boot");

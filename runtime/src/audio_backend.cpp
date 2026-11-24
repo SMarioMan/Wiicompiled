@@ -1,4 +1,5 @@
 #include "audio_backend.h"
+#include "shared_audio_mix.h"
 
 #include "runtime_log.h"
 
@@ -52,10 +53,9 @@ bool AudioBackend::EnsureInitializedLocked(uint32_t sampleRate, uint32_t channel
         m_stream = nullptr;
     }
 
-    // Headless/silenced instances do not need a live host audio device (e.g.
-    // 128 WASAPI playback streams on Windows). Record the format and drop
-    // pushed samples at zero cost while keeping guest audio timing intact.
-    if (m_silenced) {
+    // Headless/silenced instances and shared-mix secondary instances do not open
+    // a host audio device (avoiding N concurrent WASAPI playback streams).
+    if (m_silenced || SharedAudioMix::IsSecondary()) {
         m_sampleRate = sampleRate;
         m_channels = channels;
         m_initialized = true;
@@ -162,7 +162,8 @@ bool AudioBackend::PushWiiAiSamplesBE16(const uint8_t* data, size_t bytes) {
     if (m_silenced) {
         return true;
     }
-    if (!m_initialized || !m_stream) {
+    const bool isSharedSecondary = SharedAudioMix::IsSecondary();
+    if (!m_initialized || (!isSharedSecondary && !m_stream)) {
         return false;
     }
 
@@ -187,6 +188,14 @@ bool AudioBackend::PushWiiAiSamplesBE16(const uint8_t* data, size_t bytes) {
         m_convertBuffer[frame * 2 + 1] = static_cast<int16_t>(right);
     }
 
+    if (isSharedSecondary) {
+        SharedAudioMix::PublishSecondaryBlock(m_convertBuffer.data(), frameCount);
+        return true;
+    }
+    if (SharedAudioMix::IsMaster()) {
+        SharedAudioMix::MixIntoMasterBlock(m_convertBuffer.data(), frameCount);
+    }
+
     const int lenBytes = static_cast<int>(frameCount * 2 * sizeof(int16_t));
     if (!QueueHasCapacityLocked(lenBytes)) {
         return true;
@@ -208,15 +217,32 @@ bool AudioBackend::PushSamplesLE16(const int16_t* samples, size_t sampleCount) {
     if (m_silenced) {
         return true;
     }
-    if (!m_initialized || !m_stream) {
+    const bool isSharedSecondary = SharedAudioMix::IsSecondary();
+    if (!m_initialized || (!isSharedSecondary && !m_stream)) {
         return false;
+    }
+
+    const size_t frameCount = sampleCount / 2;
+    if (isSharedSecondary) {
+        SharedAudioMix::PublishSecondaryBlock(samples, frameCount);
+        return true;
+    }
+
+    const int16_t* pushPtr = samples;
+    if (SharedAudioMix::IsMaster()) {
+        if (m_convertBuffer.size() < sampleCount) {
+            m_convertBuffer.resize(sampleCount);
+        }
+        std::memcpy(m_convertBuffer.data(), samples, sampleCount * sizeof(int16_t));
+        SharedAudioMix::MixIntoMasterBlock(m_convertBuffer.data(), frameCount);
+        pushPtr = m_convertBuffer.data();
     }
 
     const int lenBytes = static_cast<int>(sampleCount * sizeof(int16_t));
     if (!QueueHasCapacityLocked(lenBytes)) {
         return true;
     }
-    if (!SDL_PutAudioStreamData(m_stream, samples, lenBytes)) {
+    if (!SDL_PutAudioStreamData(m_stream, pushPtr, lenBytes)) {
         RT_LOG(RT_TAG_AUDIO) << "SDL_PutAudioStreamData failed: " << SDL_GetError() << std::endl;
         return false;
     }

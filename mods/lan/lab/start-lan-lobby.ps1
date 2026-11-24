@@ -36,6 +36,7 @@ param(
     [ValidateSet('', 'auto', 'd3d12', 'vulkan')][string]$GraphicsApi = '',
     [ValidateRange(0.0, 4.0)][double]$ResolutionMultiplier = 0.0,
     [switch]$AllAudio,
+    [switch]$SharedAudioMix,
     [switch]$SingleGpu,
     [Alias('CpuDrive')]
     [switch]$AutoDrive,
@@ -375,6 +376,7 @@ $startedAt = Get-Date
 try {
     $modeLabel = if ($Headless) { 'headless' } else { 'windowed' }
     if ($AutoDrive) { $modeLabel += ', auto-drive' }
+    if ($SharedAudioMix -and -not $Headless) { $modeLabel += ', shared-audio-mix' }
     Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
         $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
@@ -385,6 +387,7 @@ try {
         }
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
+        elseif ($SharedAudioMix) { $argsList += '--shared-audio-mix' }
         elseif ($i -gt 1 -and -not $AllAudio) { $argsList += '--no-audio' }
         if ($AutoDrive) { $argsList += '--lan-cpu' }
         $argsList += '--lan-local'

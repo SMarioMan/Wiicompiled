@@ -5,6 +5,7 @@
 #include "abi_bridge.h"
 #include "perf_stats.h"
 #include "audio_backend.h"
+#include "shared_audio_mix.h"
 #include "ax_mix_kernels.h"
 #include "isa/big_endian.h"
 #include "memory.h"
@@ -1015,6 +1016,15 @@ private:
         accel.Setup(&pb);
         std::array<int16_t, kAxSamplesPerFrame> samples{};
         Resample(accel, pb, samples.data(), count, coeffs);
+        if (SharedAudioMix::IsEnabled() &&
+            !SharedAudioMix::ShouldMixVoice(
+                pb.is_stream != 0,
+                Hilo(pb.audio_addr.loop_addr_hi, pb.audio_addr.loop_addr_lo),
+                Hilo(pb.audio_addr.end_addr_hi, pb.audio_addr.end_addr_lo),
+                pb.audio_addr.sample_format,
+                Hilo(pb.src.ratio_hi, pb.src.ratio_lo))) {
+            return;
+        }
         // Same wrapping 16-bit ramp as MixAdd, minus the accumulate. The two's
         // complement wrap of the int16 envelope is bit-identical to the uint16
         // wrap the kernel performs, so the value stored back is unchanged.

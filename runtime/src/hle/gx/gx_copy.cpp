@@ -123,7 +123,7 @@ PPC_NATIVE_OVERRIDE_VOID(8016fc24, GX__SetDispCopyGamma_8016fc24, (uint32_t g), 
 // ============================================================================
 
 extern "C" void GX__CopyDisp_8016fc38(uint32_t da, uint32_t c) {
-    if (g_headless) {
+    if (g_headless || ShouldSkipCurrentGxFrame()) {
         ++g_gxFrameCount;
         VI_HLE_SetXfbReady(da);
         VI_HLE_PresentFrame(/*presentedXfb=*/true, /*paceToRetrace=*/true);
@@ -148,7 +148,9 @@ extern "C" void GX__CopyDisp_8016fc38(uint32_t da, uint32_t c) {
     }
     ++g_gxFrameCount;
     VI_HLE_SetXfbReady(da);
-    settings_overlay::Draw();
+    if (g_auroraRenderHostUi.load(std::memory_order_relaxed)) {
+        settings_overlay::Draw();
+    }
     // Seal, pace to the VI retrace boundary (Aurora renders the sealed frame
     // during the wait), and pre-warm the next frame.
     VI_HLE_PresentFrame(/*presentedXfb=*/true, /*paceToRetrace=*/true);

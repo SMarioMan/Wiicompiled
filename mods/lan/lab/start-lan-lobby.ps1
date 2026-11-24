@@ -407,6 +407,13 @@ $prevVkLayerPath = $env:VK_ADD_LAYER_PATH
 $prevVkLayers = $env:VK_INSTANCE_LAYERS
 $prevVkGpuIndex = $env:MKW_VK_GPU_INDEX
 $prevGpuIndex = $env:MKW_GPU_INDEX
+$prevRenderEveryN = $env:MKW_RENDER_EVERY_N
+$prevLauncherPriority = $null
+try {
+    $selfProc = [System.Diagnostics.Process]::GetCurrentProcess()
+    $prevLauncherPriority = $selfProc.PriorityClass
+    if ($Count -ge 32) { $selfProc.PriorityClass = 'AboveNormal' }
+} catch {}
 if (-not $SharedCacheDir) {
     $SharedCacheDir = if ($prevSharedCache) { $prevSharedCache } else { Join-Path $LabDir 'SharedCache' }
 }
@@ -599,10 +606,21 @@ try {
     Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
         $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
+    $effectiveGap = if ($PSBoundParameters.ContainsKey('Gap')) { $Gap } elseif ($Count -ge 32) { 0.05 } else { $Gap }
+    $secondaryRenderEveryN = if ($prevRenderEveryN) { $prevRenderEveryN } elseif (-not $Headless -and $Count -ge 96) { '3' } elseif (-not $Headless -and $Count -ge 64) { '2' } else { '' }
+    if ($secondaryRenderEveryN) {
+        Write-Host ("High-count visual pacing: Host p01 @ 60 Hz, clients p02..p{0:D2} present every {1} frames (full 60 Hz sim)." -f $Count, $secondaryRenderEveryN)
+    }
+
     for ($i = 1; $i -le $Count; $i++) {
         $instDir = $instanceDirs[$i - 1]
         if ($useVkGpuLayer) {
             $env:MKW_VK_GPU_INDEX = "$($gpuSchedule[$i - 1])"
+        }
+        if ($i -gt 1 -and $secondaryRenderEveryN) {
+            $env:MKW_RENDER_EVERY_N = $secondaryRenderEveryN
+        } else {
+            Remove-Item Env:MKW_RENDER_EVERY_N -ErrorAction SilentlyContinue
         }
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
@@ -618,15 +636,15 @@ try {
         $argsList += "--lan-peers=$Peers"
         if ($i -eq 1) { $argsList += '--lan-host' } else { $argsList += '--lan-join' }
 
-        if ($i -gt 1 -and $Gap -gt 0) {
-            Start-Sleep -Milliseconds ([int]($Gap * 1000))
+        if ($i -gt 1 -and $effectiveGap -gt 0) {
+            Start-Sleep -Milliseconds ([int]($effectiveGap * 1000))
         }
         $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
             -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
         if ($Count -ge 16) {
             try {
                 if ($i -eq 1) { $proc.PriorityClass = 'AboveNormal' }
-                elseif ($Headless) { $proc.PriorityClass = 'BelowNormal' }
+                elseif ($Headless -or $Count -ge 32) { $proc.PriorityClass = 'BelowNormal' }
             } catch {}
         }
         $launched += [pscustomobject]@{ Id = $i; Process = $proc; Directory = $instDir }
@@ -797,6 +815,11 @@ try {
     else { $env:MKW_VK_GPU_INDEX = $prevVkGpuIndex }
     if ($null -eq $prevGpuIndex) { Remove-Item Env:MKW_GPU_INDEX -ErrorAction SilentlyContinue }
     else { $env:MKW_GPU_INDEX = $prevGpuIndex }
+    if ($null -eq $prevRenderEveryN) { Remove-Item Env:MKW_RENDER_EVERY_N -ErrorAction SilentlyContinue }
+    else { $env:MKW_RENDER_EVERY_N = $prevRenderEveryN }
+    if ($null -ne $prevLauncherPriority) {
+        try { [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = $prevLauncherPriority } catch {}
+    }
 
     if (-not $success -or $StopAfterReady) {
         foreach ($entry in $launched) {

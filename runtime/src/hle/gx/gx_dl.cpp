@@ -1299,7 +1299,7 @@ extern "C" void GxNotifyDisplayListMemoryWrite(uint32_t addr, uint32_t size) {
 }
 
 extern "C" void GX__CallDisplayList_80172f64(uint32_t listAddr, uint32_t nbytes) {
-    if (g_headless || nbytes == 0 || listAddr == 0) return;
+    if (g_headless || ShouldSkipCurrentGxFrame() || nbytes == 0 || listAddr == 0) return;
     // List bytes and the arrays it indexes are GPU-side reads, so they are read when the worker runs.
     if (GxWorker::ShouldDefer()) {
         EnsureAuroraFrameActive();

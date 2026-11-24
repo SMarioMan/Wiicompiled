@@ -351,7 +351,8 @@ private:
             PushMail(kDspSync);
         }
 
-        if (::g_headless || ::g_noAudio) {
+        if (::g_headless || ::g_noAudio ||
+            (SharedAudioMix::IsSecondary() && !SharedAudioMix::IsInRace())) {
             return;
         }
 

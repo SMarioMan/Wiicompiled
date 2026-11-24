@@ -1464,13 +1464,11 @@ int RuntimeMain(int argc, char** argv) {
             _putenv_s("MKW_MULTI_INSTANCE", "1");
             if (LanRuntime::Settings().instance > 1) {
                 _putenv_s("MKW_SHARED_CACHE_READONLY", "1");
-                g_auroraRenderHostUi.store(false, std::memory_order_relaxed);
             }
 #else
             setenv("MKW_MULTI_INSTANCE", "1", 1);
             if (LanRuntime::Settings().instance > 1) {
                 setenv("MKW_SHARED_CACHE_READONLY", "1", 1);
-                g_auroraRenderHostUi.store(false, std::memory_order_relaxed);
             }
 #endif
         }

@@ -407,7 +407,7 @@ $prevVkLayerPath = $env:VK_ADD_LAYER_PATH
 $prevVkLayers = $env:VK_INSTANCE_LAYERS
 $prevVkGpuIndex = $env:MKW_VK_GPU_INDEX
 $prevGpuIndex = $env:MKW_GPU_INDEX
-$prevRenderEveryN = $env:MKW_RENDER_EVERY_N
+$prevHighCount = $env:MKW_HIGH_COUNT
 $prevLauncherPriority = $null
 try {
     $selfProc = [System.Diagnostics.Process]::GetCurrentProcess()
@@ -607,20 +607,16 @@ try {
         $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
     $effectiveGap = if ($PSBoundParameters.ContainsKey('Gap')) { $Gap } elseif ($Count -ge 32) { 0.05 } else { $Gap }
-    $secondaryRenderEveryN = if ($prevRenderEveryN) { $prevRenderEveryN } elseif (-not $Headless -and $Count -ge 96) { '3' } elseif (-not $Headless -and $Count -ge 64) { '2' } else { '' }
-    if ($secondaryRenderEveryN) {
-        Write-Host ("High-count visual pacing: Host p01 @ 60 Hz, clients p02..p{0:D2} present every {1} frames (full 60 Hz sim)." -f $Count, $secondaryRenderEveryN)
+    if (-not $Headless -and $Count -ge 48) {
+        $env:MKW_HIGH_COUNT = '1'
+    } else {
+        Remove-Item Env:MKW_HIGH_COUNT -ErrorAction SilentlyContinue
     }
 
     for ($i = 1; $i -le $Count; $i++) {
         $instDir = $instanceDirs[$i - 1]
         if ($useVkGpuLayer) {
             $env:MKW_VK_GPU_INDEX = "$($gpuSchedule[$i - 1])"
-        }
-        if ($i -gt 1 -and $secondaryRenderEveryN) {
-            $env:MKW_RENDER_EVERY_N = $secondaryRenderEveryN
-        } else {
-            Remove-Item Env:MKW_RENDER_EVERY_N -ErrorAction SilentlyContinue
         }
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
@@ -641,11 +637,10 @@ try {
         }
         $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
             -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
-        if ($Count -ge 16) {
-            try {
-                if ($i -eq 1) { $proc.PriorityClass = 'AboveNormal' }
-                elseif ($Headless -or $Count -ge 32) { $proc.PriorityClass = 'BelowNormal' }
-            } catch {}
+        # Temporarily bump host p01 during lobby join only; all instances are normalized
+        # to Normal priority as soon as the lobby is ready so gameplay has 100% parity.
+        if ($Count -ge 16 -and $i -eq 1) {
+            try { $proc.PriorityClass = 'AboveNormal' } catch {}
         }
         $launched += [pscustomobject]@{ Id = $i; Process = $proc; Directory = $instDir }
 
@@ -815,8 +810,8 @@ try {
     else { $env:MKW_VK_GPU_INDEX = $prevVkGpuIndex }
     if ($null -eq $prevGpuIndex) { Remove-Item Env:MKW_GPU_INDEX -ErrorAction SilentlyContinue }
     else { $env:MKW_GPU_INDEX = $prevGpuIndex }
-    if ($null -eq $prevRenderEveryN) { Remove-Item Env:MKW_RENDER_EVERY_N -ErrorAction SilentlyContinue }
-    else { $env:MKW_RENDER_EVERY_N = $prevRenderEveryN }
+    if ($null -eq $prevHighCount) { Remove-Item Env:MKW_HIGH_COUNT -ErrorAction SilentlyContinue }
+    else { $env:MKW_HIGH_COUNT = $prevHighCount }
     if ($null -ne $prevLauncherPriority) {
         try { [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = $prevLauncherPriority } catch {}
     }
@@ -831,6 +826,12 @@ try {
             Write-Host "Stopped all $Count instances (-StopAfterReady)."
         }
     } else {
+        # Normalize all instances to equal Normal priority before gameplay starts.
+        foreach ($entry in $launched) {
+            if ($entry.Process -and -not $entry.Process.HasExited) {
+                try { $entry.Process.PriorityClass = 'Normal' } catch {}
+            }
+        }
         Write-Host "Lobby is live and ready to play! Stop all instances later with:"
         Write-Host "  .\start-lan-lobby.ps1 -Stop"
     }

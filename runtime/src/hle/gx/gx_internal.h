@@ -87,19 +87,6 @@ inline void GXMarkFrameWork() {
 extern "C" {
 extern int g_gxFrameCount;
 
-inline bool ShouldSkipCurrentGxFrame() noexcept {
-    static const uint32_t kRenderEveryN = [] {
-        const char* env = std::getenv("MKW_RENDER_EVERY_N");
-        if (!env || !env[0]) {
-            return 1u;
-        }
-        const int v = std::atoi(env);
-        return (v >= 2 && v <= 10) ? static_cast<uint32_t>(v) : 1u;
-    }();
-    return kRenderEveryN > 1u && g_gxFrameCount >= 120 &&
-           ((static_cast<uint32_t>(g_gxFrameCount) % kRenderEveryN) != 0u);
-}
-
 extern int32_t g_scissorLeft;
 extern int32_t g_scissorTop;
 extern int32_t g_scissorWidth;

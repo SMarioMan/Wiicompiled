@@ -1,0 +1,451 @@
+<#
+.SYNOPSIS
+    Starts and automatically connects N WiiCompiled LAN instances (2..128) into one LAN lobby on Windows.
+
+.DESCRIPTION
+    Turnkey Windows launcher that:
+      1. Prepares N portable instance folders via NTFS hard links (zero duplicate GBs of EXE/DLL/DATA).
+      2. Seeds a license-0 profile (rksys.dat) once if needed and copies it to any unseeded instance.
+      3. Configures MKW_SHARED_CACHE_DIR so all visible instances share one Aurora SQLite pipeline cache.
+      4. Launches instance 1 as --lan-host and instances 2..N as --lan-join clients.
+      5. Monitors live UDP telemetry (127.0.0.254:27900) until all N instances are connected in the same
+         LAN room (page 0x9D, full SDK connectivity) and leaves the lobby ready to play (or stops them if
+         -StopAfterReady is passed).
+
+.EXAMPLE
+    .\start-lan-lobby.ps1 -Count 4
+    .\start-lan-lobby.ps1 -Count 12 -GridCols 4 -CellWidth 480 -CellHeight 270
+    .\start-lan-lobby.ps1 -Count 128 -Headless -ClockDivisor 4
+    .\start-lan-lobby.ps1 -Stop
+#>
+param(
+    [Parameter(Position = 0)]
+    [ValidateRange(2, 128)][int]$Count = 4,
+    [string]$Release = '',
+    [string]$LabDir = '',
+    [string]$SharedCacheDir = '',
+    [int]$Peers = 0,
+    [ValidateRange(1, 128)][int]$GridCols = 4,
+    [ValidateRange(160, 8192)][int]$CellWidth = 640,
+    [ValidateRange(90, 8192)][int]$CellHeight = 480,
+    [int]$OriginX = 0,
+    [int]$OriginY = 0,
+    [double]$Gap = 0.3,
+    [ValidateRange(15, 3600)][int]$TimeoutSec = 300,
+    [ValidateRange(1, 64)][int]$ClockDivisor = 1,
+    [switch]$Headless,
+    [switch]$RebuildLab,
+    [switch]$StopAfterReady,
+    [switch]$Stop
+)
+
+$ErrorActionPreference = 'Stop'
+
+if ($Stop) {
+    $procs = @(Get-Process -Name 'WiiCompiledLAN' -ErrorAction SilentlyContinue)
+    if ($procs.Count -gt 0) {
+        $procs | Stop-Process -Force
+        Write-Host "Stopped $($procs.Count) WiiCompiledLAN process(es)."
+    } else {
+        Write-Host 'No running WiiCompiledLAN processes found.'
+    }
+    return
+}
+
+# --- 1. Locate release directory ---
+function Resolve-ReleaseDir([string]$hint) {
+    $candidates = @()
+    if ($hint) { $candidates += $hint }
+    $candidates += $PSScriptRoot
+    $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+    $candidates += (Join-Path $repoRoot 'release-lan-win64')
+    foreach ($dir in $candidates) {
+        if ($dir -and (Test-Path -LiteralPath (Join-Path $dir 'WiiCompiledLAN.exe')) -and
+            (Test-Path -LiteralPath (Join-Path $dir 'DATA')) -and
+            (Test-Path -LiteralPath (Join-Path $dir 'wii_bootstrap'))) {
+            return (Resolve-Path -LiteralPath $dir).Path
+        }
+    }
+    throw "Could not find a WiiCompiled LAN Windows release (WiiCompiledLAN.exe + DATA + wii_bootstrap). Pass -Release <path>."
+}
+
+$Release = Resolve-ReleaseDir $Release
+if (-not $LabDir) { $LabDir = Join-Path $Release 'lab' }
+
+# Detect build capacity from build-inputs.txt (defaults to 12 for stock builds).
+$capacity = 12
+$buildInputs = Join-Path $Release 'build-inputs.txt'
+if (Test-Path -LiteralPath $buildInputs) {
+    $m = Select-String -LiteralPath $buildInputs -Pattern '^guest_layout_players=([0-9]+)$' | Select-Object -First 1
+    if ($m) { $capacity = [int]$m.Matches[0].Groups[1].Value }
+}
+if (-not $Peers) { $Peers = $capacity }
+if ($Count -gt $capacity) {
+    throw "$Release holds a $capacity-player build; it cannot host $Count instances. Rebuild with WIICOMPILED_LAN_PLAYERS=$Count or pass -Count <= $capacity."
+}
+if ($Peers -lt $Count) {
+    throw "-Peers $Peers must be at least -Count $Count."
+}
+
+# --- 2. Prepare / expand portable instance directories via NTFS hard links ---
+$dvdRoot = (Resolve-Path -LiteralPath (Join-Path $Release 'DATA')).Path -replace '\\', '/'
+$skipNames = @('portable.txt', 'VC_redist.x64.exe', 'make-lab.ps1', 'run-lab.ps1',
+               'watch-lab.ps1', 'start-lan-lobby.ps1', 'lan-lab.md')
+$sharedFiles = @(Get-ChildItem -LiteralPath $Release -File | Where-Object { $skipNames -notcontains $_.Name })
+
+function Remove-LabDirectory([string]$root) {
+    if (-not (Test-Path -LiteralPath $root)) { return }
+    foreach ($dir in (Get-ChildItem -LiteralPath $root -Directory)) {
+        foreach ($child in (Get-ChildItem -LiteralPath $dir.FullName -Force -ErrorAction SilentlyContinue)) {
+            if (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                [IO.Directory]::Delete($child.FullName)
+            }
+        }
+        Remove-Item -LiteralPath $dir.FullName -Recurse -Force
+    }
+    Remove-Item -LiteralPath $root -Recurse -Force
+}
+
+if ($RebuildLab -and (Test-Path -LiteralPath $LabDir)) {
+    Write-Host "Rebuilding lab directory $LabDir ..."
+    Remove-LabDirectory $LabDir
+}
+New-Item -ItemType Directory -Path $LabDir -Force | Out-Null
+
+$instanceDirs = @()
+for ($i = 1; $i -le $Count; $i++) {
+    $name = 'p{0:D2}' -f $i
+    $instDir = Join-Path $LabDir $name
+    $instanceDirs += $instDir
+
+    New-Item -ItemType Directory -Path (Join-Path $instDir 'UserData') -Force | Out-Null
+
+    foreach ($file in $sharedFiles) {
+        $dst = Join-Path $instDir $file.Name
+        if (-not (Test-Path -LiteralPath $dst)) {
+            New-Item -ItemType HardLink -Path $dst -Target $file.FullName | Out-Null
+        }
+    }
+    $bootLink = Join-Path $instDir 'wii_bootstrap'
+    if (-not (Test-Path -LiteralPath $bootLink)) {
+        New-Item -ItemType Junction -Path $bootLink -Target (Join-Path $Release 'wii_bootstrap') | Out-Null
+    }
+    $portablePath = Join-Path $instDir 'portable.txt'
+    if (-not (Test-Path -LiteralPath $portablePath)) {
+        Set-Content -LiteralPath $portablePath -Value '' -Encoding Ascii -NoNewline
+    }
+
+    $configPath = Join-Path $instDir 'UserData\Config.toml'
+    if ($RebuildLab -or -not (Test-Path -LiteralPath $configPath)) {
+        $col = ($i - 1) % $GridCols
+        $row = [math]::Floor(($i - 1) / $GridCols)
+        $x = $OriginX + $col * $CellWidth
+        $y = $OriginY + $row * $CellHeight
+        $cfg = @(
+            '[paths]'
+            ('dvd_root = "{0}"' -f $dvdRoot)
+            ''
+            '[video]'
+            'display_mode = "windowed"'
+            ('window_x = {0}' -f $x)
+            ('window_y = {0}' -f $y)
+            ('window_width = {0}' -f $CellWidth)
+            ('window_height = {0}' -f $CellHeight)
+        ) -join "`n"
+        Set-Content -LiteralPath $configPath -Value $cfg -Encoding Ascii -NoNewline
+    }
+}
+
+# --- 3. Seed license 0 (rksys.dat with RKPD header) once and distribute to unseeded instances ---
+$saveRelPath = 'UserData\NAND\title\00010004\524d4345\data\rksys.dat'
+
+function Test-HasLicenseZero([string]$rootDir) {
+    $saveFile = Join-Path $rootDir $saveRelPath
+    if (-not (Test-Path -LiteralPath $saveFile)) { return $false }
+    try {
+        $fs = [IO.File]::OpenRead($saveFile)
+        try {
+            if ($fs.Length -lt 12) { return $false }
+            $hdr = New-Object byte[] 12
+            $null = $fs.Read($hdr, 0, 12)
+            # Bytes 0x08..0x0B hold "RKPD" (0x52 0x4B 0x50 0x44) once license slot 0 is created.
+            return ($hdr[8] -eq 0x52 -and $hdr[9] -eq 0x4B -and $hdr[10] -eq 0x50 -and $hdr[11] -eq 0x44)
+        } finally {
+            $fs.Close()
+        }
+    } catch {
+        return $false
+    }
+}
+
+$seedNand = $null
+foreach ($probe in (@($instanceDirs[0], $Release) + $instanceDirs)) {
+    if (Test-HasLicenseZero $probe) {
+        $seedNand = Join-Path $probe 'UserData\NAND'
+        break
+    }
+}
+
+function Write-ScriptedPad([string]$path, [int]$buttons) {
+    $hi = [byte](($buttons -shr 8) -band 0xFF)
+    $lo = [byte]($buttons -band 0xFF)
+    [IO.File]::WriteAllBytes($path, [byte[]]@($hi, $lo, 0, 0, 0))
+}
+
+if (-not $seedNand) {
+    $seedDir = $instanceDirs[0]
+    $padPath = Join-Path $seedDir 'lan-profile-pad.bin'
+    Write-ScriptedPad $padPath 0
+    Write-Host "No license 0 found; creating license 0 once in $seedDir ..."
+    $prevPad = $env:WIICOMPILED_TEST_PAD_FILE
+    $env:WIICOMPILED_TEST_PAD_FILE = $padPath
+    $seedProc = Start-Process -FilePath (Join-Path $seedDir 'WiiCompiledLAN.exe') `
+        -ArgumentList '--headless' -WorkingDirectory $seedDir -PassThru
+    try {
+        $t0 = Get-Date
+        while (-not (Test-HasLicenseZero $seedDir)) {
+            if ($seedProc.HasExited) {
+                throw "License creation exited early with code $($seedProc.ExitCode); inspect $seedDir\UserData\Logs."
+            }
+            $elapsed = ((Get-Date) - $t0).TotalSeconds
+            if ($elapsed -gt 180) {
+                throw "Timed out waiting for license creation after 180 s; inspect $seedDir\UserData\Logs."
+            }
+            if ($elapsed -gt 8 -and ($elapsed % 3) -lt 0.35) {
+                Write-ScriptedPad $padPath 0x0100
+            } else {
+                Write-ScriptedPad $padPath 0
+            }
+            Start-Sleep -Milliseconds 100
+        }
+    } finally {
+        if (-not $seedProc.HasExited) { $seedProc.Kill() }
+        $seedProc.WaitForExit(5000) | Out-Null
+        Remove-Item -LiteralPath $padPath -Force -ErrorAction SilentlyContinue
+        if ($null -eq $prevPad) { Remove-Item Env:WIICOMPILED_TEST_PAD_FILE -ErrorAction SilentlyContinue }
+        else { $env:WIICOMPILED_TEST_PAD_FILE = $prevPad }
+    }
+    $seedNand = Join-Path $seedDir 'UserData\NAND'
+    Write-Host "License 0 created and ready."
+}
+
+$seededCount = 0
+foreach ($instDir in $instanceDirs) {
+    if (-not (Test-HasLicenseZero $instDir)) {
+        $dstNand = Join-Path $instDir 'UserData\NAND'
+        if (Test-Path -LiteralPath $dstNand) { Remove-Item -LiteralPath $dstNand -Recurse -Force }
+        Copy-Item -LiteralPath $seedNand -Destination $dstNand -Recurse
+        $seededCount++
+    }
+}
+if ($seededCount -gt 0) {
+    Write-Host "Seeded license 0 NAND into $seededCount instance(s)."
+}
+
+# --- 4. Bind UDP monitor on 127.0.0.254:27900 before launching ---
+$monitorAddr = [Net.IPAddress]::Parse('127.0.0.254')
+$monitorPort = 27900
+try {
+    $udp = New-Object Net.Sockets.UdpClient (New-Object Net.IPEndPoint ($monitorAddr, $monitorPort))
+    $udp.Client.ReceiveTimeout = 250
+    $udp.Client.ReceiveBufferSize = 2 * 1024 * 1024
+} catch {
+    throw "Cannot bind $monitorAddr`:$monitorPort - stop any running watch-lab.ps1 or harness first. ($($_.Exception.Message))"
+}
+
+function Read-Be32([byte[]]$buf, [int]$off) {
+    return ([uint32]$buf[$off] -shl 24) -bor ([uint32]$buf[$off + 1] -shl 16) `
+        -bor ([uint32]$buf[$off + 2] -shl 8) -bor [uint32]$buf[$off + 3]
+}
+
+function Get-PopCount([uint32]$v) {
+    $c = 0
+    while ($v -ne 0) {
+        $v = $v -band ($v - 1)
+        $c++
+    }
+    return $c
+}
+
+# --- 5. Configure shared Aurora pipeline cache & launch instances ---
+$prevSharedCache = $env:MKW_SHARED_CACHE_DIR
+$prevClockDiv = $env:MKW_TEST_CLOCK_DIVISOR
+if (-not $SharedCacheDir) {
+    $SharedCacheDir = if ($prevSharedCache) { $prevSharedCache } else { Join-Path $LabDir 'SharedCache' }
+}
+New-Item -ItemType Directory -Path $SharedCacheDir -Force | Out-Null
+$env:MKW_SHARED_CACHE_DIR = $SharedCacheDir
+if ($ClockDivisor -gt 1) {
+    $env:MKW_TEST_CLOCK_DIVISOR = "$ClockDivisor"
+} else {
+    Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue
+}
+
+$launched = @()
+$success = $false
+$startedAt = Get-Date
+
+try {
+    Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
+        $Count, $Release, $capacity, $(if ($Headless) { 'headless' } else { 'windowed' }), $SharedCacheDir)
+
+    for ($i = 1; $i -le $Count; $i++) {
+        $instDir = $instanceDirs[$i - 1]
+        $argsList = @()
+        if ($Headless) { $argsList += '--headless' }
+        $argsList += '--lan-local'
+        $argsList += "--lan-id=$i"
+        $argsList += "--lan-peers=$Peers"
+        if ($i -eq 1) { $argsList += '--lan-host' } else { $argsList += '--lan-join' }
+
+        if ($i -gt 1 -and $Gap -gt 0) {
+            Start-Sleep -Milliseconds ([int]($Gap * 1000))
+        }
+        $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
+            -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
+        $launched += [pscustomobject]@{ Id = $i; Process = $proc; Directory = $instDir }
+    }
+
+    # --- 6. Monitor UDP telemetry until all Count instances are in the lobby ---
+    $roomStatus = @{}
+    $sdkStatus = @{}
+    $inLobbySince = $null
+    $lastPrint = Get-Date
+    $remoteEp = New-Object Net.IPEndPoint ([Net.IPAddress]::Any, 0)
+
+    while ($true) {
+        $elapsed = ((Get-Date) - $startedAt).TotalSeconds
+        if ($elapsed -gt $TimeoutSec) {
+            throw "Timed out after $TimeoutSec s waiting for all $Count instances to connect into the LAN lobby."
+        }
+
+        foreach ($entry in $launched) {
+            if ($entry.Process.HasExited) {
+                throw "Instance $($entry.Id) (PID $($entry.Process.Id)) exited unexpectedly with code $($entry.Process.ExitCode); check $($entry.Directory)\UserData\Logs."
+            }
+        }
+
+        # Drain available telemetry packets for up to 250ms.
+        while ($udp.Available -gt 0) {
+            $pkt = $udp.Receive([ref]$remoteEp)
+            if ($pkt.Length -ne 28 -and $pkt.Length -ne 40) { continue }
+            $magic = Read-Be32 $pkt 0
+            $id = [int](Read-Be32 $pkt 4)
+            if ($id -lt 1 -or $id -gt $Count) { continue }
+            $now = Get-Date
+
+            if ($magic -eq 0x4D4B574C -and $pkt.Length -eq 28) {
+                $state = [int](Read-Be32 $pkt 8)
+                $players = [int](Read-Be32 $pkt 12)
+                $section = [int](Read-Be32 $pkt 16)
+                $page = [int](Read-Be32 $pkt 20)
+                $trans = [int](Read-Be32 $pkt 24)
+                $roomStatus[$id] = [pscustomobject]@{
+                    State = $state; Players = $players; Section = $section
+                    Page = $page; Transition = $trans; SeenAt = $now
+                }
+                if ($page -eq 0x4D -and $trans -eq 4) {
+                    throw "Instance $id reached a network error dialog (page 0x4D); inspect $($launched[$id - 1].Directory)\UserData\Logs."
+                }
+            } elseif ($magic -eq 0x4D4B574E) {
+                $role = [int](Read-Be32 $pkt 8)
+                $matchState = [int](Read-Be32 $pkt 12)
+                $sdkPlayers = [int](Read-Be32 $pkt 16)
+                $w0 = Read-Be32 $pkt 20
+                $suspended = [int](Read-Be32 $pkt 24)
+                $connCount = Get-PopCount $w0
+                $maskKey = ('{0:X8}' -f $w0)
+                if ($pkt.Length -eq 40) {
+                    $w1 = Read-Be32 $pkt 28
+                    $w2 = Read-Be32 $pkt 32
+                    $w3 = Read-Be32 $pkt 36
+                    $connCount += (Get-PopCount $w1) + (Get-PopCount $w2) + (Get-PopCount $w3)
+                    $maskKey = ('{0:X8}.{1:X8}.{2:X8}.{3:X8}' -f $w3, $w2, $w1, $w0)
+                }
+                $sdkStatus[$id] = [pscustomobject]@{
+                    Role = $role; MatchState = $matchState; Players = $sdkPlayers
+                    ConnectedCount = $connCount; MaskKey = $maskKey
+                    Suspended = $suspended; SeenAt = $now
+                }
+            }
+        }
+
+        $now = Get-Date
+        $inLobby = 0
+        $sdkReady = 0
+        $hostMask = if ($sdkStatus.ContainsKey(1)) { $sdkStatus[1].MaskKey } else { '' }
+        for ($i = 1; $i -le $Count; $i++) {
+            if ($roomStatus.ContainsKey($i)) {
+                $r = $roomStatus[$i]
+                $expectedState = if ($i -eq 1) { 3 } else { 4 }
+                if (($now - $r.SeenAt).TotalSeconds -lt 30 -and
+                    $r.State -eq $expectedState -and $r.Players -eq $Count -and
+                    $r.Page -eq 0x9D -and $r.Transition -eq 4) {
+                    $inLobby++
+                }
+            }
+            if ($sdkStatus.ContainsKey($i)) {
+                $s = $sdkStatus[$i]
+                $expectedRole = if ($i -eq 1) { 2 } else { 1 }
+                $expectedMatch = if ($i -eq 1) { 12 } else { 1 }
+                if (($now - $s.SeenAt).TotalSeconds -lt 30 -and
+                    $s.Role -eq $expectedRole -and $s.MatchState -eq $expectedMatch -and
+                    $s.Players -eq $Count -and $s.ConnectedCount -eq $Count -and
+                    $s.Suspended -eq 0 -and $s.MaskKey -eq $hostMask) {
+                    $sdkReady++
+                }
+            }
+        }
+
+        if ($inLobby -eq $Count) {
+            if ($null -eq $inLobbySince) { $inLobbySince = $now }
+        } else {
+            $inLobbySince = $null
+        }
+
+        $hasSdkTelemetry = ($sdkStatus.Count -gt 0)
+        $readyNow = if ($hasSdkTelemetry) {
+            ($inLobby -eq $Count -and $sdkReady -eq $Count)
+        } else {
+            ($null -ne $inLobbySince -and ($now - $inLobbySince).TotalSeconds -ge 5.0)
+        }
+
+        if ($readyNow) {
+            $success = $true
+            $totalSec = [math]::Round(((Get-Date) - $startedAt).TotalSeconds, 2)
+            $detail = if ($hasSdkTelemetry) { 'page 0x9D, full SDK mesh/Star' } else { 'page 0x9D, held 5s' }
+            Write-Host ''
+            Write-Host ("READY: All {0}/{0} instances are connected in the LAN lobby ({1}) in {2}s." -f $Count, $detail, $totalSec)
+            $launched | Select-Object Id, @{N='PID';E={$_.Process.Id}}, Directory | Format-Table -AutoSize
+            break
+        }
+
+        if (($now - $lastPrint).TotalSeconds -ge 2.0) {
+            $lastPrint = $now
+            Write-Host ("[{0,5:F1}s] reporting={1}/{2}  in-lobby={3}/{2}  sdk-connected={4}/{2}" -f `
+                $elapsed, $roomStatus.Count, $Count, $inLobby, $sdkReady)
+        }
+
+        Start-Sleep -Milliseconds 100
+    }
+} finally {
+    $udp.Close()
+    if ($null -eq $prevSharedCache) { Remove-Item Env:MKW_SHARED_CACHE_DIR -ErrorAction SilentlyContinue }
+    else { $env:MKW_SHARED_CACHE_DIR = $prevSharedCache }
+    if ($null -eq $prevClockDiv) { Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue }
+    else { $env:MKW_TEST_CLOCK_DIVISOR = $prevClockDiv }
+
+    if (-not $success -or $StopAfterReady) {
+        foreach ($entry in $launched) {
+            if ($entry.Process -and -not $entry.Process.HasExited) {
+                $entry.Process.Kill()
+            }
+        }
+        if ($StopAfterReady -and $success) {
+            Write-Host "Stopped all $Count instances (-StopAfterReady)."
+        }
+    } else {
+        Write-Host "Lobby is live and ready to play! Stop all instances later with:"
+        Write-Host "  .\start-lan-lobby.ps1 -Stop"
+    }
+}

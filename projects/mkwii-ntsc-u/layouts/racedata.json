@@ -42418,6 +42418,15 @@
       "Scale": 1
     },
     {
+      "Instruction": "0x805252F0",
+      "ExpectedWord": "0x386300F8",
+      "Node": 0,
+      "Operand": "right",
+      "Symbol": "MiiManager.playerDatabases.offset",
+      "Addend": 0,
+      "Scale": 1
+    },
+    {
       "Instruction": "0x805220F8",
       "ExpectedWord": "0x38630068",
       "Node": 0,

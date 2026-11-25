@@ -1036,3 +1036,99 @@ extern "C" void CtrlRaceNameBalloon_OnUpdate_HighCountOpt(CpuContext* ctx) {
 }
 REGISTER_NATIVE_WRAPPER_AS(0x807F06E8, CtrlRaceNameBalloon_OnUpdate_HighCountOpt,
                            "CtrlRaceNameBalloon_OnUpdate_HighCountOpt");
+
+// ---------------------------------------------------------------------------
+// 11. MiiManager::UpdateNetMiddleDB (PAL 0x80529748 / USA 0x805252D4)
+// ---------------------------------------------------------------------------
+// Fix missed layout patch at USA 0x805252F0 (addi r3, r3, 248): when
+// playerCapacity > 12, MiiManager.playerDatabases shifts from offset 248 to
+// 200 + playerCapacity * 4 (296 for 24p, 712 for 128p). Without this fix,
+// AIDs 0..1 are rejected and all other AIDs are shifted by -2 slots, leaving
+// the top AIDs' Mii faces and names blank.
+extern "C" void MiiManager_UpdateNetMiddleDB_Expanded(CpuContext* ctx) {
+    const uint32_t miiMgr = ctx->gpr[3];
+    const uint32_t aid = ctx->gpr[5];
+    const uint32_t playerDbOffset = 200u + MkwGuestLayout::kLayout.playerCapacity * 4u;
+    ctx->gpr[3] = miiMgr + playerDbOffset + aid * 24u;
+    MKW_GUEST_FUNC(800CC550)(ctx); // RFLUpdateMiddleDB (USA 0x800CC4B0 / PAL 0x800CC550)
+    const int32_t err = static_cast<int32_t>(ctx->gpr[3]);
+    ctx->gpr[3] = (err == 0 || err == 10) ? 1u : 0u;
+}
+REGISTER_NATIVE_REPLACEMENT_AS(0x80529748, MiiManager_UpdateNetMiddleDB_Expanded,
+                               "MiiManager_UpdateNetMiddleDB_Expanded");
+
+// ---------------------------------------------------------------------------
+// 12. Propagate active license name ("Player #") onto Guest Mii #0 locally
+//     (Mii::Load, PAL 0x80526020 / USA 0x80521BAC) and over LAN USER packets
+//     (mkw_form_user_record, PAL 0x8066300C / USA 0x80660F28).
+// ---------------------------------------------------------------------------
+namespace {
+bool ReadActiveLicenseNameUtf16Be(std::array<uint16_t, 10>& outChars) {
+    outChars.fill(0u);
+    const uint32_t mgr = Memory::Read32(MKW_GADDR(809BD748)); // SaveDataManager::sInstance
+    if (!mgr) {
+        return false;
+    }
+    const uint32_t raw = Memory::Read32(mgr + 20u);
+    if (!raw || Memory::Read32(raw + 8u) != 0x524B5044u) { // 'RKPD' slot 0
+        return false;
+    }
+    const uint16_t first = Memory::Read16(raw + 0x1Cu);
+    if (first == 0u) {
+        return false;
+    }
+    for (uint32_t i = 0; i < 10u; ++i) {
+        outChars[i] = Memory::Read16(raw + 0x1Cu + i * 2u);
+    }
+    return true;
+}
+} // namespace
+
+extern "C" void MkwFormUserRecord_LicenseName(CpuContext* ctx) {
+    const uint32_t userRecord = ctx->gpr[3];
+    MKW_GUEST_NEXT(8066300C)(ctx);
+    if (!userRecord) {
+        return;
+    }
+    std::array<uint16_t, 10> nameChars{};
+    if (!ReadActiveLicenseNameUtf16Be(nameChars)) {
+        return;
+    }
+    const uint32_t storeData = userRecord + 0x10u;
+    // Only stamp if the embedded RFLStoreData is non-empty.
+    if (Memory::Read32(storeData) == 0u && Memory::Read32(storeData + 4u) == 0u) {
+        return;
+    }
+    for (uint32_t i = 0; i < 10u; ++i) {
+        Memory::Write16(storeData + 2u + i * 2u, nameChars[i]);
+    }
+    // Recompute RFLStoreData 2-byte big-endian CRC-16 at +0x4A via RFLiCalculateCRC.
+    Memory::Write16(storeData + 0x4Au, 0u);
+    CpuContext sub = *ctx;
+    sub.gpr[3] = storeData;
+    sub.gpr[4] = 76u;
+    MKW_GUEST_FUNC(800C78D0)(&sub); // RFLiCalculateCRC (USA 0x800C7830 / PAL 0x800C78D0)
+    Memory::Write16(storeData + 0x4Au, static_cast<uint16_t>(sub.gpr[3] & 0xFFFFu));
+}
+REGISTER_NATIVE_WRAPPER_AS(0x8066300C, MkwFormUserRecord_LicenseName,
+                           "MkwFormUserRecord_LicenseName");
+
+extern "C" void Mii_Load_LicenseName(CpuContext* ctx) {
+    const uint32_t mii = ctx->gpr[3];
+    MKW_GUEST_NEXT(80526020)(ctx);
+    if (!mii) {
+        return;
+    }
+    // Only override Guest Mii (type == 3, loaded == 1) so custom RFL_DB Miis keep their own names.
+    if (Memory::Read32(mii + 4u) == 3u && Memory::Read8(mii + 0xA4u) == 1u) {
+        std::array<uint16_t, 10> nameChars{};
+        if (ReadActiveLicenseNameUtf16Be(nameChars)) {
+            for (uint32_t i = 0; i < 10u; ++i) {
+                Memory::Write16(mii + 0x68u + i * 2u, nameChars[i]);
+            }
+            Memory::Write16(mii + 0x68u + 20u, 0u);
+        }
+    }
+}
+REGISTER_NATIVE_WRAPPER_AS(0x80526020, Mii_Load_LicenseName,
+                           "Mii_Load_LicenseName");

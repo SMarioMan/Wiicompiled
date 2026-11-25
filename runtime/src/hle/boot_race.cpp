@@ -95,8 +95,9 @@ std::optional<uint32_t> g_players;
 std::optional<uint32_t> g_laps;
 
 bool OnlineScenario(uint32_t scenario) {
+    // 7=PRIVATE_VS, 8=PUBLIC_VS, 9=PUBLIC_BATTLE, 10=PRIVATE_BATTLE (LAN/Friend Room Battle).
     const auto mode=Memory::Read32(scenario+kLayout.scenarioSettings+8);
-    return mode>=6 && mode<=9;
+    return mode>=6 && mode<=10;
 }
 
 // The original Kart::Link::GetPlayerIdx follows these two pointers. Read the

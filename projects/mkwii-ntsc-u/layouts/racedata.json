@@ -56874,6 +56874,34 @@
       "Symbol": "SectionParams.online.offset+OnlineParams.regionIds.offset"
     },
     {
+      "Instruction": "0x8061E7A0",
+      "ExpectedWord": "0x906402E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.teams.offset"
+    },
+    {
+      "Instruction": "0x8061E7B0",
+      "ExpectedWord": "0x800302E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.teams.offset"
+    },
+    {
+      "Instruction": "0x8061E7E8",
+      "ExpectedWord": "0x906402E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.teams.offset"
+    },
+    {
+      "Instruction": "0x8061E800",
+      "ExpectedWord": "0x800302E4",
+      "Node": 0,
+      "Operand": "offset",
+      "Symbol": "SectionParams.online.offset+OnlineParams.teams.offset"
+    },
+    {
       "Instruction": "0x805C5CA4",
       "ExpectedWord": "0x800709E0",
       "Node": 0,

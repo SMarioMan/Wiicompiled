@@ -1,6 +1,7 @@
 #include "abi_bridge.h"
 #include "guest_abi/guest_region.h"
 #include "guest_function_imports.h"
+#include "lan_runtime.h"
 #include "memory.h"
 #include "mkw_guest_layout.h"
 
@@ -8,6 +9,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -1065,22 +1067,40 @@ REGISTER_NATIVE_REPLACEMENT_AS(0x80529748, MiiManager_UpdateNetMiddleDB_Expanded
 namespace {
 bool ReadActiveLicenseNameUtf16Be(std::array<uint16_t, 10>& outChars) {
     outChars.fill(0u);
-    const uint32_t mgr = Memory::Read32(MKW_GADDR(809BD748)); // SaveDataManager::sInstance
-    if (!mgr) {
-        return false;
+    uint32_t mgr = 0u;
+    if (Memory::TryRead32(MKW_GADDR(809BD748), mgr) && mgr != 0u) {
+        // SaveDataManager::rawRksys lives at +0x24FFC (131072 + 20476), pointing to
+        // the raw rksys.dat buffer ('RKSD' +0x00, License 0 'RKPD' +0x08, UTF-16BE
+        // Mii/license name at +0x1C..+0x2F).
+        uint32_t raw = 0u;
+        uint32_t magic = 0u;
+        if (Memory::TryRead32(mgr + 0x24FFCu, raw) && raw != 0u &&
+            Memory::TryRead32(raw + 8u, magic) && magic == 0x524B5044u &&
+            Memory::Contains(raw + 0x1Cu, 20u) &&
+            Memory::Read16(raw + 0x1Cu) != 0u) {
+            for (uint32_t i = 0; i < 10u; ++i) {
+                outChars[i] = Memory::Read16(raw + 0x1Cu + i * 2u);
+            }
+            return true;
+        }
     }
-    const uint32_t raw = Memory::Read32(mgr + 20u);
-    if (!raw || Memory::Read32(raw + 8u) != 0x524B5044u) { // 'RKPD' slot 0
-        return false;
+    // Fallback for LAN instances before SaveDataManager finishes loading or without
+    // a pre-renamed rksys.dat: format "Player <instance>" (up to 10 UTF-16BE chars).
+    const uint32_t lanInst = LanRuntime::Settings().instance;
+    if (lanInst > 0u) {
+        char buf[16]{};
+        const int n = std::snprintf(buf, sizeof(buf), "Player %u", lanInst);
+        const char* src = buf;
+        int len = n;
+        if (len > 10) {
+            len = std::snprintf(buf, sizeof(buf), "P%u", lanInst);
+        }
+        for (int i = 0; i < len && i < 10; ++i) {
+            outChars[static_cast<size_t>(i)] = static_cast<uint16_t>(static_cast<unsigned char>(src[i]));
+        }
+        return len > 0;
     }
-    const uint16_t first = Memory::Read16(raw + 0x1Cu);
-    if (first == 0u) {
-        return false;
-    }
-    for (uint32_t i = 0; i < 10u; ++i) {
-        outChars[i] = Memory::Read16(raw + 0x1Cu + i * 2u);
-    }
-    return true;
+    return false;
 }
 } // namespace
 

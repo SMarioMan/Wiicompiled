@@ -328,8 +328,11 @@ if ($seededCount -gt 0) {
     Write-Host "Seeded license 0 NAND into $seededCount instance(s)."
 }
 
-# Ensure each instance's License 0 Mii name in rksys.dat is "Player N" (UTF-16BE at 0x1C..0x2F)
-# with a valid big-endian CRC32 at 0x27FFC so player labels show player numbers everywhere.
+# Generate a unique default Mii (RFL_DB.dat) and link License 0 (rksys.dat) for each
+# instance, cycling through:
+#   12 favorite colors (0..11) -> 2 genders (Male/Female) -> 3 MKW Mii sizes (Small/Medium/Large)
+# with UTF-16BE name "Player N" so every player has a distinct Mii, shirt color,
+# gender, weight class, and "Player #" label natively across all menus and races.
 if (-not ('MkwRksysCrc' -as [type])) {
     Add-Type -TypeDefinition @'
 public static class MkwRksysCrc {
@@ -343,27 +346,116 @@ public static class MkwRksysCrc {
         }
         return ~crc;
     }
+
+    public static ushort ComputeRflCrc16(byte[] data, int len) {
+        uint crc = 0u;
+        for (int i = 0; i < len; i++) {
+            crc ^= (uint)data[i] << 8;
+            for (int k = 0; k < 8; k++) {
+                crc = (crc & 0x8000u) != 0 ? ((crc << 1) ^ 0x1021u) & 0xFFFFu : (crc << 1) & 0xFFFFu;
+            }
+        }
+        return (ushort)crc;
+    }
 }
 '@
 }
 
+# Standard Wii RFLCharData facial feature bytes (offsets 0x20..0x35, 22 bytes):
+# Default Male (hair=33 brown, eye=2) and Default Female (hair=12 brown, eye=4).
+$defaultMaleFace = [byte[]]@(
+    0x00, 0x00, 0x42, 0x40, 0x01, 0x80, 0x28, 0xA2, 0x08, 0x8C, 0x08, 0x40,
+    0x14, 0x48, 0xB8, 0x8D, 0x00, 0x8A, 0x00, 0x8A, 0x25, 0x04
+)
+$defaultFemaleFace = [byte[]]@(
+    0x00, 0x00, 0x18, 0x40, 0x01, 0x80, 0x28, 0xA2, 0x10, 0x8C, 0x08, 0x40,
+    0x14, 0x48, 0xB8, 0x8D, 0x00, 0x8A, 0x00, 0x8A, 0x25, 0x04
+)
+# MKW Mii size thresholds (Mii::Load 0x80521BAC): Small (weight <= 104-height),
+# Medium (between), Large (weight >= 150-height).
+$miiSizeTable = @(
+    @{ Height = [byte]32; Weight = [byte]32 }, # Small (Light)
+    @{ Height = [byte]64; Weight = [byte]64 }, # Medium
+    @{ Height = [byte]96; Weight = [byte]96 }  # Large (Heavy)
+)
+
 $renamedCount = 0
+$miiDbCount = 0
 for ($i = 1; $i -le $Count; $i++) {
-    $saveFile = Join-Path $instanceDirs[$i - 1] $saveRelPath
-    if (-not (Test-Path -LiteralPath $saveFile)) { continue }
-    $bytes = [IO.File]::ReadAllBytes($saveFile)
-    if ($bytes.Length -lt 0x28000) { continue }
+    $idx = $i - 1
+    $color = $idx % 12
+    $gender = [int]([math]::Floor($idx / 12)) % 2
+    $sizeClass = [int]([math]::Floor($idx / 24)) % 3
+    $dims = $miiSizeTable[$sizeClass]
+
     $desiredName = "Player $i"
     if ($desiredName.Length -gt 10) { $desiredName = "P$i" }
     $nameBytes = New-Object byte[] 20
     $encoded = [Text.Encoding]::BigEndianUnicode.GetBytes($desiredName)
     [Array]::Copy($encoded, 0, $nameBytes, 0, [Math]::Min(20, $encoded.Length))
+
+    # Unique normal-Mii RFLCreateID (8 bytes: 4-byte Mii ID with normal bit 0x80 + 4-byte System ID).
+    $miiCreateId = [byte[]]@(0x80, 0x00, 0x00, [byte]($i -band 0xFF), 0x4D, 0x4B, 0x57, 0x00)
+
+    # 1. Build 74-byte RFLCharData and write UserData\NAND\shared2\menu\FaceLib\RFL_DB.dat
+    $charData = New-Object byte[] 74
+    $charData[0x00] = [byte]($gender -shl 6)
+    $charData[0x01] = [byte](($color -band 0x0F) -shl 1)
+    [Array]::Copy($nameBytes, 0, $charData, 0x02, 20)
+    $charData[0x16] = $dims.Height
+    $charData[0x17] = $dims.Weight
+    [Array]::Copy($miiCreateId, 0, $charData, 0x18, 8)
+    $faceBytes = if ($gender -eq 1) { $defaultFemaleFace } else { $defaultMaleFace }
+    [Array]::Copy($faceBytes, 0, $charData, 0x20, 22)
+
+    $rflDir = Join-Path $instanceDirs[$i - 1] 'UserData\NAND\shared2\menu\FaceLib'
+    $rflFile = Join-Path $rflDir 'RFL_DB.dat'
+    $writeRfl = $true
+    if (Test-Path -LiteralPath $rflFile) {
+        $existingRfl = [IO.File]::ReadAllBytes($rflFile)
+        if ($existingRfl.Length -eq 0x1F1E0) {
+            $same = $true
+            for ($k = 0; $k -lt 74; $k++) {
+                if ($existingRfl[4 + $k] -ne $charData[$k]) { $same = $false; break }
+            }
+            if ($same) { $writeRfl = $false }
+        }
+    }
+    if ($writeRfl) {
+        if (-not (Test-Path -LiteralPath $rflDir)) {
+            New-Item -ItemType Directory -Path $rflDir -Force | Out-Null
+        }
+        $rflDb = New-Object byte[] 0x1F1E0
+        # Official DB header 'RNOD' at 0x0000
+        $rflDb[0] = 0x52; $rflDb[1] = 0x4E; $rflDb[2] = 0x4F; $rflDb[3] = 0x44
+        [Array]::Copy($charData, 0, $rflDb, 4, 74)
+        # Hidden/Parade DB header 'RNHD' at 0x1D00
+        $rflDb[0x1D00] = 0x52; $rflDb[0x1D01] = 0x4E; $rflDb[0x1D02] = 0x48; $rflDb[0x1D03] = 0x44
+        # CRC-16/CCITT at 0x1F1DE..0x1F1DF
+        $rflCrc = [MkwRksysCrc]::ComputeRflCrc16($rflDb, 0x1F1DE)
+        $rflDb[0x1F1DE] = [byte](($rflCrc -shr 8) -band 0xFF)
+        $rflDb[0x1F1DF] = [byte]($rflCrc -band 0xFF)
+        [IO.File]::WriteAllBytes($rflFile, $rflDb)
+        $miiDbCount++
+    }
+
+    # 2. Update License 0 name (0x1C..0x2F) and Mii CreateID (0x30..0x37) in rksys.dat
+    $saveFile = Join-Path $instanceDirs[$i - 1] $saveRelPath
+    if (-not (Test-Path -LiteralPath $saveFile)) { continue }
+    $bytes = [IO.File]::ReadAllBytes($saveFile)
+    if ($bytes.Length -lt 0x28000) { continue }
     $matches = $true
     for ($k = 0; $k -lt 20; $k++) {
         if ($bytes[0x1C + $k] -ne $nameBytes[$k]) { $matches = $false; break }
     }
+    if ($matches) {
+        for ($k = 0; $k -lt 8; $k++) {
+            if ($bytes[0x30 + $k] -ne $miiCreateId[$k]) { $matches = $false; break }
+        }
+    }
     if (-not $matches) {
         [Array]::Copy($nameBytes, 0, $bytes, 0x1C, 20)
+        [Array]::Copy($miiCreateId, 0, $bytes, 0x30, 8)
         $crc = [MkwRksysCrc]::Compute($bytes, 0x27FFC)
         $bytes[0x27FFC] = [byte](($crc -shr 24) -band 0xFF)
         $bytes[0x27FFD] = [byte](($crc -shr 16) -band 0xFF)
@@ -373,8 +465,8 @@ for ($i = 1; $i -le $Count; $i++) {
         $renamedCount++
     }
 }
-if ($renamedCount -gt 0) {
-    Write-Host "Set unique 'Player N' license names in $renamedCount instance(s)."
+if ($miiDbCount -gt 0 -or $renamedCount -gt 0) {
+    Write-Host "Prepared unique default Miis (12 colors x 2 genders x 3 sizes): $miiDbCount RFL_DB.dat, $renamedCount rksys.dat updated."
 }
 
 # --- 4. Bind UDP monitor on 127.0.0.254:27900 before launching ---

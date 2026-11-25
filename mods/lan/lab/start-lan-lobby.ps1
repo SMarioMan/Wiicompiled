@@ -544,18 +544,34 @@ if (-not $Headless -and -not $SingleGpu -and $effectiveApiGlobal -eq 'vulkan' -a
                     }
                 }
             }
-            # Sort largest free VRAM first and pin all Vulkan instances to the primary high-VRAM GPU
-            # (keeps all instances on the fastest GPU, e.g. RTX 5080, avoiding slower secondary GPU bottlenecks).
+            # Sort largest free VRAM first. Pin all Vulkan instances to the primary
+            # high-VRAM GPU (e.g. RTX 5080) up to 48 instances (NVIDIA Windows Vulkan
+            # hits a hard ~54 simultaneous VkDevice limit per GPU and crashes in
+            # vulkan-1.dll at instance #55+). For >48 instances, overflow onto
+            # secondary GPUs (up to 48 per GPU) so 64+ player lobbies launch cleanly.
+            $maxPerVkGpu = 48
             $sortedGpus = @($vkGpus | Sort-Object -Property FreeMiB -Descending)
-            $bestGpu = $sortedGpus[0]
+            $gpuCounts = @{}
             for ($k = 0; $k -lt $Count; $k++) {
-                $gpuSchedule += $bestGpu.VkIndex
+                $slotGpuIdx = [math]::Min([int][math]::Floor($k / $maxPerVkGpu), $sortedGpus.Count - 1)
+                $chosen = $sortedGpus[$slotGpuIdx]
+                $gpuSchedule += $chosen.VkIndex
+                if (-not $gpuCounts.ContainsKey($chosen.VkIndex)) { $gpuCounts[$chosen.VkIndex] = 0 }
+                $gpuCounts[$chosen.VkIndex]++
             }
             $useVkGpuLayer = $true
             $env:VK_ADD_LAYER_PATH = $Release
             $env:VK_INSTANCE_LAYERS = if ($prevVkLayers) { "$prevVkLayers;VK_LAYER_MKW_gpu_select" } else { 'VK_LAYER_MKW_gpu_select' }
-            Write-Host ("Vulkan GPU selected: GPU{0}={1} (all {2} inst, {3} MiB free)" -f `
-                $bestGpu.VkIndex, $bestGpu.Name, $Count, $bestGpu.FreeMiB)
+            $summaryParts = @()
+            foreach ($g in $sortedGpus) {
+                if ($gpuCounts.ContainsKey($g.VkIndex)) {
+                    $summaryParts += ("GPU{0}={1} ({2} inst, {3} MiB free)" -f $g.VkIndex, $g.Name, $gpuCounts[$g.VkIndex], $g.FreeMiB)
+                }
+            }
+            Write-Host ("Vulkan GPU schedule: {0}" -f ($summaryParts -join '; '))
+            if ($Count -gt ($maxPerVkGpu * $sortedGpus.Count)) {
+                Write-Warning ("Count={0} exceeds {1} Vulkan instances across {2} GPU(s); NVIDIA Vulkan caps at ~54 VkDevices/GPU. Consider -GraphicsApi d3d12 for 96+ visible instances." -f $Count, ($maxPerVkGpu * $sortedGpus.Count), $sortedGpus.Count)
+            }
         }
     } catch {} finally {
         $ErrorActionPreference = $prevEap
@@ -591,7 +607,9 @@ try {
     Write-Host ("Starting {0} instance(s) from {1} (capacity {2}, {3}, SharedCache={4})..." -f `
         $Count, $Release, $capacity, $modeLabel, $SharedCacheDir)
 
-    $effectiveGap = if ($PSBoundParameters.ContainsKey('Gap')) { $Gap } elseif ($Count -ge 32) { 0.05 } else { $Gap }
+    # For >=48 visible instances, stagger client launches by 0.5s so late clients
+    # do not sit behind a >60s serial DWC host join queue and hit error page 0x4D.
+    $effectiveGap = if ($PSBoundParameters.ContainsKey('Gap')) { $Gap } elseif ($Count -ge 48) { 0.5 } elseif ($Count -ge 32) { 0.05 } else { $Gap }
     if (-not $Headless -and $Count -ge 48) {
         $env:MKW_HIGH_COUNT = '1'
     } else {
@@ -608,10 +626,27 @@ try {
         Remove-Item Env:MKW_OPT_KART_CULL -ErrorAction SilentlyContinue
     }
 
+    $seenGpuWriter = @{}
     for ($i = 1; $i -le $Count; $i++) {
         $instDir = $instanceDirs[$i - 1]
         if ($useVkGpuLayer) {
-            $env:MKW_VK_GPU_INDEX = "$($gpuSchedule[$i - 1])"
+            $gpuIdx = $gpuSchedule[$i - 1]
+            $env:MKW_VK_GPU_INDEX = "$gpuIdx"
+            if ($gpuCounts.Count -gt 1) {
+                # Keep one Dawn SQLite cache per GPU architecture; let the first instance
+                # on each GPU populate it read-write and subsequent ones open read-only.
+                $gpuCacheDir = if ($gpuIdx -eq $gpuSchedule[0]) { $SharedCacheDir } else { "${SharedCacheDir}_gpu$gpuIdx" }
+                if (-not (Test-Path -LiteralPath $gpuCacheDir)) {
+                    New-Item -ItemType Directory -Path $gpuCacheDir -Force | Out-Null
+                }
+                $env:MKW_SHARED_CACHE_DIR = $gpuCacheDir
+                if (-not $seenGpuWriter.ContainsKey($gpuIdx)) {
+                    $seenGpuWriter[$gpuIdx] = $true
+                    $env:MKW_SHARED_CACHE_READONLY = '0'
+                } else {
+                    $env:MKW_SHARED_CACHE_READONLY = '1'
+                }
+            }
         }
         $argsList = @()
         if ($Headless) { $argsList += '--headless' }
@@ -630,8 +665,16 @@ try {
         if ($i -gt 1 -and $effectiveGap -gt 0) {
             Start-Sleep -Milliseconds ([int]($effectiveGap * 1000))
         }
+        # Redirect stdout/stderr to per-instance files so 48-128 concurrent processes
+        # never serialize on the shared Windows Terminal ConPTY pipe.
+        $instLogDir = Join-Path $instDir 'UserData\Logs'
+        if (-not (Test-Path -LiteralPath $instLogDir)) {
+            New-Item -ItemType Directory -Path $instLogDir -Force | Out-Null
+        }
         $proc = Start-Process -FilePath (Join-Path $instDir 'WiiCompiledLAN.exe') `
-            -ArgumentList $argsList -WorkingDirectory $instDir -PassThru
+            -ArgumentList $argsList -WorkingDirectory $instDir -NoNewWindow `
+            -RedirectStandardOutput (Join-Path $instLogDir 'launch_stdout.log') `
+            -RedirectStandardError (Join-Path $instLogDir 'launch_stderr.log') -PassThru
         # Temporarily bump host p01 during lobby join only; all instances are normalized
         # to Normal priority as soon as the lobby is ready so gameplay has 100% parity.
         if ($Count -ge 16 -and $i -eq 1) {
@@ -793,6 +836,7 @@ try {
     }
 } finally {
     $udp.Close()
+    Remove-Item Env:MKW_SHARED_CACHE_READONLY -ErrorAction SilentlyContinue
     if ($null -eq $prevSharedCache) { Remove-Item Env:MKW_SHARED_CACHE_DIR -ErrorAction SilentlyContinue }
     else { $env:MKW_SHARED_CACHE_DIR = $prevSharedCache }
     if ($null -eq $prevClockDiv) { Remove-Item Env:MKW_TEST_CLOCK_DIVISOR -ErrorAction SilentlyContinue }

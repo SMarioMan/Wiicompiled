@@ -1463,12 +1463,18 @@ int RuntimeMain(int argc, char** argv) {
 #if defined(_WIN32)
             _putenv_s("MKW_MULTI_INSTANCE", "1");
             if (LanRuntime::Settings().instance > 1) {
-                _putenv_s("MKW_SHARED_CACHE_READONLY", "1");
+                const char* existingRo = std::getenv("MKW_SHARED_CACHE_READONLY");
+                if (existingRo == nullptr || existingRo[0] == '\0') {
+                    _putenv_s("MKW_SHARED_CACHE_READONLY", "1");
+                }
             }
 #else
             setenv("MKW_MULTI_INSTANCE", "1", 1);
             if (LanRuntime::Settings().instance > 1) {
-                setenv("MKW_SHARED_CACHE_READONLY", "1", 1);
+                const char* existingRo = std::getenv("MKW_SHARED_CACHE_READONLY");
+                if (existingRo == nullptr || existingRo[0] == '\0') {
+                    setenv("MKW_SHARED_CACHE_READONLY", "1", 1);
+                }
             }
 #endif
         }
